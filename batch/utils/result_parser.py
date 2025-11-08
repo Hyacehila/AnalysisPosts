@@ -3,11 +3,13 @@
 
 解析智谱Batch API返回的JSONL格式结果文件，将结果映射回原始博文数据
 支持四种分析类型的结果解析：情感极性、情感属性、主题分析、发布者对象
+支持多文件合并
 """
 
 import json
 import os
 import re
+import glob
 from typing import Dict, Any, List, Optional
 
 
@@ -154,8 +156,8 @@ def parse_publisher_analysis_result(result_line: str, publisher_objects: List[st
         return None
 
 
-def parse_results_with_mapping(result_file_path: str, analysis_type: str, **kwargs) -> Dict[int, Any]:
-    """解析结果文件并生成索引映射"""
+def parse_single_result_file(result_file_path: str, analysis_type: str, **kwargs) -> Dict[int, Any]:
+    """解析单个结果文件并生成索引映射"""
     result_mapping = {}
     
     if not os.path.exists(result_file_path):
@@ -210,6 +212,62 @@ def parse_results_with_mapping(result_file_path: str, analysis_type: str, **kwar
     return result_mapping
 
 
+def merge_multiple_result_mappings(result_mappings: List[Dict[int, Any]]) -> Dict[int, Any]:
+    """合并多个结果映射"""
+    merged_mapping = {}
+    
+    for i, mapping in enumerate(result_mappings):
+        if not mapping:
+            print(f"警告: 第{i+1}个结果映射为空")
+            continue
+        
+        for index, result in mapping.items():
+            if index in merged_mapping:
+                print(f"警告: 索引{index}在多个文件中都存在，使用第{i+1}个文件的结果")
+            merged_mapping[index] = result
+    
+    return merged_mapping
+
+
+def parse_multiple_result_files(result_file_paths: List[str], analysis_type: str, **kwargs) -> Dict[int, Any]:
+    """解析多个结果文件并合并"""
+    print(f"解析 {len(result_file_paths)} 个 {analysis_type} 结果文件...")
+    
+    result_mappings = []
+    
+    for i, file_path in enumerate(result_file_paths):
+        print(f"  解析文件 {i+1}/{len(result_file_paths)}: {os.path.basename(file_path)}")
+        mapping = parse_single_result_file(file_path, analysis_type, **kwargs)
+        result_mappings.append(mapping)
+    
+    # 合并所有映射
+    merged_mapping = merge_multiple_result_mappings(result_mappings)
+    
+    print(f"  合并完成，共 {len(merged_mapping)} 个有效结果")
+    
+    return merged_mapping
+
+
+def find_result_files(temp_dir: str, analysis_type: str) -> List[str]:
+    """查找指定分析类型的结果文件"""
+    # 支持单文件和多文件格式
+    patterns = [
+        f"{analysis_type}_results.jsonl",
+        f"{analysis_type}_results_part*.jsonl"
+    ]
+    
+    result_files = []
+    for pattern in patterns:
+        full_pattern = os.path.join(temp_dir, pattern)
+        files = glob.glob(full_pattern)
+        result_files.extend(files)
+    
+    # 排序确保一致性
+    result_files.sort()
+    
+    return result_files
+
+
 def validate_result_completeness(posts: List[Dict[str, Any]], result_mapping: Dict[int, Any], analysis_type: str) -> Dict[str, Any]:
     """验证结果完整性"""
     total_posts = len(posts)
@@ -257,6 +315,12 @@ def load_reference_data(posts_file: str, topics_file: str, sentiment_attributes_
     except Exception as e:
         print(f"加载参考数据失败: {e}")
         return [], [], [], []
+
+
+# 保持向后兼容的旧函数
+def parse_results_with_mapping(result_file_path: str, analysis_type: str, **kwargs) -> Dict[int, Any]:
+    """解析结果文件并生成索引映射（向后兼容）"""
+    return parse_single_result_file(result_file_path, analysis_type, **kwargs)
 
 
 if __name__ == "__main__":

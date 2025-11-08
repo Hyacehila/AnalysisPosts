@@ -275,6 +275,12 @@ class SentimentPolarityAnalysisBatchNode(BatchNode):
         
         return score
     
+    def exec_fallback(self, prep_res, exc):
+        """当情感极性分析失败时的回退处理"""
+        print(f"情感极性分析失败，使用默认值: {str(exc)}")
+        # 返回中性评分作为默认值
+        return 3
+    
     def post(self, shared, prep_res, exec_res):
         """将分析结果附加到对应博文对象的sentiment_polarity字段中"""
         blog_data = shared.get("data", {}).get("blog_data", [])
@@ -376,6 +382,12 @@ class SentimentAttributeAnalysisBatchNode(BatchNode):
                 valid_attributes.append(attr)
         
         return valid_attributes 
+    
+    def exec_fallback(self, prep_res, exc):
+        """当情感属性分析失败时的回退处理"""
+        print(f"情感属性分析失败，使用默认值: {str(exc)}")
+        # 返回中性属性作为默认值
+        return ["中立"]
     
     def post(self, shared, prep_res, exec_res):
         """将分析结果附加到对应博文对象的sentiment_attribute字段中"""
@@ -509,6 +521,12 @@ class TwoLevelTopicAnalysisBatchNode(BatchNode):
         
         return valid_topics  # 允许返回空列表，表示找不到符合的主题
     
+    def exec_fallback(self, prep_res, exc):
+        """当主题分析失败时的回退处理"""
+        print(f"主题分析失败，使用默认值: {str(exc)}")
+        # 返回空列表作为默认值，表示无法识别主题
+        return []
+    
     def post(self, shared, prep_res, exec_res):
         """将分析结果附加到对应博文对象的topics字段中"""
         blog_data = shared.get("data", {}).get("blog_data", [])
@@ -600,6 +618,12 @@ class PublisherObjectAnalysisBatchNode(BatchNode):
         else:
             # 如果不在列表中，返回默认值
             return "个人用户" if "个人用户" in publisher_objects else None
+    
+    def exec_fallback(self, prep_res, exc):
+        """当发布者分析失败时的回退处理"""
+        print(f"发布者分析失败，使用默认值: {str(exc)}")
+        # 返回个人用户作为默认值
+        return "个人用户"
     
     def post(self, shared, prep_res, exec_res):
         """将分析结果附加到对应博文对象的publisher字段中"""

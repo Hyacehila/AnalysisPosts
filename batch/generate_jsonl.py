@@ -2,6 +2,7 @@
 生成JSONL文件脚本
 
 从data文件夹加载博文数据和配置文件，生成四个对应的JSONL文件
+支持自动拆分以符合API限制（1万条/500MB）
 """
 
 import os
@@ -38,11 +39,56 @@ def load_data_files():
         return None, None, None, None
 
 
+def save_batch_info(jsonl_files: dict, temp_dir: str):
+    """保存批处理文件信息"""
+    info_file = os.path.join(temp_dir, "jsonl_files_info.json")
+    
+    try:
+        # 计算文件统计信息
+        file_stats = {}
+        total_files = 0
+        total_size = 0
+        
+        for analysis_type, file_paths in jsonl_files.items():
+            file_stats[analysis_type] = {
+                "file_count": len(file_paths),
+                "files": []
+            }
+            
+            for file_path in file_paths:
+                if os.path.exists(file_path):
+                    size = os.path.getsize(file_path)
+                    file_stats[analysis_type]["files"].append({
+                        "path": os.path.basename(file_path),
+                        "size_bytes": size,
+                        "size_mb": size / 1024 / 1024
+                    })
+                    total_files += 1
+                    total_size += size
+        
+        # 保存信息
+        batch_info = {
+            "generation_time": os.path.getmtime(info_file) if os.path.exists(info_file) else None,
+            "total_files": total_files,
+            "total_size_bytes": total_size,
+            "total_size_mb": total_size / 1024 / 1024,
+            "analysis_types": file_stats
+        }
+        
+        with open(info_file, 'w', encoding='utf-8') as f:
+            json.dump(batch_info, f, ensure_ascii=False, indent=2)
+        
+        print(f"批处理文件信息已保存到: {info_file}")
+        
+    except Exception as e:
+        print(f"保存批处理信息失败: {e}")
+
+
 def main():
     """主函数"""
-    print("=" * 50)
-    print("生成JSONL文件")
-    print("=" * 50)
+    print("=" * 60)
+    print("生成JSONL文件（支持自动拆分）")
+    print("=" * 60)
     
     # 加载数据
     posts, topics_hierarchy, sentiment_attributes, publisher_objects = load_data_files()
@@ -72,13 +118,27 @@ def main():
             temp_dir=temp_dir
         )
         
-        print("\n" + "=" * 50)
+        print("\n" + "=" * 60)
         print("JSONL文件生成完成")
-        print("=" * 50)
+        print("=" * 60)
         
-        for analysis_type, file_path in jsonl_files.items():
-            file_size = os.path.getsize(file_path)
-            print(f"{analysis_type}: {file_path} ({file_size} bytes)")
+        # 显示文件信息
+        total_files = 0
+        total_size = 0
+        
+        for analysis_type, file_paths in jsonl_files.items():
+            print(f"\n{analysis_type}: {len(file_paths)} 个文件")
+            for file_path in file_paths:
+                if os.path.exists(file_path):
+                    size = os.path.getsize(file_path)
+                    total_files += 1
+                    total_size += size
+                    print(f"  - {os.path.basename(file_path)} ({size/1024/1024:.2f} MB)")
+        
+        print(f"\n总计: {total_files} 个文件, {total_size/1024/1024:.2f} MB")
+        
+        # 保存批处理信息
+        save_batch_info(jsonl_files, temp_dir)
         
         print(f"\n所有JSONL文件已保存到: {temp_dir}/")
         print("可以继续执行 upload_and_start.py")

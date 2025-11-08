@@ -2,12 +2,18 @@
 JSONL文件生成工具
 
 根据nodes.py中的提示词设计，创建四个对应的JSONL文件
+支持文件拆分以符合API限制（1万条/500MB）
 """
 
 import os
 import json
 import base64
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
+
+
+# API限制常量
+MAX_LINES_PER_FILE = 10000  # 每个文件最大条数
+MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024  # 500MB
 
 
 def encode_image_to_base64(image_path: str) -> str:
@@ -83,8 +89,67 @@ def get_temperature_for_analysis(analysis_type: str) -> float:
     return 0.3
 
 
-def generate_sentiment_polarity_jsonl(posts: List[Dict[str, Any]], data_dir: str, output_path: str) -> int:
-    """生成情感极性分析JSONL文件"""
+def split_requests_by_limits(requests: List[Dict[str, Any]], base_path: str) -> List[str]:
+    """
+    根据API限制拆分请求列表为多个文件
+    
+    Args:
+        requests: 请求列表
+        base_path: 基础文件路径（不带扩展名）
+        
+    Returns:
+        生成的文件路径列表
+    """
+    if not requests:
+        return []
+    
+    file_paths = []
+    current_requests = []
+    current_size = 0
+    
+    for request in requests:
+        # 计算当前请求的大小（估算）
+        request_str = json.dumps(request, ensure_ascii=False) + '\n'
+        request_size = len(request_str.encode('utf-8'))
+        
+        # 检查是否需要拆分
+        if (len(current_requests) >= MAX_LINES_PER_FILE or 
+            current_size + request_size > MAX_FILE_SIZE_BYTES):
+            
+            # 保存当前文件
+            if current_requests:
+                file_path = f"{base_path}_part{len(file_paths) + 1}.jsonl"
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    for req in current_requests:
+                        f.write(json.dumps(req, ensure_ascii=False) + '\n')
+                file_paths.append(file_path)
+                
+                # 重置
+                current_requests = []
+                current_size = 0
+        
+        # 添加当前请求
+        current_requests.append(request)
+        current_size += request_size
+    
+    # 保存最后一个文件
+    if current_requests:
+        if len(file_paths) == 0:
+            # 只有一个文件时，不添加part后缀
+            file_path = f"{base_path}.jsonl"
+        else:
+            file_path = f"{base_path}_part{len(file_paths) + 1}.jsonl"
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            for req in current_requests:
+                f.write(json.dumps(req, ensure_ascii=False) + '\n')
+        file_paths.append(file_path)
+    
+    return file_paths
+
+
+def generate_sentiment_polarity_requests(posts: List[Dict[str, Any]], data_dir: str) -> List[Dict[str, Any]]:
+    """生成情感极性分析请求列表"""
     requests = []
     
     for i, post in enumerate(posts):
@@ -175,16 +240,11 @@ def generate_sentiment_polarity_jsonl(posts: List[Dict[str, Any]], data_dir: str
         
         requests.append(request)
     
-    # 写入JSONL文件
-    with open(output_path, 'w', encoding='utf-8') as f:
-        for request in requests:
-            f.write(json.dumps(request, ensure_ascii=False) + '\n')
-    
-    return len(requests)
+    return requests
 
 
-def generate_sentiment_attribute_jsonl(posts: List[Dict[str, Any]], attributes: List[str], output_path: str) -> int:
-    """生成情感属性分析JSONL文件"""
+def generate_sentiment_attribute_requests(posts: List[Dict[str, Any]], attributes: List[str]) -> List[Dict[str, Any]]:
+    """生成情感属性分析请求列表"""
     requests = []
     
     for i, post in enumerate(posts):
@@ -254,16 +314,11 @@ def generate_sentiment_attribute_jsonl(posts: List[Dict[str, Any]], attributes: 
         
         requests.append(request)
     
-    # 写入JSONL文件
-    with open(output_path, 'w', encoding='utf-8') as f:
-        for request in requests:
-            f.write(json.dumps(request, ensure_ascii=False) + '\n')
-    
-    return len(requests)
+    return requests
 
 
-def generate_topic_analysis_jsonl(posts: List[Dict[str, Any]], topics: List[Dict[str, Any]], data_dir: str, output_path: str) -> int:
-    """生成两级主题分析JSONL文件"""
+def generate_topic_analysis_requests(posts: List[Dict[str, Any]], topics: List[Dict[str, Any]], data_dir: str) -> List[Dict[str, Any]]:
+    """生成两级主题分析请求列表"""
     requests = []
     
     for i, post in enumerate(posts):
@@ -352,16 +407,11 @@ def generate_topic_analysis_jsonl(posts: List[Dict[str, Any]], topics: List[Dict
         
         requests.append(request)
     
-    # 写入JSONL文件
-    with open(output_path, 'w', encoding='utf-8') as f:
-        for request in requests:
-            f.write(json.dumps(request, ensure_ascii=False) + '\n')
-    
-    return len(requests)
+    return requests
 
 
-def generate_publisher_analysis_jsonl(posts: List[Dict[str, Any]], publishers: List[str], output_path: str) -> int:
-    """生成发布者对象分析JSONL文件"""
+def generate_publisher_analysis_requests(posts: List[Dict[str, Any]], publishers: List[str]) -> List[Dict[str, Any]]:
+    """生成发布者对象分析请求列表"""
     requests = []
     
     for i, post in enumerate(posts):
@@ -428,12 +478,7 @@ def generate_publisher_analysis_jsonl(posts: List[Dict[str, Any]], publishers: L
         
         requests.append(request)
     
-    # 写入JSONL文件
-    with open(output_path, 'w', encoding='utf-8') as f:
-        for request in requests:
-            f.write(json.dumps(request, ensure_ascii=False) + '\n')
-    
-    return len(requests)
+    return requests
 
 
 def create_all_jsonl_files(posts: List[Dict[str, Any]], 
@@ -441,9 +486,9 @@ def create_all_jsonl_files(posts: List[Dict[str, Any]],
                          sentiment_attributes: List[str],
                          publishers: List[str],
                          data_dir: str,
-                         temp_dir: str) -> Dict[str, str]:
+                         temp_dir: str) -> Dict[str, List[str]]:
     """
-    创建所有四个JSONL文件
+    创建所有四个JSONL文件，支持自动拆分
     
     Args:
         posts: 博文数据列表
@@ -454,35 +499,102 @@ def create_all_jsonl_files(posts: List[Dict[str, Any]],
         temp_dir: 临时文件目录路径
         
     Returns:
-        分析类型到文件路径的映射
+        分析类型到文件路径列表的映射
     """
     jsonl_files = {}
     
+    print(f"开始生成JSONL文件，总共 {len(posts)} 条博文")
+    
     # 创建情感极性分析JSONL
-    sentiment_polarity_path = os.path.join(temp_dir, "sentiment_polarity_batch.jsonl")
-    count = generate_sentiment_polarity_jsonl(posts, data_dir, sentiment_polarity_path)
-    jsonl_files["sentiment_polarity"] = sentiment_polarity_path
-    print(f"创建情感极性分析JSONL文件: {count} 条请求")
+    print("生成情感极性分析请求...")
+    sentiment_polarity_requests = generate_sentiment_polarity_requests(posts, data_dir)
+    sentiment_polarity_files = split_requests_by_limits(
+        sentiment_polarity_requests, 
+        os.path.join(temp_dir, "sentiment_polarity_batch")
+    )
+    jsonl_files["sentiment_polarity"] = sentiment_polarity_files
+    print(f"创建情感极性分析JSONL文件: {len(sentiment_polarity_requests)} 条请求 -> {len(sentiment_polarity_files)} 个文件")
     
     # 创建情感属性分析JSONL
-    sentiment_attribute_path = os.path.join(temp_dir, "sentiment_attribute_batch.jsonl")
-    count = generate_sentiment_attribute_jsonl(posts, sentiment_attributes, sentiment_attribute_path)
-    jsonl_files["sentiment_attribute"] = sentiment_attribute_path
-    print(f"创建情感属性分析JSONL文件: {count} 条请求")
+    print("生成情感属性分析请求...")
+    sentiment_attribute_requests = generate_sentiment_attribute_requests(posts, sentiment_attributes)
+    sentiment_attribute_files = split_requests_by_limits(
+        sentiment_attribute_requests,
+        os.path.join(temp_dir, "sentiment_attribute_batch")
+    )
+    jsonl_files["sentiment_attribute"] = sentiment_attribute_files
+    print(f"创建情感属性分析JSONL文件: {len(sentiment_attribute_requests)} 条请求 -> {len(sentiment_attribute_files)} 个文件")
     
     # 创建主题分析JSONL
-    topic_analysis_path = os.path.join(temp_dir, "topic_analysis_batch.jsonl")
-    count = generate_topic_analysis_jsonl(posts, topics, data_dir, topic_analysis_path)
-    jsonl_files["topic_analysis"] = topic_analysis_path
-    print(f"创建主题分析JSONL文件: {count} 条请求")
+    print("生成主题分析请求...")
+    topic_analysis_requests = generate_topic_analysis_requests(posts, topics, data_dir)
+    topic_analysis_files = split_requests_by_limits(
+        topic_analysis_requests,
+        os.path.join(temp_dir, "topic_analysis_batch")
+    )
+    jsonl_files["topic_analysis"] = topic_analysis_files
+    print(f"创建主题分析JSONL文件: {len(topic_analysis_requests)} 条请求 -> {len(topic_analysis_files)} 个文件")
     
     # 创建发布者对象分析JSONL
-    publisher_analysis_path = os.path.join(temp_dir, "publisher_analysis_batch.jsonl")
-    count = generate_publisher_analysis_jsonl(posts, publishers, publisher_analysis_path)
-    jsonl_files["publisher_analysis"] = publisher_analysis_path
-    print(f"创建发布者对象分析JSONL文件: {count} 条请求")
+    print("生成发布者对象分析请求...")
+    publisher_analysis_requests = generate_publisher_analysis_requests(posts, publishers)
+    publisher_analysis_files = split_requests_by_limits(
+        publisher_analysis_requests,
+        os.path.join(temp_dir, "publisher_analysis_batch")
+    )
+    jsonl_files["publisher_analysis"] = publisher_analysis_files
+    print(f"创建发布者对象分析JSONL文件: {len(publisher_analysis_requests)} 条请求 -> {len(publisher_analysis_files)} 个文件")
+    
+    # 显示文件大小信息
+    print("\n文件大小信息:")
+    total_size = 0
+    for analysis_type, files in jsonl_files.items():
+        for file_path in files:
+            if os.path.exists(file_path):
+                size = os.path.getsize(file_path)
+                total_size += size
+                print(f"  {file_path}: {size/1024/1024:.2f} MB")
+    
+    print(f"总大小: {total_size/1024/1024:.2f} MB")
     
     return jsonl_files
+
+
+# 保持向后兼容的旧函数
+def generate_sentiment_polarity_jsonl(posts: List[Dict[str, Any]], data_dir: str, output_path: str) -> int:
+    """生成情感极性分析JSONL文件（向后兼容）"""
+    requests = generate_sentiment_polarity_requests(posts, data_dir)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for request in requests:
+            f.write(json.dumps(request, ensure_ascii=False) + '\n')
+    return len(requests)
+
+
+def generate_sentiment_attribute_jsonl(posts: List[Dict[str, Any]], attributes: List[str], output_path: str) -> int:
+    """生成情感属性分析JSONL文件（向后兼容）"""
+    requests = generate_sentiment_attribute_requests(posts, attributes)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for request in requests:
+            f.write(json.dumps(request, ensure_ascii=False) + '\n')
+    return len(requests)
+
+
+def generate_topic_analysis_jsonl(posts: List[Dict[str, Any]], topics: List[Dict[str, Any]], data_dir: str, output_path: str) -> int:
+    """生成两级主题分析JSONL文件（向后兼容）"""
+    requests = generate_topic_analysis_requests(posts, topics, data_dir)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for request in requests:
+            f.write(json.dumps(request, ensure_ascii=False) + '\n')
+    return len(requests)
+
+
+def generate_publisher_analysis_jsonl(posts: List[Dict[str, Any]], publishers: List[str], output_path: str) -> int:
+    """生成发布者对象分析JSONL文件（向后兼容）"""
+    requests = generate_publisher_analysis_requests(posts, publishers)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for request in requests:
+            f.write(json.dumps(request, ensure_ascii=False) + '\n')
+    return len(requests)
 
 
 if __name__ == "__main__":

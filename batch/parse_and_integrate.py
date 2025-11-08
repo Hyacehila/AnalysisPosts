@@ -1,62 +1,26 @@
 """
-解析并整合结果脚本
+解析和整合批处理结果脚本
 
-解析批处理结果文件，将结果与原始博文数据整合，生成增强后的博文数据
+解析下载的批处理结果文件，将结果与原始博文数据整合
+支持多文件结果合并
 """
 
 import os
 import sys
 import json
-from utils.result_parser import load_reference_data
 from utils.data_integration import (
     load_and_integrate_all_results,
     save_enhanced_posts,
-    generate_integration_report,
-    validate_enhanced_posts
+    validate_enhanced_posts,
+    save_integration_report
 )
 
 
-def get_api_key():
-    """获取API密钥"""
-    api_key = "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH"
-    
-    return api_key
-
-
-def check_result_files():
-    """检查结果文件是否存在"""
-    temp_dir = "batch/temp"
-    result_files = {
-        "sentiment_polarity": os.path.join(temp_dir, "sentiment_polarity_results.jsonl"),
-        "sentiment_attribute": os.path.join(temp_dir, "sentiment_attribute_results.jsonl"),
-        "topic_analysis": os.path.join(temp_dir, "topic_analysis_results.jsonl"),
-        "publisher_analysis": os.path.join(temp_dir, "publisher_analysis_results.jsonl")
-    }
-    
-    missing_files = []
-    for analysis_type, file_path in result_files.items():
-        if not os.path.exists(file_path):
-            missing_files.append(f"{analysis_type}: {file_path}")
-    
-    if missing_files:
-        print("以下结果文件不存在:")
-        for file_info in missing_files:
-            print(f"  - {file_info}")
-        print("\n请先运行 download_results.py 下载结果文件")
-        return None
-    
-    return result_files
-
-
-def load_reference_data_safe():
-    """安全加载参考数据"""
+def load_reference_data():
+    """加载参考数据"""
     data_dir = "data"
     
     try:
-        # 加载博文数据
-        with open(os.path.join(data_dir, "posts.json"), 'r', encoding='utf-8') as f:
-            posts = json.load(f)
-        
         # 加载主题层次结构
         with open(os.path.join(data_dir, "topics.json"), 'r', encoding='utf-8') as f:
             topics_hierarchy = json.load(f)
@@ -69,174 +33,191 @@ def load_reference_data_safe():
         with open(os.path.join(data_dir, "publisher_objects.json"), 'r', encoding='utf-8') as f:
             publisher_objects = json.load(f)
         
-        return posts, topics_hierarchy, sentiment_attributes, publisher_objects
+        return topics_hierarchy, sentiment_attributes, publisher_objects
         
     except Exception as e:
         print(f"加载参考数据失败: {e}")
-        return None, None, None, None
+        return [], [], []
 
 
-def load_batch_info():
-    """加载批处理信息"""
-    temp_dir = "batch/temp"
-    info_file = os.path.join(temp_dir, "batch_info.json")
+def check_result_files(temp_dir: str):
+    """检查结果文件是否存在"""
+    required_patterns = [
+        "sentiment_polarity_results*.jsonl",
+        "sentiment_attribute_results*.jsonl", 
+        "topic_analysis_results*.jsonl",
+        "publisher_analysis_results*.jsonl"
+    ]
     
-    if not os.path.exists(info_file):
-        print(f"批处理信息文件不存在: {info_file}")
-        print("请先运行 upload_and_start.py 创建批处理任务")
-        return None
+    import glob
+    found_files = {}
     
-    try:
-        with open(info_file, 'r', encoding='utf-8') as f:
-            batch_info = json.load(f)
-        
-        return batch_info
-        
-    except Exception as e:
-        print(f"加载批处理信息失败: {e}")
-        return None
-
-
-def parse_and_integrate():
-    """解析并整合结果"""
-    print("加载参考数据...")
+    for pattern in required_patterns:
+        full_pattern = os.path.join(temp_dir, pattern)
+        files = glob.glob(full_pattern)
+        found_files[pattern] = files
     
-    # 加载参考数据
-    posts, topics_hierarchy, sentiment_attributes, publisher_objects = load_reference_data_safe()
+    print("结果文件检查:")
+    for pattern, files in found_files.items():
+        if files:
+            print(f"  ✓ {pattern}: {len(files)} 个文件")
+            for file in files:
+                print(f"    - {os.path.basename(file)}")
+        else:
+            print(f"  ✗ {pattern}: 未找到")
     
-    if posts is None:
-        print("参考数据加载失败，程序退出")
-        return None
-    
-    print(f"加载博文数据: {len(posts)} 条")
-    print(f"加载主题层次结构: {len(topics_hierarchy)} 个父主题")
-    print(f"加载情感属性: {len(sentiment_attributes)} 个")
-    print(f"加载发布者对象: {len(publisher_objects)} 个")
-    print()
-    
-    # 检查结果文件
-    result_files = check_result_files()
-    if not result_files:
-        return None
-    
-    print(f"找到 {len(result_files)} 个结果文件:")
-    for analysis_type, file_path in result_files.items():
-        file_size = os.path.getsize(file_path)
-        print(f"  {analysis_type}: {file_path} ({file_size} bytes)")
-    print()
-    
-    # 加载批处理信息用于报告
-    batch_info = load_batch_info()
-    if batch_info:
-        print(f"批处理任务信息:")
-        for analysis_type, info in batch_info.items():
-            batch_id = info.get("batch_id")
-            status = info.get("status", "unknown")
-            print(f"  {analysis_type}: {batch_id} ({status})")
-        print()
-    
-    # 加载并整合所有结果
-    print("开始解析并整合结果...")
-    
-    integration_result = load_and_integrate_all_results(
-        posts_file="data/posts.json",
-        sentiment_polarity_file=result_files["sentiment_polarity"],
-        sentiment_attribute_file=result_files["sentiment_attribute"],
-        topic_analysis_file=result_files["topic_analysis"],
-        publisher_analysis_file=result_files["publisher_analysis"],
-        topics_hierarchy=topics_hierarchy,
-        sentiment_attributes=sentiment_attributes,
-        publisher_objects=publisher_objects
-    )
-    
-    if "error" in integration_result:
-        print(f"整合失败: {integration_result['error']}")
-        return None
-    
-    enhanced_posts = integration_result.get("enhanced_posts", [])
-    integration_stats = integration_result.get("integration_stats", {})
-    
-    print("结果整合完成!")
-    print()
-    
-    # 生成整合报告
-    report = generate_integration_report(integration_stats)
-    print(report)
-    print()
-    
-    # 验证增强数据
-    print("验证增强数据...")
-    validation_result = validate_enhanced_posts(enhanced_posts)
-    
-    print("数据验证结果:")
-    print(f"  总博文数: {validation_result['total_posts']}")
-    
-    field_completeness = validation_result.get("field_completeness", {})
-    for field, stats in field_completeness.items():
-        count = stats.get("count", 0)
-        completeness = stats.get("completeness", 0)
-        print(f"  {field}: {count} 条 ({completeness}%)")
-    
-    data_quality = validation_result.get("data_quality", {})
-    for field, count in data_quality.items():
-        print(f"  {field}_valid: {count}")
-    
-    issues = validation_result.get("issues", [])
-    if issues:
-        print("  发现的问题:")
-        for issue in issues:
-            print(f"    - {issue}")
-    else:
-        print("  未发现明显问题")
-    print()
-    
-    # 保存增强数据
-    output_path = "batch/enhanced_posts.json"
-    print(f"保存增强数据到: {output_path}")
-    
-    if save_enhanced_posts(enhanced_posts, output_path):
-        print("增强数据保存成功!")
-        
-        # 保存整合报告
-        report_file = "batch/integration_report.txt"
-        try:
-            with open(report_file, 'w', encoding='utf-8') as f:
-                f.write(report)
-            print(f"整合报告已保存到: {report_file}")
-        except Exception as e:
-            print(f"保存整合报告失败: {e}")
-        
-        # 验证结果仅在控制台显示，不保存到文件
-        print("验证结果仅在控制台显示，未保存到文件")
-        
-        return enhanced_posts
-    else:
-        print("增强数据保存失败!")
-        return None
+    return found_files
 
 
 def main():
     """主函数"""
-    print("=" * 50)
-    print("解析并整合批处理结果")
-    print("=" * 50)
+    print("=" * 60)
+    print("解析和整合批处理结果（支持多文件合并）")
+    print("=" * 60)
     
-    # 解析并整合结果
-    enhanced_posts = parse_and_integrate()
+    # 检查结果文件
+    temp_dir = os.path.join(os.path.dirname(__file__), "temp")
+    found_files = check_result_files(temp_dir)
     
-    if enhanced_posts is not None:
-        print("\n" + "=" * 50)
-        print("数据整合完成")
-        print("=" * 50)
+    # 检查是否有任何结果文件
+    has_any_results = any(len(files) > 0 for files in found_files.values())
+    if not has_any_results:
+        print("\n未找到任何结果文件")
+        print("请先运行 upload_and_start.py 完成批处理任务")
+        return
+    
+    # 加载参考数据
+    topics_hierarchy, sentiment_attributes, publisher_objects = load_reference_data()
+    
+    if not topics_hierarchy:
+        print("参考数据加载失败，程序退出")
+        return
+    
+    print(f"\n加载参考数据:")
+    print(f"  主题层次结构: {len(topics_hierarchy)} 个父主题")
+    print(f"  情感属性: {len(sentiment_attributes)} 个")
+    print(f"  发布者对象: {len(publisher_objects)} 个")
+    
+    # 整合结果
+    print(f"\n开始整合结果...")
+    
+    try:
+        integration_result = load_and_integrate_all_results(
+            posts_file="data/posts.json",
+            temp_dir=temp_dir,
+            topics_hierarchy=topics_hierarchy,
+            sentiment_attributes=sentiment_attributes,
+            publisher_objects=publisher_objects
+        )
         
-        print(f"最终增强博文数据: {len(enhanced_posts)} 条")
-        print("输出文件: batch/enhanced_posts.json")
-        print("报告文件: batch/integration_report.txt")
+        if "error" in integration_result:
+            print(f"整合失败: {integration_result['error']}")
+            return
         
-        print("\n数据整合流程已完成!")
-        print("可以使用 batch/enhanced_posts.json 进行后续分析")
-    else:
-        print("\n数据整合失败，请检查错误信息")
+        enhanced_posts = integration_result["enhanced_posts"]
+        integration_stats = integration_result["integration_stats"]
+        source_files = integration_result["source_files"]
+        
+        print(f"\n" + "=" * 60)
+        print("结果整合完成")
+        print("=" * 60)
+        
+        # 显示整合统计
+        print(f"原始博文数量: {integration_stats['total_posts']}")
+        print(f"增强博文数量: {len(enhanced_posts)}")
+        print()
+        
+        # 显示各分析类型的统计
+        analysis_types = [
+            ("sentiment_polarity", "情感极性分析"),
+            ("sentiment_attribute", "情感属性分析"),
+            ("topic_analysis", "主题分析"),
+            ("publisher_analysis", "发布者对象分析")
+        ]
+        
+        for analysis_key, analysis_name in analysis_types:
+            stats = integration_stats.get(analysis_key, {})
+            if stats.get("status") == "not_processed":
+                print(f"{analysis_name}: 未处理")
+            else:
+                processed = stats.get("processed_posts", 0)
+                completeness = stats.get("completeness_rate", 0)
+                print(f"{analysis_name}: {processed}/{integration_stats['total_posts']} ({completeness}%)")
+                
+                # 显示源文件信息
+                files = source_files.get(analysis_key, [])
+                if files:
+                    print(f"  源文件: {len(files)} 个")
+                    for file in files:
+                        print(f"    - {os.path.basename(file)}")
+        
+        # 验证增强数据
+        print(f"\n验证增强数据...")
+        validation_result = validate_enhanced_posts(enhanced_posts)
+        
+        print(f"验证结果:")
+        print(f"  总博文数: {validation_result['total_posts']}")
+        
+        for field in ["sentiment_polarity", "sentiment_attribute", "topics", "publisher"]:
+            field_stats = validation_result["field_completeness"].get(field, {})
+            count = field_stats.get("count", 0)
+            completeness = field_stats.get("completeness", 0)
+            print(f"  {field}: {count} 个 ({completeness}%)")
+        
+        if validation_result["issues"]:
+            print(f"  发现问题: {len(validation_result['issues'])} 个")
+            for issue in validation_result["issues"]:
+                print(f"    - {issue}")
+        else:
+            print("  未发现问题")
+        
+        # 保存增强数据
+        output_dir = "data"
+        enhanced_posts_path = os.path.join(output_dir, "enhanced_posts.json")
+        
+        if save_enhanced_posts(enhanced_posts, enhanced_posts_path):
+            print(f"\n✓ 增强博文数据已保存到: {enhanced_posts_path}")
+        else:
+            print(f"\n✗ 保存增强博文数据失败")
+            return
+        
+        # 保存整合报告
+        report_path = os.path.join(output_dir, "integration_report.json")
+        if save_integration_report(integration_stats, validation_result, report_path):
+            print(f"✓ 整合报告已保存到: {report_path}")
+        else:
+            print(f"\n✗ 保存整合报告失败")
+        
+        # 显示最终统计
+        print(f"\n" + "=" * 60)
+        print("处理完成统计")
+        print("=" * 60)
+        
+        total_processed = 0
+        total_possible = len(enhanced_posts) * 4  # 4种分析类型
+        
+        for analysis_key, _ in analysis_types:
+            stats = integration_stats.get(analysis_key, {})
+            if stats.get("status") != "not_processed":
+                total_processed += stats.get("processed_posts", 0)
+        
+        overall_success_rate = (total_processed / total_possible * 100) if total_possible > 0 else 0
+        
+        print(f"总体处理成功率: {overall_success_rate:.2f}%")
+        print(f"成功处理的分析结果: {total_processed}/{total_possible}")
+        
+        if overall_success_rate >= 90:
+            print("✓ 数据整合质量良好")
+        elif overall_success_rate >= 70:
+            print("⚠ 数据整合质量一般，建议检查缺失数据")
+        else:
+            print("✗ 数据整合质量较差，建议重新处理")
+        
+    except Exception as e:
+        print(f"整合过程中发生错误: {e}")
+        import traceback
+        traceback.print_exc()
+        return
 
 
 if __name__ == "__main__":

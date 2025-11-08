@@ -2,12 +2,13 @@
 数据整合工具
 
 将批处理结果与原始博文数据整合，生成增强后的博文数据
+支持多文件结果合并
 """
 
 import json
 import os
 from typing import List, Dict, Any, Optional
-from .result_parser import parse_results_with_mapping, validate_result_completeness
+from .result_parser import parse_multiple_result_files, find_result_files, validate_result_completeness
 
 
 def integrate_analysis_results(posts: List[Dict[str, Any]],
@@ -64,22 +65,16 @@ def integrate_analysis_results(posts: List[Dict[str, Any]],
 
 
 def load_and_integrate_all_results(posts_file: str,
-                                 sentiment_polarity_file: str,
-                                 sentiment_attribute_file: str,
-                                 topic_analysis_file: str,
-                                 publisher_analysis_file: str,
+                                 temp_dir: str,
                                  topics_hierarchy: List[Dict[str, Any]],
                                  sentiment_attributes: List[str],
                                  publisher_objects: List[str]) -> Dict[str, Any]:
     """
-    加载并整合所有批处理结果
+    加载并整合所有批处理结果（支持多文件）
     
     Args:
         posts_file: 原始博文数据文件路径
-        sentiment_polarity_file: 情感极性结果文件路径
-        sentiment_attribute_file: 情感属性结果文件路径
-        topic_analysis_file: 主题分析结果文件路径
-        publisher_analysis_file: 发布者对象分析结果文件路径
+        temp_dir: 临时文件目录（包含结果文件）
         topics_hierarchy: 主题层次结构
         sentiment_attributes: 情感属性列表
         publisher_objects: 发布者对象列表
@@ -95,36 +90,46 @@ def load_and_integrate_all_results(posts_file: str,
         print(f"加载博文数据失败: {e}")
         return {"error": str(e)}
     
-    # 加载各种分析结果
+    print(f"加载博文数据: {len(posts)} 条")
+    
+    # 查找并解析各种分析结果文件
     sentiment_polarity_results = None
     sentiment_attribute_results = None
     topic_analysis_results = None
     publisher_analysis_results = None
     
     # 情感极性分析结果
-    if os.path.exists(sentiment_polarity_file):
-        sentiment_polarity_results = parse_results_with_mapping(
-            sentiment_polarity_file, "sentiment_polarity"
+    sentiment_polarity_files = find_result_files(temp_dir, "sentiment_polarity")
+    if sentiment_polarity_files:
+        print(f"找到情感极性结果文件: {len(sentiment_polarity_files)} 个")
+        sentiment_polarity_results = parse_multiple_result_files(
+            sentiment_polarity_files, "sentiment_polarity"
         )
     
     # 情感属性分析结果
-    if os.path.exists(sentiment_attribute_file):
-        sentiment_attribute_results = parse_results_with_mapping(
-            sentiment_attribute_file, "sentiment_attribute",
+    sentiment_attribute_files = find_result_files(temp_dir, "sentiment_attribute")
+    if sentiment_attribute_files:
+        print(f"找到情感属性结果文件: {len(sentiment_attribute_files)} 个")
+        sentiment_attribute_results = parse_multiple_result_files(
+            sentiment_attribute_files, "sentiment_attribute",
             sentiment_attributes=sentiment_attributes
         )
     
     # 主题分析结果
-    if os.path.exists(topic_analysis_file):
-        topic_analysis_results = parse_results_with_mapping(
-            topic_analysis_file, "topic_analysis",
+    topic_analysis_files = find_result_files(temp_dir, "topic_analysis")
+    if topic_analysis_files:
+        print(f"找到主题分析结果文件: {len(topic_analysis_files)} 个")
+        topic_analysis_results = parse_multiple_result_files(
+            topic_analysis_files, "topic_analysis",
             topics_hierarchy=topics_hierarchy
         )
     
     # 发布者对象分析结果
-    if os.path.exists(publisher_analysis_file):
-        publisher_analysis_results = parse_results_with_mapping(
-            publisher_analysis_file, "publisher_analysis",
+    publisher_analysis_files = find_result_files(temp_dir, "publisher_analysis")
+    if publisher_analysis_files:
+        print(f"找到发布者对象结果文件: {len(publisher_analysis_files)} 个")
+        publisher_analysis_results = parse_multiple_result_files(
+            publisher_analysis_files, "publisher_analysis",
             publisher_objects=publisher_objects
         )
     
@@ -162,6 +167,12 @@ def load_and_integrate_all_results(posts_file: str,
             "sentiment_attribute": sentiment_attribute_results,
             "topic_analysis": topic_analysis_results,
             "publisher_analysis": publisher_analysis_results
+        },
+        "source_files": {
+            "sentiment_polarity": sentiment_polarity_files,
+            "sentiment_attribute": sentiment_attribute_files,
+            "topic_analysis": topic_analysis_files,
+            "publisher_analysis": publisher_analysis_files
         }
     }
 
@@ -202,9 +213,9 @@ def generate_integration_report(integration_stats: Dict[str, Any]) -> str:
         报告文本
     """
     report = []
-    report.append("=" * 50)
-    report.append("数据整合报告")
-    report.append("=" * 50)
+    report.append("=" * 60)
+    report.append("数据整合报告（多文件合并）")
+    report.append("=" * 60)
     
     total_posts = integration_stats.get("total_posts", 0)
     report.append(f"总博文数量: {total_posts}")
@@ -326,6 +337,126 @@ def validate_enhanced_posts(enhanced_posts: List[Dict[str, Any]]) -> Dict[str, A
             validation_result["issues"].append(f"{field}分析完整性过低")
     
     return validation_result
+
+
+def save_integration_report(integration_stats: Dict[str, Any], validation_result: Dict[str, Any], output_path: str) -> bool:
+    """
+    保存整合报告
+    
+    Args:
+        integration_stats: 整合统计信息
+        validation_result: 验证结果
+        output_path: 报告输出路径
+        
+    Returns:
+        保存是否成功
+    """
+    try:
+        report_data = {
+            "integration_stats": integration_stats,
+            "validation_result": validation_result,
+            "report_text": generate_integration_report(integration_stats)
+        }
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(report_data, f, ensure_ascii=False, indent=2)
+        
+        print(f"整合报告已保存到: {output_path}")
+        return True
+    except Exception as e:
+        print(f"保存整合报告失败: {e}")
+        return False
+
+
+# 保持向后兼容的旧函数
+def load_and_integrate_all_results_legacy(posts_file: str,
+                                     sentiment_polarity_file: str,
+                                     sentiment_attribute_file: str,
+                                     topic_analysis_file: str,
+                                     publisher_analysis_file: str,
+                                     topics_hierarchy: List[Dict[str, Any]],
+                                     sentiment_attributes: List[str],
+                                     publisher_objects: List[str]) -> Dict[str, Any]:
+    """加载并整合所有批处理结果（向后兼容）"""
+    from .result_parser import parse_results_with_mapping
+    
+    # 加载原始博文数据
+    try:
+        with open(posts_file, 'r', encoding='utf-8') as f:
+            posts = json.load(f)
+    except Exception as e:
+        print(f"加载博文数据失败: {e}")
+        return {"error": str(e)}
+    
+    # 加载各种分析结果
+    sentiment_polarity_results = None
+    sentiment_attribute_results = None
+    topic_analysis_results = None
+    publisher_analysis_results = None
+    
+    # 情感极性分析结果
+    if os.path.exists(sentiment_polarity_file):
+        sentiment_polarity_results = parse_results_with_mapping(
+            sentiment_polarity_file, "sentiment_polarity"
+        )
+    
+    # 情感属性分析结果
+    if os.path.exists(sentiment_attribute_file):
+        sentiment_attribute_results = parse_results_with_mapping(
+            sentiment_attribute_file, "sentiment_attribute",
+            sentiment_attributes=sentiment_attributes
+        )
+    
+    # 主题分析结果
+    if os.path.exists(topic_analysis_file):
+        topic_analysis_results = parse_results_with_mapping(
+            topic_analysis_file, "topic_analysis",
+            topics_hierarchy=topics_hierarchy
+        )
+    
+    # 发布者对象分析结果
+    if os.path.exists(publisher_analysis_file):
+        publisher_analysis_results = parse_results_with_mapping(
+            publisher_analysis_file, "publisher_analysis",
+            publisher_objects=publisher_objects
+        )
+    
+    # 整合结果
+    enhanced_posts = integrate_analysis_results(
+        posts,
+        sentiment_polarity_results,
+        sentiment_attribute_results,
+        topic_analysis_results,
+        publisher_analysis_results
+    )
+    
+    # 生成统计信息
+    integration_stats = {
+        "total_posts": len(posts),
+        "sentiment_polarity": validate_result_completeness(
+            posts, sentiment_polarity_results or {}, "sentiment_polarity"
+        ) if sentiment_polarity_results else {"status": "not_processed"},
+        "sentiment_attribute": validate_result_completeness(
+            posts, sentiment_attribute_results or {}, "sentiment_attribute"
+        ) if sentiment_attribute_results else {"status": "not_processed"},
+        "topic_analysis": validate_result_completeness(
+            posts, topic_analysis_results or {}, "topic_analysis"
+        ) if topic_analysis_results else {"status": "not_processed"},
+        "publisher_analysis": validate_result_completeness(
+            posts, publisher_analysis_results or {}, "publisher_analysis"
+        ) if publisher_analysis_results else {"status": "not_processed"}
+    }
+    
+    return {
+        "enhanced_posts": enhanced_posts,
+        "integration_stats": integration_stats,
+        "result_maps": {
+            "sentiment_polarity": sentiment_polarity_results,
+            "sentiment_attribute": sentiment_attribute_results,
+            "topic_analysis": topic_analysis_results,
+            "publisher_analysis": publisher_analysis_results
+        }
+    }
 
 
 if __name__ == "__main__":
