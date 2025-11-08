@@ -2,7 +2,7 @@
 JSONL文件生成工具
 
 根据nodes.py中的提示词设计，创建四个对应的JSONL文件
-支持文件拆分以符合API限制（1万条/500MB）
+支持文件拆分以符合API限制（5万条/100MB）
 """
 
 import os
@@ -12,8 +12,8 @@ from typing import List, Dict, Any, Tuple
 
 
 # API限制常量
-MAX_LINES_PER_FILE = 10000  # 每个文件最大条数
-MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024  # 500MB
+MAX_LINES_PER_FILE = 50000  # 每个文件最大条数
+MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024  # 100MB
 
 
 def encode_image_to_base64(image_path: str) -> str:
