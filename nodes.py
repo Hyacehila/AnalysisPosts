@@ -244,10 +244,20 @@ class SentimentPolarityAnalysisBatchNode(BatchNode):
         # 过滤掉空字符串
         image_paths = [img for img in image_paths if img and img.strip()]
         
+        # 处理相对路径：如果路径不是绝对路径，则假设相对于data目录
+        processed_image_paths = []
+        for img_path in image_paths:
+            if not os.path.isabs(img_path):
+                # 相对路径，添加data目录前缀
+                full_path = os.path.join("data", img_path)
+                processed_image_paths.append(full_path)
+            else:
+                processed_image_paths.append(img_path)
+        
         # 调用多模态LLM
-        if image_paths:
+        if processed_image_paths:
             # 有图片时使用多模态模型
-            response = call_glm4v_plus(prompt, image_paths=image_paths, temperature=0.3)
+            response = call_glm4v_plus(prompt, image_paths=processed_image_paths, temperature=0.3)
         else:
             # 无图片时使用纯文本模型
             response = call_glm_45_air(prompt, temperature=0.3)
@@ -311,16 +321,17 @@ class SentimentAttributeAnalysisBatchNode(BatchNode):
         attributes_str = "、".join(sentiment_attributes)
         
         # 构建提示词
-        prompt = f"""分析博文情感属性
+        prompt = f"""
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的整体情感属性。
 
 可选择的情感属性：{attributes_str}
-
-博文内容：
-{blog_post.get('content', '')}
 
 请从上述列表中选择1-3个最贴切的情感属性，严格按照以下JSON格式输出：
 
 ["属性1", "属性2"]
+
+请直接输出JSON数组，不要添加任何其他文字
 
 --- 示例 1：愤怒内容 ---
 博文内容：这场暴雨太让人愤怒了！政府为什么不提前预警！
@@ -342,7 +353,11 @@ class SentimentAttributeAnalysisBatchNode(BatchNode):
 博文内容：希望雨快点停，明天能正常上班。
 预期输出：["希望", "期待"]
 
-请直接输出JSON数组，不要添加任何其他文字："""
+
+博文内容：
+{blog_post.get('content', '')}
+
+"""
         
         # 调用纯文本LLM
         response = call_glm_45_air(prompt, temperature=0.3)
@@ -412,14 +427,13 @@ class TwoLevelTopicAnalysisBatchNode(BatchNode):
             topics_str += f"\n父主题：{parent_topic}\n子主题：{'、'.join(sub_topics)}\n"
         
         # 构建提示词
-        prompt = f"""分析博文主题
+        prompt = f"""
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的主题层次结构。
 
-主题层次结构：{topics_str}
+候选的主题层次结构：{topics_str}
 
-博文内容：
-{blog_post.get('content', '')}
-
-        请从上述主题列表中选择1-2个最贴切的父主题和对应的子主题，严格按照以下JSON格式输出：
+请从上述主题列表中选择1-2个最贴切的父主题和对应的子主题，严格按照以下JSON格式输出，请直接输出JSON数组，不要添加任何其他文字：
 
 [{{"parent_topic": "父主题", "sub_topic": "子主题"}}, ...]
 
@@ -445,15 +459,28 @@ class TwoLevelTopicAnalysisBatchNode(BatchNode):
 博文内容：今天天气不错，适合出门散步。
 预期输出：[]
 
-请直接输出JSON数组，不要添加任何其他文字："""
+博文内容：
+{blog_post.get('content', '')}
+
+"""
         
         # 准备图片路径（如果有）
         image_paths = blog_post.get('image_urls', [])
         image_paths = [img for img in image_paths if img and img.strip()]
         
+        # 处理相对路径：如果路径不是绝对路径，则假设相对于data目录
+        processed_image_paths = []
+        for img_path in image_paths:
+            if not os.path.isabs(img_path):
+                # 相对路径，添加data目录前缀
+                full_path = os.path.join("data", img_path)
+                processed_image_paths.append(full_path)
+            else:
+                processed_image_paths.append(img_path)
+        
         # 调用多模态LLM
-        if image_paths:
-            response = call_glm4v_plus(prompt, image_paths=image_paths, temperature=0.3)
+        if processed_image_paths:
+            response = call_glm4v_plus(prompt, image_paths=processed_image_paths, temperature=0.3)
         else:
             response = call_glm_45_air(prompt, temperature=0.3)
         
@@ -530,12 +557,12 @@ class PublisherObjectAnalysisBatchNode(BatchNode):
         # 构建提示词
         prompt = f"""分析博文发布者类型
 
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的博文发布者类型。
 可选择的发布者对象：{publishers_str}
 
-博文内容：
-{blog_post.get('content', '')}
 
-请从上述列表中选择1个最贴切的发布者对象，直接输出发布者类型字符串。
+请从上述列表中选择1个最贴切的发布者对象，直接输出发布者类型字符串。请直接输出发布者类型字符串，不要添加任何其他文字
 
 --- 示例 1：气象台内容 ---
 博文内容：北京市气象台发布暴雨红色预警信号。
@@ -557,7 +584,9 @@ class PublisherObjectAnalysisBatchNode(BatchNode):
 博文内容：消防部门提醒市民注意安全。
 预期输出：应急管理部门
 
-请直接输出发布者类型字符串，不要添加任何其他文字："""
+博文内容：
+{blog_post.get('content', '')}
+"""
         
         # 调用纯文本LLM
         response = call_glm_45_air(prompt, temperature=0.3)

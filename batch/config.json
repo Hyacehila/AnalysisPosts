@@ -1,0 +1,40 @@
+{
+  "api": {
+    "base_url": "https://open.bigmodel.cn/api/paas/v4/",
+    "api_key": "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH",
+    "timeout": 300
+  },
+  "batch": {
+    "model": "glm-4-air",
+    "multimodal_model": "glm-4v-plus",
+    "max_file_size": 104857600,
+    "max_requests_per_file": 10000,
+    "poll_interval": 60,
+    "task_timeout": 14400,
+    "max_retries": 3,
+    "retry_delay": 30,
+    "max_concurrent_tasks": 3
+  },
+  "paths": {
+    "data_dir": "../data",
+    "batch_dir": ".",
+    "temp_dir": "./temp",
+    "results_dir": "./results",
+    "utils_dir": "./utils"
+  },
+  "files": {
+    "blog_data": "../data/posts.json",
+    "topics": "../data/topics.json",
+    "sentiment_attributes": "../data/sentiment_attributes.json",
+    "publisher_objects": "../data/publisher_objects.json",
+    "enhanced_output": "./enhanced_blogs.json",
+    "workflow_status": "./workflow_status.json",
+    "downloaded_results": "./downloaded_results.json"
+  },
+  "analysis_types": [
+    "sentiment_polarity",
+    "sentiment_attribute", 
+    "topic_analysis",
+    "publisher_analysis"
+  ]
+}

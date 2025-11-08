@@ -71,7 +71,7 @@ def main():
     shared = {
         "data": {
             "data_paths": {
-                "blog_data_path": "data/test_three_posts.json",
+                "blog_data_path": "data/test_posts.json",
                 "topics_path": "data/topics.json",
                 "sentiment_attributes_path": "data/sentiment_attributes.json",
                 "publisher_objects_path": "data/publisher_objects.json"
