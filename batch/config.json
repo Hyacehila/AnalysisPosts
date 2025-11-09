@@ -6,7 +6,6 @@
   },
   "batch": {
     "model": "glm-4-air",
-    "multimodal_model": "glm-4v-plus",
     "max_file_size": 104857600,
     "max_requests_per_file": 10000,
     "poll_interval": 60,

@@ -8,7 +8,7 @@
 import os
 import sys
 import json
-from utils.batch_client import process_all_analysis_types
+from utils.batch_client import upload_and_create_all_batches
 
 
 def get_api_key():
@@ -150,10 +150,9 @@ def main():
     
     # 处理所有分析类型
     try:
-        batch_results = process_all_analysis_types(
+        batch_results = upload_and_create_all_batches(
             api_key=api_key,
-            jsonl_files=jsonl_files,
-            output_dir="batch/temp"
+            jsonl_files=jsonl_files
         )
         
         print("\n" + "=" * 60)
@@ -161,41 +160,34 @@ def main():
         print("=" * 60)
         
         # 显示结果摘要
-        total_completed = 0
+        total_batches = 0
         total_failed = 0
         
         for analysis_type, result in batch_results.items():
             print(f"\n{analysis_type}:")
             
-            if result["status"] == "completed":
-                batch_status = result["batch_status"]
-                completed = batch_status["total_completed"]
-                failed = batch_status["total_failed"]
-                total_completed += completed
-                total_failed += failed
+            if result["status"] == "batches_created":
+                successful_batches = len(result["successful_batches"])
+                total_batches += successful_batches
                 
-                print(f"  状态: 完成")
-                print(f"  成功任务: {completed}")
-                print(f"  失败任务: {failed}")
+                print(f"  状态: 批处理任务已创建")
+                print(f"  成功创建任务: {successful_batches}")
                 
-                # 显示下载的文件
-                downloaded_files = result.get("downloaded_files", {})
-                if downloaded_files.get(analysis_type):
-                    print(f"  下载文件: {len(downloaded_files[analysis_type])} 个")
-                    for file_path in downloaded_files[analysis_type]:
-                        print(f"    - {os.path.basename(file_path)}")
+                # 显示创建的任务信息
+                for batch_info in result["successful_batches"]:
+                    print(f"    - {batch_info['description']}: {batch_info['batch_id']}")
                 
             else:
                 print(f"  状态: {result['status']}")
                 total_failed += 1
         
-        print(f"\n总计: {total_completed} 个任务成功, {total_failed} 个任务失败")
+        print(f"\n总计: {total_batches} 个批处理任务已创建")
         
         # 保存结果
         save_batch_results(batch_results, "batch/temp")
         
-        if total_completed > 0:
-            print(f"\n已创建 {total_completed} 个批处理任务")
+        if total_batches > 0:
+            print(f"\n已成功创建 {total_batches} 个批处理任务")
             print("可以使用智谱控制台查看任务进度")
             print("完成后可以执行 download_results.py 下载结果")
         else:

@@ -7,7 +7,6 @@ JSONL文件生成工具
 
 import os
 import json
-import base64
 from typing import List, Dict, Any, Tuple
 
 
@@ -16,72 +15,9 @@ MAX_LINES_PER_FILE = 50000  # 每个文件最大条数
 MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024  # 100MB
 
 
-def encode_image_to_base64(image_path: str) -> str:
-    """将图片文件编码为Base64字符串"""
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
-
-
-def get_image_mime_type(image_path: str) -> str:
-    """获取图片的MIME类型"""
-    ext = os.path.splitext(image_path)[1].lower()
-    mime_types = {
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.png': 'image/png',
-        '.gif': 'image/gif',
-        '.webp': 'image/webp'
-    }
-    return mime_types.get(ext, 'image/jpeg')
-
-
-def process_images_for_batch(blog_post: Dict[str, Any], data_dir: str) -> List[Dict[str, Any]]:
-    """为批处理请求处理图片"""
-    image_content = []
-    image_urls = blog_post.get('image_urls', [])
-    
-    for img_url in image_urls:
-        if not img_url or not img_url.strip():
-            continue
-            
-        # 构建完整的图片路径
-        if img_url.startswith('http'):
-            # 如果是网络图片，需要先下载（这里暂不处理）
-            continue
-        else:
-            # 本地图片路径
-            full_path = os.path.join(data_dir, img_url.lstrip('/'))
-            
-            if os.path.exists(full_path):
-                try:
-                    base64_image = encode_image_to_base64(full_path)
-                    mime_type = get_image_mime_type(full_path)
-                    data_url = f"data:{mime_type};base64,{base64_image}"
-                    
-                    image_content.append({
-                        "type": "image_url",
-                        "image_url": {
-                            "url": data_url
-                        }
-                    })
-                except Exception as e:
-                    print(f"处理图片失败 {full_path}: {e}")
-                    continue
-    
-    return image_content
-
-
-def select_model_for_analysis(analysis_type: str, has_images: bool) -> str:
-    """根据分析类型和是否有图片选择模型"""
-    if analysis_type in ["sentiment_polarity", "topic_analysis"]:
-        # 情感极性分析和主题分析任务，无论是否包含图片都使用多模态视觉模型
-        return "glm-4v-plus"
-    elif analysis_type == "sentiment_attribute":
-        return "glm-4-air"
-    elif analysis_type == "publisher_analysis":
-        return "glm-4-air"
-    else:
-        return "glm-4-air"
+def select_model_for_analysis(analysis_type: str) -> str:
+    """根据分析类型选择模型，所有分析都使用 glm-4-air"""
+    return "glm-4-air"
 
 
 def get_temperature_for_analysis(analysis_type: str) -> float:
@@ -153,14 +89,9 @@ def generate_sentiment_polarity_requests(posts: List[Dict[str, Any]], data_dir: 
     requests = []
     
     for i, post in enumerate(posts):
-        # 检查是否有图片
-        image_urls = post.get('image_urls', [])
-        image_urls = [img for img in image_urls if img and img.strip()]
-        has_images = len(image_urls) > 0
-        
-        # 构建提示词（与nodes.py中完全一致）
+        # 构建提示词（只分析文本内容）
         prompt = f"""你是一个专业的社交媒体内容分析师。
-你的任务是分析以下博文内容（包括文本和图片）的整体情感极性。
+你的任务是分析以下博文内容的整体情感极性。
 
 情感极性评分标准如下：
 1 - 极度悲观 (例如：愤怒、绝望、极度不满)
@@ -170,7 +101,7 @@ def generate_sentiment_polarity_requests(posts: List[Dict[str, Any]], data_dir: 
 5 - 极度乐观 (例如：兴奋、感激、极度喜悦)
 
 要求：
-1. 请仔细阅读文本、观察图片，并结合上述评分标准，对这篇博文的整体情感倾向做出判断
+1. 请仔细阅读文本内容，并结合上述评分标准，对这篇博文的整体情感倾向做出判断
 2. 你的最终输出必须只包含一个代表判断结果的阿拉伯数字（1-5）
 3. 不要添加任何解释、标题、引言、JSON格式或其他任何文本
 4. 如果内容无法判断或超出理解范围，请输出数字0
@@ -203,20 +134,9 @@ def generate_sentiment_polarity_requests(posts: List[Dict[str, Any]], data_dir: 
 
 {post.get('content', '')}"""
         
-        # 选择模型
-        model = select_model_for_analysis("sentiment_polarity", has_images)
+        # 选择模型和参数
+        model = select_model_for_analysis("sentiment_polarity")
         temperature = get_temperature_for_analysis("sentiment_polarity")
-        
-        # 构建请求
-        if has_images:
-            # 有图片时的多模态请求
-            image_content = process_images_for_batch(post, data_dir)
-            content = [
-                {"type": "text", "text": prompt}
-            ] + image_content
-        else:
-            # 无图片时的纯文本请求
-            content = prompt
         
         request = {
             "custom_id": f"sentiment_polarity_{i:06d}",
@@ -231,7 +151,7 @@ def generate_sentiment_polarity_requests(posts: List[Dict[str, Any]], data_dir: 
                     },
                     {
                         "role": "user",
-                        "content": content
+                        "content": prompt
                     }
                 ],
                 "temperature": temperature
@@ -251,9 +171,9 @@ def generate_sentiment_attribute_requests(posts: List[Dict[str, Any]], attribute
         # 构建情感属性列表字符串
         attributes_str = "、".join(attributes)
         
-        # 构建提示词（与nodes.py中完全一致）
+        # 构建提示词（只分析文本内容）
         prompt = f"""你是一个专业的社交媒体内容分析师。
-你的任务是分析以下博文内容（包括文本和图片）的整体情感属性。
+你的任务是分析以下博文内容的整体情感属性。
 
 可选择的情感属性：{attributes_str}
 
@@ -289,7 +209,7 @@ def generate_sentiment_attribute_requests(posts: List[Dict[str, Any]], attribute
 """
         
         # 选择模型和参数
-        model = select_model_for_analysis("sentiment_attribute", False)
+        model = select_model_for_analysis("sentiment_attribute")
         temperature = get_temperature_for_analysis("sentiment_attribute")
         
         request = {
@@ -322,15 +242,16 @@ def generate_topic_analysis_requests(posts: List[Dict[str, Any]], topics: List[D
     requests = []
     
     for i, post in enumerate(posts):
-        # 构建主题层次结构字符串
+        # 构建主题层次结构字符串 - 与nodes.py保持一致
         topics_str = ""
         for topic_group in topics:
             parent_topic = topic_group.get("parent_topic", "")
             sub_topics = topic_group.get("sub_topics", [])
             topics_str += f"\n父主题：{parent_topic}\n子主题：{'、'.join(sub_topics)}\n"
         
-        # 构建提示词（与nodes.py中完全一致）
-        prompt = f"""你是一个专业的社交媒体内容分析师。
+        # 构建提示词 - 与nodes.py保持完全一致
+        prompt = f"""
+你是一个专业的社交媒体内容分析师。
 你的任务是分析以下博文内容（包括文本和图片）的主题层次结构。
 
 候选的主题层次结构：{topics_str}
@@ -363,28 +284,14 @@ def generate_topic_analysis_requests(posts: List[Dict[str, Any]], topics: List[D
 
 博文内容：
 {post.get('content', '')}
+
 """
         
-        # 检查是否有图片
-        image_urls = post.get('image_urls', [])
-        image_urls = [img for img in image_urls if img and img.strip()]
-        has_images = len(image_urls) > 0
-        
-        # 选择模型和参数
-        model = select_model_for_analysis("topic_analysis", has_images)
+        # 选择模型和参数 - 与nodes.py保持一致
+        model = select_model_for_analysis("topic_analysis")
         temperature = get_temperature_for_analysis("topic_analysis")
         
-        # 构建请求
-        if has_images:
-            # 有图片时的多模态请求
-            image_content = process_images_for_batch(post, data_dir)
-            content = [
-                {"type": "text", "text": prompt}
-            ] + image_content
-        else:
-            # 无图片时的纯文本请求
-            content = prompt
-        
+        # 注意：batch处理目前不支持图片，但提示词保持一致
         request = {
             "custom_id": f"topic_analysis_{i:06d}",
             "method": "POST",
@@ -398,7 +305,7 @@ def generate_topic_analysis_requests(posts: List[Dict[str, Any]], topics: List[D
                     },
                     {
                         "role": "user",
-                        "content": content
+                        "content": prompt
                     }
                 ],
                 "temperature": temperature
@@ -418,11 +325,11 @@ def generate_publisher_analysis_requests(posts: List[Dict[str, Any]], publishers
         # 构建发布者对象列表字符串
         publishers_str = "、".join(publishers)
         
-        # 构建提示词（与nodes.py中完全一致）
+        # 构建提示词（只分析文本内容）
         prompt = f"""分析博文发布者类型
 
 你是一个专业的社交媒体内容分析师。
-你的任务是分析以下博文内容（包括文本和图片）的博文发布者类型。
+你的任务是分析以下博文内容的博文发布者类型。
 可选择的发布者对象：{publishers_str}
 
 
@@ -453,7 +360,7 @@ def generate_publisher_analysis_requests(posts: List[Dict[str, Any]], publishers
 """
         
         # 选择模型和参数
-        model = select_model_for_analysis("publisher_analysis", False)
+        model = select_model_for_analysis("publisher_analysis")
         temperature = get_temperature_for_analysis("publisher_analysis")
         
         request = {

@@ -107,28 +107,23 @@ def parse_topic_analysis_result(result_line: str, topics_hierarchy: List[Dict[st
         except json.JSONDecodeError:
             return None
         
-        # 验证主题结构
+        # 验证主题结构 - 与nodes.py保持一致
         valid_topics = []
-        valid_parent_topics = {topic["parent_topic"] for topic in topics_hierarchy}
-        valid_sub_topics = {}
-        for topic_group in topics_hierarchy:
-            valid_sub_topics[topic_group["parent_topic"]] = set(topic_group["sub_topics"])
-        
-        for topic in topics:
-            if not isinstance(topic, dict):
-                continue
+        for topic_item in topics:
+            parent_topic = topic_item.get("parent_topic", "")
+            sub_topic = topic_item.get("sub_topic", "")
             
-            parent_topic = topic.get("parent_topic")
-            sub_topic = topic.get("sub_topic")
-            
-            if (parent_topic in valid_parent_topics and 
-                sub_topic in valid_sub_topics.get(parent_topic, set())):
-                valid_topics.append({
-                    "parent_topic": parent_topic,
-                    "sub_topic": sub_topic
-                })
+            # 验证父主题和子主题是否在预定义列表中
+            for topic_group in topics_hierarchy:
+                if topic_group.get("parent_topic") == parent_topic:
+                    if sub_topic in topic_group.get("sub_topics", []):
+                        valid_topics.append({
+                            "parent_topic": parent_topic,
+                            "sub_topic": sub_topic
+                        })
+                    break  # 与nodes.py保持一致：找到匹配的父主题后break
         
-        return valid_topics if valid_topics else None
+        return valid_topics  # 与nodes.py保持一致：允许返回空列表
         
     except (json.JSONDecodeError, KeyError, IndexError):
         return None
@@ -250,10 +245,12 @@ def parse_multiple_result_files(result_file_paths: List[str], analysis_type: str
 
 def find_result_files(temp_dir: str, analysis_type: str) -> List[str]:
     """查找指定分析类型的结果文件"""
-    # 支持单文件和多文件格式
+    # 支持多种文件命名格式，包括实际的文件命名模式
     patterns = [
         f"{analysis_type}_results.jsonl",
-        f"{analysis_type}_results_part*.jsonl"
+        f"{analysis_type}_results_part*.jsonl",
+        f"{analysis_type}*results*.jsonl",  # 匹配实际文件名格式
+        f"{analysis_type}_{analysis_type} analysis_results.jsonl"  # 精确匹配当前文件名
     ]
     
     result_files = []
@@ -262,7 +259,8 @@ def find_result_files(temp_dir: str, analysis_type: str) -> List[str]:
         files = glob.glob(full_pattern)
         result_files.extend(files)
     
-    # 排序确保一致性
+    # 去重并排序确保一致性
+    result_files = list(set(result_files))
     result_files.sort()
     
     return result_files

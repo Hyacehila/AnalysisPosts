@@ -22,22 +22,83 @@ def get_api_key():
 def load_batch_info():
     """加载批处理任务信息"""
     temp_dir = "batch/temp"
+    
+    # 尝试读取batch_results.json（新格式）
+    batch_results_file = os.path.join(temp_dir, "batch_results.json")
+    if os.path.exists(batch_results_file):
+        try:
+            print(f"尝试读取: {batch_results_file}")
+            with open(batch_results_file, 'r', encoding='utf-8') as f:
+                batch_results = json.load(f)
+            
+            print(f"成功读取batch_results.json，包含 {len(batch_results)} 个分析类型")
+            
+            # 从batch_results中提取所有批处理任务（新格式）
+            all_batch_tasks = {}
+            for analysis_type, result in batch_results.items():
+                print(f"处理分析类型: {analysis_type}")
+                if result.get("status") == "batches_created" and result.get("successful_batches"):
+                    # 新格式：只创建了任务，还没有完成状态
+                    # 需要查询每个任务的状态
+                    batch_tasks = []
+                    for batch_info in result["successful_batches"]:
+                        batch_tasks.append({
+                            "batch_id": batch_info.get("batch_id"),
+                            "description": batch_info.get("description", ""),
+                            "request_counts": {}  # 需要后续查询获取
+                        })
+                        print(f"  找到batch_id: {batch_info.get('batch_id')} (状态未知)")
+                    
+                    if batch_tasks:
+                        all_batch_tasks[analysis_type] = batch_tasks
+                        print(f"  {analysis_type} 找到 {len(batch_tasks)} 个批处理任务")
+                elif result.get("status") == "completed" and result.get("batch_status"):
+                    # 旧格式：已完成的工作流
+                    completed_tasks = []
+                    # 从batch_status.completed中获取已完成的任务
+                    for completed_item in result["batch_status"].get("completed", []):
+                        if completed_item.get("final_status") and completed_item["final_status"].get("status") == "completed":
+                            completed_tasks.append({
+                                "batch_id": completed_item.get("batch_id"),
+                                "output_file_id": completed_item["final_status"].get("output_file_id"),
+                                "error_file_id": completed_item["final_status"].get("error_file_id"),
+                                "description": completed_item.get("description", ""),
+                                "request_counts": completed_item["final_status"].get("request_counts", {})
+                            })
+                            print(f"  找到已完成的batch_id: {completed_item.get('batch_id')}")
+                    
+                    if completed_tasks:
+                        all_batch_tasks[analysis_type] = completed_tasks
+                        print(f"  {analysis_type} 找到 {len(completed_tasks)} 个已完成的任务")
+            
+            if all_batch_tasks:
+                total_tasks = sum(len(tasks) for tasks in all_batch_tasks.values())
+                print(f"从batch_results.json加载了 {len(all_batch_tasks)} 个分析类型，共 {total_tasks} 个批处理任务")
+                return all_batch_tasks
+            else:
+                print("未找到任何已完成的批处理任务")
+            
+        except Exception as e:
+            print(f"加载batch_results.json失败: {e}")
+            import traceback
+            print(f"详细错误: {traceback.format_exc()}")
+    
+    # 回退到旧的batch_info.json格式
     info_file = os.path.join(temp_dir, "batch_info.json")
+    if os.path.exists(info_file):
+        try:
+            with open(info_file, 'r', encoding='utf-8') as f:
+                batch_info = json.load(f)
+            
+            print(f"从batch_info.json加载了 {len(batch_info)} 个批处理任务")
+            return batch_info
+            
+        except Exception as e:
+            print(f"加载batch_info.json失败: {e}")
     
-    if not os.path.exists(info_file):
-        print(f"批处理信息文件不存在: {info_file}")
-        print("请先运行 upload_and_start.py 创建批处理任务")
-        return None
-    
-    try:
-        with open(info_file, 'r', encoding='utf-8') as f:
-            batch_info = json.load(f)
-        
-        return batch_info
-        
-    except Exception as e:
-        print(f"加载批处理信息失败: {e}")
-        return None
+    print(f"批处理信息文件不存在: {info_file}")
+    print("请先运行 upload_and_start.py 创建批处理任务")
+    return None
 
 
 def check_all_batch_status(api_key: str, batch_info: dict) -> dict:
@@ -48,38 +109,78 @@ def check_all_batch_status(api_key: str, batch_info: dict) -> dict:
     print()
     
     for analysis_type, info in batch_info.items():
-        batch_id = info.get("batch_id")
-        if not batch_id:
-            print(f"{analysis_type}: 无batch_id")
-            continue
-        
-        print(f"检查 {analysis_type} (ID: {batch_id})...")
-        
-        status = get_batch_status(api_key, batch_id)
-        if status:
-            status_info[analysis_type] = {
-                "batch_id": batch_id,
-                "status": status.get("status"),
-                "created_at": status.get("created_at"),
-                "completed_at": status.get("completed_at"),
-                "request_counts": status.get("request_counts", {}),
-                "output_file_id": status.get("output_file_id"),
-                "error_file_id": status.get("error_file_id")
-            }
-            
-            print(f"  状态: {status.get('status')}")
-            
-            # 显示请求统计
-            counts = status.get("request_counts", {})
-            if counts:
-                total = counts.get("total", 0)
-                completed = counts.get("completed", 0)
-                failed = counts.get("failed", 0)
-                print(f"  进度: {completed}/{total} 完成, {failed} 失败")
+        if isinstance(info, list):
+            # 新格式：每个分析类型有多个任务
+            for i, task in enumerate(info):
+                batch_id = task.get("batch_id")
+                description = task.get("description", f"Part {i+1}")
+                
+                if not batch_id:
+                    print(f"{analysis_type} - {description}: 无batch_id")
+                    continue
+                
+                print(f"检查 {analysis_type} - {description} (ID: {batch_id})...")
+                
+                status = get_batch_status(api_key, batch_id)
+                if status:
+                    key = f"{analysis_type}_{description}"
+                    status_info[key] = {
+                        "batch_id": batch_id,
+                        "status": status.get("status"),
+                        "created_at": status.get("created_at"),
+                        "completed_at": status.get("completed_at"),
+                        "request_counts": status.get("request_counts", {}),
+                        "output_file_id": status.get("output_file_id"),
+                        "error_file_id": status.get("error_file_id")
+                    }
+                    
+                    print(f"  状态: {status.get('status')}")
+                    
+                    # 显示请求统计
+                    counts = status.get("request_counts", {})
+                    if counts:
+                        total = counts.get("total", 0)
+                        completed = counts.get("completed", 0)
+                        failed = counts.get("failed", 0)
+                        print(f"  进度: {completed}/{total} 完成, {failed} 失败")
+                else:
+                    print(f"  状态查询失败")
+                
+                print()
         else:
-            print(f"  状态查询失败")
-        
-        print()
+            # 旧格式：每个分析类型只有一个任务
+            batch_id = info.get("batch_id")
+            if not batch_id:
+                print(f"{analysis_type}: 无batch_id")
+                continue
+            
+            print(f"检查 {analysis_type} (ID: {batch_id})...")
+            
+            status = get_batch_status(api_key, batch_id)
+            if status:
+                status_info[analysis_type] = {
+                    "batch_id": batch_id,
+                    "status": status.get("status"),
+                    "created_at": status.get("created_at"),
+                    "completed_at": status.get("completed_at"),
+                    "request_counts": status.get("request_counts", {}),
+                    "output_file_id": status.get("output_file_id"),
+                    "error_file_id": status.get("error_file_id")
+                }
+                
+                print(f"  状态: {status.get('status')}")
+                
+                # 显示请求统计
+                counts = status.get("request_counts", {})
+                if counts:
+                    total = counts.get("total", 0)
+                    completed = counts.get("completed", 0)
+                    failed = counts.get("failed", 0)
+                    print(f"  进度: {completed}/{total} 完成, {failed} 失败")
+            else:
+                print(f"  状态查询失败")
+            
+            print()
     
     return status_info
 
@@ -146,32 +247,71 @@ def download_result_files(api_key: str, completed_tasks: dict) -> dict:
     print("下载结果文件...")
     print()
     
-    for analysis_type, status in completed_tasks.items():
-        output_file_id = status.get("output_file_id")
-        error_file_id = status.get("error_file_id")
-        
-        # 下载结果文件
-        if output_file_id:
-            result_path = os.path.join(temp_dir, f"{analysis_type}_results.jsonl")
-            print(f"下载 {analysis_type} 结果文件...")
+    for analysis_type, tasks in completed_tasks.items():
+        if isinstance(tasks, list):
+            # 新格式：每个分析类型有多个任务
+            analysis_files = []
+            for i, task in enumerate(tasks):
+                output_file_id = task.get("output_file_id")
+                error_file_id = task.get("error_file_id")
+                description = task.get("description", f"Part {i+1}")
+                
+                # 下载结果文件
+                if output_file_id:
+                    # 使用描述信息创建文件名
+                    safe_description = description.replace(" ", "_").replace("(", "").replace(")", "").lower()
+                    result_path = os.path.join(temp_dir, f"{analysis_type}_{safe_description}_results.jsonl")
+                    print(f"下载 {analysis_type} - {description} 结果文件...")
+                    
+                    if download_file(api_key, output_file_id, result_path):
+                        analysis_files.append(result_path)
+                        print(f"  结果文件: {result_path}")
+                    else:
+                        print(f"  结果文件下载失败")
+                
+                # 下载错误文件
+                if error_file_id:
+                    safe_description = description.replace(" ", "_").replace("(", "").replace(")", "").lower()
+                    error_path = os.path.join(temp_dir, f"{analysis_type}_{safe_description}_errors.jsonl")
+                    print(f"下载 {analysis_type} - {description} 错误文件...")
+                    
+                    if download_file(api_key, error_file_id, error_path):
+                        print(f"  错误文件: {error_path}")
+                    else:
+                        print(f"  错误文件下载失败")
+                
+                print()
             
-            if download_file(api_key, output_file_id, result_path):
-                downloaded_files[analysis_type] = result_path
-                print(f"  结果文件: {result_path}")
-            else:
-                print(f"  结果文件下载失败")
+            if analysis_files:
+                downloaded_files[analysis_type] = analysis_files
         
-        # 下载错误文件
-        if error_file_id:
-            error_path = os.path.join(temp_dir, f"{analysis_type}_errors.jsonl")
-            print(f"下载 {analysis_type} 错误文件...")
+        else:
+            # 旧格式：每个分析类型只有一个任务
+            output_file_id = tasks.get("output_file_id")
+            error_file_id = tasks.get("error_file_id")
             
-            if download_file(api_key, error_file_id, error_path):
-                print(f"  错误文件: {error_path}")
-            else:
-                print(f"  错误文件下载失败")
-        
-        print()
+            # 下载结果文件
+            if output_file_id:
+                result_path = os.path.join(temp_dir, f"{analysis_type}_results.jsonl")
+                print(f"下载 {analysis_type} 结果文件...")
+                
+                if download_file(api_key, output_file_id, result_path):
+                    downloaded_files[analysis_type] = [result_path]
+                    print(f"  结果文件: {result_path}")
+                else:
+                    print(f"  结果文件下载失败")
+            
+            # 下载错误文件
+            if error_file_id:
+                error_path = os.path.join(temp_dir, f"{analysis_type}_errors.jsonl")
+                print(f"下载 {analysis_type} 错误文件...")
+                
+                if download_file(api_key, error_file_id, error_path):
+                    print(f"  错误文件: {error_path}")
+                else:
+                    print(f"  错误文件下载失败")
+            
+            print()
     
     return downloaded_files
 
@@ -250,8 +390,17 @@ def main():
     
     print(f"找到 {len(batch_info)} 个批处理任务:")
     for analysis_type, info in batch_info.items():
-        batch_id = info.get("batch_id")
-        print(f"  {analysis_type}: {batch_id}")
+        if isinstance(info, list):
+            # 新格式：每个分析类型有多个任务
+            print(f"  {analysis_type}: {len(info)} 个任务")
+            for i, task in enumerate(info):
+                batch_id = task.get("batch_id")
+                description = task.get("description", f"Part {i+1}")
+                print(f"    - {description}: {batch_id}")
+        else:
+            # 旧格式：每个分析类型只有一个任务
+            batch_id = info.get("batch_id")
+            print(f"  {analysis_type}: {batch_id}")
     print()
     
     # 等待任务完成
@@ -293,9 +442,14 @@ def main():
         print("=" * 50)
         
         print("下载的文件:")
-        for analysis_type, file_path in downloaded_files.items():
-            file_size = os.path.getsize(file_path)
-            print(f"  {analysis_type}: {file_path} ({file_size} bytes)")
+        for analysis_type, files in downloaded_files.items():
+            if isinstance(files, list):
+                for file_path in files:
+                    file_size = os.path.getsize(file_path)
+                    print(f"  {analysis_type}: {file_path} ({file_size} bytes)")
+            else:
+                file_size = os.path.getsize(files)
+                print(f"  {analysis_type}: {files} ({file_size} bytes)")
         
         print(f"\n所有结果文件已保存到: batch/temp/")
         print("可以继续执行 parse_and_integrate.py 解析并整合结果")

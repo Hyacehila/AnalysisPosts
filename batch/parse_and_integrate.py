@@ -42,11 +42,12 @@ def load_reference_data():
 
 def check_result_files(temp_dir: str):
     """检查结果文件是否存在"""
+    # 更新文件匹配模式，适配实际的文件命名
     required_patterns = [
-        "sentiment_polarity_results*.jsonl",
-        "sentiment_attribute_results*.jsonl", 
-        "topic_analysis_results*.jsonl",
-        "publisher_analysis_results*.jsonl"
+        "sentiment_polarity*results*.jsonl",
+        "sentiment_attribute*results*.jsonl", 
+        "topic_analysis*results*.jsonl",
+        "publisher_analysis*results*.jsonl"
     ]
     
     import glob

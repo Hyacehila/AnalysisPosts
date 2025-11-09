@@ -163,14 +163,35 @@ def download_file(api_key: str, file_id: str, output_path: str) -> bool:
         # 确保输出目录存在
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        # 写入文件
-        file_content.write_to_file(output_path)
+        # 写入文件 - 处理不同类型的返回值
+        if hasattr(file_content, 'write_to_file'):
+            # 如果对象有write_to_file方法
+            file_content.write_to_file(output_path)
+        elif hasattr(file_content, 'content'):
+            # 如果对象有content属性
+            with open(output_path, 'wb') as f:
+                f.write(file_content.content)
+        elif isinstance(file_content, bytes):
+            # 如果直接返回字节数据
+            with open(output_path, 'wb') as f:
+                f.write(file_content)
+        elif hasattr(file_content, 'read'):
+            # 如果是文件类对象
+            with open(output_path, 'wb') as f:
+                f.write(file_content.read())
+        else:
+            # 尝试直接写入
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(str(file_content))
         
         print(f"文件下载成功: {file_id} -> {os.path.basename(output_path)}")
         return True
         
     except Exception as e:
         print(f"下载文件失败 {file_id}: {str(e)}")
+        # 添加更详细的错误信息
+        import traceback
+        print(f"详细错误信息: {traceback.format_exc()}")
         return False
 
 
@@ -416,18 +437,17 @@ def download_multiple_results(api_key: str, completed_batches: List[Dict[str, An
     return downloaded_files
 
 
-def process_multiple_files_workflow(api_key: str, file_paths: List[str], analysis_type: str, output_dir: str = "batch/temp") -> Dict[str, Any]:
+def upload_and_create_batches(api_key: str, file_paths: List[str], analysis_type: str) -> Dict[str, Any]:
     """
-    处理多个文件的完整工作流
+    上传文件并创建批处理任务（不等待完成）
     
     Args:
         api_key: 智谱API密钥
         file_paths: 文件路径列表
         analysis_type: 分析类型
-        output_dir: 输出目录
         
     Returns:
-        处理结果
+        上传和创建任务的结果
     """
     print(f"\n开始处理 {analysis_type} 的 {len(file_paths)} 个文件")
     
@@ -449,10 +469,39 @@ def process_multiple_files_workflow(api_key: str, file_paths: List[str], analysi
     
     print(f"成功创建 {len(successful_batches)}/{len(successful_uploads)} 个批处理任务")
     
-    # 3. 等待任务完成
+    return {
+        "status": "batches_created",
+        "upload_results": upload_results,
+        "batch_results": batch_results,
+        "successful_batches": successful_batches
+    }
+
+
+def process_multiple_files_workflow(api_key: str, file_paths: List[str], analysis_type: str, output_dir: str = "batch/temp") -> Dict[str, Any]:
+    """
+    处理多个文件的完整工作流（包含等待和下载）
+    
+    Args:
+        api_key: 智谱API密钥
+        file_paths: 文件路径列表
+        analysis_type: 分析类型
+        output_dir: 输出目录
+        
+    Returns:
+        处理结果
+    """
+    # 1. 上传文件并创建批处理任务
+    upload_result = upload_and_create_batches(api_key, file_paths, analysis_type)
+    
+    if upload_result["status"] != "batches_created":
+        return upload_result
+    
+    successful_batches = upload_result["successful_batches"]
+    
+    # 2. 等待任务完成
     batch_status = wait_for_multiple_batches(api_key, successful_batches)
     
-    # 4. 下载结果
+    # 3. 下载结果
     if batch_status["total_completed"] > 0:
         downloaded_files = download_multiple_results(
             api_key, 
@@ -464,11 +513,43 @@ def process_multiple_files_workflow(api_key: str, file_paths: List[str], analysi
     
     return {
         "status": "completed",
-        "upload_results": upload_results,
-        "batch_results": batch_results,
+        "upload_results": upload_result["upload_results"],
+        "batch_results": upload_result["batch_results"],
         "batch_status": batch_status,
         "downloaded_files": downloaded_files
     }
+
+
+def upload_and_create_all_batches(api_key: str, jsonl_files: Dict[str, List[str]]) -> Dict[str, Any]:
+    """
+    上传所有分析类型的文件并创建批处理任务（不等待完成）
+    
+    Args:
+        api_key: 智谱API密钥
+        jsonl_files: 分析类型到文件路径列表的映射
+        
+    Returns:
+        所有上传和创建任务的结果
+    """
+    all_results = {}
+    
+    for analysis_type, file_paths in jsonl_files.items():
+        print(f"\n{'='*60}")
+        print(f"开始处理分析类型: {analysis_type}")
+        print(f"文件数量: {len(file_paths)}")
+        print(f"{'='*60}")
+        
+        result = upload_and_create_batches(api_key, file_paths, analysis_type)
+        all_results[analysis_type] = result
+        
+        if result["status"] == "batches_created":
+            successful_batches = len(result["successful_batches"])
+            total_batches = len(result["batch_results"])
+            print(f"\n{analysis_type} 批处理任务创建完成: {successful_batches}/{total_batches} 成功")
+        else:
+            print(f"\n{analysis_type} 批处理任务创建失败: {result['status']}")
+    
+    return all_results
 
 
 def process_all_analysis_types(api_key: str, jsonl_files: Dict[str, List[str]], output_dir: str = "batch/temp") -> Dict[str, Any]:
