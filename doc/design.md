@@ -228,7 +228,7 @@ flowchart TD
 
 ### 基础工具函数
 
-1. **glm-4.5-air-x纯文本模型调用** (`utils/call_llm.py` → `call_glm_45_air`)
+1. **glm-4.5-air纯文本模型调用** (`utils/call_llm.py` → `call_glm_45_air`)
    - *Input*: prompt (str), temperature (float), max_tokens (int)
    - *Output*: response (str)
    - 用于基础文本处理任务，不开启推理模式

@@ -1,0 +1,154 @@
+{
+  "integration_stats": {
+    "total_posts": 17275,
+    "sentiment_polarity": {
+      "analysis_type": "sentiment_polarity",
+      "total_posts": 17275,
+      "processed_posts": 17103,
+      "missing_posts": 172,
+      "completeness_rate": 99.0,
+      "missing_indices": [
+        685,
+        1137,
+        1271,
+        1511,
+        1661,
+        1855,
+        2232,
+        2396,
+        2552,
+        2627,
+        2659,
+        2912,
+        3236,
+        3316,
+        3369,
+        3419,
+        4509,
+        4516,
+        4756,
+        6000
+      ],
+      "status": "completed"
+    },
+    "sentiment_attribute": {
+      "analysis_type": "sentiment_attribute",
+      "total_posts": 17275,
+      "processed_posts": 16863,
+      "missing_posts": 412,
+      "completeness_rate": 97.62,
+      "missing_indices": [
+        72,
+        244,
+        271,
+        298,
+        338,
+        392,
+        423,
+        577,
+        604,
+        649,
+        1271,
+        1511,
+        1664,
+        1855,
+        2070,
+        2071,
+        2232,
+        2396,
+        2520,
+        2552
+      ],
+      "status": "completed"
+    },
+    "topic_analysis": {
+      "analysis_type": "topic_analysis",
+      "total_posts": 17275,
+      "processed_posts": 15323,
+      "missing_posts": 1952,
+      "completeness_rate": 88.7,
+      "missing_indices": [
+        6,
+        8,
+        29,
+        43,
+        50,
+        54,
+        55,
+        57,
+        61,
+        64,
+        132,
+        148,
+        151,
+        157,
+        158,
+        167,
+        174,
+        185,
+        202,
+        217
+      ],
+      "status": "incomplete"
+    },
+    "publisher_analysis": {
+      "analysis_type": "publisher_analysis",
+      "total_posts": 17275,
+      "processed_posts": 17130,
+      "missing_posts": 145,
+      "completeness_rate": 99.16,
+      "missing_indices": [
+        1123,
+        1271,
+        1435,
+        1503,
+        1511,
+        1642,
+        1799,
+        1855,
+        2232,
+        2396,
+        2552,
+        2659,
+        2703,
+        2717,
+        2912,
+        3200,
+        3316,
+        3419,
+        4509,
+        5016
+      ],
+      "status": "completed"
+    }
+  },
+  "validation_result": {
+    "total_posts": 17275,
+    "field_completeness": {
+      "sentiment_polarity": {
+        "count": 17103,
+        "completeness": 99.0
+      },
+      "sentiment_attribute": {
+        "count": 16863,
+        "completeness": 97.62
+      },
+      "topics": {
+        "count": 15323,
+        "completeness": 88.7
+      },
+      "publisher": {
+        "count": 17130,
+        "completeness": 99.16
+      }
+    },
+    "data_quality": {
+      "sentiment_polarity_valid": 17103,
+      "sentiment_attribute_valid": 16863,
+      "topics_valid": 15323,
+      "publisher_valid": 17130
+    },
+    "issues": []
+  },
+  "report_text": "============================================================\n数据整合报告（多文件合并）\n============================================================\n总博文数量: 17275\n\n情感极性分析: 17103/17275 (99.0%)\n  缺失索引: [685, 1137, 1271, 1511, 1661, 1855, 2232, 2396, 2552, 2627]... (共20个)\n情感属性分析: 16863/17275 (97.62%)\n  缺失索引: [72, 244, 271, 298, 338, 392, 423, 577, 604, 649]... (共20个)\n主题分析: 15323/17275 (88.7%)\n  缺失索引: [6, 8, 29, 43, 50, 54, 55, 57, 61, 64]... (共20个)\n发布者对象分析: 17130/17275 (99.16%)\n  缺失索引: [1123, 1271, 1435, 1503, 1511, 1642, 1799, 1855, 2232, 2396]... (共20个)\n\n整体完整性: 96.12%"
+}

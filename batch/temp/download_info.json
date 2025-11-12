@@ -1,0 +1,72 @@
+{
+  "completed_tasks": {
+    "sentiment_polarity_sentiment_polarity analysis": {
+      "batch_id": "batch_1988210677822922752",
+      "status": "completed",
+      "created_at": 1762861339000,
+      "completed_at": 1762867631000,
+      "request_counts": {
+        "completed": 17167,
+        "failed": 108,
+        "total": 17275
+      },
+      "output_file_id": "1762867631_be2e4bf4a55a467db98c99166cdeadb8",
+      "error_file_id": "1762867631_056369fdd1f740efa7463bd1cd6e57e5"
+    },
+    "sentiment_attribute_sentiment_attribute analysis": {
+      "batch_id": "batch_1988210830721953792",
+      "status": "completed",
+      "created_at": 1762861375000,
+      "completed_at": 1762867639000,
+      "request_counts": {
+        "completed": 17166,
+        "failed": 109,
+        "total": 17275
+      },
+      "output_file_id": "1762867638_fd085d7d371c49a0a185a6f818b8e617",
+      "error_file_id": "1762867639_ccd4c73b5a954e7e8f8e507da01a30ee"
+    },
+    "topic_analysis_topic_analysis analysis": {
+      "batch_id": "batch_1988211115594743808",
+      "status": "completed",
+      "created_at": 1762861443000,
+      "completed_at": 1762867646000,
+      "request_counts": {
+        "completed": 17165,
+        "failed": 110,
+        "total": 17275
+      },
+      "output_file_id": "1762867646_af83d2959e164af4841df848f8c732b7",
+      "error_file_id": "1762867646_9753399b7fca49268f493eb8323a59c8"
+    },
+    "publisher_analysis_publisher_analysis analysis": {
+      "batch_id": "batch_1988211346563403776",
+      "status": "completed",
+      "created_at": 1762861498000,
+      "completed_at": 1762867653000,
+      "request_counts": {
+        "completed": 17166,
+        "failed": 109,
+        "total": 17275
+      },
+      "output_file_id": "1762867652_a5010fd6ad8f4ad8a4b377899872af1b",
+      "error_file_id": "1762867653_8e54347d0f024020bc87d619c8362207"
+    }
+  },
+  "failed_tasks": {},
+  "downloaded_files": {
+    "sentiment_polarity_sentiment_polarity analysis": [
+      "batch/temp\\sentiment_polarity_sentiment_polarity analysis_results.jsonl"
+    ],
+    "sentiment_attribute_sentiment_attribute analysis": [
+      "batch/temp\\sentiment_attribute_sentiment_attribute analysis_results.jsonl"
+    ],
+    "topic_analysis_topic_analysis analysis": [
+      "batch/temp\\topic_analysis_topic_analysis analysis_results.jsonl"
+    ],
+    "publisher_analysis_publisher_analysis analysis": [
+      "batch/temp\\publisher_analysis_publisher_analysis analysis_results.jsonl"
+    ]
+  },
+  "download_time": "2025-11-11 21:28:22"
+}
