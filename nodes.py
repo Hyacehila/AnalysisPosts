@@ -12,13 +12,44 @@
 
 import json
 import os
+import asyncio
 from typing import List, Dict, Any, Optional
-from pocketflow import Node, BatchNode
+from pocketflow import Node, BatchNode, AsyncNode
 from utils.call_llm import call_glm_45_air, call_glm4v_plus
 from utils.data_loader import (
     load_blog_data, load_topics, load_sentiment_attributes, 
     load_publisher_objects, save_enhanced_blog_data, load_enhanced_blog_data
 )
+
+
+class AsyncParallelBatchNode(AsyncNode, BatchNode):
+    """
+    带并发限制的异步并行批处理节点
+    支持通过 max_concurrent 参数控制并发执行数量
+    """
+    
+    def __init__(self, max_concurrent=None, **kwargs):
+        super().__init__(**kwargs)
+        self.max_concurrent = max_concurrent
+        # ✅ 正确：在构造时创建信号量（实例级别共享）
+        self._semaphore = (
+            asyncio.Semaphore(max_concurrent) 
+            if max_concurrent else None
+        )
+    
+    async def _exec(self, items):
+        if not items:
+            return []
+            
+        # 使用实例属性中的信号量
+        if self._semaphore:
+            async def sem_exec(item):
+                async with self._semaphore:  # 同一实例的所有调用共享
+                    return await AsyncNode._exec(self, item)
+            
+            return await asyncio.gather(*(sem_exec(i) for i in items))
+        else:
+            return await asyncio.gather(*(AsyncNode._exec(self, i) for i in items))
 
 
 class DataLoadNode(Node):
@@ -177,6 +208,133 @@ class SaveEnhancedDataNode(Node):
         return "default"
 
 
+class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
+    """
+    异步情感极性分析BatchNode
+    Purpose: 批量分析博文的情感极性（1-5档数字分级）
+    Type: AsyncParallelBatchNode
+    """
+    
+    async def prep_async(self, shared):
+        """返回博文数据列表，每条博文作为独立处理单元"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        return blog_data
+    
+    async def exec_async(self, prep_res):
+        """对单条博文调用多模态LLM进行情感极性分析"""
+        blog_post = prep_res
+        # 构建提示词
+        prompt = f"""
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的整体情感极性。
+
+情感极性评分标准如下：
+1 - 极度悲观 (例如：愤怒、绝望、极度不满)
+2 - 悲观 (例如：失望、担忧、轻微不满)
+3 - 无明显极性 (例如：事实陈述、客观描述、无明显情感倾向)
+4 - 乐观 (例如：开心、满意、期待)
+5 - 极度乐观 (例如：兴奋、感激、极度喜悦)
+
+要求：
+1. 请仔细阅读文本、观察图片，并结合上述评分标准，对这篇博文的整体情感倾向做出判断
+2. 你的最终输出必须只包含一个代表判断结果的阿拉伯数字（1-5）
+3. 不要添加任何解释、标题、引言、JSON格式或其他任何文本
+4. 如果内容无法判断或超出理解范围，请输出数字0
+
+--- 示例 1：极度悲观 (1分) ---
+博文内容：我家被洪水淹了！所有的家具都毁了，一年的积蓄就这样没了！天啊，我该怎么办！
+预期输出：1
+
+--- 示例 2：悲观 (2分) ---
+博文内容：这场雨下得太大了，出门很不方便，担心会影响明天的上班。
+预期输出：2
+
+--- 示例 3：无明显极性 (3分) ---
+博文内容：北京市气象台发布暴雨红色预警信号，预计未来3小时内将出现特大暴雨。
+预期输出：3
+
+--- 示例 4：乐观 (4分) ---
+博文内容：虽然下大雨，但看到邻居们互相帮助，心里很温暖，相信很快就会好起来的。
+预期输出：4
+
+--- 示例 5：极度乐观 (5分) ---
+博文内容：太棒了！救援队及时赶到，所有人都安全了！感谢所有救援人员，你们是最棒的！
+预期输出：5
+
+--- 示例 6：无法判断 (0分) ---
+博文内容：asdfghjkl123456789
+预期输出：0
+
+现在请分析以下博文内容：
+
+{blog_post.get('content', '')}
+"""
+        
+        # 准备图片路径（如果有）
+        image_paths = blog_post.get('image_urls', [])
+        # 过滤掉空字符串
+        image_paths = [img for img in image_paths if img and img.strip()]
+        
+        # 处理相对路径：如果路径不是绝对路径，则假设相对于data目录
+        processed_image_paths = []
+        for img_path in image_paths:
+            if not os.path.isabs(img_path):
+                # 相对路径，添加data目录前缀
+                full_path = os.path.join("data", img_path)
+                processed_image_paths.append(full_path)
+            else:
+                processed_image_paths.append(img_path)
+        
+        # 使用 asyncio.to_thread 来在单独线程中运行同步的LLM调用，让出协程
+        if processed_image_paths:
+            # 有图片时使用多模态模型
+            response = await asyncio.to_thread(
+                call_glm4v_plus, prompt, image_paths=processed_image_paths, temperature=0.3
+            )
+        else:
+            # 无图片时使用纯文本模型
+            response = await asyncio.to_thread(
+                call_glm_45_air, prompt, temperature=0.3
+            )
+        
+        # 提取数字并验证格式
+        response = response.strip()
+        
+        # 检查是否为单一数字
+        if not response.isdigit():
+            raise ValueError(f"模型输出不是数字: {response}")
+        
+        score = int(response)
+        if not 1 <= score <= 5:
+            raise ValueError(f"模型输出数字不在1-5范围内: {score}")
+        
+        return score
+    
+    async def exec_fallback_async(self, prep_res, exc):
+        """当情感极性分析失败时的回退处理"""
+        print(f"情感极性分析失败，使用默认值: {str(exc)}")
+        # 返回中性评分作为默认值
+        return 3
+    
+    async def post_async(self, shared, prep_res, exec_res):
+        """将分析结果附加到对应博文对象的sentiment_polarity字段中"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        
+        # 确保结果列表长度与博文数据长度一致
+        if len(exec_res) != len(blog_data):
+            print("警告：情感极性分析结果数量与博文数量不匹配")
+            return "default"
+        
+        # 将结果附加到博文数据中
+        for i, blog_post in enumerate(blog_data):
+            if i < len(exec_res):
+                blog_post['sentiment_polarity'] = exec_res[i]
+            else:
+                blog_post['sentiment_polarity'] = None
+        
+        return "default"
+
+
 class SentimentPolarityAnalysisBatchNode(BatchNode):
     """
     情感极性分析BatchNode
@@ -300,6 +458,116 @@ class SentimentPolarityAnalysisBatchNode(BatchNode):
         return "default"
 
 
+class AsyncSentimentAttributeAnalysisBatchNode(AsyncParallelBatchNode):
+    """
+    异步情感属性分析BatchNode
+    Purpose: 批量分析博文的具体情感状态和强度
+    Type: AsyncParallelBatchNode
+    """
+    
+    async def prep_async(self, shared):
+        """返回博文数据列表，每条博文作为独立处理单元"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        sentiment_attributes = shared.get("data", {}).get("sentiment_attributes", [])
+        
+        # 返回包含博文和情感属性的列表，每个元素包含处理单条博文所需的所有信息
+        return [{
+            "blog_data": blog_post,
+            "sentiment_attributes": sentiment_attributes
+        } for blog_post in blog_data]
+    
+    async def exec_async(self, prep_res):
+        """对单条博文调用单模态LLM进行情感属性分析"""
+        blog_post = prep_res["blog_data"]
+        sentiment_attributes = prep_res["sentiment_attributes"]
+        
+        # 构建情感属性列表字符串
+        attributes_str = "、".join(sentiment_attributes)
+        
+        # 构建提示词
+        prompt = f"""
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的整体情感属性。
+
+可选择的情感属性：{attributes_str}
+
+请从上述列表中选择1-3个最贴切的情感属性，严格按照以下JSON格式输出：
+
+["属性1", "属性2"]
+
+请直接输出JSON数组，不要添加任何其他文字
+
+--- 示例 1：愤怒内容 ---
+博文内容：这场暴雨太让人愤怒了！政府为什么不提前预警！
+预期输出：["生气"]
+
+--- 示例 2：支持赞赏内容 ---
+博文内容：感谢救援人员的辛勤付出，你们是最棒的！
+预期输出：["支持", "赞赏"]
+
+--- 示例 3：中立客观内容 ---
+博文内容：北京市气象台发布暴雨红色预警信号。
+预期输出：["中立"]
+
+--- 示例 4：担忧焦虑内容 ---
+博文内容：担心这场雨会造成更大的损失，希望大家都平安。
+预期输出：["担忧", "焦虑"]
+
+--- 示例 5：希望期待内容 ---
+博文内容：希望雨快点停，明天能正常上班。
+预期输出：["希望", "期待"]
+
+
+博文内容：
+{blog_post.get('content', '')}
+
+"""
+        
+        # 使用 asyncio.to_thread 来在单独线程中运行同步的LLM调用，让出协程
+        response = await asyncio.to_thread(
+            call_glm_45_air, prompt, temperature=0.3
+        )
+        
+        # 解析JSON响应 - 让PocketFlow处理JSON解析错误
+        attributes = json.loads(response.strip())
+        
+        # 验证是否为列表
+        if not isinstance(attributes, list):
+            raise ValueError(f"模型输出不是列表格式: {attributes}")
+        
+        # 验证结果是否在预定义列表中
+        valid_attributes = []
+        for attr in attributes:
+            if attr in sentiment_attributes:
+                valid_attributes.append(attr)
+        
+        return valid_attributes 
+    
+    async def exec_fallback_async(self, prep_res, exc):
+        """当情感属性分析失败时的回退处理"""
+        print(f"情感属性分析失败，使用默认值: {str(exc)}")
+        # 返回中性属性作为默认值
+        return ["中立"]
+    
+    async def post_async(self, shared, prep_res, exec_res):
+        """将分析结果附加到对应博文对象的sentiment_attribute字段中"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        
+        # 确保结果列表长度与博文数据长度一致
+        if len(exec_res) != len(blog_data):
+            print("警告：情感属性分析结果数量与博文数量不匹配")
+            return "default"
+        
+        # 将结果附加到博文数据中
+        for i, blog_post in enumerate(blog_data):
+            if i < len(exec_res):
+                blog_post['sentiment_attribute'] = exec_res[i]
+            else:
+                blog_post['sentiment_attribute'] = None
+        
+        return "default"
+
+
 class SentimentAttributeAnalysisBatchNode(BatchNode):
     """
     情感属性分析BatchNode
@@ -404,6 +672,148 @@ class SentimentAttributeAnalysisBatchNode(BatchNode):
                 blog_post['sentiment_attribute'] = exec_res[i]
             else:
                 blog_post['sentiment_attribute'] = None
+        
+        return "default"
+
+
+class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
+    """
+    异步两级主题分析BatchNode
+    Purpose: 批量从预定义主题列表中选择合适主题
+    Type: AsyncParallelBatchNode
+    """
+    
+    async def prep_async(self, shared):
+        """返回博文数据列表，每条博文作为独立处理单元"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        topics_hierarchy = shared.get("data", {}).get("topics_hierarchy", [])
+        
+        # 返回包含博文和主题层次结构的列表，每个元素包含处理单条博文所需的所有信息
+        return [{
+            "blog_data": blog_post,
+            "topics_hierarchy": topics_hierarchy
+        } for blog_post in blog_data]
+    
+    async def exec_async(self, prep_res):
+        """对单条博文调用多模态LLM进行主题匹配和选择"""
+        blog_post = prep_res["blog_data"]
+        topics_hierarchy = prep_res["topics_hierarchy"]
+        
+        # 构建主题层次结构字符串
+        topics_str = ""
+        for topic_group in topics_hierarchy:
+            parent_topic = topic_group.get("parent_topic", "")
+            sub_topics = topic_group.get("sub_topics", [])
+            topics_str += f"\n父主题：{parent_topic}\n子主题：{'、'.join(sub_topics)}\n"
+        
+        # 构建提示词
+        prompt = f"""
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的主题层次结构。
+
+候选的主题层次结构：{topics_str}
+
+请从上述主题列表中选择1-2个最贴切的父主题和对应的子主题，严格按照以下JSON格式输出，请直接输出JSON数组，不要添加任何其他文字：
+
+[{{"parent_topic": "父主题", "sub_topic": "子主题"}}, ...]
+
+如果没有找到符合的主题，请输出空数组：[]
+
+--- 示例 1：暴雨灾害内容 ---
+博文内容：北京遭遇特大暴雨，多地出现严重内涝。
+预期输出：[{{"parent_topic": "自然灾害", "sub_topic": "暴雨"}}]
+
+--- 示例 2：地铁运营内容 ---
+博文内容：因暴雨影响，地铁部分线路暂停运营。
+预期输出：[{{"parent_topic": "交通运输", "sub_topic": "地铁运营"}}]
+
+--- 示例 3：政府预警内容 ---
+博文内容：市政府发布暴雨红色预警，请市民注意防范。
+预期输出：[{{"parent_topic": "政府工作", "sub_topic": "预警发布"}}]
+
+--- 示例 4：多主题内容 ---
+博文内容：暴雨导致地铁停运，政府启动应急响应。
+预期输出：[{{"parent_topic": "自然灾害", "sub_topic": "暴雨"}}, {{"parent_topic": "交通运输", "sub_topic": "地铁运营"}}]
+
+--- 示例 5：无相关主题内容 ---
+博文内容：今天天气不错，适合出门散步。
+预期输出：[]
+
+博文内容：
+{blog_post.get('content', '')}
+
+"""
+        
+        # 准备图片路径（如果有）
+        image_paths = blog_post.get('image_urls', [])
+        image_paths = [img for img in image_paths if img and img.strip()]
+        
+        # 处理相对路径：如果路径不是绝对路径，则假设相对于data目录
+        processed_image_paths = []
+        for img_path in image_paths:
+            if not os.path.isabs(img_path):
+                # 相对路径，添加data目录前缀
+                full_path = os.path.join("data", img_path)
+                processed_image_paths.append(full_path)
+            else:
+                processed_image_paths.append(img_path)
+        
+        # 使用 asyncio.to_thread 来在单独线程中运行同步的LLM调用，让出协程
+        if processed_image_paths:
+            response = await asyncio.to_thread(
+                call_glm4v_plus, prompt, image_paths=processed_image_paths, temperature=0.3
+            )
+        else:
+            response = await asyncio.to_thread(
+                call_glm_45_air, prompt, temperature=0.3
+            )
+        
+        # 解析JSON响应
+        topics = json.loads(response.strip())
+        
+        # 验证是否为列表
+        if not isinstance(topics, list):
+            raise ValueError(f"模型输出不是列表格式: {topics}")
+        
+        # 验证结果是否在预定义列表中
+        valid_topics = []
+        for topic_item in topics:
+            parent_topic = topic_item.get("parent_topic", "")
+            sub_topic = topic_item.get("sub_topic", "")
+            
+            # 验证父主题和子主题是否在预定义列表中
+            for topic_group in topics_hierarchy:
+                if topic_group.get("parent_topic") == parent_topic:
+                    if sub_topic in topic_group.get("sub_topics", []):
+                        valid_topics.append({
+                            "parent_topic": parent_topic,
+                            "sub_topic": sub_topic
+                        })
+                    break
+        
+        return valid_topics  # 允许返回空列表，表示找不到符合的主题
+    
+    async def exec_fallback_async(self, prep_res, exc):
+        """当主题分析失败时的回退处理"""
+        print(f"主题分析失败，使用默认值: {str(exc)}")
+        # 返回空列表作为默认值，表示无法识别主题
+        return []
+    
+    async def post_async(self, shared, prep_res, exec_res):
+        """将分析结果附加到对应博文对象的topics字段中"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        
+        # 确保结果列表长度与博文数据长度一致
+        if len(exec_res) != len(blog_data):
+            print("警告：主题分析结果数量与博文数量不匹配")
+            return "default"
+        
+        # 将结果附加到博文数据中
+        for i, blog_post in enumerate(blog_data):
+            if i < len(exec_res):
+                blog_post['topics'] = exec_res[i]
+            else:
+                blog_post['topics'] = None
         
         return "default"
 
@@ -542,6 +952,106 @@ class TwoLevelTopicAnalysisBatchNode(BatchNode):
                 blog_post['topics'] = exec_res[i]
             else:
                 blog_post['topics'] = None
+        
+        return "default"
+
+
+class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
+    """
+    异步发布者对象分析BatchNode
+    Purpose: 批量识别发布者类型和特征
+    Type: AsyncParallelBatchNode
+    """
+    
+    async def prep_async(self, shared):
+        """返回博文数据列表，每条博文作为独立处理单元"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        publisher_objects = shared.get("data", {}).get("publisher_objects", [])
+        
+        # 返回包含博文和发布者对象的列表，每个元素包含处理单条博文所需的所有信息
+        return [{
+            "blog_data": blog_post,
+            "publisher_objects": publisher_objects
+        } for blog_post in blog_data]
+    
+    async def exec_async(self, prep_res):
+        """对单条博文调用单模态LLM进行发布者类型识别"""
+        blog_post = prep_res["blog_data"]
+        publisher_objects = prep_res["publisher_objects"]
+        
+        # 构建发布者对象列表字符串
+        publishers_str = "、".join(publisher_objects)
+        
+        # 构建提示词
+        prompt = f"""分析博文发布者类型
+
+你是一个专业的社交媒体内容分析师。
+你的任务是分析以下博文内容（包括文本和图片）的博文发布者类型。
+可选择的发布者对象：{publishers_str}
+
+
+请从上述列表中选择1个最贴切的发布者对象，直接输出发布者类型字符串。请直接输出发布者类型字符串，不要添加任何其他文字
+
+--- 示例 1：气象台内容 ---
+博文内容：北京市气象台发布暴雨红色预警信号。
+预期输出：政府机构
+
+--- 示例 2：媒体内容 ---
+博文内容：本报记者现场报道暴雨情况。
+预期输出：官方新闻媒体
+
+--- 示例 3：普通用户内容 ---
+博文内容：今天雨好大，出门要小心。
+预期输出：个人用户
+
+--- 示例 4：事业单位内容 ---
+博文内容：北京地铁发布运营调整通知。
+预期输出：事业单位
+
+--- 示例 5：应急管理部门内容 ---
+博文内容：消防部门提醒市民注意安全。
+预期输出：应急管理部门
+
+博文内容：
+{blog_post.get('content', '')}
+"""
+        
+        # 使用 asyncio.to_thread 来在单独线程中运行同步的LLM调用，让出协程
+        response = await asyncio.to_thread(
+            call_glm_45_air, prompt, temperature=0.3
+        )
+        
+        # 直接解析字符串响应
+        publisher = response.strip()
+        
+        # 验证结果是否在预定义列表中
+        if publisher in publisher_objects:
+            return publisher
+        else:
+            # 如果不在列表中，返回默认值
+            return "个人用户" if "个人用户" in publisher_objects else None
+    
+    async def exec_fallback_async(self, prep_res, exc):
+        """当发布者分析失败时的回退处理"""
+        print(f"发布者分析失败，使用默认值: {str(exc)}")
+        # 返回个人用户作为默认值
+        return "个人用户"
+    
+    async def post_async(self, shared, prep_res, exec_res):
+        """将分析结果附加到对应博文对象的publisher字段中"""
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        
+        # 确保结果列表长度与博文数据长度一致
+        if len(exec_res) != len(blog_data):
+            print("警告：发布者分析结果数量与博文数量不匹配")
+            return "default"
+        
+        # 将结果附加到博文数据中
+        for i, blog_post in enumerate(blog_data):
+            if i < len(exec_res):
+                blog_post['publisher'] = exec_res[i]
+            else:
+                blog_post['publisher'] = None
         
         return "default"
 
