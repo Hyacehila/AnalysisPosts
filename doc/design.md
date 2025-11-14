@@ -633,14 +633,57 @@ shared = {
 - **时间开销**：自主决策和循环审查需要更多时间
 - **质量控制**：需要精心设计提示词确保分析质量
 
+## Async实现详解
+
+### AsyncParallelBatchNode设计
+
+我们实现了`AsyncParallelBatchNode`类，它结合了`AsyncNode`和`BatchNode`的特性，支持并发控制的异步批处理。该类通过`max_concurrent`参数控制并发执行数量，使用`asyncio.Semaphore`实现精确的并发控制。
+
+### Async分析节点实现
+
+为四个核心分析维度都实现了对应的Async版本：
+
+1. **AsyncSentimentPolarityAnalysisBatchNode**：异步批量分析博文情感极性
+2. **AsyncSentimentAttributeAnalysisBatchNode**：异步批量分析博文情感属性  
+3. **AsyncTwoLevelTopicAnalysisBatchNode**：异步批量分析两级主题结构
+4. **AsyncPublisherObjectAnalysisBatchNode**：异步批量识别发布者类型
+
+所有Async节点都使用`asyncio.to_thread`将同步LLM调用转为异步执行，支持多模态模型调用，并包含完整的异步重试和回退机制。
+
+### AsyncFlow编排
+
+提供了完整的异步流程编排示例，支持可配置的并发控制：
+
+```python
+# 创建异步批处理节点，设置并发限制
+sentiment_polarity_node = AsyncSentimentPolarityAnalysisBatchNode(
+    max_retries=3, wait=10, max_concurrent=3
+)
+# 创建异步流程
+async_flow = AsyncFlow(start=data_load_node)
+```
+
+### 使用场景和配置建议
+
+- **小规模数据处理**（<1000条）：使用较高并发数（max_concurrent=10）快速处理
+- **中等规模数据处理**（1000-10000条）：使用平衡配置（max_concurrent=5）  
+- **大规模数据处理**（>10000条）：使用保守配置（max_concurrent=3）确保稳定性
+
+### Async实现优势
+
+1. **性能提升**：多个博文可以同时进行LLM分析，显著提升处理速度
+2. **资源控制**：通过信号量控制并发数，避免触发API限流
+3. **可靠性增强**：支持异步重试机制和优雅降级，提高系统稳定性
+
 ## 技术考虑
 
 ### 性能优化
 - **批量处理**：使用BatchFlow实现四个分析维度的批量处理
 - **并行执行**：四个BatchNode可以并行运行，提高处理效率
-- **异步处理**：图片分析等耗时任务异步执行
+- **异步处理**：通过AsyncParallelBatchNode实现真正的并发处理，支持可配置的并发控制
 - **结果缓存**：避免重复分析相同内容
 - **分批加载**：大数据集分批处理避免内存溢出
+- **并发控制**：使用信号量机制精确控制API调用频率，避免触发限流
 
 ### 可靠性设计
 - **节点重试**：处理API调用失败和网络异常
