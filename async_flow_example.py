@@ -26,11 +26,11 @@ async def create_async_analysis_flow():
     # 创建节点实例，设置并发限制
     data_load_node = DataLoadNode()
     
-    # 异步批处理节点，设置并发限制为3（避免API调用过于频繁）
-    sentiment_polarity_node = AsyncSentimentPolarityAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=5)
-    sentiment_attribute_node = AsyncSentimentAttributeAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=5)
-    topic_analysis_node = AsyncTwoLevelTopicAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=5)  # 主题分析较复杂，降低并发
-    publisher_analysis_node = AsyncPublisherObjectAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=5)  # 发布者分析较简单，可以提高并发
+    # 异步批处理节点，设置并发限制为4（避免API调用过于频繁）
+    sentiment_polarity_node = AsyncSentimentPolarityAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=3)
+    sentiment_attribute_node = AsyncSentimentAttributeAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=3)
+    topic_analysis_node = AsyncTwoLevelTopicAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=3)  # 主题分析较复杂，降低并发
+    publisher_analysis_node = AsyncPublisherObjectAnalysisBatchNode(max_retries=3, wait=10,max_concurrent=3)  # 发布者分析较简单，可以提高并发
     
     # 同步节点
     save_data_node = SaveEnhancedDataNode()
@@ -83,10 +83,10 @@ async def main():
     
     print("开始异步数据处理流程...")
     print("配置信息:")
-    print(f"  - 情感极性分析并发数: 5")
-    print(f"  - 情感属性分析并发数: 5") 
-    print(f"  - 主题分析并发数: 5")
-    print(f"  - 发布者分析并发数: 5")
+    print(f"  - 情感极性分析并发数: 4")
+    print(f"  - 情感属性分析并发数:4") 
+    print(f"  - 主题分析并发数: 4")
+    print(f"  - 发布者分析并发数: 4")
     print()
     
     # 运行异步流程

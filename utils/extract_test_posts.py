@@ -88,11 +88,11 @@ def main():
     print("=== 提取测试数据脚本 ===")
     print(f"输入文件: {input_file}")
     print(f"输出文件: {output_file}")
-    print(f"提取数量: 200 条")
+    print(f"提取数量: 100 条")
     print("-" * 40)
     
     # 提取测试数据
-    success = extract_test_posts(input_file, output_file, 200)
+    success = extract_test_posts(input_file, output_file, 100)
     
     if success:
         print("\n[成功] 测试数据提取完成！")
