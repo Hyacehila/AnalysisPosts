@@ -13,14 +13,28 @@ GLM模型调用工具函数
 import os
 import json
 import base64
+import threading
 from typing import List, Dict, Any, Optional, Union
 from zai import ZaiClient
 
 # API密钥配置
 GLM_API_KEY = "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH"  # API密钥
 
+# 使用 ThreadLocal 存储客户端实例
+# 这样每个线程会有自己独立的 Client，既避免了锁竞争，又实现了连接复用
+_thread_local = threading.local()
 
-def call_glm_45_air(prompt: str, temperature: float = 0.7, max_tokens: Optional[int] = None, enable_thinking: bool = False) -> str:
+def get_client():
+    """
+    获取当前线程的 ZaiClient 实例
+    如果在当前线程是第一次调用，则创建一个新实例并缓存
+    """
+    if not hasattr(_thread_local, "client"):
+        _thread_local.client = ZaiClient(api_key=GLM_API_KEY)
+    return _thread_local.client
+
+
+def call_glm_45_air(prompt: str, temperature: float = 0.7, max_tokens: Optional[int] = None, enable_thinking: bool = False, timeout: int = 30) -> str:
     """
     调用glm-4.5-air纯文本模型
     
@@ -29,12 +43,13 @@ def call_glm_45_air(prompt: str, temperature: float = 0.7, max_tokens: Optional[
         temperature: 温度参数，控制随机性
         max_tokens: 最大生成token数
         enable_thinking: 是否开启思考模式，默认False（不开启）
+        timeout: 请求超时时间（秒），默认30秒
         
     Returns:
         模型生成的文本响应
     """
     try:
-        client = ZaiClient(api_key=GLM_API_KEY)
+        client = get_client()  # 创建新的客户端实例
         
         messages = [
             {"role": "user", "content": prompt}
@@ -44,7 +59,8 @@ def call_glm_45_air(prompt: str, temperature: float = 0.7, max_tokens: Optional[
             "model": "glm-4.5-air",
             "messages": messages,
             "temperature": temperature,
-            "stream": False
+            "stream": False,
+            "timeout": timeout  # 添加超时设置
         }
         
         if max_tokens:
@@ -54,68 +70,49 @@ def call_glm_45_air(prompt: str, temperature: float = 0.7, max_tokens: Optional[
         return response.choices[0].message.content
         
     except Exception as e:
-        raise Exception(f"调用glm-4.5-air模型失败: {str(e)}")
+        # 更详细的错误信息，帮助诊断问题
+        error_msg = str(e)
+        if "429" in error_msg or "rate" in error_msg.lower():
+            raise Exception(f"API速率限制: {error_msg}")
+        elif "timeout" in error_msg.lower():
+            raise Exception(f"请求超时({timeout}秒): {error_msg}")
+        else:
+            raise Exception(f"调用glm-4.5-air模型失败: {error_msg}")
 
 
 def call_glm4v_plus(prompt: str, image_paths: Optional[List[str]] = None, 
                    image_data: Optional[List[bytes]] = None, 
-                   temperature: float = 0.7, max_tokens: Optional[int] = None) -> str:
+                   temperature: float = 0.7, max_tokens: Optional[int] = None, timeout: int = 30) -> str:
     """
-    调用glm4v-plus视觉分析模型
+    调用glm-4.5-air纯文本模型（原为glm4v-plus，已切换）
+    
+    注意：此函数已改为调用 glm-4.5-air 模型，忽略所有图像参数
     
     Args:
         prompt: 输入提示词
-        image_paths: 图片文件路径列表
-        image_data: 图片二进制数据列表（与image_paths二选一）
+        image_paths: 图片文件路径列表（已忽略，保留参数以兼容旧代码）
+        image_data: 图片二进制数据列表（已忽略，保留参数以兼容旧代码）
         temperature: 温度参数，控制随机性
         max_tokens: 最大生成token数
+        timeout: 请求超时时间（秒），默认30秒
         
     Returns:
         模型生成的文本响应
     """
     try:
-        client = ZaiClient(api_key=GLM_API_KEY)
+        client = get_client()  # 创建新的客户端实例
         
-        # 构建消息内容
-        content = [{"type": "text", "text": prompt}]
-        
-        # 处理图片输入
-        if image_paths:
-            for img_path in image_paths:
-                with open(img_path, "rb") as f:
-                    img_data = f.read()
-                base64_image = base64.b64encode(img_data).decode('utf-8')
-                # 根据文件扩展名确定MIME类型
-                if img_path.lower().endswith(('.png', '.PNG')):
-                    mime_type = "image/png"
-                else:
-                    mime_type = "image/jpeg"
-                content.append({
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:{mime_type};base64,{base64_image}"
-                    }
-                })
-        
-        elif image_data:
-            for img_bytes in image_data:
-                base64_image = base64.b64encode(img_bytes).decode('utf-8')
-                content.append({
-                    "type": "image_url", 
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"
-                    }
-                })
-        
+        # 直接使用文本提示词，忽略所有图像参数
         messages = [
-            {"role": "user", "content": content}
+            {"role": "user", "content": prompt}
         ]
         
         params = {
-            "model": "glm-4v-plus",
+            "model": "glm-4.5-air",
             "messages": messages,
             "temperature": temperature,
-            "stream": False
+            "stream": False,
+            "timeout": timeout  # 添加超时设置
         }
         
         if max_tokens:
@@ -125,7 +122,13 @@ def call_glm4v_plus(prompt: str, image_paths: Optional[List[str]] = None,
         return response.choices[0].message.content
         
     except Exception as e:
-        raise Exception(f"调用glm4v-plus模型失败: {str(e)}")
+        error_msg = str(e)
+        if "429" in error_msg or "rate" in error_msg.lower():
+            raise Exception(f"API速率限制: {error_msg}")
+        elif "timeout" in error_msg.lower():
+            raise Exception(f"请求超时({timeout}秒): {error_msg}")
+        else:
+            raise Exception(f"调用glm-4.5-air模型失败: {error_msg}")
 
 
 def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None, 
@@ -147,7 +150,7 @@ def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None,
         模型生成的文本响应
     """
     try:
-        client = ZaiClient(api_key=GLM_API_KEY)
+        client = get_client()  # 创建新的客户端实例
         
         # 构建消息内容
         content = [{"type": "text", "text": prompt}]
@@ -220,7 +223,7 @@ def call_glm46(prompt: str, temperature: float = 0.8,
         模型生成的文本响应
     """
     try:
-        client = ZaiClient(api_key=GLM_API_KEY)
+        client = get_client()  # 创建新的客户端实例
         
         messages = [
             {"role": "user", "content": prompt}
