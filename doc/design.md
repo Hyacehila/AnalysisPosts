@@ -2,18 +2,7 @@
 
 > Please DON'T remove notes for AI
 
-## 目录
 
-1. [系统概述](#系统概述)
-2. [需求分析](#需求分析)
-3. [架构设计](#架构设计)
-4. [数据模型](#数据模型)
-5. [核心模块](#核心模块)
-6. [工具函数](#工具函数)
-7. [节点设计](#节点设计)
-8. [实现规范](#实现规范)
-9. [技术考虑](#技术考虑)
-10. [部署指南](#部署指南)
 
 ---
 
@@ -66,13 +55,43 @@
 - 支持已处理的增强数据
 
 #### 3. 分析工具集
-**功能描述**：四个核心分析工具，支撑深度分析需求
+**功能描述**：四类核心分析工具集，每类包含若干工具函数，支撑深度分析和可视化需求
 
-**工具列表**：
-- 情感趋势分析工具：时间序列情感变化分析
-- 主题演化分析工具：主题热度变化和关联分析
-- 地理分布分析工具：舆情地理分布和热点识别
-- 情感主题发布者交互分析工具：多维度交叉分析
+**工具集架构**：
+
+##### 3.1 情感趋势分析工具集
+时间序列情感变化分析，包含以下工具函数：
+- `sentiment_distribution_stats`：情感极性分布统计（各档位数量、占比）
+- `sentiment_time_series`：情感时序趋势分析（按小时/天聚合）
+- `sentiment_anomaly_detection`：情感异常点检测（突变、峰值识别）
+- `sentiment_trend_chart`：情感趋势折线图/面积图生成
+- `sentiment_pie_chart`：情感分布饼图生成
+
+##### 3.2 主题演化分析工具集
+主题热度变化和关联分析，包含以下工具函数：
+- `topic_frequency_stats`：主题频次统计（父主题/子主题分布）
+- `topic_time_evolution`：主题时序演化分析（热度变化趋势）
+- `topic_cooccurrence_analysis`：主题共现关联分析（主题间关系）
+- `topic_ranking_chart`：主题热度排行柱状图生成
+- `topic_evolution_chart`：主题演化时序图生成
+- `topic_network_chart`：主题关联网络图生成
+
+##### 3.3 地理分布分析工具集
+舆情地理分布和热点识别，包含以下工具函数：
+- `geographic_distribution_stats`：地理分布统计（省份/城市级别）
+- `geographic_hotspot_detection`：热点区域识别（高密度区域）
+- `geographic_sentiment_analysis`：地区情感差异分析
+- `geographic_heatmap`：地理热力图生成
+- `geographic_bar_chart`：地区分布柱状图生成
+
+##### 3.4 多维交互分析工具集
+情感、主题、地理、发布者多维度交叉分析，包含以下工具函数：
+- `publisher_distribution_stats`：发布者类型分布统计
+- `cross_dimension_matrix`：多维交叉矩阵分析（如：发布者×情感、主题×地区）
+- `influence_analysis`：影响力分析（互动量、传播力）
+- `correlation_analysis`：维度相关性分析
+- `interaction_heatmap`：交互热力图生成
+- `publisher_bar_chart`：发布者分布柱状图生成
 
 #### 4. 解耦合架构
 **设计理念**：数据处理与分析报告生成完全独立，通过Flow编排支持多种运行模式
@@ -132,112 +151,135 @@
 ### 处理规则
 
 #### 核心规则
+- **三阶段解耦**：原始博文增强处理、分析执行、报告生成三个阶段完全独立
+- **多路径执行**：每个阶段支持多种执行方式，通过shared字典中的参数控制
 - **并行处理**：原始博文数据的四个分析维度完全并行，无先后顺序
 - **模型调用**：所有分析通过多模态语言模型API调用进行
 - **信息附加**：分析结果直接附加到原始博文数据字典中
-- **双轨制**：报告生成支持Workflow和Agent两种路径
+
+#### 多路径执行架构
+| 阶段 | 路径选项 | 控制参数 | 说明 |
+|------|----------|----------|------|
+| 原始博文增强处理 | 异步批量并行 | `enhancement_mode="async"` | 本地代码并发调用API |
+| 原始博文增强处理 | Batch API并行 | `enhancement_mode="batch_api"` | 一次性提交批量请求到API服务端 |
+| 分析执行 | Agent自主调度 | `analysis_mode="agent"` | LLM动态决策工具调用 |
+| 分析执行 | 预定义Workflow | `analysis_mode="workflow"` | 执行.py脚本的固定流程 |
+| 报告生成 | 模板填充 | `report_mode="template"` | 预定义大纲，LLM填充内容 |
+| 报告生成 | 多轮迭代 | `report_mode="iterative"` | 生成-评审-修改循环 |
+
+#### Agent工具调度方式
+| 方式 | 控制参数 | 说明 |
+|------|----------|------|
+| MCP动态查询 | `tool_source="mcp"` | 通过Model Context Protocol动态获取工具列表 |
+| 本地Function Calling | `tool_source="local"` | 返回本地注册的固定工具列表 |
 
 #### 质量保证
 - **结果验证**：所有分析结果必须通过预定义候选列表验证
 - **错误处理**：提供完善的错误处理和重试机制
 - **数据完整性**：确保增强数据的格式完整性和一致性
+- **迭代控制**：多轮迭代报告生成设置最大迭代次数保障
 
 ## 架构设计
 
 ### 系统架构概览
 
-舆情分析智能体采用分层模块化架构，基于PocketFlow框架构建，实现数据处理与分析报告生成的完全解耦。
+舆情分析智能体采用**三阶段解耦架构**，基于PocketFlow框架构建，每个阶段独立运行并支持多种执行路径。
 
 ```mermaid
 flowchart TB
-    subgraph SystemArchitecture[系统架构]
+    subgraph SystemArchitecture[系统架构 - 三阶段解耦]
         subgraph DataLayer[数据层]
             raw_data[原始博文数据]
             enhanced_data[增强博文数据]
+            analysis_results[分析结果存储<br/>图表/表格/描述]
             reference_data[参考数据<br/>主题/情感/发布者]
         end
         
-        subgraph ProcessingLayer[处理层]
-            subgraph DataProcessing[数据处理模块]
-                sentiment_polarity[情感极性分析]
-                sentiment_attribute[情感属性分析]
-                topic_analysis[两级主题分析]
-                publisher_analysis[发布者对象分析]
-            end
-            
-            subgraph AnalysisTools[分析工具集]
-                trend_tool[情感趋势分析]
-                evolution_tool[主题演化分析]
-                geo_tool[地理分布分析]
-                interaction_tool[交互分析工具]
+        subgraph Stage1[阶段1: 原始博文增强处理]
+            subgraph EnhancementModes[增强处理方式]
+                async_mode[异步批量并行<br/>本地并发调用API]
+                batch_api_mode[Batch API并行<br/>服务端批量处理]
             end
         end
         
-        subgraph OrchestrationLayer[编排层]
-            subgraph FlowEngine[Flow引擎]
-                data_processing_flow[数据处理Flow]
-                report_generation_flow[报告生成Flow]
-                complete_flow[完整Flow]
+        subgraph Stage2[阶段2: 分析执行]
+            subgraph AnalysisModes[分析执行方式]
+                agent_mode[Agent自主调度]
+                workflow_mode[预定义Workflow<br/>.py脚本执行]
             end
-            
-            subgraph ReportEngine[报告引擎]
-                workflow_path[Workflow路径]
-                agent_path[Agent路径]
-                report_generator[报告生成器]
+            subgraph AgentNodes[Agent调度节点]
+                get_tools[GetTools<br/>获取工具列表]
+                decision_tools[DecisionTools<br/>LLM决策]
+                execute_tools[ExecuteTools<br/>执行并存储]
+            end
+            subgraph ToolSource[工具来源]
+                mcp_source[MCP动态查询]
+                local_source[本地Function Calling]
+            end
+        end
+        
+        subgraph Stage3[阶段3: 报告生成]
+            subgraph ReportModes[报告生成方式]
+                template_mode[模板填充<br/>预定义大纲+LLM填充]
+                iterative_mode[多轮迭代<br/>生成-评审-修改循环]
             end
         end
         
         subgraph UtilityLayer[工具层]
-            llm_service[LLM调用服务]
+            llm_service[LLM调用服务<br/>解耦设计可切换模型]
             data_service[数据加载服务]
             viz_service[可视化服务]
             storage_service[存储服务]
         end
     end
     
-    raw_data --> DataProcessing
-    reference_data --> DataProcessing
-    DataProcessing --> enhanced_data
-    enhanced_data --> AnalysisTools
-    AnalysisTools --> ReportEngine
-    ReportEngine --> FlowEngine
-    FlowEngine --> UtilityLayer
-    UtilityLayer --> DataLayer
+    raw_data --> Stage1
+    reference_data --> Stage1
+    Stage1 --> enhanced_data
+    enhanced_data --> Stage2
+    get_tools --> decision_tools
+    decision_tools --> execute_tools
+    execute_tools --> decision_tools
+    mcp_source -.-> get_tools
+    local_source -.-> get_tools
+    Stage2 --> analysis_results
+    analysis_results --> Stage3
+    Stage3 --> UtilityLayer
 ```
 
 ### 核心设计原则
 
-#### 1. 分层解耦
-- **数据层**：负责数据存储和管理，与业务逻辑完全分离
-- **处理层**：包含数据处理和分析工具，专注于业务逻辑
-- **编排层**：Flow引擎和报告引擎，负责流程控制和决策
-- **工具层**：基础服务层，提供LLM调用、数据管理等通用能力
+#### 1. 三阶段解耦
+- **阶段1 - 原始博文增强处理**：为博文添加情感、主题、发布者等维度标注
+- **阶段2 - 分析执行**：基于增强数据执行深度分析，生成图表、表格和洞察
+- **阶段3 - 报告生成**：综合分析结果，生成结构化的Markdown报告
+- **独立运行**：每个阶段可单独执行，支持断点续传和结果复用
 
-#### 2. 模块化设计
+#### 2. 多路径执行控制
+- **统一控制机制**：所有执行路径通过shared字典中的参数控制
+- **灵活切换**：运行时可动态选择执行路径
+- **组合使用**：不同阶段可选择不同的执行路径组合
+
+```python
+# 路径控制参数示例
+shared["config"]["enhancement_mode"] = "async"      # 或 "batch_api"
+shared["config"]["analysis_mode"] = "agent"         # 或 "workflow"
+shared["config"]["tool_source"] = "mcp"             # 或 "local"
+shared["config"]["report_mode"] = "template"        # 或 "iterative"
+```
+
+#### 3. 模块化设计
 - **独立模块**：每个功能模块都可以独立运行和测试
 - **标准接口**：模块间通过标准化的数据接口通信
-- **可插拔**：分析工具可以动态添加和替换
+- **可插拔**：分析工具可以动态添加和替换（支持MCP动态发现）
 - **版本兼容**：保持向后兼容性，支持平滑升级
 
-#### 3. 双轨制架构
-- **Workflow路径**：预定义的标准化分析流程
-- **Agent路径**：智能体自主决策的探索性分析
-- **混合模式**：支持两种路径的组合使用
-- **动态切换**：根据数据特征和需求自动选择最优路径
+#### 4. LLM调用解耦
+- **统一接口**：所有LLM调用通过`call_llm`系列函数封装
+- **模型可切换**：生成和评审可使用同一模型或不同模型
+- **参数化配置**：模型选择、温度、token限制等通过配置控制
 
-### 技术架构选型
 
-#### PocketFlow框架优势
-- **轻量级**：100行核心代码，零依赖，无厂商锁定
-- **表达力强**：支持Agent、Workflow、RAG、MapReduce等模式
-- **易扩展**：节点和Flow可以灵活组合和嵌套
-- **异步支持**：原生支持异步处理和并发控制
-
-#### 多模态AI集成
-- **GLM-4.5-air**：纯文本处理，适用于情感属性和发布者分析
-- **GLM4V-plus**：视觉分析，适用于情感极性和主题分析
-- **GLM4.5v-thinking**：思考模式，适用于Agent视觉理解
-- **GLM4.6**：推理模式，适用于复杂决策和多模态推理
 
 ## 数据模型
 
@@ -289,58 +331,6 @@ flowchart LR
     chart_storage --> file_storage
 ```
 
-### 核心数据结构
-
-#### 1. 原始博文数据模型
-```python
-class RawBlogPost:
-    """原始博文数据模型"""
-    username: str          # 用户名
-    user_id: str          # 用户ID
-    content: str           # 博文内容
-    publish_time: str     # 发布时间
-    location: str          # 地理位置
-    repost_count: int      # 转发数
-    comment_count: int     # 评论数
-    like_count: int        # 点赞数
-    image_urls: List[str]  # 图片URL列表
-```
-
-#### 2. 增强博文数据模型
-```python
-class EnhancedBlogPost(RawBlogPost):
-    """增强博文数据模型"""
-    sentiment_polarity: Optional[int]           # 情感极性 (1-5)
-    sentiment_attribute: Optional[List[str]]     # 情感属性列表
-    topics: Optional[List[Dict]]              # 主题分析结果
-    publisher: Optional[str]                   # 发布者类型
-    processing_metadata: Optional[Dict]         # 处理元数据
-```
-
-#### 3. 分析结果数据模型
-```python
-class AnalysisResult:
-    """分析结果数据模型"""
-    tool_name: str                    # 工具名称
-    analysis_type: str                 # 分析类型
-    timestamp: str                    # 分析时间戳
-    result_data: Dict                 # 分析结果数据
-    charts: List[ChartInfo]          # 生成的图表信息
-    insights: List[str]               # 关键洞察
-    confidence: Optional[float]         # 结果置信度
-```
-
-#### 4. 图表信息数据模型
-```python
-class ChartInfo:
-    """图表信息数据模型"""
-    title: str                        # 图表标题
-    file_path: str                     # 文件路径
-    description: str                   # 图表描述
-    chart_type: str                    # 图表类型
-    metadata: Dict                     # 图表元数据
-    created_at: str                    # 创建时间
-```
 
 ### 数据质量保证
 
@@ -365,1138 +355,871 @@ class ChartInfo:
 ## Flow Design
 
 > Notes for AI:
-> 1. Consider the design patterns of agent, map-reduce, rag, and workflow. Apply them if they fit.
-> 2. Present a concise, high-level description of the workflow.
+> 1. 系统采用三阶段解耦架构，每个阶段独立运行
+> 2. 每个阶段支持多种执行路径，通过shared字典参数控制
+> 3. 所有流程图使用清晰的节点描述
 
 ### Applicable Design Pattern:
 
-1. **Batch Pattern**: 用于原始博文数据处理的四个分析维度
-   - 四个分析维度通过Batch节点独立处理，无依赖关系
-   - 使用BatchNode实现批量处理，每个维度独立处理所有博文数据
+1. **Batch Pattern**: 用于原始博文增强处理
+   - 四个分析维度通过Batch节点独立处理
+   - 支持异步批量并行和Batch API并行两种方式
 
-2. **Agent Pattern**: 用于报告生成的智能体路径
-   - Context: 结构化数据和统计概况
-   - Action: 动态调用分析工具，生成深度洞察
+2. **Agent Pattern**: 用于分析执行的智能体调度
+   - GetTools → DecisionTools → ExecuteTools 三节点循环
+   - 支持MCP动态查询和本地Function Calling两种工具来源
 
-3. **Workflow Pattern**: 用于报告生成的预定义路径
-   - 固定顺序调用分析工具，生成标准化分析结果
+3. **Workflow Pattern**: 用于分析执行的预定义流程
+   - 直接执行.py脚本，按固定顺序调用工具
 
-4. **Dual-Track Architecture**: 报告生成的双轨制设计
-   - Workflow路径：可预测、高效的标准化分析
-   - Agent路径：灵活、智能的探索性分析
+4. **Iterative Pattern**: 用于报告生成的多轮迭代
+   - 生成 → 评审 → 修改循环，直到满意或达到最大迭代次数
 
 ### Flow high-level Design:
 
-#### 1. CompleteFlow（完整流程 - 数据处理+分析报告生成）
+#### 完整系统Flow总览
 
 ```mermaid
-flowchart TD
-    subgraph CompleteFlow[完整Flow - 数据处理+分析报告生成]
-        subgraph data_processing_stage[原始博文数据处理阶段 - 并行信息增强]
-            data_load[数据加载] --> data_validation[数据验证]
-            data_validation --> parallel_analysis[四个并行BatchNode]
+flowchart TB
+    subgraph CompleteSystemFlow[完整系统Flow - 三阶段解耦]
+        
+        subgraph Stage1[阶段1: 原始博文增强处理Flow]
+            load_data[DataLoadNode<br/>加载原始数据] --> validate_data[DataValidationNode<br/>数据验证]
+            validate_data --> enhancement_mode{enhancement_mode?}
             
-            subgraph parallel_analysis[四个并行BatchNode处理]
-                sentiment_polarity[情感极性分析BatchNode<br/>原地增强sentiment_polarity字段]
-                sentiment_attribute[情感属性分析BatchNode<br/>原地增强sentiment_attribute字段]
-                topic_analysis[两级主题分析BatchNode<br/>原地增强topics字段]
-                publisher_analysis[发布者对象分析BatchNode<br/>原地增强publisher字段]
-            end
+            enhancement_mode -->|async| async_enhancement[AsyncEnhancementFlow<br/>异步批量并行处理]
+            enhancement_mode -->|batch_api| batch_api_enhancement[BatchAPIEnhancementFlow<br/>Batch API并行处理]
             
-            parallel_analysis --> final_validation[数据验证节点]
-            final_validation --> enhanced_data[增强数据输出]
+            async_enhancement --> save_enhanced[SaveEnhancedDataNode<br/>保存增强数据]
+            batch_api_enhancement --> save_enhanced
         end
         
-        subgraph report_generation_stage[分析报告生成阶段 - 双轨制]
-            analysis_mode_selection[分析模式选择] --> workflow_path{选择路径}
+        subgraph Stage2[阶段2: 分析执行Flow]
+            load_enhanced[LoadEnhancedDataNode<br/>加载增强数据] --> analysis_mode{analysis_mode?}
             
-            workflow_path -->|Workflow路径| predefined_workflow[预定义工作流]
-            workflow_path -->|Agent路径| intelligent_agent[智能体自主分析]
+            analysis_mode -->|agent| agent_analysis[AgentAnalysisFlow<br/>Agent自主调度]
+            analysis_mode -->|workflow| workflow_analysis[WorkflowAnalysisFlow<br/>预定义Workflow]
             
-            subgraph predefined_workflow[Workflow路径 - 固定顺序]
-                trend_analysis[情感趋势分析] --> evolution_analysis[主题演化分析]
-                evolution_analysis --> geographic_analysis[地理分布分析]
-                geographic_analysis --> interaction_analysis[情感主题发布者交互分析]
-                interaction_analysis --> workflow_report[Workflow报告生成]
-            end
-            
-            subgraph intelligent_agent[Agent路径 - 智能决策]
-                agent_initial[读取数据概况] --> agent_decision{决策分析工具}
-                agent_decision -->|需要趋势| agent_trend[调用情感趋势工具]
-                agent_decision -->|需要演化| agent_evolution[调用主题演化工具]
-                agent_decision -->|需要地理| agent_geographic[调用地理分布工具]
-                agent_decision -->|需要交互| agent_interaction[调用交互分析工具]
-                agent_decision -->|直接生成| agent_generate[生成初步报告]
-                
-                agent_trend --> agent_generate
-                agent_evolution --> agent_generate
-                agent_geographic --> agent_generate
-                agent_interaction --> agent_generate
-                
-                agent_generate --> agent_review{审查报告完整性}
-                agent_review -->|不完整| agent_decision
-                agent_review -->|完整| agent_report[Agent最终报告]
-            end
-            
-            workflow_report --> final_output[最终报告输出]
-            agent_report --> final_output
+            agent_analysis --> save_analysis[SaveAnalysisResultsNode<br/>保存分析结果]
+            workflow_analysis --> save_analysis
         end
         
-        enhanced_data --> analysis_mode_selection
+        subgraph Stage3[阶段3: 报告生成Flow]
+            load_analysis[LoadAnalysisResultsNode<br/>加载分析结果] --> report_mode{report_mode?}
+            
+            report_mode -->|template| template_report[TemplateReportFlow<br/>模板填充方式]
+            report_mode -->|iterative| iterative_report[IterativeReportFlow<br/>多轮迭代方式]
+            
+            template_report --> save_report[SaveReportNode<br/>保存最终报告]
+            iterative_report --> save_report
+        end
+        
+        save_enhanced --> load_enhanced
+        save_analysis --> load_analysis
     end
 ```
 
-#### 2. DataProcessingFlow（数据处理Flow - 仅数据处理）
+---
+
+#### 阶段1详细设计: 原始博文增强处理Flow
+
+##### 1.1 异步批量并行处理路径 (enhancement_mode="async")
 
 ```mermaid
 flowchart TD
-    subgraph DataProcessingFlow[数据处理Flow - 仅数据处理]
-        subgraph data_processing_stage_standalone[独立数据处理阶段]
-            data_load_standalone[数据加载] --> data_validation_standalone[数据验证]
-            data_validation_standalone --> parallel_analysis_standalone[四个并行BatchNode]
-            
-            subgraph parallel_analysis_standalone[四个并行BatchNode处理]
-                sentiment_polarity_standalone[情感极性分析BatchNode]
-                sentiment_attribute_standalone[情感属性分析BatchNode]
-                topic_analysis_standalone[两级主题分析BatchNode]
-                publisher_analysis_standalone[发布者对象分析BatchNode]
-            end
-            
-            parallel_analysis_standalone --> data_validation_overview[数据验证与概况分析]
-            data_validation_overview --> save_enhanced_data[保存增强数据]
-        end
-    end
-```
-
-#### 3. ReportGenerationFlow（报告生成Flow - 仅分析报告生成）
-
-```mermaid
-flowchart TD
-    subgraph ReportGenerationFlow[报告生成Flow - 仅分析报告生成]
-        data_load_standalone[数据加载] --> data_validation_overview_standalone[数据验证与概况分析]
-        data_validation_overview_standalone --> report_generation_stage_standalone[独立分析报告生成阶段]
+    subgraph AsyncEnhancementFlow[异步批量并行处理Flow]
+        async_start[开始] --> async_load[DataLoadNode<br/>加载原始博文数据]
+        async_load --> async_validate[DataValidationNode<br/>验证数据格式]
+        async_validate --> async_parallel[AsyncParallelBatchFlow<br/>异步并行处理]
         
-        subgraph report_generation_stage_standalone[分析报告生成阶段 - 双轨制]
-            analysis_mode_selection_standalone[分析模式选择] --> workflow_path_standalone{选择路径}
-            
-            workflow_path_standalone -->|Workflow路径| predefined_workflow_standalone[预定义工作流]
-            workflow_path_standalone -->|Agent路径| intelligent_agent_standalone[智能体自主分析]
-            
-            subgraph predefined_workflow_standalone[Workflow路径 - 固定顺序]
-                trend_analysis_standalone[情感趋势分析] --> evolution_analysis_standalone[主题演化分析]
-                evolution_analysis_standalone --> geographic_analysis_standalone[地理分布分析]
-                geographic_analysis_standalone --> interaction_analysis_standalone[情感主题发布者交互分析]
-                interaction_analysis_standalone --> workflow_report_standalone[Workflow报告生成]
-            end
-            
-            subgraph intelligent_agent_standalone[Agent路径 - 智能决策]
-                agent_initial_standalone[读取数据概况] --> agent_decision_standalone{决策分析工具}
-                agent_decision_standalone -->|需要趋势| agent_trend_standalone[调用情感趋势工具]
-                agent_decision_standalone -->|需要演化| agent_evolution_standalone[调用主题演化工具]
-                agent_decision_standalone -->|需要地理| agent_geographic_standalone[调用地理分布工具]
-                agent_decision_standalone -->|需要交互| agent_interaction_standalone[调用交互分析工具]
-                agent_decision_standalone -->|直接生成| agent_generate_standalone[生成初步报告]
-                
-                agent_trend_standalone --> agent_generate_standalone
-                agent_evolution_standalone --> agent_generate_standalone
-                agent_geographic_standalone --> agent_generate_standalone
-                agent_interaction_standalone --> agent_generate_standalone
-                
-                agent_generate_standalone --> agent_review_standalone{审查报告完整性}
-                agent_review_standalone -->|不完整| agent_decision_standalone
-                agent_review_standalone -->|完整| agent_report_standalone[Agent最终报告]
-            end
-            
-            workflow_report_standalone --> final_output_standalone[最终报告输出]
-            agent_report_standalone --> final_output_standalone
+        subgraph async_parallel[AsyncParallelBatchFlow - 四维度并行]
+            async_sentiment_polarity[AsyncSentimentPolarityBatchNode<br/>情感极性分析]
+            async_sentiment_attribute[AsyncSentimentAttributeBatchNode<br/>情感属性分析]
+            async_topic[AsyncTopicAnalysisBatchNode<br/>两级主题分析]
+            async_publisher[AsyncPublisherAnalysisBatchNode<br/>发布者对象分析]
         end
+        
+        async_parallel --> async_merge[DataMergeNode<br/>合并增强结果]
+        async_merge --> async_quality[QualityCheckNode<br/>质量检查]
+        async_quality --> async_save[SaveEnhancedDataNode<br/>保存增强数据]
+        async_save --> async_end[结束]
     end
 ```
+
+##### 1.2 Batch API并行处理路径 (enhancement_mode="batch_api")
+
+```mermaid
+flowchart TD
+    subgraph BatchAPIEnhancementFlow[Batch API并行处理Flow]
+        batch_start[开始] --> batch_load[DataLoadNode<br/>加载原始博文数据]
+        batch_load --> batch_validate[DataValidationNode<br/>验证数据格式]
+        batch_validate --> batch_prepare[BatchRequestPrepareNode<br/>准备批量请求]
+        
+        subgraph batch_submit[Batch API提交 - 四维度]
+            batch_sentiment_polarity[SubmitBatchJobNode<br/>情感极性批量任务]
+            batch_sentiment_attribute[SubmitBatchJobNode<br/>情感属性批量任务]
+            batch_topic[SubmitBatchJobNode<br/>主题分析批量任务]
+            batch_publisher[SubmitBatchJobNode<br/>发布者分析批量任务]
+        end
+        
+        batch_prepare --> batch_submit
+        batch_submit --> batch_poll[BatchJobPollNode<br/>轮询任务状态]
+        batch_poll --> batch_retrieve[BatchResultRetrieveNode<br/>获取批量结果]
+        batch_retrieve --> batch_merge[DataMergeNode<br/>合并增强结果]
+        batch_merge --> batch_quality[QualityCheckNode<br/>质量检查]
+        batch_quality --> batch_save[SaveEnhancedDataNode<br/>保存增强数据]
+        batch_save --> batch_end[结束]
+    end
+```
+
+---
+
+#### 阶段2详细设计: 分析执行Flow
+
+##### 2.1 Agent自主调度路径 (analysis_mode="agent")
+
+```mermaid
+flowchart TD
+    subgraph AgentAnalysisFlow[Agent自主调度Flow]
+        agent_start[开始] --> agent_load[LoadEnhancedDataNode<br/>加载增强数据]
+        agent_load --> agent_summary[DataSummaryNode<br/>生成数据概况]
+        agent_summary --> get_tools[GetToolsNode<br/>获取工具列表]
+        
+        get_tools --> tool_source{tool_source?}
+        tool_source -->|mcp| mcp_query[MCPQueryNode<br/>MCP动态查询工具]
+        tool_source -->|local| local_registry[LocalRegistryNode<br/>本地工具注册表]
+        
+        mcp_query --> decision_tools
+        local_registry --> decision_tools
+        
+        decision_tools[DecisionToolsNode<br/>LLM决策下一步] --> decision_result{决策结果?}
+        
+        decision_result -->|call_tool| execute_tools[ExecuteToolsNode<br/>执行工具函数]
+        decision_result -->|finish| agent_save[SaveAnalysisResultsNode<br/>保存分析结果]
+        
+        execute_tools --> store_result[StoreToolResultNode<br/>存储工具结果]
+        store_result --> iteration_check{迭代次数检查}
+        iteration_check -->|未超限| decision_tools
+        iteration_check -->|超限| agent_save
+        
+        agent_save --> agent_end[结束]
+    end
+```
+
+##### 2.2 预定义Workflow路径 (analysis_mode="workflow")
+
+```mermaid
+flowchart TD
+    subgraph WorkflowAnalysisFlow[预定义Workflow Flow]
+        wf_start[开始] --> wf_load[LoadEnhancedDataNode<br/>加载增强数据]
+        wf_load --> wf_summary[DataSummaryNode<br/>生成数据概况]
+        
+        wf_summary --> wf_sentiment[SentimentTrendAnalysisNode<br/>情感趋势分析工具集]
+        wf_sentiment --> wf_topic[TopicEvolutionAnalysisNode<br/>主题演化分析工具集]
+        wf_topic --> wf_geo[GeographicAnalysisNode<br/>地理分布分析工具集]
+        wf_geo --> wf_cross[CrossDimensionAnalysisNode<br/>多维交互分析工具集]
+        
+        wf_cross --> wf_save[SaveAnalysisResultsNode<br/>保存分析结果]
+        wf_save --> wf_end[结束]
+    end
+    
+    style wf_sentiment fill:#e1f5fe
+    style wf_topic fill:#e8f5e9
+    style wf_geo fill:#fff3e0
+    style wf_cross fill:#fce4ec
+```
+
+---
+
+#### 阶段3详细设计: 报告生成Flow
+
+##### 3.1 模板填充路径 (report_mode="template")
+
+```mermaid
+flowchart TD
+    subgraph TemplateReportFlow[模板填充报告生成Flow]
+        tmpl_start[开始] --> tmpl_load[LoadAnalysisResultsNode<br/>加载分析结果]
+        tmpl_load --> tmpl_template[LoadTemplateNode<br/>加载报告模板]
+        
+        subgraph tmpl_fill[章节填充 - LLM自主填充]
+            tmpl_executive[FillSectionNode<br/>综述章节]
+            tmpl_sentiment[FillSectionNode<br/>情感态势分析]
+            tmpl_topic[FillSectionNode<br/>话题演变分析]
+            tmpl_spread[FillSectionNode<br/>传播路径分析]
+            tmpl_recommend[FillSectionNode<br/>研判与建议]
+        end
+        
+        tmpl_template --> tmpl_fill
+        tmpl_fill --> tmpl_assemble[AssembleReportNode<br/>组装完整报告]
+        tmpl_assemble --> tmpl_format[FormatReportNode<br/>格式化Markdown]
+        tmpl_format --> tmpl_save[SaveReportNode<br/>保存报告文件]
+        tmpl_save --> tmpl_end[结束]
+    end
+```
+
+##### 3.2 多轮迭代路径 (report_mode="iterative")
+
+```mermaid
+flowchart TD
+    subgraph IterativeReportFlow[多轮迭代报告生成Flow]
+        iter_start[开始] --> iter_load[LoadAnalysisResultsNode<br/>加载分析结果]
+        iter_load --> iter_init[InitReportStateNode<br/>初始化报告状态]
+        
+        iter_init --> generate_report[GenerateReportNode<br/>LLM生成/修改报告]
+        generate_report --> review_report[ReviewReportNode<br/>LLM评审报告]
+        
+        review_report --> review_result{评审结果?}
+        review_result -->|satisfied| iter_format[FormatReportNode<br/>格式化Markdown]
+        review_result -->|needs_revision| check_iteration{迭代次数?}
+        
+        check_iteration -->|未达上限| apply_feedback[ApplyFeedbackNode<br/>应用修改意见]
+        check_iteration -->|达到上限| iter_format
+        
+        apply_feedback --> generate_report
+        
+        iter_format --> iter_save[SaveReportNode<br/>保存报告文件]
+        iter_save --> iter_end[结束]
+    end
+    
+    style generate_report fill:#e3f2fd
+    style review_report fill:#fce4ec
+```
+
+---
 
 ### Flow编排架构
 
-#### 1. CompleteFlow（完整流程）
-- **组成**: DataProcessingFlow + ReportGenerationFlow
-- **用途**: 从原始数据到最终报告的完整处理流程
-- **数据流**: 原始博文 → 增强数据 → 分析报告
+#### 独立Flow说明
 
-#### 2. DataProcessingFlow（数据处理流程）
-- **组成**: 仅包含数据处理阶段的节点
-- **用途**: 独立运行数据处理，生成增强数据
-- **数据流**: 原始博文 → 增强数据 → 保存文件
-
-#### 3. ReportGenerationFlow（报告生成流程）
-- **组成**: 仅包含报告生成阶段的节点
-- **用途**: 对已有增强数据进行分析报告生成
-- **数据流**: 增强数据 → 分析报告
+| Flow名称 | 阶段 | 用途 | 输入 | 输出 |
+|----------|------|------|------|------|
+| EnhancementFlow | 阶段1 | 原始博文增强处理 | 原始博文JSON | 增强博文JSON |
+| AnalysisFlow | 阶段2 | 分析执行 | 增强博文JSON | 分析结果（图/表/描述） |
+| ReportFlow | 阶段3 | 报告生成 | 分析结果 | Markdown报告 |
+| CompleteFlow | 全部 | 完整流程 | 原始博文JSON | Markdown报告 |
 
 #### Flow编排优势
-- **模块化**: 每个Flow都是独立的功能模块
-- **可复用**: 节点可以在不同Flow中复用
-- **灵活性**: 根据需求选择合适的Flow运行
-- **易维护**: 独立的Flow便于调试和维护
+- **三阶段解耦**：每个阶段可独立运行、调试和优化
+- **多路径灵活**：通过shared参数动态切换执行路径
+- **断点续传**：每个阶段输出持久化，支持从中间阶段恢复
+- **可组合性**：不同阶段的路径可自由组合
 
-## Tool Definitions (Refined for Visualization)
+## 分析工具集设计
 
-> Notes for AI: The tool output schema now explicitly includes 'charts'. We updated tool definitions to clearly inform Agent that calling these tools not only returns data, but also generates visualization files.
+> Notes for AI: 工具集采用统一架构，每类工具集包含数据处理和可视化两类函数。所有工具函数遵循统一的输入输出规范，便于Agent动态调用。
 
-```json
-{
-  "tools": [
-    {
-      "name": "analyze_sentiment_trend",
-      "description": "分析情感趋势并生成折线图/面积图。",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "time_granularity": {
-            "type": "string",
-            "enum": ["hour", "day"],
-            "description": "时间聚合粒度，默认为'day'，突发事件建议用'hour'。",
-            "default": "day"
-          },
-          "focus_sentiment": {
-            "type": "string",
-            "description": "特定关注的情感极性（如'1'表示极度悲观），不填则分析整体。",
-            "default": null
-          }
-        },
-        "required": []
-      },
-      "returns": {
-        "summary": "趋势的文本摘要",
-        "data_points": "关键数据点，用于LLM理解趋势",
-        "charts": [
-          {
-            "title": "情感变化趋势图",
-            "path": "outputs/images/sentiment_trend_{timestamp}.png",
-            "description": "展示了正负面情感在7天内的波动情况，X轴为时间，Y轴为情感热度。"
-          }
-        ]
-      }
-    },
-    {
-      "name": "analyze_topic_evolution",
-      "description": "分析话题演化并生成网络图/时间序列图。",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "top_k": {
-            "type": "integer",
-            "description": "返回热度最高的主题数量。",
-            "default": 10
-          },
-          "evolution_phase": {
-            "type": "string",
-            "enum": ["all", "start", "peak", "end"],
-            "description": "重点分析的阶段，'all'为全周期。",
-            "default": "all"
-          }
-        },
-        "required": []
-      },
-      "returns": {
-        "hot_topics": "热门主题列表",
-        "rising_topics": "上升趋势主题",
-        "topic_network": "主题共现关系",
-        "charts": [
-          {
-            "title": "话题演化网络图",
-            "path": "outputs/images/topic_evolution_{timestamp}.png",
-            "description": "展示了话题之间的关联关系和演化路径。"
-          }
-        ]
-      }
-    },
-    {
-      "name": "analyze_geographic_distribution",
-      "description": "分析地理分布并生成热力地图。",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "map_level": {
-            "type": "string",
-            "enum": ["province", "city"],
-            "description": "地理分析的行政级别。",
-            "default": "province"
-          },
-          "min_post_count": {
-            "type": "integer",
-            "description": "过滤掉博文数量少于该值的地区。",
-            "default": 10
-          }
-        },
-        "required": []
-      },
-      "returns": {
-        "hotspots": "热点地区列表",
-        "charts": [
-          {
-            "title": "全国舆情热力分布",
-            "path": "outputs/images/geo_map_{timestamp}.png",
-            "description": "中国地图热力图，颜色越深代表讨论量越大。"
-          }
-        ]
-      }
-    },
-    {
-      "name": "analyze_publisher_interaction",
-      "description": "分析发布者交互并生成交互矩阵图。",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "target_publisher_type": {
-            "type": "string",
-            "description": "特定关注的发布者类型（如'官方新闻媒体'），不填则分析所有。",
-            "default": null
-          },
-          "cross_analysis_dimension": {
-            "type": "string",
-            "enum": ["sentiment", "topic"],
-            "description": "与发布者进行交叉分析的维度。",
-            "default": "topic"
-          }
-        },
-        "required": ["cross_analysis_dimension"]
-      },
-      "returns": {
-        "interaction_matrix": "交互矩阵",
-        "publisher_influence": "各类发布者影响力分析",
-        "charts": [
-          {
-            "title": "发布者类型交互热力图",
-            "path": "outputs/images/publisher_interaction_{timestamp}.png",
-            "description": "展示了不同发布者类型与话题/情感的交互强度。"
-          }
-        ]
-      }
-    }
-  ]
-}
-```
+### 工具集概述
+
+系统提供四类核心分析工具集，每类工具集包含若干工具函数：
+
+| 工具集 | 功能定位 | 数据处理函数 | 可视化函数 |
+|--------|----------|--------------|------------|
+| 情感趋势分析 | 时间序列情感变化分析 | 分布统计、时序分析、异常检测 | 趋势图、饼图 |
+| 主题演化分析 | 主题热度变化和关联分析 | 频次统计、演化分析、共现分析 | 排行图、演化图、网络图 |
+| 地理分布分析 | 舆情地理分布和热点识别 | 分布统计、热点检测、地区情感 | 热力图、柱状图 |
+| 多维交互分析 | 多维度交叉分析 | 发布者分布、交叉矩阵、影响力、相关性 | 热力图、柱状图 |
+
+### 工具函数设计原则
+
+1. **输入统一**：所有工具函数接收增强后的博文数据列表作为主要输入
+2. **输出标准化**：返回包含 `data`、`summary`、`charts`（可选）的标准字典结构
+3. **可视化自动存储**：可视化函数自动生成图表并存储到 `report/images/` 目录
+4. **支持Agent调用**：工具函数通过统一注册表暴露，支持MCP和本地Function Calling两种调用方式
 
 ## Utility Functions
 
-> Notes for AI:
-> 1. Understand the utility function definition thoroughly by reviewing the doc.
-> 2. Include only the necessary utility functions, based on nodes in the flow.
+> Notes for AI: 基础工具函数按功能分类，详细实现参考 `utils/` 目录
 
-### 基础工具函数
+### 工具函数分类
 
-1. **glm-4.5-air纯文本模型调用** (`utils/call_llm.py` → `call_glm_45_air`)
-   - *Input*: prompt (str), temperature (float), max_tokens (int)
-   - *Output*: response (str)
-   - 用于基础文本处理任务，不开启推理模式
-   - 适用于情感属性分析和发布者对象分析
-
-2. **glm4v-plus视觉分析模型调用** (`utils/call_llm.py` → `call_glm4v_plus`)
-   - *Input*: prompt (str), image_paths (list), image_data (list), temperature (float), max_tokens (int)
-   - *Output*: response (str)
-   - 用于图像分析任务，不开启推理模式，支持JPEG和PNG格式
-   - 适用于情感极性分析和两级主题分析
-
-3. **glm4.5v思考模式模型调用** (`utils/call_llm.py` → `call_glm45v_thinking`)
-   - *Input*: prompt (str),image_paths (list) , temperature (float), max_tokens (int), enable_thinking (bool)
-   - *Output*: response (str)
-   - 用于报告分析智能体的视觉理解任务，开启思考模式
-   - 支持图像理解，与glm4.6组合使用
-
-4. **glm4.6智能体推理模型调用** (`utils/call_llm.py` → `call_glm46`)
-   - *Input*: prompt (str), temperature (float), max_tokens (int), enable_reasoning (bool)
-   - *Output*: response (str)
-   - 用于复杂推理任务，纯文本，开启推理模式
-   - 与glm4.5v组合使用实现多模态推理
-
-4. **加载博文数据** (`utils/data_loader.py` → `load_blog_data`)
-   - *Input*: data_file_path (str)
-   - *Output*: blog_data_list (list)
-   - 一次性加载JSON格式博文数据到内存，支持3万条博文以内的数据处理
-
-5. **加载主题数据** (`utils/data_loader.py` → `load_topics`)
-   - *Input*: topics_file_path (str)
-   - *Output*: topics_hierarchy (dict)
-   - 从外部JSON文件加载两层嵌套的主题结构（10个父主题，约100个子主题）
-
-6. **加载情感属性数据** (`utils/data_loader.py` → `load_sentiment_attributes`)
-   - *Input*: sentiment_attributes_file_path (str)
-   - *Output*: sentiment_attributes (dict)
-   - 从外部JSON文件加载预定义的情感属性列表和分类
-
-7. **加载发布者对象数据** (`utils/data_loader.py` → `load_publisher_objects`)
-   - *Input*: publisher_objects_file_path (str)
-   - *Output*: publisher_objects (dict)
-   - 从外部JSON文件加载预定义的发布者对象类型和特征
-
-8. **保存增强数据** (`utils/data_loader.py` → `save_enhanced_blog_data`)
-   - *Input*: enhanced_blog_data (list), output_path (str)
-   - *Output*: success (bool)
-   - 将分析结果写入原始博文JSON文件，添加新的字段
-
-9. **加载增强数据** (`utils/data_loader.py` → `load_enhanced_blog_data`)
-   - *Input*: enhanced_data_path (str)
-   - *Output*: enhanced_blog_data (list)
-   - 加载已处理的增强数据，支持跳过数据处理阶段
-
-10. **数据格式验证** (`utils/data_loader.py` → `validate_enhanced_data_format`)
-   - *Input*: blog_data (list)
-   - *Output*: validation_result (dict)
-   - 验证增强数据格式的完整性，检查必需字段是否存在，并生成数据统计概况
-
-### Agent分析工具函数
-
-5. **情感趋势分析工具** (`utils/sentiment_trend_analysis.py`)
-   - *Input*: enhanced_blog_data (list), time_range (str)
-   - *Output*: trend_analysis_result (dict)
-   - 预先设计的固定分析函数，分析情感随时间的变化趋势、拐点、异常模式
-   - 返回格式：{"trend": str, "key_points": list, "anomalies": list, "insights": list}
-
-6. **主题演化分析工具** (`utils/topic_evolution_analysis.py`)
-   - *Input*: enhanced_blog_data (list), analysis_depth (str)
-   - *Output*: evolution_analysis_result (dict)
-   - 预先设计的固定分析函数，分析主题热度变化、新兴主题、衰退主题、主题关联
-   - 返回格式：{"emerging_topics": list, "declining_topics": list, "topic_correlations": dict, "evolution_patterns": list}
-
-7. **地理分布分析工具** (`utils/geographic_distribution_analysis.py`)
-   - *Input*: enhanced_blog_data (list), analysis_type (str)
-   - *Output*: geographic_analysis_result (dict)
-   - 预先设计的固定分析函数，分析地区差异、热点区域、传播模式、地理聚类
-   - 返回格式：{"hotspots": list, "regional_differences": dict, "spread_patterns": list, "geographic_insights": list}
-
-8. **情感主题发布者交互分析工具** (`utils/sentiment_topic_publisher_interaction.py`)
-   - *Input*: enhanced_blog_data (list), interaction_type (str)
-   - *Output*: interaction_analysis_result (dict)
-   - 预先设计的固定分析函数，分析情感、主题、发布者三者之间的交互关系和模式
-   - 返回格式：{"interaction_patterns": dict, "correlations": dict, "insights": list, "recommendations": list}
+| 分类 | 文件位置 | 功能说明 |
+|------|----------|----------|
+| LLM调用 | `utils/call_llm.py` | 封装多种模型调用（纯文本、多模态、推理模式） |
+| 数据加载 | `utils/data_loader.py` | 博文数据、参考数据的加载与保存 |
+| 分析工具 | `utils/analysis_tools/` | 四类分析工具集的具体实现 |
 
 ## Node Design
 
 ### Shared Store
 
-> Notes for AI: Try to minimize data redundancy
+> Notes for AI: shared字典是节点间通信的核心，按功能分区组织
 
 ```python
 shared = {
     # === 数据管理 ===
     "data": {
-        # 博文数据：统一存储，原地增强
-        # 原始数据格式：[{username: str, user_id: str, content: str, publish_time: str, location: str, repost_count: int, comment_count: int, like_count: int, image_urls: [str]}, ...]
-        # 增强后格式：[{username: str, user_id: str, content: str, publish_time: str, location: str, repost_count: int, comment_count: int, like_count: int, image_urls: [str], sentiment_polarity: int, sentiment_attribute: [str], topics: [dict], publisher: str}, ...]
-        "blog_data": [],  # 统一存储所有博文数据，通过原地添加字段实现信息增强
-        
-        # 主题层次结构：两层嵌套结构，外层数组包含多个字典，每个字典包含父主题和子主题列表
-        # 数据格式：[{"parent_topic": str, "sub_topics": [str, str, ...]}, ...]
-        # 示例：[{"parent_topic": "自然灾害", "sub_topics": ["暴雨", "洪水", "台风", ...]}, ...]
-        "topics_hierarchy": [],  # 从data/topics.json加载，包含10个父主题和约100个子主题
-        
-        # 情感属性列表：预定义的情感状态词汇列表
-        # 数据格式：[str, str, str, ...]
-        # 示例：["生气", "支持", "担忧", "兴奋", "失望", "希望", "恐惧", "满意", "惊讶", ...]
-        "sentiment_attributes": [],  # 从data/sentiment_attributes.json加载，包含约45个情感属性词汇
-        
-        # 发布者对象列表：预定义的发布者类型和职业列表
-        # 数据格式：[str, str, str, ...]
-        # 示例：["政府机构", "官方新闻媒体", "自媒体", "企业账号", "个人用户", "事业单位", ...]
-        "publisher_objects": [],  # 从data/publisher_objects.json加载，包含约100个发布者类型
-        
-        # 数据文件路径配置
-        "data_paths": {
-            "blog_data_path": "data/beijing_rainstorm_posts.json",  # 原始博文数据文件路径
-            "topics_path": "data/topics.json",  # 主题层次结构文件路径
-            "sentiment_attributes_path": "data/sentiment_attributes.json",  # 情感属性文件路径
-            "publisher_objects_path": "data/publisher_objects.json"  # 发布者对象文件路径
-        }
+        "blog_data": [],              # 博文数据（原始或增强后）
+        "topics_hierarchy": [],        # 主题层次结构（从data/topics.json加载）
+        "sentiment_attributes": [],    # 情感属性列表（从data/sentiment_attributes.json加载）
+        "publisher_objects": [],       # 发布者类型列表（从data/publisher_objects.json加载）
     },
     
-    # === 配置管理 ===
+    # === 三阶段路径控制 ===
     "config": {
-        "sentiment_levels": [1, 2, 3, 4, 5],  # 1-极度悲观，2-悲观，3-无明显极性，4-乐观，5-极度乐观
-        "batch_size": 100,
-        "processing": {
-            "max_images_per_blog": 10,
-            "retry_attempts": 3,
-            "timeout": 30
-        },
-        "run_mode": "complete",  # 运行模式: complete, data_processing_only, analysis_only
-        "data_source": {
-            "type": "original",  # 数据源类型: original, enhanced
-            "auto_detect": True,  # 自动检测数据源类型
-            "enhanced_data_path": "data/enhanced_blogs.json"  # 增强数据文件路径
-        },
-        "analysis_mode": "workflow",
+        # 阶段1: 增强处理方式
+        "enhancement_mode": "async",   # "async" | "batch_api"
+        
+        # 阶段2: 分析执行方式
+        "analysis_mode": "workflow",   # "workflow" | "agent"
+        "tool_source": "local",        # "local" | "mcp" (Agent模式下的工具来源)
+        
+        # 阶段3: 报告生成方式
+        "report_mode": "template",     # "template" | "iterative"
+        
+        # Agent配置
         "agent_config": {
-            "max_iterations": 10,
-            "auto_decision": True,
-            "exploration_depth": "deep"
+            "max_iterations": 10
+        },
+        
+        # 迭代报告配置
+        "iterative_report_config": {
+            "max_iterations": 5,
+            "min_score_threshold": 80
         }
     },
     
-    # === 分析结果与中间状态 ===
-    "results": {
-        # 工具执行产生的结构化数据结果存储于此
-        "analysis_outputs": {
-            "sentiment_trend": None,
-            "topic_evolution": None,
-            "geographic_distribution": None,
-            "publisher_interaction": None
-        },
-        
-        # [新增] 可视化资源注册表（供Agent引用图片）
-        # 这是一个列表，记录了所有已生成的图片及其元数据
-        "generated_charts": [
-            # 示例
-            # {
-            #   "tool_source": "analyze_sentiment_trend",
-            #   "file_path": "outputs/images/trend_20231025.png",
-            #   "title": "7日情感走势图",
-            #   "content_summary": "10月24日出现负面峰值..."
-            # }
-        ],
-        
-        # Agent运行时的状态记录
-        "agent_state": {
-            "history": [], # 保存Agent的思考过程：[{"step": 1, "thought": "...", "action": "...", "observation": "..."}, ...]
-            "current_iteration": 0,
-            "plan_completed": False,
-            "data_summary": {} # 数据概况，用于Prompt上下文
-        },
-        
-        # 最终报告文本
-        "final_report_text": "",
-        
-        # 兼容性字段（保持向后兼容）
-        "analysis": {
-            "sentiment_trend": {},
-            "topic_evolution": {},
-            "geographic_distribution": {},
-            "interaction_analysis": {}
-        },
-        "report": {
-            "final_report": "",
-            "preliminary_report": "",
-            "analysis_iterations": 0,
-            "tools_used": []
-        },
-        "statistics": {
-            "total_blogs": 0,
-            "processed_blogs": 0,
-            "sentiment_distribution": {},
-            "topic_distribution": {},
-            "publisher_distribution": {},
-            "geographic_distribution": {},
-            "engagement_statistics": {
-                "total_reposts": 0,
-                "total_comments": 0,
-                "total_likes": 0,
-                "avg_reposts": 0,
-                "avg_comments": 0,
-                "avg_likes": 0
-            },
-            "user_statistics": {
-                "unique_users": 0,
-                "top_active_users": [],
-                "user_type_distribution": {}
-            },
-            "content_statistics": {
-                "total_images": 0,
-                "blogs_with_images": 0,
-                "avg_content_length": 0,
-                "time_distribution": {}
-            },
-            "empty_fields": {
-                "sentiment_polarity_empty": 0,
-                "sentiment_attribute_empty": 0,
-                "topics_empty": 0,
-                "publisher_empty": 0
-            }
-        }
+    # === 运行时状态 ===
+    "agent": {
+        "available_tools": [],         # 可用工具列表
+        "execution_history": [],       # 工具执行历史
+        "current_iteration": 0,
+        "is_finished": False
     },
-
+    
+    # === 报告生成状态 ===
+    "report": {
+        "iteration": 0,
+        "current_draft": "",
+        "revision_feedback": "",
+        "review_history": []
+    }
 }
 ```
 
+**说明**：
+- 分析结果（图表、数据、描述）存储在 `report/` 文件夹中，不在shared字典中保存
+- 最终报告输出到 `report/report.md`
+- 可视化图表存储在 `report/images/` 目录
+
 ### Node Steps
 
-> Notes for AI: Carefully decide whether to use Batch/Async Node/Flow.
+> Notes for AI: 节点按三阶段组织，每个阶段的多种执行路径通过shared参数控制
 
-#### 数据处理模块节点
+---
 
-#### 数据处理模块节点
+## 阶段1节点: 原始博文增强处理
 
-**1. 数据加载节点 (DataLoadNode)**
-- **功能**：加载原始博文数据或增强数据
+### 通用节点
+
+**1. DataLoadNode (数据加载节点)**
+- **功能**：加载原始博文数据
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取数据文件路径和配置参数，根据配置判断加载原始数据还是增强数据
+  - *prep*：读取数据文件路径配置
   - *exec*：加载JSON格式博文数据，验证数据格式完整性
-  - *post*：将数据存储到shared["data"]["blog_data"]中
+  - *post*：将数据存储到 `shared["data"]["blog_data"]` 中
 
-**2. 情感极性分析BatchNode (SentimentPolarityAnalysisBatchNode)**
-- **功能**：批量分析博文的情感极性（1-5档数字分级）
-- **类型**：BatchNode
+**2. DataValidationNode (数据验证节点)**
+- **功能**：验证数据格式和完整性
+- **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：返回博文数据列表，每条博文作为独立处理单元
-  - *exec*：对单条博文调用多模态LLM进行情感极性分析，验证结果是否在预定义的1-5档数字列表中
-  - *post*：将分析结果（数字1-5）附加到对应博文对象的sentiment_polarity字段中，如果不在候选列表中则留空
+  - *prep*：读取博文数据
+  - *exec*：检查必需字段、数据类型、格式规范
+  - *post*：记录验证结果，返回下一步Action
 
-**3. 情感属性分析BatchNode (SentimentAttributeAnalysisBatchNode)**
-- **功能**：批量分析博文的具体情感状态和强度
-- **类型**：BatchNode
+**3. DataMergeNode (数据合并节点)**
+- **功能**：合并四个维度的增强结果
+- **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：返回博文数据列表，每条博文作为独立处理单元
-  - *exec*：对单条博文调用单模态LLM进行情感属性分析，验证结果是否在预定义的情感属性列表中
-  - *post*：将分析结果附加到对应博文对象的sentiment_attribute字段中，如果不在候选列表中则留空
+  - *prep*：读取四个维度的分析结果
+  - *exec*：将结果合并到原始博文对象中
+  - *post*：更新 `shared["data"]["blog_data"]`
 
-**4. 两级主题分析BatchNode (TwoLevelTopicAnalysisBatchNode)**
-- **功能**：批量从预定义主题列表中选择合适主题
-- **类型**：BatchNode
-- **实现步骤**：
-  - *prep*：返回博文数据列表，每条博文作为独立处理单元
-  - *exec*：对单条博文调用多模态LLM进行主题匹配和选择，验证结果是否在预定义的主题层次结构中
-  - *post*：将分析结果附加到对应博文对象的topics字段中，如果不在候选列表中则留空
-
-**5. 发布者对象分析BatchNode (PublisherObjectAnalysisBatchNode)**
-- **功能**：批量识别发布者类型和特征
-- **类型**：BatchNode
-- **实现步骤**：
-  - *prep*：返回博文数据列表，每条博文作为独立处理单元
-  - *exec*：对单条博文调用单模态LLM进行发布者类型识别，验证结果是否在预定义的发布者对象列表中
-  - *post*：将分析结果附加到对应博文对象的publisher字段中，如果不在候选列表中则留空
-
-**6. 数据验证与概况分析节点 (DataValidationAndOverviewNode)**
-- **功能**：验证增强数据的完整性并生成数据统计概况
+**4. QualityCheckNode (质量检查节点)**
+- **功能**：检查增强数据质量
 - **类型**：Regular Node
 - **实现步骤**：
   - *prep*：读取增强后的博文数据
-  - *exec*：验证必需字段（sentiment_polarity, sentiment_attribute, topics, publisher）是否存在，统计留空字段数量，生成数据统计概况，包括：
-    - 基础统计：总博文数、处理成功数
-    - 参与度统计：总转发数、总评论数、总点赞数、平均转发/评论/点赞数
-    - 用户统计：独立用户数、活跃用户排行、用户类型分布
-    - 内容统计：总图片数、包含图片的博文数、平均内容长度、时间分布
-    - 地理分布统计：各地区博文数量分布
-    - 情感分布统计：各情感极性和属性的分布情况
-    - 主题分布统计：各主题的分布情况
-    - 发布者分布统计：各发布者类型的分布情况
-  - *post*：更新验证结果和统计信息，为后续分析提供数据概况
+  - *exec*：统计各字段填充率、验证候选列表匹配度
+  - *post*：记录质量报告到 `shared["results"]["statistics"]`
 
-**7. 数据保存节点 (SaveEnhancedDataNode)**
-- **功能**：将增强后的博文数据保存到指定文件路径
+**5. SaveEnhancedDataNode (保存增强数据节点)**
+- **功能**：将增强数据持久化到文件
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取增强后的博文数据和保存路径配置
-  - *exec*：调用数据保存工具函数，将增强数据写入文件
-  - *post*：验证保存结果，更新保存状态信息
+  - *prep*：读取增强数据和保存路径
+  - *exec*：写入JSON文件
+  - *post*：记录保存状态
 
-#### 报告生成模块节点
+### 异步批量并行路径节点 (enhancement_mode="async")
 
-**7. 分析模式选择节点 (AnalysisModeSelectionNode)**
-- **功能**：根据配置选择报告生成路径
+**6. AsyncSentimentPolarityBatchNode (异步情感极性分析节点)**
+- **功能**：异步批量分析博文情感极性
+- **类型**：AsyncParallelBatchNode
+- **并发控制**：通过 `max_concurrent` 参数限制并发数
+- **实现步骤**：
+  - *prep_async*：返回博文数据列表
+  - *exec_async*：对单条博文调用多模态LLM进行情感极性分析（1-5档）
+  - *post_async*：将结果附加到博文对象的 `sentiment_polarity` 字段
+
+**7. AsyncSentimentAttributeBatchNode (异步情感属性分析节点)**
+- **功能**：异步批量分析博文情感属性
+- **类型**：AsyncParallelBatchNode
+- **实现步骤**：
+  - *prep_async*：返回博文数据列表
+  - *exec_async*：对单条博文调用LLM进行情感属性分析
+  - *post_async*：将结果附加到 `sentiment_attribute` 字段
+
+**8. AsyncTopicAnalysisBatchNode (异步主题分析节点)**
+- **功能**：异步批量分析博文主题
+- **类型**：AsyncParallelBatchNode
+- **实现步骤**：
+  - *prep_async*：返回博文数据列表
+  - *exec_async*：对单条博文调用多模态LLM进行两级主题匹配
+  - *post_async*：将结果附加到 `topics` 字段
+
+**9. AsyncPublisherAnalysisBatchNode (异步发布者分析节点)**
+- **功能**：异步批量识别发布者类型
+- **类型**：AsyncParallelBatchNode
+- **实现步骤**：
+  - *prep_async*：返回博文数据列表
+  - *exec_async*：对单条博文调用LLM进行发布者类型识别
+  - *post_async*：将结果附加到 `publisher` 字段
+
+### Batch API并行路径节点 (enhancement_mode="batch_api")
+
+**10. BatchRequestPrepareNode (批量请求准备节点)**
+- **功能**：将博文数据转换为Batch API请求格式
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取分析模式配置和增强数据概况
-  - *exec*：根据配置决定使用Workflow还是Agent路径
-  - *post*：根据选择结果跳转到相应路径
+  - *prep*：读取博文数据和参考数据（主题列表、情感属性等）
+  - *exec*：为四个维度分别构建批量请求JSONL文件
+  - *post*：保存请求文件路径到 `shared["batch_api"]["request_files"]`
 
-**8. 预定义工作流 (PredefinedWorkflow)**
-- **功能**：按固定顺序执行分析工具
-- **类型**：Workflow
-- **实现步骤**：
-  - *prep*：读取增强数据和工作流配置
-  - *exec*：按顺序调用四个分析工具
-  - *post*：将所有分析结果传递给报告生成节点
-
-**9. 智能体自主分析节点 (IntelligentAgentAnalysisNode)**
-- **功能**：智能体自主决策调用分析工具，此节点不仅仅是一个简单的调用，而是一个循环决策引擎。它不直接生成最终报告，而是负责填充 shared["results"]["analysis_outputs"] 和 shared["results"]["generated_charts"]
-- **类型**：Agent Node (Loop)
-- **输入**：shared["results"]["agent_state"]["data_summary"], Tool Definitions
-- **输出**：Updates to shared["results"]["analysis_outputs"], shared["results"]["generated_charts"] and shared["results"]["agent_state"]["history"]
-- **逻辑流程**：
-
-**初始化**：检查 data_summary 是否存在，若不存在则生成一份简要统计（总数、时间跨度、主要极性）
-
-**上下文构建**：构建Prompt，包含：
-- Role: 高级舆情分析师
-- Goal: 全面分析当前舆情数据，为最终报告提供详尽的支撑材料
-- Data Context: 当前的数据概况
-- Tool Definitions: 上述JSON Schema（包含charts字段）
-- History: 已执行的步骤和获得的关键发现（Observation摘要）
-- Constraint: 必须基于数据说话，若数据不足需调用工具。当认为信息足够撰写全面报告时，输出 FINISH
-
-**LLM决策**：调用 glm-4.6（推理模式）决定下一步行动
-
-**输出格式**：JSON {"thought": "...", "tool_name": "...", "tool_params": {...}} OR {"thought": "...", "action": "FINISH"}
-
-**动作执行**：
-- 解析LLM输出
-- 若是调用工具：
-  - 映射 tool_name 到具体的Python工具函数（如 utils.sentiment_trend_analysis）
-  - 传入 tool_params 和 enhanced_blog_data
-  - 获取工具返回的 result_dict
-  - State Update: 将 result_dict 存入 shared["results"]["analysis_outputs"][tool_name]
-  - Charts Registration: 提取 result_dict 中的 charts 字段，将每个图表信息注册到 shared["results"]["generated_charts"] 中
-  - History Update: 将关键发现摘要存入 history
-- 若是 FINISH：退出循环
-
-**循环控制**：检查迭代次数 current_iteration，若超过 max_iterations (10次），强制退出
-
-#### 分析工具节点 (Workflow Wrapper Nodes)
-
-**10. 情感趋势分析节点 (SentimentTrendAnalysisNode)**
-- **功能**：分析情感随时间的变化趋势
+**11. SubmitBatchJobNode (提交批量任务节点)**
+- **功能**：向API服务端提交批量任务
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取增强数据中的情感和时间信息
-  - *exec*：调用情感趋势分析工具
-  - *post*：存储趋势分析结果
+  - *prep*：读取请求文件路径
+  - *exec*：调用Batch API接口提交任务，获取任务ID
+  - *post*：保存任务ID到 `shared["batch_api"]["job_ids"]`
 
-**11. 主题演化分析节点 (TopicEvolutionAnalysisNode)**
-- **功能**：分析主题随时间的演化模式
+**12. BatchJobPollNode (任务状态轮询节点)**
+- **功能**：轮询批量任务执行状态
+- **类型**：Regular Node (with retry)
+- **实现步骤**：
+  - *prep*：读取任务ID列表
+  - *exec*：查询各任务状态，等待全部完成
+  - *post*：根据状态返回Action（"completed"/"polling"/"failed"）
+
+**13. BatchResultRetrieveNode (批量结果获取节点)**
+- **功能**：获取批量任务的执行结果
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取增强数据中的主题和时间信息
-  - *exec*：调用主题演化分析工具
-  - *post*：存储演化分析结果
+  - *prep*：读取已完成的任务ID
+  - *exec*：下载并解析结果文件
+  - *post*：将结果存入 `shared["batch_api"]["results"]`
 
-**12. 地理分布分析节点 (GeographicDistributionAnalysisNode)**
-- **功能**：分析舆情的地理分布特征
+---
+
+## 阶段2节点: 分析执行
+
+### 通用节点
+
+**14. LoadEnhancedDataNode (加载增强数据节点)**
+- **功能**：加载已完成增强处理的博文数据
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取增强数据中的地理位置信息
-  - *exec*：调用地理分布分析工具
-  - *post*：存储地理分析结果
+  - *prep*：读取增强数据文件路径
+  - *exec*：加载JSON数据
+  - *post*：存储到 `shared["data"]["blog_data"]`
 
-**13. 情感主题发布者交互分析节点 (SentimentTopicPublisherInteractionAnalysisNode)**
-- **功能**：分析情感、主题、发布者三者的交互关系
+**15. DataSummaryNode (数据概况生成节点)**
+- **功能**：生成增强数据的统计概况
 - **类型**：Regular Node
 - **实现步骤**：
-  - *prep*：读取增强数据中的情感、主题、发布者信息
-  - *exec*：调用交互分析工具
-  - *post*：存储交互分析结果
+  - *prep*：读取增强数据
+  - *exec*：计算各维度分布、时间跨度、总量等统计信息
+  - *post*：存储到 `shared["results"]["agent_state"]["data_summary"]`
 
-**14. 报告生成节点 (ReportGenerationNode)**
-- **功能**：将所有已生成的分析结果（无论是来自Workflow还是Agent）整合成一篇连贯的Markdown报告
+**16. SaveAnalysisResultsNode (保存分析结果节点)**
+- **功能**：将分析结果持久化
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取分析输出和图表列表
+  - *exec*：保存JSON结果文件
+  - *post*：记录保存状态
+
+### Agent自主调度路径节点 (analysis_mode="agent")
+
+**17. GetToolsNode (获取工具列表节点)**
+- **功能**：根据配置获取可用工具列表
+- **类型**：Regular Node
+- **控制参数**：`shared["config"]["tool_source"]`
+- **实现步骤**：
+  - *prep*：读取 `tool_source` 配置
+  - *exec*：
+    - 若 `tool_source="mcp"`：调用MCP服务器查询可用工具
+    - 若 `tool_source="local"`：返回本地注册的固定工具列表
+  - *post*：将工具定义存储到 `shared["agent"]["available_tools"]`
+
+**18. DecisionToolsNode (工具决策节点)**
+- **功能**：LLM决定下一步调用哪个工具或结束
 - **类型**：Regular Node (LLM Call)
-- **输入**：shared["results"]["analysis_outputs"], shared["data"]["topics_hierarchy"]
-- **输出**：shared["results"]["final_report_text"]
 - **实现步骤**：
+  - *prep*：读取数据概况、可用工具、执行历史
+  - *exec*：构建Prompt调用LLM，获取决策结果
+  - *post*：解析决策，返回Action
+    - `"call_tool"`: 需要执行工具
+    - `"finish"`: 分析完成
 
-**上下文准备**：
-- 收集 analysis_outputs 中所有非空的数据
-- 将复杂的JSON数据转换为适合Prompt阅读的文本摘要（例如，将时间序列数组转换为"呈上升趋势，峰值出现在X日"的描述）
-- 读取 analysis_mode，如果是Agent模式，附加上Agent的思考历史 history 作为分析思路参考
-
-**提示词构建**：
-- Role: 资深政府/企业舆情分析专家
-- Task: 撰写《舆情深度分析报告》
-- Source Material: 注入上述准备好的分析结果摘要
-- Output Format Requirements: Markdown格式，包含以下章节：
-  - 综述 (Executive Summary)：核心观点、舆情等级、关键建议
-  - 情感态势分析：情感占比、趋势变化、主要矛盾点
-  - 话题演变深度解析：核心话题、衍生话题、话题间的关联
-  - 传播路径与人群画像：谁在传播、在哪里传播、意见领袖是谁
-  - 研判与建议：针对性的应对策略
-
-**LLM生成**：调用 call_glm45v_thinking (开启思考模式) 或 call_glm46
-- Note: 开启Thinking模式有助于LLM整合碎片化的工具输出，构建更严密的逻辑链条
-
-**审查与优化（可选）**：
-- 简单检查生成的报告是否包含"NaN"或"undefined"等错误占位符
-- 将报告保存至文件系统
-
-**Workflow模式下的分析工具节点**：
-在Workflow模式下，这些节点按顺序直接调用工具函数，不经过Agent决策。
-
-**通用逻辑**：
-- *prep*：从shared读取全量数据
-- *exec*：使用默认参数（或Config中配置的参数）调用对应的工具函数
-- *post*：将结果存入 shared["results"]["analysis_outputs"][对应的key]
-
-## 工具函数接口规范
-
-为了支持上述JSON Schema，工具函数的Python实现应遵循统一规范：
-
-```python
-# utils/analysis_tools.py
-
-def analyze_sentiment_trend(blog_data: list, time_granularity: str = "day", focus_sentiment: str = None) -> dict:
-    """
-    实现情感趋势分析逻辑。
-    Args:
-        blog_data: 增强后的博文列表
-        time_granularity: 'hour' or 'day'
-        focus_sentiment: Optional filter
-    Returns:
-        dict: 符合JSON Schema中returns描述的字典
-    """
-    # 1. Data Aggregation using Pandas
-    # 2. Anomaly Detection (e.g., simple threshold or z-score)
-    # 3. Generate summary text based on stats
-    pass
-
-def analyze_topic_evolution(blog_data: list, top_k: int = 10, evolution_phase: str = "all") -> dict:
-    """
-    实现主题演化分析逻辑。
-    Args:
-        blog_data: 增强后的博文列表
-        top_k: 返回热度最高的主题数量
-        evolution_phase: 重点分析的阶段
-    Returns:
-        dict: 符合JSON Schema中returns描述的字典
-    """
-    # Implementation...
-    pass
-
-def analyze_geographic_distribution(blog_data: list, map_level: str = "province", min_post_count: int = 10) -> dict:
-    """
-    实现地理分布分析逻辑。
-    Args:
-        blog_data: 增强后的博文列表
-        map_level: 地理分析的行政级别
-        min_post_count: 过滤掉博文数量少于该值的地区
-    Returns:
-        dict: 符合JSON Schema中returns描述的字典
-    """
-    # Implementation...
-    pass
-
-def analyze_publisher_interaction(blog_data: list, target_publisher_type: str = None, cross_analysis_dimension: str = "topic") -> dict:
-    """
-    实现发布者交互分析逻辑。
-    Args:
-        blog_data: 增强后的博文列表
-        target_publisher_type: 特定关注的发布者类型
-        cross_analysis_dimension: 与发布者进行交叉分析的维度
-    Returns:
-        dict: 符合JSON Schema中returns描述的字典
-    """
-    # Implementation...
-    pass
+**DecisionToolsNode Prompt结构**：
 ```
+你是一位资深舆情分析专家。根据当前数据概况和已执行的分析，决定下一步行动。
 
-## Agent Prompt 模板
-
-```python
-AGENT_SYSTEM_PROMPT = """
-你是一个能够熟练使用数据分析工具的舆情分析专家智能体。
-你的任务是根据给定的数据概况，自主规划并调用工具，以获取足够的信息来撰写一份深度的舆情报告。
-
-你可以使用的工具定义如下：
-{tool_definitions}
-
-当前数据概况：
+## 当前数据概况
 {data_summary}
 
-已执行的历史操作：
-{history}
+## 可用工具
+{tool_definitions}
 
-请思考当前还需要分析什么维度才能得出全面结论？
-- 如果需要分析趋势，请调用 analyze_sentiment_trend
-- 如果需要分析话题，请调用 analyze_topic_evolution
-- 如果需要分析地理分布，请调用 analyze_geographic_distribution
-- 如果需要分析交互，请调用 analyze_publisher_interaction
-- ...
+## 已执行的分析
+{execution_history}
 
-请以JSON格式输出你的决策：
-{{
-    "thought": "我需要先看整体的情感走势，特别是负面情绪何时爆发",
-    "tool_name": "analyze_sentiment_trend",
-    "tool_params": {{
-        "time_granularity": "hour",
-        "focus_sentiment": "1"
-    }}
-}}
-
-如果你认为现有信息已经足够撰写报告，请输出：
-{{
-    "thought": "我已经掌握了趋势、话题和人群分布，可以生成报告了",
-    "action": "FINISH"
-}}
-"""
+## 决策要求
+- 如需调用工具，输出：{"action": "call_tool", "tool_name": "...", "tool_params": {...}, "reason": "..."}
+- 如分析充分，输出：{"action": "finish", "reason": "..."}
 ```
+
+**19. ExecuteToolsNode (工具执行节点)**
+- **功能**：执行指定的工具函数
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取决策结果中的工具名称和参数
+  - *exec*：调用对应的工具函数（本地或MCP）
+  - *post*：
+    - 存储结果到 `shared["results"]["analysis_outputs"]`
+    - 注册图表到 `shared["results"]["generated_charts"]`
+    - 记录执行历史到 `shared["agent"]["execution_history"]`
+    - 返回 `"continue"` 继续循环
+
+**20. StoreToolResultNode (工具结果存储节点)**
+- **功能**：存储工具执行结果并更新状态
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取工具执行结果
+  - *exec*：格式化结果、提取关键发现
+  - *post*：更新 `shared["results"]` 和 `shared["agent"]["execution_history"]`
+
+### 预定义Workflow路径节点 (analysis_mode="workflow")
+
+> 这些节点按固定顺序执行，每个节点调用对应工具集的全部工具
+
+**21. SentimentTrendAnalysisNode (情感趋势分析节点)**
+- **功能**：执行情感趋势分析工具集
+- **类型**：Regular Node
+- **调用工具**：`sentiment_distribution_stats`, `sentiment_time_series`, `sentiment_anomaly_detection`, `sentiment_trend_chart`, `sentiment_pie_chart`
+- **实现步骤**：
+  - *prep*：读取增强数据
+  - *exec*：依次调用工具集中的全部函数
+  - *post*：存储结果到 `shared["results"]["analysis_outputs"]["sentiment_trend"]`
+
+**22. TopicEvolutionAnalysisNode (主题演化分析节点)**
+- **功能**：执行主题演化分析工具集
+- **类型**：Regular Node
+- **调用工具**：`topic_frequency_stats`, `topic_time_evolution`, `topic_cooccurrence_analysis`, `topic_ranking_chart`, `topic_evolution_chart`, `topic_network_chart`
+
+**23. GeographicAnalysisNode (地理分布分析节点)**
+- **功能**：执行地理分布分析工具集
+- **类型**：Regular Node
+- **调用工具**：`geographic_distribution_stats`, `geographic_hotspot_detection`, `geographic_sentiment_analysis`, `geographic_heatmap`, `geographic_bar_chart`
+
+**24. CrossDimensionAnalysisNode (多维交互分析节点)**
+- **功能**：执行多维交互分析工具集
+- **类型**：Regular Node
+- **调用工具**：`publisher_distribution_stats`, `cross_dimension_matrix`, `influence_analysis`, `correlation_analysis`, `interaction_heatmap`, `publisher_bar_chart`
+
+---
+
+## 阶段3节点: 报告生成
+
+### 通用节点
+
+**25. LoadAnalysisResultsNode (加载分析结果节点)**
+- **功能**：加载阶段2产生的分析结果
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取分析结果文件路径
+  - *exec*：加载JSON数据和图表信息
+  - *post*：存储到 `shared["results"]`
+
+**26. FormatReportNode (报告格式化节点)**
+- **功能**：格式化最终Markdown报告
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取报告内容
+  - *exec*：处理图片路径、修复格式问题、添加目录
+  - *post*：更新 `shared["results"]["final_report_text"]`
+
+**27. SaveReportNode (保存报告节点)**
+- **功能**：保存最终报告到文件
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取格式化后的报告
+  - *exec*：写入Markdown文件
+  - *post*：记录保存路径
+
+### 模板填充路径节点 (report_mode="template")
+
+**28. LoadTemplateNode (加载模板节点)**
+- **功能**：加载预定义的报告模板
+- **类型**：Regular Node
+- **模板结构**：
+```markdown
+# 舆情深度分析报告
+
+## 一、综述
+{executive_summary}
+
+## 二、情感态势分析
+{sentiment_analysis}
+
+## 三、话题演变深度解析
+{topic_analysis}
+
+## 四、传播路径与人群画像
+{spread_analysis}
+
+## 五、研判与建议
+{recommendations}
+```
+- **实现步骤**：
+  - *prep*：读取模板文件路径
+  - *exec*：加载模板内容
+  - *post*：存储到 `shared["report"]["template"]`
+
+**29. FillSectionNode (章节填充节点)**
+- **功能**：使用LLM填充单个章节内容
+- **类型**：Regular Node (LLM Call)
+- **实现步骤**：
+  - *prep*：读取章节模板和相关分析结果
+  - *exec*：构建章节填充Prompt，调用LLM生成内容
+  - *post*：存储章节内容到 `shared["report"]["sections"][section_name]`
+
+**30. AssembleReportNode (报告组装节点)**
+- **功能**：将各章节组装成完整报告
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取所有已填充的章节
+  - *exec*：按模板顺序组装报告
+  - *post*：存储到 `shared["results"]["final_report_text"]`
+
+### 多轮迭代路径节点 (report_mode="iterative")
+
+**31. InitReportStateNode (初始化报告状态节点)**
+- **功能**：初始化迭代报告生成的状态
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取分析结果和配置
+  - *exec*：初始化迭代计数器、历史记录
+  - *post*：设置 `shared["report"]["iteration"]` = 0, `shared["report"]["max_iterations"]`
+
+**32. GenerateReportNode (报告生成节点)**
+- **功能**：LLM生成或修改报告
+- **类型**：Regular Node (LLM Call)
+- **实现步骤**：
+  - *prep*：读取分析结果、当前报告草稿、修改意见
+  - *exec*：构建Prompt调用LLM生成/修改报告
+  - *post*：存储报告草稿到 `shared["report"]["current_draft"]`
+
+**GenerateReportNode Prompt结构**：
+```
+你是资深舆情分析专家，请撰写/修改舆情分析报告。
+
+## 分析数据
+{analysis_results_summary}
+
+## 可用图表
+{charts_list}
+
+## 当前草稿（如有）
+{current_draft}
+
+## 修改意见（如有）
+{revision_feedback}
+
+## 要求
+- 格式：Markdown
+- 结构：综述、情感分析、话题分析、传播分析、建议
+- 必须引用可用图表（使用Markdown图片语法）
+- 基于数据进行深度解读
+```
+
+**33. ReviewReportNode (报告评审节点)**
+- **功能**：LLM评审报告质量并提出修改意见
+- **类型**：Regular Node (LLM Call)
+- **实现步骤**：
+  - *prep*：读取当前报告草稿
+  - *exec*：构建评审Prompt，调用LLM评审
+  - *post*：根据评审结果返回Action
+    - `"satisfied"`: 报告质量合格
+    - `"needs_revision"`: 需要修改
+
+**ReviewReportNode Prompt结构**：
+```
+你是资深舆情报告评审专家，请评审以下报告。
+
+## 报告内容
+{current_draft}
+
+## 评审标准
+1. 结构完整性：是否包含所有必需章节
+2. 数据支撑：结论是否有数据依据
+3. 图表引用：是否正确引用了分析图表
+4. 逻辑连贯：各章节是否逻辑通顺
+5. 建议可行性：应对建议是否具体可行
+
+## 输出格式
+{
+    "verdict": "satisfied" 或 "needs_revision",
+    "score": 0-100,
+    "feedback": "具体修改意见（如需修改）"
+}
+```
+
+**34. ApplyFeedbackNode (应用修改意见节点)**
+- **功能**：处理评审意见，准备下一轮迭代
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取评审意见
+  - *exec*：格式化修改意见
+  - *post*：
+    - 增加迭代计数 `shared["report"]["iteration"]` += 1
+    - 存储修改意见到 `shared["report"]["revision_feedback"]`
+    - 检查是否达到最大迭代次数，返回相应Action
 
 ## 文件存储结构
 
-### 项目目录结构
+> Notes for AI: 基于实际项目结构
 
 ```
 project_root/
-├── data/                  # 原始与增强数据
-│   ├── posts.json
-│   ├── enhanced_blogs.json
-│   ├── topics.json
-│   ├── sentiment_attributes.json
-│   └── publisher_objects.json
-├── utils/                 # 工具函数
-│   ├── call_llm.py
-│   ├── data_loader.py
-│   ├── sentiment_trend_analysis.py
-│   ├── topic_evolution_analysis.py
-│   ├── geographic_distribution_analysis.py
-│   └── sentiment_topic_publisher_interaction.py
-├── outputs/
-│   ├── images/            # [新增] 存放分析节点生成的所有可视化图表
-│   │   ├── sentiment_trend_20231027_1001.png
-│   │   ├── geo_distribution_province.png
-│   │   └── ...
-│   └── report.md          # 最终生成的包含图片链接的Markdown报告
-└── ...
+├── data/                           # 数据文件
+│   ├── posts.json                  # 原始博文数据
+│   ├── topics.json                 # 主题层次结构
+│   ├── sentiment_attributes.json   # 情感属性列表
+│   └── publisher_objects.json      # 发布者类型列表
+├── batch/                          # Batch API处理模块
+│   ├── generate_jsonl.py           # 生成批量请求文件
+│   ├── upload_and_start.py         # 上传并启动任务
+│   ├── download_results.py         # 下载结果
+│   └── parse_and_integrate.py      # 解析并整合结果
+├── report/                         # 分析结果与报告输出
+│   ├── images/                     # 可视化图表存储
+│   ├── template.md                 # 报告模板
+│   └── report.md                   # 最终生成的报告
+├── utils/                          # 工具函数
+│   ├── call_llm.py                 # LLM调用封装
+│   └── data_loader.py              # 数据加载与保存
+├── doc/                            # 文档
+│   └── design.md                   # 设计文档
+├── tests/                          # 测试
+├── nodes.py                        # 节点定义
+├── flow.py                         # 流程编排
+├── EnhancementFlow.py              # 增强处理流程
+└── main.py                         # 入口文件
 ```
 
-### 可视化资源命名规范
+### 输出约定
 
-- **文件名格式**：`{analysis_type}_{timestamp}.png`
-- **时间戳格式**：`YYYYMMDD_HHMM`（如：20231027_1430）
-- **示例文件名**：
-  - `sentiment_trend_20231027_1430.png`
-  - `topic_evolution_20231027_1445.png`
-  - `geo_distribution_province_20231027_1500.png`
-  - `publisher_interaction_20231027_1515.png`
+- **分析结果**：存储在 `report/` 目录
+- **可视化图表**：存储在 `report/images/`，命名格式 `{type}_{timestamp}.png`
+- **最终报告**：输出到 `report/report.md`
 
-### 图片存储管理
-
-- **自动创建目录**：系统运行时自动创建 `outputs/images/` 目录
-- **文件唯一性**：使用时间戳确保文件名唯一
-- **路径管理**：所有图片路径相对于项目根目录，便于报告引用
-- **清理策略**：可配置自动清理过期图片，避免磁盘空间占用
-
-## Report Generation Prompt 模板 (Updated for Visualization)
-
-```python
-REPORT_GENERATION_PROMPT = """
-你是一位资深政府/企业舆情分析专家。请基于提供的分析数据和可用图表资源，撰写一份图文并茂的《舆情深度分析报告》。
-
-【输入资源】
-1. 统计数据摘要：
-{analysis_data_json}
-
-2. 可用图表列表（必须在报告中引用）：
-{charts_list_string}
-
-【撰写要求】
-1. **格式**：Markdown格式。
-2. **图文结合**：
-   - 在分析对应的章节，必须插入相关的图表。
-   - 使用标准Markdown语法插入图片：`![图片标题](图片路径)`。
-   - **严禁虚构图片路径**，只能使用【可用图表列表】中提供的 Path。
-3. **深度解读**：
-   - 插入图片后，紧接着需要对图片内容进行解读。
-   - 结合【统计数据摘要】中的具体数字，解释图表反映了什么趋势、什么问题。
-   - 例如："如下图所示（插入trend.png），舆情在24日达到峰值..."
-
-【报告大纲】
-1. **综述** (Executive Summary)
-   - 核心观点、舆情等级、关键建议
-   
-2. **情感态势分析**
-   - 在此处插入情感趋势图并分析
-   - 情感占比、趋势变化、主要矛盾点
-   
-3. **话题演变深度解析**
-   - 在此处插入话题图谱并分析
-   - 核心话题、衍生话题、话题间的关联
-   
-4. **传播路径与人群画像**
-   - 在此处插入地理分布图并分析
-   - 谁在传播、在哪里传播、意见领袖是谁
-   
-5. **研判与建议**
-   - 在此处插入发布者交互图并分析
-   - 针对性的应对策略
-
-请生成完整的Markdown格式报告。
-"""
-```
-
-## 代码实现示例 (Python)
-
-### 1. 修改工具函数返回值
-
-```python
-# utils/sentiment_trend_analysis.py
-import matplotlib.pyplot as plt
-import pandas as pd
-import time
-import os
-
-def analyze_sentiment_trend(blog_data, time_granularity="day", focus_sentiment=None):
-    """
-    实现情感趋势分析逻辑。
-    Args:
-        blog_data: 增强后的博文列表
-        time_granularity: 'hour' or 'day'
-        focus_sentiment: Optional filter
-    Returns:
-        dict: 符合JSON Schema中returns描述的字典，包含charts字段
-    """
-    # 1. 数据处理
-    df = pd.DataFrame(blog_data)
-    # ... 计算逻辑 ...
-    
-    # 2. 生成图表
-    plt.figure(figsize=(10, 6))
-    plt.plot(df['time'], df['sentiment_score'])
-    plt.title("Sentiment Trend")
-    
-    # 3. 保存图片
-    timestamp = int(time.time())
-    file_name = f"sentiment_trend_{timestamp}.png"
-    
-    # 确保目录存在
-    os.makedirs("outputs/images", exist_ok=True)
-    file_path = f"outputs/images/{file_name}"
-    plt.savefig(file_path)
-    plt.close()
-    
-    # 4. 返回带图片路径的结果
-    return {
-        "summary": "舆情在10月24日达到负面峰值，随后回落。",
-        "key_points": {"2023-10-24": -0.8, "2023-10-25": -0.2},
-        "charts": [
-            {
-                "title": "情感趋势全景图",
-                "path": file_path, # 相对路径
-                "description": "展示了全周期内的情感极性波动"
-            }
-        ]
-    }
-```
-
-### 2. 修改报告生成节点逻辑
-
-```python
-# nodes/report_generation_node.py
-
-def generate_report(shared_context):
-    analysis_outputs = shared_context["results"]["analysis_outputs"]
-    generated_charts = shared_context["results"]["generated_charts"]
-    
-    # 格式化图表清单
-    charts_str = ""
-    for idx, chart in enumerate(generated_charts):
-        charts_str += f"- Chart {idx+1}: {chart['title']}\n"
-        charts_str += f"  Path: {chart['path']}\n"
-        charts_str += f"  Context: {chart['description']}\n\n"
-        
-    # 构建Prompt
-    prompt = REPORT_GENERATION_PROMPT.format(
-        analysis_data_json=json.dumps(analysis_outputs, indent=2, ensure_ascii=False),
-        charts_list_string=charts_str
-    )
-    
-    # 调用LLM
-    report_content = call_glm46(prompt)
-    
-    # 保存报告
-    os.makedirs("outputs", exist_ok=True)
-    with open("outputs/report.md", "w", encoding="utf-8") as f:
-        f.write(report_content)
-        
-    return report_content
-```
-
-通过以上设计，我们确保了：
-
-1. **自动化绘图**：分析节点负责产生素材
-2. **有据可依**：LLM拿到的是真实存在的图片路径，不会产生幻觉链接
-3. **图文并茂**：报告生成Prompt强制要求LLM将图片嵌入到Markdown中，并基于数据进行解读
-4. **资源管理**：统一的文件存储结构和命名规范，便于管理和引用
-
-## 双轨制报告生成设计
+## 路径选择指南
 
 ### 设计理念
-为了平衡灵活性和可靠性，本系统采用双轨制报告生成架构：
-- **Workflow路径**：可预测、高效的标准化分析流程
-- **Agent路径**：灵活、智能的探索性分析流程
 
-### 路径选择策略
+系统采用**三阶段解耦 + 多路径执行**架构，每个阶段独立运行，各自支持多种执行方式：
 
-#### Workflow路径适用场景
-- 标准化的日常舆情监控
-- 已知类型的常规分析需求
-- 对分析路径有明确要求的场景
-- 需要快速生成标准化报告的情况
-- 计算资源和时间有限的情况
+| 阶段 | 路径选项 | 特点 |
+|------|----------|------|
+| 阶段1: 增强处理 | 异步并行 / Batch API | 处理效率 vs API成本 |
+| 阶段2: 分析执行 | Agent调度 / Workflow | 灵活性 vs 可预测性 |
+| 阶段3: 报告生成 | 模板填充 / 多轮迭代 | 效率 vs 质量 |
 
-#### Agent路径适用场景
-- 复杂的多维度舆情分析
-- 需要深度洞察和关联分析
-- 数据特征不明确或异常情况
-- 需要探索性分析的舆情事件
-- 对分析深度要求较高的场景
+### 阶段1: 增强处理路径选择
 
-#### 混合模式策略
-- **Workflow优先**：先执行Workflow路径，再由Agent进行补充分析
-- **智能切换**：基于数据复杂度自动选择最适合的路径
-- **用户指定**：允许用户根据具体需求手动选择路径
+#### 异步批量并行 (enhancement_mode="async")
+- **适用场景**：中小规模数据（<5000条）、需要实时反馈
+- **优势**：可控制并发数、支持实时进度监控、易于调试
+- **劣势**：受本地资源限制、大规模时效率下降
 
-### Workflow路径特点
+#### Batch API并行 (enhancement_mode="batch_api")
+- **适用场景**：大规模数据（>5000条）、对时效要求不高
+- **优势**：服务端处理无本地资源限制、成本更低
+- **劣势**：需要轮询等待、无法实时查看进度
 
-#### 优势
-- **可预测性**：分析路径和结果高度可控
-- **高效性**：固定流程，执行效率高
-- **成本可控**：分析工具调用次数固定，成本可预测
-- **一致性**：相同输入产生一致的分析结果
-- **易于调试**：固定流程便于问题定位和优化
+### 阶段2: 分析执行路径选择
 
-#### 限制
-- **灵活性不足**：无法适应数据特征的变化
-- **深度有限**：可能遗漏预定义路径外的洞察
-- **适应性差**：对异常情况处理能力有限
+#### Agent自主调度 (analysis_mode="agent")
+- **适用场景**：
+  - 复杂的多维度舆情分析
+  - 数据特征不明确或异常情况
+  - 需要探索性分析的舆情事件
+- **工具来源选择**：
+  - `tool_source="mcp"`: 动态发现工具，适合工具集频繁变化的场景
+  - `tool_source="local"`: 固定工具列表，适合稳定的分析需求
+- **优势**：灵活性高、能发现隐藏模式、自适应能力强
+- **挑战**：结果不确定、成本较高、需要精心设计Prompt
 
-### Agent路径特点
+#### 预定义Workflow (analysis_mode="workflow")
+- **适用场景**：
+  - 标准化的日常舆情监控
+  - 对分析路径有明确要求
+  - 计算资源和时间有限
+- **优势**：可预测性强、效率高、成本可控、易于调试
+- **劣势**：灵活性不足、可能遗漏非预定义洞察
 
-#### 优势
-- **高度灵活性**：根据数据特征动态调整分析策略
-- **深度洞察**：能够发现隐藏的关联和模式
-- **自适应能力**：根据分析结果调整后续分析方向
-- **创新性**：可能发现预定义流程无法覆盖的洞察
+### 阶段3: 报告生成路径选择
 
-#### 挑战
-- **不确定性**：分析路径和结果可能难以预测
-- **计算成本**：可能调用更多分析工具，成本较高
-- **时间开销**：自主决策和循环审查需要更多时间
-- **质量控制**：需要精心设计提示词确保分析质量
+#### 模板填充 (report_mode="template")
+- **适用场景**：
+  - 格式要求固定的标准报告
+  - 需要快速生成报告
+  - 对报告结构有明确规范
+- **模板结构**：预定义章节大纲（综述、情感分析、话题分析、传播分析、建议）
+- **优势**：效率高、格式一致、可控性强
+- **劣势**：灵活性受限于模板结构
 
-## Async实现详解
+#### 多轮迭代 (report_mode="iterative")
+- **适用场景**：
+  - 对报告质量要求极高
+  - 需要深度解读和精细打磨
+  - 重要的舆情事件报告
+- **迭代机制**：
+  - 生成 → 评审 → 修改 → 再评审
+  - 最大迭代次数限制（默认5次）
+  - 满意度阈值控制（默认80分）
+- **优势**：质量有保障、可以自我完善
+- **挑战**：时间成本高、需要更多API调用
 
-### AsyncParallelBatchNode设计
+## 增强处理实现要点
 
-我们实现了`AsyncParallelBatchNode`类，它结合了`AsyncNode`和`BatchNode`的特性，支持并发控制的异步批处理。该类通过`max_concurrent`参数控制并发执行数量，使用`asyncio.Semaphore`实现精确的并发控制。
+### 异步批量并行 (enhancement_mode="async")
 
-### Async分析节点实现
+- 基于PocketFlow的 `AsyncParallelBatchNode` 实现
+- 通过 `max_concurrent` 参数控制并发数，使用 `asyncio.Semaphore` 进行限流
+- 四个分析维度（情感极性、情感属性、主题、发布者）可并行执行
+- 支持异步重试和优雅降级
 
-为四个核心分析维度都实现了对应的Async版本：
+### Batch API并行 (enhancement_mode="batch_api")
 
-1. **AsyncSentimentPolarityAnalysisBatchNode**：异步批量分析博文情感极性
-2. **AsyncSentimentAttributeAnalysisBatchNode**：异步批量分析博文情感属性  
-3. **AsyncTwoLevelTopicAnalysisBatchNode**：异步批量分析两级主题结构
-4. **AsyncPublisherObjectAnalysisBatchNode**：异步批量识别发布者类型
-
-所有Async节点都使用`asyncio.to_thread`将同步LLM调用转为异步执行，支持多模态模型调用，并包含完整的异步重试和回退机制。
-
-### AsyncFlow编排
-
-提供了完整的异步流程编排示例，支持可配置的并发控制：
-
-```python
-# 创建异步批处理节点，设置并发限制
-sentiment_polarity_node = AsyncSentimentPolarityAnalysisBatchNode(
-    max_retries=3, wait=10, max_concurrent=3
-)
-# 创建异步流程
-async_flow = AsyncFlow(start=data_load_node)
-```
-
-### 使用场景和配置建议
-
-- **小规模数据处理**（<1000条）：使用较高并发数（max_concurrent=10）快速处理
-- **中等规模数据处理**（1000-10000条）：使用平衡配置（max_concurrent=5）  
-- **大规模数据处理**（>10000条）：使用保守配置（max_concurrent=3）确保稳定性
-
-### Async实现优势
-
-1. **性能提升**：多个博文可以同时进行LLM分析，显著提升处理速度
-2. **资源控制**：通过信号量控制并发数，避免触发API限流
-3. **可靠性增强**：支持异步重试机制和优雅降级，提高系统稳定性
+- 将博文数据转换为JSONL请求文件
+- 通过智谱Batch API一次性提交批量任务
+- 轮询任务状态直到完成
+- 下载并解析结果文件，整合到增强数据中
+- 详细实现参考 `batch/` 目录
 
 ## 技术考虑
 
@@ -1521,129 +1244,4 @@ async_flow = AsyncFlow(start=data_load_node)
 - **配置化管理**：通过配置文件灵活调整系统行为
 - **接口标准化**：统一的数据接口和工具调用规范
 
-## 实现优先级和部署考虑
 
-### 实现阶段规划
-
-#### 第一阶段：核心数据处理功能
-1. **基础工具函数开发**
-   - 实现Call VLM函数（支持多模态输入）
-   - 实现四个数据处理工具函数
-   - 实现数据加载和保存函数
-
-2. **数据处理模块开发**
-   - DataLoadNode：数据加载和验证
-   - 四个批量分析节点：情感极性、情感属性、两级主题、发布者对象
-   - BatchAnalysisFlow：批量处理流程
-   - DataEnhancementIntegrationNode：数据整合
-
-3. **基础测试和验证**
-   - 小规模数据集测试（100-1000条博文）
-   - 并行处理性能测试
-   - 数据增强结果验证
-
-#### 第二阶段：报告生成功能
-1. **分析工具开发**
-   - 四个Agent分析工具函数
-   - 工具接口标准化
-   - 结果格式统一
-
-2. **报告生成模块开发**
-   - AnalysisModeSelectionNode：模式选择
-   - PredefinedWorkflow：预定义工作流
-   - IntelligentAgentAnalysis：智能体分析
-   - ReportGenerationNode：报告生成
-
-3. **双轨制集成测试**
-   - Workflow路径完整性测试
-   - Agent路径智能决策测试
-   - 混合模式切换测试
-
-#### 第三阶段：优化和完善
-1. **性能优化**
-   - 并行处理优化
-   - 内存使用优化
-   - API调用优化
-   - 缓存机制实现
-
-2. **用户体验优化**
-   - 详细的日志系统
-   - 进度监控和可视化
-   - 错误处理和用户反馈
-   - 配置管理界面
-
-3. **部署和运维**
-   - 容器化部署
-   - 监控和告警系统
-   - 性能调优和压力测试
-   - 文档和使用指南
-
-### 部署架构建议
-
-#### 开发环境
-- **本地开发**：使用小规模数据集进行原型验证
-- **模型选择**：使用开源模型或低成本API
-- **存储方案**：本地文件系统存储
-- **监控工具**：基础日志和性能监控
-
-#### 测试环境
-- **中等规模**：使用1万条博文进行功能测试
-- **模型验证**：对比不同模型的分析效果
-- **性能测试**：并行处理和内存使用测试
-- **集成测试**：端到端流程验证
-
-#### 生产环境
-- **计算资源**：支持GPU加速的高性能服务器
-- **模型部署**：
-  - VLM模型：专用API服务或本地部署
-  - LLM模型：云服务API（OpenAI、Claude等）
-  - 分析模型：针对特定任务优化的模型
-- **存储方案**：
-  - 原始数据：分布式文件系统
-  - 处理结果：数据库存储
-  - 缓存：Redis集群
-- **监控系统**：
-  - 实时任务进度监控
-  - 模型API调用监控
-  - 系统性能和资源监控
-  - 错误率和成功率监控
-
-### 成本控制策略
-
-#### API调用优化
-- **批量处理**：合并多个小请求减少API调用次数
-- **结果缓存**：相同内容避免重复分析
-- **智能降级**：高成本模型仅在必要时使用
-- **调用频率控制**：避免触发API限流
-
-#### 资源调度优化
-- **并行处理**：充分利用多核CPU和GPU资源
-- **负载均衡**：多实例并行处理提高吞吐量
-- **弹性扩缩容**：根据负载动态调整资源
-- **内存管理**：及时释放不需要的数据
-
-#### 模型选择策略
-- **成本效益分析**：平衡分析质量和成本
-- **模型组合**：不同任务使用最适合的模型
-- **本地vs云端**：根据使用频率选择部署方式
-- **模型版本管理**：支持模型升级和回滚
-
-### 质量保证措施
-
-#### 数据质量保证
-- **输入验证**：严格的数据格式检查
-- **异常处理**：缺失或错误数据的处理策略
-- **数据清洗**：去除重复和无效数据
-- **一致性检查**：确保数据逻辑一致性
-
-#### 分析质量保证
-- **结果验证**：抽样人工验证分析结果
-- **一致性检查**：确保分析逻辑的一致性
-- **阈值调优**：基于实际效果调整参数阈值
-- **A/B测试**：对比不同分析方法的效果
-
-#### 系统质量保证
-- **错误恢复**：节点失败时的重试和降级机制
-- **数据备份**：重要数据的定期备份
-- **版本管理**：模型和代码的版本控制
-- **安全防护**：数据安全和隐私保护措施
