@@ -1,23 +1,49 @@
 """
-舆情分析智能体 - 阶段1节点定义
+舆情分析智能体 - 节点定义
 
-根据设计文档，阶段1（原始博文增强处理）支持两种执行路径：
-1. 异步批量并行 (enhancement_mode="async") - 使用 AsyncParallelBatchNode
-2. Batch API并行 (enhancement_mode="batch_api") - 使用 batch/ 目录下的脚本
+根据设计文档，系统采用中央调度+三阶段顺序依赖架构。
+本文件包含所有节点定义，按以下结构组织：
 
-本文件包含以下节点：
-- 基础节点：AsyncParallelBatchNode（带并发限制的异步并行批处理基类）
-- 通用节点：DataLoadNode, SaveEnhancedDataNode, DataValidationAndOverviewNode
-- 异步分析节点（四维度）：
-  - AsyncSentimentPolarityAnalysisBatchNode（情感极性）
-  - AsyncSentimentAttributeAnalysisBatchNode（情感属性）
-  - AsyncTwoLevelTopicAnalysisBatchNode（两级主题）
-  - AsyncPublisherObjectAnalysisBatchNode（发布者对象）
+================================================================================
+目录结构
+================================================================================
+
+1. 系统调度节点
+   - DispatcherNode: 综合调度节点，系统入口和中央控制器
+   - TerminalNode: 终止节点，宣布流程结束
+
+2. 基础节点类
+   - AsyncParallelBatchNode: 带并发限制的异步并行批处理基类
+
+3. 阶段1节点: 原始博文增强处理
+   3.1 阶段1入口节点
+       - Stage1EntryNode: 阶段1入口，决定进入async或batch_api路径
+   3.2 通用节点
+       - DataLoadNode: 数据加载
+       - SaveEnhancedDataNode: 保存增强数据
+       - DataValidationAndOverviewNode: 数据验证与概况分析
+       - Stage1CompletionNode: 阶段1完成节点，返回调度器
+   3.3 异步批量并行路径节点 (enhancement_mode="async")
+       - AsyncSentimentPolarityAnalysisBatchNode: 情感极性分析
+       - AsyncSentimentAttributeAnalysisBatchNode: 情感属性分析
+       - AsyncTwoLevelTopicAnalysisBatchNode: 两级主题分析
+       - AsyncPublisherObjectAnalysisBatchNode: 发布者对象分析
+   3.4 Batch API路径节点 (enhancement_mode="batch_api")
+       - BatchAPIEnhancementNode: 调用Batch API脚本处理
+
+4. 阶段2节点: 分析执行（待实现）
+   - Stage2EntryNode, WorkflowAnalysisNode, AgentAnalysisFlow节点等
+
+5. 阶段3节点: 报告生成（待实现）
+   - Stage3EntryNode, TemplateReportNode, IterativeReportFlow节点等
+
+================================================================================
 """
 
 import json
 import os
 import asyncio
+import subprocess
 from typing import List, Dict, Any, Optional
 from pocketflow import Node, BatchNode, AsyncNode
 from utils.call_llm import call_glm_45_air, call_glm4v_plus
@@ -28,7 +54,165 @@ from utils.data_loader import (
 
 
 # =============================================================================
-# 基础节点类
+# 1. 系统调度节点
+# =============================================================================
+
+class DispatcherNode(Node):
+    """
+    综合调度节点 - 系统入口和中央控制器
+    
+    功能：
+    1. 作为整个系统Flow的入口节点
+    2. 根据shared["dispatcher"]配置决定执行哪个阶段
+    3. 根据各阶段的config参数决定具体执行路径
+    4. 每个阶段完成后返回此节点，决定下一步动作
+    
+    返回的Action类型：
+    - stage1_async: 阶段1异步处理路径
+    - stage1_batch_api: 阶段1 Batch API处理路径
+    - stage2_workflow: 阶段2固定脚本分析
+    - stage2_agent: 阶段2 LLM自主分析
+    - stage3_template: 阶段3模板填充
+    - stage3_iterative: 阶段3多轮迭代
+    - done: 所有阶段完成，跳转到TerminalNode
+    """
+    
+    def prep(self, shared):
+        """读取调度配置和当前状态"""
+        # 初始化dispatcher配置（如果不存在）
+        if "dispatcher" not in shared:
+            shared["dispatcher"] = {
+                "start_stage": 1,
+                "run_stages": [1, 2, 3],
+                "current_stage": 0,
+                "completed_stages": [],
+                "next_action": None
+            }
+        
+        dispatcher = shared["dispatcher"]
+        config = shared.get("config", {})
+        
+        return {
+            "start_stage": dispatcher.get("start_stage", 1),
+            "run_stages": dispatcher.get("run_stages", [1, 2, 3]),
+            "current_stage": dispatcher.get("current_stage", 0),
+            "completed_stages": dispatcher.get("completed_stages", []),
+            "enhancement_mode": config.get("enhancement_mode", "async"),
+            "analysis_mode": config.get("analysis_mode", "workflow"),
+            "report_mode": config.get("report_mode", "template")
+        }
+    
+    def exec(self, prep_res):
+        """计算下一步动作"""
+        start_stage = prep_res["start_stage"]
+        run_stages = prep_res["run_stages"]
+        current_stage = prep_res["current_stage"]
+        completed_stages = prep_res["completed_stages"]
+        enhancement_mode = prep_res["enhancement_mode"]
+        analysis_mode = prep_res["analysis_mode"]
+        report_mode = prep_res["report_mode"]
+        
+        # 确定下一个需要执行的阶段
+        if current_stage == 0:
+            # 首次进入，从start_stage开始
+            next_stage = start_stage
+        else:
+            # 找到下一个在run_stages中且未完成的阶段
+            next_stage = None
+            for stage in run_stages:
+                if stage > current_stage and stage not in completed_stages:
+                    next_stage = stage
+                    break
+        
+        # 检查是否还有需要执行的阶段
+        if next_stage is None or next_stage not in run_stages:
+            return {"action": "done", "next_stage": None}
+        
+        # 根据阶段确定具体路径
+        if next_stage == 1:
+            action = f"stage1_{enhancement_mode}"
+        elif next_stage == 2:
+            action = f"stage2_{analysis_mode}"
+        elif next_stage == 3:
+            action = f"stage3_{report_mode}"
+        else:
+            action = "done"
+        
+        return {"action": action, "next_stage": next_stage}
+    
+    def post(self, shared, prep_res, exec_res):
+        """更新调度状态，返回Action"""
+        action = exec_res["action"]
+        next_stage = exec_res["next_stage"]
+        
+        # 更新当前阶段
+        if next_stage is not None:
+            shared["dispatcher"]["current_stage"] = next_stage
+        
+        shared["dispatcher"]["next_action"] = action
+        
+        print(f"[Dispatcher] 下一步动作: {action}")
+        
+        return action
+
+
+class TerminalNode(Node):
+    """
+    终止节点 - 宣布流程结束
+    
+    功能：
+    1. 作为整个Flow的终点
+    2. 输出执行摘要信息
+    3. 清理临时状态（如需要）
+    """
+    
+    def prep(self, shared):
+        """读取执行结果摘要"""
+        dispatcher = shared.get("dispatcher", {})
+        results = shared.get("results", {})
+        
+        return {
+            "completed_stages": dispatcher.get("completed_stages", []),
+            "statistics": results.get("statistics", {}),
+            "data_save": results.get("data_save", {})
+        }
+    
+    def exec(self, prep_res):
+        """生成执行摘要"""
+        completed_stages = prep_res["completed_stages"]
+        statistics = prep_res["statistics"]
+        data_save = prep_res["data_save"]
+        
+        summary = {
+            "status": "completed",
+            "completed_stages": completed_stages,
+            "total_blogs_processed": statistics.get("total_blogs", 0),
+            "data_saved": data_save.get("saved", False),
+            "output_path": data_save.get("output_path", "")
+        }
+        
+        return summary
+    
+    def post(self, shared, prep_res, exec_res):
+        """输出执行摘要，结束流程"""
+        print("\n" + "=" * 60)
+        print("舆情分析智能体 - 执行完成")
+        print("=" * 60)
+        print(f"状态: {exec_res['status']}")
+        print(f"已完成阶段: {exec_res['completed_stages']}")
+        print(f"处理博文数: {exec_res['total_blogs_processed']}")
+        if exec_res['data_saved']:
+            print(f"数据已保存至: {exec_res['output_path']}")
+        print("=" * 60 + "\n")
+        
+        # 存储最终摘要
+        shared["final_summary"] = exec_res
+        
+        return "default"
+
+
+# =============================================================================
+# 2. 基础节点类
 # =============================================================================
 
 class AsyncParallelBatchNode(AsyncNode, BatchNode):
@@ -70,8 +254,95 @@ class AsyncParallelBatchNode(AsyncNode, BatchNode):
 
 
 # =============================================================================
-# 通用节点：数据加载与保存
+# 3. 阶段1节点: 原始博文增强处理
 # =============================================================================
+
+# -----------------------------------------------------------------------------
+# 3.1 阶段1入口节点
+# -----------------------------------------------------------------------------
+
+class Stage1EntryNode(Node):
+    """
+    阶段1入口节点
+    
+    功能：
+    1. 加载原始博文数据和参考数据
+    2. 根据enhancement_mode配置决定进入哪个处理路径
+    3. 返回对应的Action: "async" 或 "batch_api"
+    """
+    
+    def prep(self, shared):
+        """读取配置参数"""
+        config = shared.get("config", {})
+        enhancement_mode = config.get("enhancement_mode", "async")
+        
+        return {"enhancement_mode": enhancement_mode}
+    
+    def exec(self, prep_res):
+        """确定处理路径"""
+        enhancement_mode = prep_res["enhancement_mode"]
+        
+        print(f"\n[Stage1] 进入阶段1: 原始博文增强处理")
+        print(f"[Stage1] 处理模式: {enhancement_mode}")
+        
+        return {"mode": enhancement_mode}
+    
+    def post(self, shared, prep_res, exec_res):
+        """返回对应的Action"""
+        mode = exec_res["mode"]
+        
+        # 返回对应的action，用于Flow路由
+        if mode == "batch_api":
+            return "batch_api"
+        else:
+            return "async"
+
+
+class Stage1CompletionNode(Node):
+    """
+    阶段1完成节点
+    
+    功能：
+    1. 标记阶段1完成
+    2. 更新dispatcher状态
+    3. 返回"dispatch" Action，跳转回DispatcherNode
+    """
+    
+    def prep(self, shared):
+        """读取当前状态"""
+        return {
+            "current_stage": shared.get("dispatcher", {}).get("current_stage", 1),
+            "completed_stages": shared.get("dispatcher", {}).get("completed_stages", [])
+        }
+    
+    def exec(self, prep_res):
+        """确认阶段完成"""
+        print(f"\n[Stage1] 阶段1处理完成")
+        return {"stage": 1}
+    
+    def post(self, shared, prep_res, exec_res):
+        """更新完成状态，返回dispatch"""
+        stage = exec_res["stage"]
+        
+        # 确保dispatcher存在
+        if "dispatcher" not in shared:
+            shared["dispatcher"] = {}
+        
+        # 更新已完成阶段列表
+        completed_stages = shared["dispatcher"].get("completed_stages", [])
+        if stage not in completed_stages:
+            completed_stages.append(stage)
+        shared["dispatcher"]["completed_stages"] = completed_stages
+        
+        print(f"[Stage1] 已完成阶段: {completed_stages}")
+        
+        # 返回dispatch，跳转回调度器
+        return "dispatch"
+
+
+# -----------------------------------------------------------------------------
+# 3.2 通用节点
+# -----------------------------------------------------------------------------
 
 class DataLoadNode(Node):
     """
@@ -143,6 +414,8 @@ class DataLoadNode(Node):
             shared["results"] = {"statistics": {}}
         shared["results"]["statistics"]["total_blogs"] = len(exec_res["blog_data"])
         
+        print(f"[DataLoad] 加载完成，共 {len(exec_res['blog_data'])} 条博文")
+        
         return "default"
 
 
@@ -187,14 +460,14 @@ class SaveEnhancedDataNode(Node):
             shared["results"] = {}
         
         if exec_res["success"]:
-            print(f"✓ 成功保存 {exec_res['data_count']} 条增强数据到: {exec_res['output_path']}")
+            print(f"[SaveData] ✓ 成功保存 {exec_res['data_count']} 条增强数据到: {exec_res['output_path']}")
             shared["results"]["data_save"] = {
                 "saved": True,
                 "output_path": exec_res["output_path"],
                 "data_count": exec_res["data_count"]
             }
         else:
-            print(f"✗ 保存增强数据失败: {exec_res['output_path']}")
+            print(f"[SaveData] ✗ 保存增强数据失败: {exec_res['output_path']}")
             shared["results"]["data_save"] = {
                 "saved": False,
                 "output_path": exec_res["output_path"],
@@ -361,12 +634,15 @@ class DataValidationAndOverviewNode(Node):
             shared["results"]["statistics"] = {}
         
         shared["results"]["statistics"].update(exec_res)
+        
+        print(f"[Validation] 验证完成: {exec_res['processed_blogs']}/{exec_res['total_blogs']} 条博文已处理")
+        
         return "default"
 
 
-# =============================================================================
-# 异步分析节点：四维度分析 (enhancement_mode="async")
-# =============================================================================
+# -----------------------------------------------------------------------------
+# 3.3 异步批量并行路径节点 (enhancement_mode="async")
+# -----------------------------------------------------------------------------
 
 class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
     """
@@ -447,6 +723,8 @@ class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
         for i, blog_post in enumerate(blog_data):
             blog_post['sentiment_polarity'] = exec_res[i] if i < len(exec_res) else None
         
+        print(f"[AsyncSentimentPolarity] 完成 {len(exec_res)} 条博文的情感极性分析")
+        
         return "default"
 
 
@@ -508,6 +786,8 @@ class AsyncSentimentAttributeAnalysisBatchNode(AsyncParallelBatchNode):
         
         for i, blog_post in enumerate(blog_data):
             blog_post['sentiment_attribute'] = exec_res[i] if i < len(exec_res) else None
+        
+        print(f"[AsyncSentimentAttribute] 完成 {len(exec_res)} 条博文的情感属性分析")
         
         return "default"
 
@@ -609,6 +889,8 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
         for i, blog_post in enumerate(blog_data):
             blog_post['topics'] = exec_res[i] if i < len(exec_res) else None
         
+        print(f"[AsyncTopic] 完成 {len(exec_res)} 条博文的主题分析")
+        
         return "default"
 
 
@@ -671,4 +953,159 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
         for i, blog_post in enumerate(blog_data):
             blog_post['publisher'] = exec_res[i] if i < len(exec_res) else None
         
+        print(f"[AsyncPublisher] 完成 {len(exec_res)} 条博文的发布者分析")
+        
         return "default"
+
+
+# -----------------------------------------------------------------------------
+# 3.4 Batch API路径节点 (enhancement_mode="batch_api")
+# -----------------------------------------------------------------------------
+
+class BatchAPIEnhancementNode(Node):
+    """
+    Batch API增强处理节点
+    
+    功能：调用batch/目录下的脚本进行批量处理
+    类型：Regular Node
+    
+    处理流程：
+    1. 调用 batch/batch_run.py 脚本执行完整的Batch API流程
+    2. 等待处理完成
+    3. 加载处理结果到shared中
+    
+    Batch API流程包括：
+    - generate_jsonl.py: 生成批量请求文件
+    - upload_and_start.py: 上传并启动任务
+    - download_results.py: 下载结果
+    - parse_and_integrate.py: 解析并整合结果
+    """
+    
+    def prep(self, shared):
+        """读取配置参数"""
+        config = shared.get("config", {})
+        batch_config = config.get("batch_api_config", {})
+        
+        return {
+            "batch_script_path": batch_config.get("script_path", "batch/batch_run.py"),
+            "input_data_path": batch_config.get("input_path", "data/beijing_rainstorm_posts.json"),
+            "output_data_path": batch_config.get("output_path", "data/enhanced_blogs.json"),
+            "wait_for_completion": batch_config.get("wait_for_completion", True)
+        }
+    
+    def exec(self, prep_res):
+        """执行Batch API处理脚本"""
+        batch_script_path = prep_res["batch_script_path"]
+        
+        print(f"\n[BatchAPI] 开始执行Batch API处理...")
+        print(f"[BatchAPI] 脚本路径: {batch_script_path}")
+        
+        # 检查脚本是否存在
+        if not os.path.exists(batch_script_path):
+            return {
+                "success": False,
+                "error": f"Batch脚本不存在: {batch_script_path}",
+                "output_path": prep_res["output_data_path"]
+            }
+        
+        try:
+            # 执行batch_run.py脚本
+            result = subprocess.run(
+                ["python", batch_script_path],
+                capture_output=True,
+                text=True,
+                cwd=os.getcwd()
+            )
+            
+            if result.returncode == 0:
+                print(f"[BatchAPI] 脚本执行成功")
+                print(result.stdout)
+                return {
+                    "success": True,
+                    "output_path": prep_res["output_data_path"],
+                    "stdout": result.stdout
+                }
+            else:
+                print(f"[BatchAPI] 脚本执行失败")
+                print(f"错误输出: {result.stderr}")
+                return {
+                    "success": False,
+                    "error": result.stderr,
+                    "output_path": prep_res["output_data_path"]
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "output_path": prep_res["output_data_path"]
+            }
+    
+    def post(self, shared, prep_res, exec_res):
+        """加载处理结果，更新shared"""
+        if exec_res["success"]:
+            # 尝试加载处理后的数据
+            output_path = exec_res["output_path"]
+            
+            if os.path.exists(output_path):
+                try:
+                    enhanced_data = load_enhanced_blog_data(output_path)
+                    shared["data"]["blog_data"] = enhanced_data
+                    
+                    print(f"[BatchAPI] ✓ 成功加载 {len(enhanced_data)} 条增强数据")
+                    
+                    if "results" not in shared:
+                        shared["results"] = {}
+                    shared["results"]["batch_api"] = {
+                        "success": True,
+                        "data_count": len(enhanced_data)
+                    }
+                except Exception as e:
+                    print(f"[BatchAPI] ✗ 加载增强数据失败: {str(e)}")
+                    shared["results"]["batch_api"] = {
+                        "success": False,
+                        "error": str(e)
+                    }
+            else:
+                print(f"[BatchAPI] ✗ 输出文件不存在: {output_path}")
+                shared["results"]["batch_api"] = {
+                    "success": False,
+                    "error": f"输出文件不存在: {output_path}"
+                }
+        else:
+            print(f"[BatchAPI] ✗ Batch API处理失败: {exec_res.get('error', 'Unknown error')}")
+            if "results" not in shared:
+                shared["results"] = {}
+            shared["results"]["batch_api"] = {
+                "success": False,
+                "error": exec_res.get("error", "Unknown error")
+            }
+        
+        return "default"
+
+
+# =============================================================================
+# 4. 阶段2节点: 分析执行（待实现）
+# =============================================================================
+
+# TODO: 实现以下节点
+# - Stage2EntryNode: 阶段2入口节点
+# - WorkflowAnalysisNode: 固定脚本分析节点
+# - CollectToolsNode: 工具收集节点
+# - DecisionToolsNode: 工具决策节点
+# - ExecuteToolsNode: 工具执行节点
+# - ProcessResultNode: 结果处理节点
+# - Stage2CompletionNode: 阶段2完成节点
+
+
+# =============================================================================
+# 5. 阶段3节点: 报告生成（待实现）
+# =============================================================================
+
+# TODO: 实现以下节点
+# - Stage3EntryNode: 阶段3入口节点
+# - TemplateReportNode: 模板填充报告节点
+# - GenerateReportNode: 报告生成节点
+# - ReviewReportNode: 报告评审节点
+# - ApplyFeedbackNode: 应用修改意见节点
+# - Stage3CompletionNode: 阶段3完成节点
