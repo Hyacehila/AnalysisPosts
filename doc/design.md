@@ -12,10 +12,10 @@
 舆情分析智能体是一个基于PocketFlow框架的大规模博文数据分析系统，旨在通过多模态AI模型实现对社交媒体博文内容的深度分析和智能报告生成。
 
 ### 核心特性
+- **三阶段解耦**：增强处理、分析执行、报告生成三阶段独立运行
 - **多维度分析**：情感极性、情感属性、主题分类、发布者识别
-- **双轨制报告**：Workflow标准化路径 + Agent智能化路径
+- **多路径执行**：每阶段支持多种执行方式（异步/Batch API、Agent/Workflow、模板/迭代）
 - **大规模处理**：支持3万条博文数据的批量处理
-- **模块化架构**：数据处理与报告生成完全解耦
 - **多模态支持**：文本与图像内容的综合分析
 
 ---
@@ -24,13 +24,14 @@
 
 > Notes for AI: Keep it simple and clear.
 > If the requirements are abstract, write concrete user stories
+> 需求按三阶段解耦架构组织，每个阶段独立运行并支持多种执行路径
 
-### 核心需求
+### 核心需求 - 三阶段解耦架构
 
-#### 1. 原始博文数据处理模块
-**功能描述**：为每个博文并行添加四个维度的分析信息，支持独立运行
+#### 阶段1: 原始博文增强处理
+**功能描述**：为每个博文添加四个维度的分析信息，支持独立运行
 
-**具体需求**：
+**四维度分析**：
 - **情感极性分析**：1-5档情感分级
   - 1-极度悲观，2-悲观，3-无明显极性，4-乐观，5-极度乐观
 - **情感属性分析**：具体情感状态识别
@@ -39,27 +40,27 @@
 - **发布者对象分析**：识别发布者类型
   - 政府机构、官方新闻媒体、自媒体、企业账号、个人用户等
 
-#### 2. 分析报告生成模块
-**功能描述**：双轨制报告生成架构，支持独立运行
+**执行路径**：
+- **异步批量并行**：本地代码并发调用API，适合中小规模数据
+- **Batch API并行**：一次性提交批量请求到API服务端，适合大规模数据
 
-**双轨制架构**：
-- **Workflow路径**：按预定义工作流顺序运行分析模块
+#### 阶段2: 分析执行
+**功能描述**：基于增强数据执行深度分析，生成图表、表格和洞察，支持独立运行
+
+**执行路径**：
+- **预定义Workflow**（思路1）：执行固定的分析脚本
+  - 流程：执行脚本生成全部图形 → LLM补充洞察信息 → 填充shared字典
   - 特点：可预测、高效、标准化
   - 适用：日常监控、常规分析、快速报告
-- **Agent路径**：智能体自主决策调用工具并循环完善报告
-  - 特点：灵活、智能、深度洞察
-  - 适用：复杂分析、探索性研究、深度报告
+- **Agent自主调度**（思路2）：Single Agent循环决策
+  - 流程：工具收集 → 工具决策 → 工具执行 → 结果处理 → 返回决策（循环）
+  - 终止条件：Agent判断分析已充分 或 达到最大迭代次数
+  - 特点：灵活、智能、可探索隐藏模式
+  - 适用：复杂分析、探索性研究、异常情况
 
-**数据源兼容**：
-- 支持读取原始博文数据
-- 支持已处理的增强数据
+**分析工具集**：四类核心分析工具集，每类包含若干工具函数
 
-#### 3. 分析工具集
-**功能描述**：四类核心分析工具集，每类包含若干工具函数，支撑深度分析和可视化需求
-
-**工具集架构**：
-
-##### 3.1 情感趋势分析工具集
+##### 2.1 情感趋势分析工具集
 时间序列情感变化分析，包含以下工具函数：
 - `sentiment_distribution_stats`：情感极性分布统计（各档位数量、占比）
 - `sentiment_time_series`：情感时序趋势分析（按小时/天聚合）
@@ -67,7 +68,7 @@
 - `sentiment_trend_chart`：情感趋势折线图/面积图生成
 - `sentiment_pie_chart`：情感分布饼图生成
 
-##### 3.2 主题演化分析工具集
+##### 2.2 主题演化分析工具集
 主题热度变化和关联分析，包含以下工具函数：
 - `topic_frequency_stats`：主题频次统计（父主题/子主题分布）
 - `topic_time_evolution`：主题时序演化分析（热度变化趋势）
@@ -76,7 +77,7 @@
 - `topic_evolution_chart`：主题演化时序图生成
 - `topic_network_chart`：主题关联网络图生成
 
-##### 3.3 地理分布分析工具集
+##### 2.3 地理分布分析工具集
 舆情地理分布和热点识别，包含以下工具函数：
 - `geographic_distribution_stats`：地理分布统计（省份/城市级别）
 - `geographic_hotspot_detection`：热点区域识别（高密度区域）
@@ -84,7 +85,7 @@
 - `geographic_heatmap`：地理热力图生成
 - `geographic_bar_chart`：地区分布柱状图生成
 
-##### 3.4 多维交互分析工具集
+##### 2.4 多维交互分析工具集
 情感、主题、地理、发布者多维度交叉分析，包含以下工具函数：
 - `publisher_distribution_stats`：发布者类型分布统计
 - `cross_dimension_matrix`：多维交叉矩阵分析（如：发布者×情感、主题×地区）
@@ -93,15 +94,36 @@
 - `interaction_heatmap`：交互热力图生成
 - `publisher_bar_chart`：发布者分布柱状图生成
 
-#### 4. 解耦合架构
-**设计理念**：数据处理与分析报告生成完全独立，通过Flow编排支持多种运行模式
+#### 阶段3: 报告生成
+**功能描述**：综合分析结果，生成结构化的Markdown报告，支持独立运行
+
+**执行路径**：
+- **模板填充**：预定义大纲，LLM填充内容
+  - 特点：效率高、格式一致、可控性强
+  - 适用：格式要求固定的标准报告
+- **多轮迭代**：生成-评审-修改循环
+  - 特点：质量有保障、可自我完善
+  - 适用：对报告质量要求极高的重要舆情事件
+
+**数据输入**：
+- **主要数据源**：阶段2输出的分析结果（图表、统计数据、洞察描述）
+- **辅助数据源**：增强后博文数据的少量样本（用于典型案例引用、原文示例等）
+
+#### 解耦架构设计
+**设计理念**：三阶段顺序依赖（阶段1 → 阶段2 → 阶段3），但每个阶段可独立执行
+
+**独立执行前提**：
+- 每个阶段独立执行的前提是：**前序阶段已完成并将数据存储到指定位置**
+- 阶段2独立执行：需要阶段1输出的增强数据（`data/enhanced_posts.json`）
+- 阶段3独立执行：需要阶段2输出的分析结果（`report/` 目录下的图表和数据）
 
 **运行模式**：
-- **完整Flow**：数据处理 + 分析报告生成
-- **数据处理Flow**：只运行数据处理模块
-- **报告生成Flow**：跳过数据处理，直接对已有增强数据进行分析报告生成
+- **完整Flow**：阶段1 → 阶段2 → 阶段3（从原始数据到最终报告）
+- **增强处理Flow**：仅运行阶段1（输出增强数据供后续使用）
+- **分析执行Flow**：仅运行阶段2（需要已有增强数据）
+- **报告生成Flow**：仅运行阶段3（需要已有分析结果）
 
-#### 5. 大规模处理能力
+#### 大规模处理能力
 **处理能力**：支持3万条博文数据的高效处理
 
 **实现方式**：通过在原始数据字典中附加新字段实现信息增强
@@ -151,21 +173,23 @@
 ### 处理规则
 
 #### 核心规则
-- **三阶段解耦**：原始博文增强处理、分析执行、报告生成三个阶段完全独立
+- **三阶段顺序依赖**：阶段1 → 阶段2 → 阶段3，后序阶段依赖前序阶段输出
 - **多路径执行**：每个阶段支持多种执行方式，通过shared字典中的参数控制
-- **并行处理**：原始博文数据的四个分析维度完全并行，无先后顺序
+- **独立执行**：各阶段可独立运行，前提是前序阶段已完成并存储数据到指定位置
+- **前置检查**：阶段2/3独立执行前需检查前序阶段输出文件是否存在
+- **并行处理**：阶段1中四个分析维度完全并行，无先后顺序
 - **模型调用**：所有分析通过多模态语言模型API调用进行
-- **信息附加**：分析结果直接附加到原始博文数据字典中
+- **阶段数据隔离**：阶段3仅使用阶段2的分析结果和少量博文样本，不直接处理全量增强数据
 
 #### 多路径执行架构
 | 阶段 | 路径选项 | 控制参数 | 说明 |
 |------|----------|----------|------|
-| 原始博文增强处理 | 异步批量并行 | `enhancement_mode="async"` | 本地代码并发调用API |
-| 原始博文增强处理 | Batch API并行 | `enhancement_mode="batch_api"` | 一次性提交批量请求到API服务端 |
-| 分析执行 | Agent自主调度 | `analysis_mode="agent"` | LLM动态决策工具调用 |
-| 分析执行 | 预定义Workflow | `analysis_mode="workflow"` | 执行.py脚本的固定流程 |
-| 报告生成 | 模板填充 | `report_mode="template"` | 预定义大纲，LLM填充内容 |
-| 报告生成 | 多轮迭代 | `report_mode="iterative"` | 生成-评审-修改循环 |
+| 阶段1: 增强处理 | 异步批量并行 | `enhancement_mode="async"` | 本地代码并发调用API |
+| 阶段1: 增强处理 | Batch API并行 | `enhancement_mode="batch_api"` | 一次性提交批量请求到API服务端 |
+| 阶段2: 分析执行 | 预定义Workflow | `analysis_mode="workflow"` | 执行固定脚本生成图形 → LLM补充信息 |
+| 阶段2: 分析执行 | Agent自主调度 | `analysis_mode="agent"` | Single Agent循环决策执行工具 |
+| 阶段3: 报告生成 | 模板填充 | `report_mode="template"` | 预定义大纲，LLM填充内容 |
+| 阶段3: 报告生成 | 多轮迭代 | `report_mode="iterative"` | 生成-评审-修改循环 |
 
 #### Agent工具调度方式
 | 方式 | 控制参数 | 说明 |
@@ -178,89 +202,123 @@
 - **错误处理**：提供完善的错误处理和重试机制
 - **数据完整性**：确保增强数据的格式完整性和一致性
 - **迭代控制**：多轮迭代报告生成设置最大迭代次数保障
+- **前置验证**：阶段独立执行前验证前序输出文件存在且格式正确
 
 ## 架构设计
 
 ### 系统架构概览
 
-舆情分析智能体采用**三阶段解耦架构**，基于PocketFlow框架构建，每个阶段独立运行并支持多种执行路径。
+舆情分析智能体采用**中央调度 + 三阶段顺序依赖架构**，基于PocketFlow框架构建。系统通过一个**综合调度节点（DispatcherNode）**作为入口和中央控制器，根据配置决定执行路径，每个阶段完成后返回调度节点决定下一步动作。
 
 ```mermaid
 flowchart TB
-    subgraph SystemArchitecture[系统架构 - 三阶段解耦]
+    subgraph SystemArchitecture[系统架构 - 中央调度 + 三阶段]
         subgraph DataLayer[数据层]
             raw_data[原始博文数据]
             enhanced_data[增强博文数据]
-            analysis_results[分析结果存储<br/>图表/表格/描述]
+            analysis_results[分析结果存储<br/>图表/数据/洞察]
             reference_data[参考数据<br/>主题/情感/发布者]
         end
         
+        subgraph DispatcherLayer[调度层]
+            dispatcher[DispatcherNode<br/>综合调度节点<br/>Flow入口]
+        end
+        
         subgraph Stage1[阶段1: 原始博文增强处理]
-            subgraph EnhancementModes[增强处理方式]
-                async_mode[异步批量并行<br/>本地并发调用API]
-                batch_api_mode[Batch API并行<br/>服务端批量处理]
-            end
+            s1_switch{enhancement_mode?}
+            async_flow[AsyncEnhancementFlow<br/>异步批量并行]
+            batch_flow[BatchAPIFlow<br/>Batch API处理]
         end
         
         subgraph Stage2[阶段2: 分析执行]
-            subgraph AnalysisModes[分析执行方式]
-                agent_mode[Agent自主调度]
-                workflow_mode[预定义Workflow<br/>.py脚本执行]
-            end
-            subgraph AgentNodes[Agent调度节点]
-                get_tools[GetTools<br/>获取工具列表]
-                decision_tools[DecisionTools<br/>LLM决策]
-                execute_tools[ExecuteTools<br/>执行并存储]
-            end
-            subgraph ToolSource[工具来源]
-                mcp_source[MCP动态查询]
-                local_source[本地Function Calling]
-            end
+            s2_switch{analysis_mode?}
+            workflow_node[WorkflowAnalysisNode<br/>固定脚本分析]
+            agent_flow[AgentAnalysisFlow<br/>LLM自主分析]
         end
         
         subgraph Stage3[阶段3: 报告生成]
-            subgraph ReportModes[报告生成方式]
-                template_mode[模板填充<br/>预定义大纲+LLM填充]
-                iterative_mode[多轮迭代<br/>生成-评审-修改循环]
-            end
-        end
-        
-        subgraph UtilityLayer[工具层]
-            llm_service[LLM调用服务<br/>解耦设计可切换模型]
-            data_service[数据加载服务]
-            viz_service[可视化服务]
-            storage_service[存储服务]
+            s3_switch{report_mode?}
+            template_node[TemplateReportNode<br/>模板填充]
+            iterative_flow[IterativeReportFlow<br/>多轮迭代]
         end
     end
     
-    raw_data --> Stage1
-    reference_data --> Stage1
-    Stage1 --> enhanced_data
-    enhanced_data --> Stage2
-    get_tools --> decision_tools
-    decision_tools --> execute_tools
-    execute_tools --> decision_tools
-    mcp_source -.-> get_tools
-    local_source -.-> get_tools
-    Stage2 --> analysis_results
-    analysis_results --> Stage3
-    Stage3 --> UtilityLayer
+    dispatcher -->|start_stage=1| s1_switch
+    dispatcher -->|start_stage=2| s2_switch
+    dispatcher -->|start_stage=3| s3_switch
+    
+    s1_switch -->|async| async_flow
+    s1_switch -->|batch_api| batch_flow
+    async_flow -->|完成| dispatcher
+    batch_flow -->|完成| dispatcher
+    
+    s2_switch -->|workflow| workflow_node
+    s2_switch -->|agent| agent_flow
+    workflow_node -->|完成| dispatcher
+    agent_flow -->|完成| dispatcher
+    
+    s3_switch -->|template| template_node
+    s3_switch -->|iterative| iterative_flow
+    template_node -->|完成| dispatcher
+    iterative_flow -->|完成| dispatcher
+    
+    dispatcher -->|所有阶段完成| end_node[结束]
+    
+    raw_data -.-> Stage1
+    reference_data -.-> Stage1
+    Stage1 -.-> enhanced_data
+    enhanced_data -.-> Stage2
+    Stage2 -.-> analysis_results
+    analysis_results -.-> Stage3
 ```
+
+### 调度机制说明
+
+**DispatcherNode（综合调度节点）**是整个系统的入口和中央控制器：
+
+1. **启动阶段选择**：根据 `shared["config"]["start_stage"]` 决定从哪个阶段开始
+2. **阶段内路径选择**：根据各阶段的配置参数选择具体执行路径
+3. **阶段间流转**：每个阶段完成后返回调度节点，根据 `shared["config"]["run_stages"]` 决定是否继续下一阶段
+4. **终止条件**：所有配置的阶段执行完毕后结束流程
+
+| 阶段 | 配置参数 | 路径选项 | 执行形式 |
+|------|----------|----------|----------|
+| 阶段1 | `enhancement_mode` | `async` / `batch_api` | Flow |
+| 阶段2 | `analysis_mode` | `workflow` / `agent` | Node / Flow |
+| 阶段3 | `report_mode` | `template` / `iterative` | Node / Flow |
 
 ### 核心设计原则
 
-#### 1. 三阶段解耦
-- **阶段1 - 原始博文增强处理**：为博文添加情感、主题、发布者等维度标注
-- **阶段2 - 分析执行**：基于增强数据执行深度分析，生成图表、表格和洞察
-- **阶段3 - 报告生成**：综合分析结果，生成结构化的Markdown报告
-- **独立运行**：每个阶段可单独执行，支持断点续传和结果复用
+#### 1. 中央调度架构
+- **DispatcherNode**：作为系统入口和中央控制器
+- **统一入口**：所有执行流程从DispatcherNode开始
+- **阶段回调**：每个阶段完成后返回DispatcherNode，由调度节点决定下一步
+- **灵活配置**：支持配置起始阶段和执行阶段列表
 
-#### 2. 多路径执行控制
+#### 2. 三阶段顺序依赖（与需求分析完全对应）
+- **阶段1 - 原始博文增强处理**：为博文添加情感、主题、发布者等维度标注
+  - 对应需求："阶段1: 原始博文增强处理 - 四维度分析"
+  - 输出：`data/enhanced_posts.json`
+- **阶段2 - 分析执行**：基于增强数据执行深度分析，生成图表、表格和洞察
+  - 对应需求："阶段2: 分析执行 - 分析工具集"
+  - 输出：`report/analysis_data.json`、`report/insights.json`、`report/images/`
+- **阶段3 - 报告生成**：综合分析结果，生成结构化的Markdown报告
+  - 对应需求："阶段3: 报告生成 - 报告输出"
+  - 输入：阶段2输出 + 少量博文样本
+  - 输出：`report/report.md`
+- **顺序依赖**：阶段1 → 阶段2 → 阶段3
+- **独立运行**：每个阶段可单独执行，前提是前序阶段已完成并存储数据到指定位置
+
+#### 3. 多路径执行控制
 - **统一控制机制**：所有执行路径通过shared字典中的参数控制
 - **灵活切换**：运行时可动态选择执行路径
 - **组合使用**：不同阶段可选择不同的执行路径组合
 
 ```python
+# 调度控制参数示例
+shared["dispatcher"]["start_stage"] = 1             # 起始阶段
+shared["dispatcher"]["run_stages"] = [1, 2, 3]      # 执行阶段列表
+
 # 路径控制参数示例
 shared["config"]["enhancement_mode"] = "async"      # 或 "batch_api"
 shared["config"]["analysis_mode"] = "agent"         # 或 "workflow"
@@ -268,156 +326,125 @@ shared["config"]["tool_source"] = "mcp"             # 或 "local"
 shared["config"]["report_mode"] = "template"        # 或 "iterative"
 ```
 
-#### 3. 模块化设计
+#### 4. 模块化设计
 - **独立模块**：每个功能模块都可以独立运行和测试
 - **标准接口**：模块间通过标准化的数据接口通信
 - **可插拔**：分析工具可以动态添加和替换（支持MCP动态发现）
 - **版本兼容**：保持向后兼容性，支持平滑升级
 
-#### 4. LLM调用解耦
+#### 5. LLM调用解耦
 - **统一接口**：所有LLM调用通过`call_llm`系列函数封装
 - **模型可切换**：生成和评审可使用同一模型或不同模型
 - **参数化配置**：模型选择、温度、token限制等通过配置控制
 
 
-
-## 数据模型
-
-### 数据流架构
-
-```mermaid
-flowchart LR
-    subgraph DataFlow[数据流架构]
-        subgraph Input[输入数据]
-            raw_posts[原始博文JSON]
-            topics_json[主题层次JSON]
-            sentiment_json[情感属性JSON]
-            publisher_json[发布者对象JSON]
-        end
-        
-        subgraph Processing[数据处理]
-            validation[数据验证]
-            enhancement[信息增强]
-            quality_check[质量检查]
-        end
-        
-        subgraph Output[输出数据]
-            enhanced_posts[增强博文JSON]
-            analysis_results[分析结果]
-            visualizations[可视化图表]
-            final_report[最终报告]
-        end
-        
-        subgraph Storage[存储层]
-            file_storage[文件存储]
-            image_storage[图片存储]
-            chart_storage[图表存储]
-        end
-    end
-    
-    raw_posts --> validation
-    topics_json --> enhancement
-    sentiment_json --> enhancement
-    publisher_json --> enhancement
-    validation --> enhancement
-    enhancement --> quality_check
-    quality_check --> enhanced_posts
-    enhanced_posts --> analysis_results
-    analysis_results --> visualizations
-    visualizations --> final_report
-    
-    enhanced_posts --> file_storage
-    image_storage --> file_storage
-    chart_storage --> file_storage
-```
-
-
-### 数据质量保证
-
-#### 1. 数据验证规则
-- **格式验证**：严格检查JSON格式和数据类型
-- **完整性验证**：确保必需字段存在且非空
-- **一致性验证**：检查数据间的逻辑一致性
-- **范围验证**：验证数值字段在合理范围内
-
-#### 2. 数据清洗策略
-- **重复数据去除**：基于内容哈希去除重复博文
-- **无效数据处理**：处理空内容、异常字符等
-- **标准化处理**：统一时间格式、地理位置等
-- **异常值处理**：识别和处理异常的数值数据
-
-#### 3. 数据增强质量控制
-- **候选列表验证**：确保分析结果在预定义候选列表中
-- **置信度阈值**：设置最低置信度要求
-- **多轮验证**：关键分析结果进行多轮验证
-- **人工抽样验证**：定期人工验证分析结果质量
-
 ## Flow Design
 
 > Notes for AI:
-> 1. 系统采用三阶段解耦架构，每个阶段独立运行
-> 2. 每个阶段支持多种执行路径，通过shared字典参数控制
-> 3. 所有流程图使用清晰的节点描述
+> 1. 系统采用三阶段解耦架构，与需求分析中定义的三阶段完全对应
+> 2. 阶段1(增强处理)对应需求中的"四维度分析"
+> 3. 阶段2(分析执行)对应需求中的"分析工具集"  
+> 4. 阶段3(报告生成)对应需求中的"报告输出"
+> 5. 每个阶段支持多种执行路径，通过shared["config"]参数控制
+> 6. 所有流程图使用清晰的节点描述
 
 ### Applicable Design Pattern:
 
-1. **Batch Pattern**: 用于原始博文增强处理
-   - 四个分析维度通过Batch节点独立处理
-   - 支持异步批量并行和Batch API并行两种方式
+1. **Central Dispatcher Pattern**: 系统入口和中央调度
+   - 综合调度节点作为Flow入口，统一管理三阶段的执行流程
+   - 根据配置决定启动阶段、执行路径
+   - 每个阶段完成后返回调度节点，决定下一步动作
+   - 实现阶段间的解耦和灵活组合
 
-2. **Agent Pattern**: 用于分析执行的智能体调度
-   - GetTools → DecisionTools → ExecuteTools 三节点循环
+2. **Batch Pattern**: 用于阶段1(增强处理)
+   - 对应需求：四维度分析（情感极性、情感属性、主题、发布者）
+   - 四个分析维度通过Batch节点独立处理
+   - 支持异步批量并行(async)和Batch API并行(batch_api)两种方式
+
+3. **Workflow Pattern**: 用于阶段2(分析执行)的预定义流程路径（思路1）
+   - 对应需求：分析工具集的预定义Workflow执行路径
+   - 流程：执行固定脚本生成全部图形 → LLM补充洞察信息 → 填充shared字典
+   - 特点：可预测、高效
+
+4. **Agent Loop Pattern**: 用于阶段2(分析执行)的智能体调度路径（思路2）
+   - 对应需求：分析工具集的Agent自主调度执行路径
+   - 流程：CollectTools → DecisionTools → ExecuteTools → ProcessResult → 返回Decision（循环）
+   - 终止条件：Agent判断分析充分 或 达到最大迭代次数
    - 支持MCP动态查询和本地Function Calling两种工具来源
 
-3. **Workflow Pattern**: 用于分析执行的预定义流程
-   - 直接执行.py脚本，按固定顺序调用工具
-
-4. **Iterative Pattern**: 用于报告生成的多轮迭代
+5. **Iterative Pattern**: 用于阶段3(报告生成)的多轮迭代路径
+   - 对应需求：报告输出的多轮迭代执行路径
    - 生成 → 评审 → 修改循环，直到满意或达到最大迭代次数
 
 ### Flow high-level Design:
 
-#### 完整系统Flow总览
+#### 完整系统Flow总览（中央调度模式）
+
+系统采用中央调度模式，DispatcherNode作为入口和控制中心，根据配置决定执行路径，每个阶段完成后返回调度节点。
 
 ```mermaid
 flowchart TB
-    subgraph CompleteSystemFlow[完整系统Flow - 三阶段解耦]
+    subgraph CompleteSystemFlow[完整系统Flow - 中央调度模式]
+        start[开始] --> dispatcher
         
-        subgraph Stage1[阶段1: 原始博文增强处理Flow]
-            load_data[DataLoadNode<br/>加载原始数据] --> validate_data[DataValidationNode<br/>数据验证]
-            validate_data --> enhancement_mode{enhancement_mode?}
-            
-            enhancement_mode -->|async| async_enhancement[AsyncEnhancementFlow<br/>异步批量并行处理]
-            enhancement_mode -->|batch_api| batch_api_enhancement[BatchAPIEnhancementFlow<br/>Batch API并行处理]
-            
-            async_enhancement --> save_enhanced[SaveEnhancedDataNode<br/>保存增强数据]
-            batch_api_enhancement --> save_enhanced
+        dispatcher[DispatcherNode<br/>综合调度节点]
+        
+        dispatcher -->|"next_stage=1"| stage1_entry[阶段1入口]
+        dispatcher -->|"next_stage=2"| stage2_entry[阶段2入口]
+        dispatcher -->|"next_stage=3"| stage3_entry[阶段3入口]
+        dispatcher -->|"next_stage=done"| finish[结束]
+        
+        subgraph Stage1[阶段1: 原始博文增强处理]
+            stage1_entry --> s1_mode{enhancement_mode?}
+            s1_mode -->|async| async_flow[AsyncEnhancementFlow]
+            s1_mode -->|batch_api| batch_flow[BatchAPIFlow]
+            async_flow --> s1_done[阶段1完成]
+            batch_flow --> s1_done
         end
         
-        subgraph Stage2[阶段2: 分析执行Flow]
-            load_enhanced[LoadEnhancedDataNode<br/>加载增强数据] --> analysis_mode{analysis_mode?}
-            
-            analysis_mode -->|agent| agent_analysis[AgentAnalysisFlow<br/>Agent自主调度]
-            analysis_mode -->|workflow| workflow_analysis[WorkflowAnalysisFlow<br/>预定义Workflow]
-            
-            agent_analysis --> save_analysis[SaveAnalysisResultsNode<br/>保存分析结果]
-            workflow_analysis --> save_analysis
+        subgraph Stage2[阶段2: 分析执行]
+            stage2_entry --> s2_mode{analysis_mode?}
+            s2_mode -->|workflow| workflow_node[WorkflowAnalysisNode]
+            s2_mode -->|agent| agent_flow[AgentAnalysisFlow]
+            workflow_node --> s2_done[阶段2完成]
+            agent_flow --> s2_done
         end
         
-        subgraph Stage3[阶段3: 报告生成Flow]
-            load_analysis[LoadAnalysisResultsNode<br/>加载分析结果] --> report_mode{report_mode?}
-            
-            report_mode -->|template| template_report[TemplateReportFlow<br/>模板填充方式]
-            report_mode -->|iterative| iterative_report[IterativeReportFlow<br/>多轮迭代方式]
-            
-            template_report --> save_report[SaveReportNode<br/>保存最终报告]
-            iterative_report --> save_report
+        subgraph Stage3[阶段3: 报告生成]
+            stage3_entry --> s3_mode{report_mode?}
+            s3_mode -->|template| template_node[TemplateReportNode]
+            s3_mode -->|iterative| iterative_flow[IterativeReportFlow]
+            template_node --> s3_done[阶段3完成]
+            iterative_flow --> s3_done
         end
         
-        save_enhanced --> load_enhanced
-        save_analysis --> load_analysis
+        s1_done -->|返回调度| dispatcher
+        s2_done -->|返回调度| dispatcher
+        s3_done -->|返回调度| dispatcher
     end
+    
+    style dispatcher fill:#ffeb3b,stroke:#f57f17,stroke-width:3px
+    style finish fill:#4caf50,stroke:#2e7d32
 ```
+
+#### 调度逻辑说明
+
+**DispatcherNode工作流程**：
+1. 读取 `shared["config"]["start_stage"]` 确定起始阶段
+2. 读取 `shared["config"]["run_stages"]` 确定需要执行的阶段列表
+3. 根据当前阶段的配置参数选择具体执行路径（Flow或Node）
+4. 阶段完成后更新 `shared["dispatcher"]["current_stage"]`，返回调度节点
+5. 调度节点判断下一步：继续下一阶段 或 结束
+
+**路径选择规则**：
+| 阶段 | 配置参数 | 选项 | 执行形式 | 说明 |
+|------|----------|------|----------|------|
+| 阶段1 | `enhancement_mode` | `async` | Flow | 异步并行处理Flow |
+| | | `batch_api` | Flow | Batch API处理Flow |
+| 阶段2 | `analysis_mode` | `workflow` | Node | 固定脚本分析节点 |
+| | | `agent` | Flow | LLM自主分析Flow |
+| 阶段3 | `report_mode` | `template` | Node | 模板填充节点 |
+| | | `iterative` | Flow | 多轮迭代Flow |
 
 ---
 
@@ -476,57 +503,60 @@ flowchart TD
 
 #### 阶段2详细设计: 分析执行Flow
 
-##### 2.1 Agent自主调度路径 (analysis_mode="agent")
+> 阶段2提供两种执行思路：
+> - **Workflow路径**：执行固定脚本生成全部图形，然后调用LLM补充信息填充shared字典
+> - **Agent路径**：Single Agent自主决策，通过循环反复执行工具直到分析充分或达到最大迭代次数
 
-```mermaid
-flowchart TD
-    subgraph AgentAnalysisFlow[Agent自主调度Flow]
-        agent_start[开始] --> agent_load[LoadEnhancedDataNode<br/>加载增强数据]
-        agent_load --> agent_summary[DataSummaryNode<br/>生成数据概况]
-        agent_summary --> get_tools[GetToolsNode<br/>获取工具列表]
-        
-        get_tools --> tool_source{tool_source?}
-        tool_source -->|mcp| mcp_query[MCPQueryNode<br/>MCP动态查询工具]
-        tool_source -->|local| local_registry[LocalRegistryNode<br/>本地工具注册表]
-        
-        mcp_query --> decision_tools
-        local_registry --> decision_tools
-        
-        decision_tools[DecisionToolsNode<br/>LLM决策下一步] --> decision_result{决策结果?}
-        
-        decision_result -->|call_tool| execute_tools[ExecuteToolsNode<br/>执行工具函数]
-        decision_result -->|finish| agent_save[SaveAnalysisResultsNode<br/>保存分析结果]
-        
-        execute_tools --> store_result[StoreToolResultNode<br/>存储工具结果]
-        store_result --> iteration_check{迭代次数检查}
-        iteration_check -->|未超限| decision_tools
-        iteration_check -->|超限| agent_save
-        
-        agent_save --> agent_end[结束]
-    end
-```
+##### 2.1 预定义Workflow路径 (analysis_mode="workflow")
 
-##### 2.2 预定义Workflow路径 (analysis_mode="workflow")
+执行固定的分析脚本，按顺序生成所有图形，然后通过LLM调用补充洞察信息。
 
 ```mermaid
 flowchart TD
     subgraph WorkflowAnalysisFlow[预定义Workflow Flow]
         wf_start[开始] --> wf_load[LoadEnhancedDataNode<br/>加载增强数据]
-        wf_load --> wf_summary[DataSummaryNode<br/>生成数据概况]
+        wf_load --> wf_script[ExecuteAnalysisScriptNode<br/>执行固定分析脚本<br/>生成全部图形]
         
-        wf_summary --> wf_sentiment[SentimentTrendAnalysisNode<br/>情感趋势分析工具集]
-        wf_sentiment --> wf_topic[TopicEvolutionAnalysisNode<br/>主题演化分析工具集]
-        wf_topic --> wf_geo[GeographicAnalysisNode<br/>地理分布分析工具集]
-        wf_geo --> wf_cross[CrossDimensionAnalysisNode<br/>多维交互分析工具集]
+        wf_script --> wf_llm[LLMInsightNode<br/>LLM补充洞察信息<br/>填充shared字典]
         
-        wf_cross --> wf_save[SaveAnalysisResultsNode<br/>保存分析结果]
+        wf_llm --> wf_save[SaveAnalysisResultsNode<br/>保存分析结果]
         wf_save --> wf_end[结束]
     end
     
-    style wf_sentiment fill:#e1f5fe
-    style wf_topic fill:#e8f5e9
-    style wf_geo fill:#fff3e0
-    style wf_cross fill:#fce4ec
+    style wf_script fill:#e1f5fe
+    style wf_llm fill:#e8f5e9
+```
+
+##### 2.2 Agent自主调度路径 (analysis_mode="agent")
+
+Single Agent通过循环自主决策执行哪些分析工具，直到认为分析充分或达到最大迭代次数。
+
+```mermaid
+flowchart TD
+    subgraph AgentAnalysisFlow[Agent自主调度Flow - Single Agent Loop]
+        agent_start[开始] --> agent_load[LoadEnhancedDataNode<br/>加载增强数据]
+        agent_load --> agent_summary[DataSummaryNode<br/>生成数据概况]
+        
+        agent_summary --> collect_tools[CollectToolsNode<br/>工具收集节点<br/>获取可用工具列表]
+        
+        collect_tools --> decision_node[DecisionToolsNode<br/>工具决策节点<br/>LLM决定执行哪个工具]
+        
+        decision_node --> execute_node[ExecuteToolsNode<br/>工具执行节点<br/>执行选定的分析工具]
+        
+        execute_node --> process_result[ProcessResultNode<br/>结果处理节点<br/>简单分析执行结果]
+        
+        process_result --> check_finish{分析充分?<br/>或达到最大迭代?}
+        
+        check_finish -->|继续分析| decision_node
+        check_finish -->|结束分析| agent_save[SaveAnalysisResultsNode<br/>保存分析结果]
+        
+        agent_save --> agent_end[结束]
+    end
+    
+    style collect_tools fill:#fff3e0
+    style decision_node fill:#e3f2fd
+    style execute_node fill:#e8f5e9
+    style process_result fill:#fce4ec
 ```
 
 ---
@@ -589,28 +619,41 @@ flowchart TD
 
 ### Flow编排架构
 
-#### 独立Flow说明
+#### 系统入口Flow
 
-| Flow名称 | 阶段 | 用途 | 输入 | 输出 |
-|----------|------|------|------|------|
-| EnhancementFlow | 阶段1 | 原始博文增强处理 | 原始博文JSON | 增强博文JSON |
-| AnalysisFlow | 阶段2 | 分析执行 | 增强博文JSON | 分析结果（图/表/描述） |
-| ReportFlow | 阶段3 | 报告生成 | 分析结果 | Markdown报告 |
-| CompleteFlow | 全部 | 完整流程 | 原始博文JSON | Markdown报告 |
+| Flow/Node名称 | 类型 | 用途 | 说明 |
+|---------------|------|------|------|
+| MainFlow | Flow | 系统入口 | 以DispatcherNode为起点，串联所有阶段 |
+| DispatcherNode | Node | 综合调度 | 根据配置决定执行路径，阶段完成后返回此节点 |
+
+#### 阶段Flow/Node说明
+
+| Flow/Node名称 | 阶段 | 执行形式 | 用途 | 触发Action |
+|---------------|------|----------|------|------------|
+| AsyncEnhancementFlow | 阶段1 | Flow | 异步批量并行处理 | `stage1_async` |
+| BatchAPIFlow | 阶段1 | Flow | Batch API并行处理 | `stage1_batch_api` |
+| WorkflowAnalysisNode | 阶段2 | Node | 固定脚本分析 | `stage2_workflow` |
+| AgentAnalysisFlow | 阶段2 | Flow | LLM自主分析 | `stage2_agent` |
+| TemplateReportNode | 阶段3 | Node | 模板填充报告 | `stage3_template` |
+| IterativeReportFlow | 阶段3 | Flow | 多轮迭代报告 | `stage3_iterative` |
 
 #### Flow编排优势
-- **三阶段解耦**：每个阶段可独立运行、调试和优化
-- **多路径灵活**：通过shared参数动态切换执行路径
-- **断点续传**：每个阶段输出持久化，支持从中间阶段恢复
-- **可组合性**：不同阶段的路径可自由组合
+- **中央调度**：DispatcherNode统一管理流程，每个阶段完成后返回调度节点
+- **灵活启动**：可配置起始阶段和执行阶段列表，支持从任意阶段开始
+- **动态路径**：通过shared配置动态选择每个阶段的具体执行路径
+- **顺序依赖解耦**：阶段1→2→3顺序依赖，但每个阶段可独立运行
+- **断点续传**：每个阶段输出持久化到指定位置，支持从中间阶段恢复
 
 ## 分析工具集设计
 
-> Notes for AI: 工具集采用统一架构，每类工具集包含数据处理和可视化两类函数。所有工具函数遵循统一的输入输出规范，便于Agent动态调用。
+> Notes for AI: 
+> - 分析工具集是阶段2（分析执行）的核心组件，对应需求分析中的"阶段2: 分析执行 - 分析工具集"
+> - 工具集采用统一架构，每类工具集包含数据处理和可视化两类函数
+> - 所有工具函数遵循统一的输入输出规范，便于Agent动态调用或Workflow固定流程调用
 
 ### 工具集概述
 
-系统提供四类核心分析工具集，每类工具集包含若干工具函数：
+系统提供四类核心分析工具集（对应需求分析中的2.1-2.4），每类工具集包含若干工具函数：
 
 | 工具集 | 功能定位 | 数据处理函数 | 可视化函数 |
 |--------|----------|--------------|------------|
@@ -642,11 +685,11 @@ flowchart TD
 
 ### Shared Store
 
-> Notes for AI: shared字典是节点间通信的核心，按功能分区组织
+> Notes for AI: shared字典是节点间通信的核心，按中央调度+三阶段架构分区组织
 
 ```python
 shared = {
-    # === 数据管理 ===
+    # === 数据管理（贯穿三阶段） ===
     "data": {
         "blog_data": [],              # 博文数据（原始或增强后）
         "topics_hierarchy": [],        # 主题层次结构（从data/topics.json加载）
@@ -654,39 +697,48 @@ shared = {
         "publisher_objects": [],       # 发布者类型列表（从data/publisher_objects.json加载）
     },
     
-    # === 三阶段路径控制 ===
+    # === 调度控制（DispatcherNode使用） ===
+    "dispatcher": {
+        "start_stage": 1,              # 起始阶段：1 | 2 | 3
+        "run_stages": [1, 2, 3],       # 需要执行的阶段列表
+        "current_stage": 0,            # 当前执行到的阶段（0表示未开始）
+        "completed_stages": [],        # 已完成的阶段列表
+        "next_action": "stage1"        # 下一步动作：stage1 | stage2 | stage3 | done
+    },
+    
+    # === 三阶段路径控制（对应需求分析中的三阶段架构） ===
     "config": {
-        # 阶段1: 增强处理方式
+        # 阶段1: 增强处理方式（对应需求：四维度分析）
         "enhancement_mode": "async",   # "async" | "batch_api"
         
-        # 阶段2: 分析执行方式
+        # 阶段2: 分析执行方式（对应需求：分析工具集）
         "analysis_mode": "workflow",   # "workflow" | "agent"
         "tool_source": "local",        # "local" | "mcp" (Agent模式下的工具来源)
         
-        # 阶段3: 报告生成方式
+        # 阶段3: 报告生成方式（对应需求：报告输出）
         "report_mode": "template",     # "template" | "iterative"
         
-        # Agent配置
+        # 阶段2 Agent配置
         "agent_config": {
-            "max_iterations": 10
+            "max_iterations": 100
         },
         
-        # 迭代报告配置
+        # 阶段3 迭代报告配置
         "iterative_report_config": {
-            "max_iterations": 5,
-            "min_score_threshold": 80
+            "max_iterations": 10,
         }
     },
     
-    # === 运行时状态 ===
+    # === 阶段2运行时状态（Agent Loop模式） ===
     "agent": {
-        "available_tools": [],         # 可用工具列表
-        "execution_history": [],       # 工具执行历史
-        "current_iteration": 0,
-        "is_finished": False
+        "available_tools": [],         # 工具收集节点获取的可用工具列表
+        "execution_history": [],       # 工具执行历史（每次循环记录）
+        "current_iteration": 0,        # 当前循环迭代次数
+        "max_iterations": 10,          # 最大迭代次数（防止无限循环）
+        "is_finished": False           # Agent是否判断分析已充分
     },
     
-    # === 报告生成状态 ===
+    # === 阶段3报告生成状态 ===
     "report": {
         "iteration": 0,
         "current_draft": "",
@@ -696,18 +748,100 @@ shared = {
 }
 ```
 
-**说明**：
-- 分析结果（图表、数据、描述）存储在 `report/` 文件夹中，不在shared字典中保存
-- 最终报告输出到 `report/report.md`
-- 可视化图表存储在 `report/images/` 目录
+**阶段间数据传递**：
+- **阶段1输出** → 阶段2输入：增强博文数据保存到 `data/enhanced_posts.json`
+- **阶段2输出** → 阶段3输入：分析结果存储在 `report/` 目录
+  - 图表文件：`report/images/`
+  - 统计数据：`report/analysis_data.json`
+  - 洞察描述：`report/insights.json`
+- **阶段3输出**：最终报告 `report/report.md`
+
+**独立执行说明**：
+- 阶段2独立执行：需先检查 `data/enhanced_posts.json` 是否存在
+- 阶段3独立执行：需先检查 `report/analysis_data.json` 和 `report/images/` 是否存在
+- 阶段3仅从增强数据中读取少量博文样本用于典型案例引用
 
 ### Node Steps
 
-> Notes for AI: 节点按三阶段组织，每个阶段的多种执行路径通过shared参数控制
+> Notes for AI: 节点按中央调度+三阶段架构组织，DispatcherNode作为入口和中央控制器
 
 ---
 
-## 阶段1节点: 原始博文增强处理
+## 系统入口节点
+
+### DispatcherNode (综合调度节点)
+
+**功能**：作为整个系统的入口和中央控制器，根据配置决定执行路径
+
+**类型**：Regular Node（Flow入口）
+
+**核心职责**：
+1. 首次进入时，根据 `shared["dispatcher"]["start_stage"]` 确定起始阶段
+2. 根据当前阶段的配置参数，决定进入哪个具体的Flow或Node
+3. 阶段完成后返回时，更新状态并决定下一步动作
+4. 所有阶段完成后，返回 `"done"` 结束流程
+
+**实现步骤**：
+- *prep*：读取调度配置和当前状态
+  ```python
+  dispatcher = shared.get("dispatcher", {})
+  config = shared.get("config", {})
+  return {
+      "start_stage": dispatcher.get("start_stage", 1),
+      "run_stages": dispatcher.get("run_stages", [1, 2, 3]),
+      "current_stage": dispatcher.get("current_stage", 0),
+      "completed_stages": dispatcher.get("completed_stages", []),
+      "enhancement_mode": config.get("enhancement_mode", "async"),
+      "analysis_mode": config.get("analysis_mode", "workflow"),
+      "report_mode": config.get("report_mode", "template")
+  }
+  ```
+- *exec*：计算下一步动作
+  ```python
+  # 确定下一个需要执行的阶段
+  if current_stage == 0:
+      next_stage = start_stage
+  else:
+      # 找到下一个在run_stages中且未完成的阶段
+      next_stage = find_next_stage(run_stages, completed_stages, current_stage)
+  
+  if next_stage is None:
+      return {"action": "done"}
+  
+  # 根据阶段确定具体路径
+  if next_stage == 1:
+      return {"action": f"stage1_{enhancement_mode}"}  # stage1_async 或 stage1_batch_api
+  elif next_stage == 2:
+      return {"action": f"stage2_{analysis_mode}"}     # stage2_workflow 或 stage2_agent
+  elif next_stage == 3:
+      return {"action": f"stage3_{report_mode}"}       # stage3_template 或 stage3_iterative
+  ```
+- *post*：更新调度状态，返回Action
+  ```python
+  shared["dispatcher"]["current_stage"] = next_stage
+  shared["dispatcher"]["next_action"] = exec_res["action"]
+  return exec_res["action"]  # 返回动作字符串作为Flow转移的Action
+  ```
+
+**返回的Action类型**：
+| Action | 说明 | 目标 |
+|--------|------|------|
+| `stage1_async` | 阶段1异步处理 | AsyncEnhancementFlow |
+| `stage1_batch_api` | 阶段1 Batch API处理 | BatchAPIFlow |
+| `stage2_workflow` | 阶段2固定脚本分析 | WorkflowAnalysisNode |
+| `stage2_agent` | 阶段2 LLM自主分析 | AgentAnalysisFlow |
+| `stage3_template` | 阶段3模板填充 | TemplateReportNode |
+| `stage3_iterative` | 阶段3多轮迭代 | IterativeReportFlow |
+| `done` | 所有阶段完成 | 结束 |
+
+**阶段完成后的回调**：
+每个阶段的Flow/Node完成后，需要：
+1. 更新 `shared["dispatcher"]["completed_stages"]` 添加当前阶段
+2. 返回 `"dispatch"` Action，跳转回 DispatcherNode
+
+---
+
+## 阶段1节点: 原始博文增强处理（对应需求：四维度分析）
 
 ### 通用节点
 
@@ -822,16 +956,17 @@ shared = {
 
 ---
 
-## 阶段2节点: 分析执行
+## 阶段2节点: 分析执行（对应需求：分析工具集）
 
 ### 通用节点
 
 **14. LoadEnhancedDataNode (加载增强数据节点)**
 - **功能**：加载已完成增强处理的博文数据
 - **类型**：Regular Node
+- **前置检查**：验证阶段1输出文件是否存在（`data/enhanced_posts.json`）
 - **实现步骤**：
-  - *prep*：读取增强数据文件路径
-  - *exec*：加载JSON数据
+  - *prep*：读取增强数据文件路径，检查前置条件
+  - *exec*：加载JSON数据，验证增强字段完整性
   - *post*：存储到 `shared["data"]["blog_data"]`
 
 **15. DataSummaryNode (数据概况生成节点)**
@@ -843,17 +978,67 @@ shared = {
   - *post*：存储到 `shared["results"]["agent_state"]["data_summary"]`
 
 **16. SaveAnalysisResultsNode (保存分析结果节点)**
-- **功能**：将分析结果持久化
+- **功能**：将分析结果持久化，供阶段3使用
 - **类型**：Regular Node
+- **输出位置**：
+  - 统计数据：`report/analysis_data.json`
+  - 洞察描述：`report/insights.json`
+  - 图表文件：`report/images/`
 - **实现步骤**：
   - *prep*：读取分析输出和图表列表
-  - *exec*：保存JSON结果文件
-  - *post*：记录保存状态
+  - *exec*：保存JSON结果文件和图表
+  - *post*：记录保存状态，供阶段3前置检查使用
+
+### 预定义Workflow路径节点 (analysis_mode="workflow")
+
+> 执行固定的分析脚本生成全部图形，然后通过LLM补充洞察信息
+
+**17. ExecuteAnalysisScriptNode (执行分析脚本节点)**
+- **功能**：执行固定的分析脚本，生成全部所需图形
+- **类型**：Regular Node
+- **实现步骤**：
+  - *prep*：读取增强数据
+  - *exec*：执行预定义的分析脚本，依次调用四类工具集的全部工具函数
+    - 情感趋势分析工具集
+    - 主题演化分析工具集
+    - 地理分布分析工具集
+    - 多维交互分析工具集
+  - *post*：存储图形到 `report/images/`，记录生成的图表列表
+
+**18. LLMInsightNode (LLM洞察补充节点)**
+- **功能**：调用LLM为生成的图形补充洞察信息，填充shared字典
+- **类型**：Regular Node (LLM Call)
+- **实现步骤**：
+  - *prep*：读取生成的图表列表和统计数据
+  - *exec*：构建Prompt调用LLM，生成各维度的洞察描述
+  - *post*：填充 `shared["results"]["insights"]`
+
+**LLMInsightNode Prompt结构**：
+```
+你是一位资深舆情分析专家。根据以下分析数据，为每个维度生成洞察描述。
+
+## 统计数据
+{statistics_data}
+
+## 生成的图表
+{charts_list}
+
+## 要求
+为以下维度生成洞察：
+1. 情感趋势洞察
+2. 主题演化洞察
+3. 地理分布洞察
+4. 多维交互洞察
+
+输出JSON格式：{"sentiment": "...", "topic": "...", "geographic": "...", "cross_dimension": "..."}
+```
 
 ### Agent自主调度路径节点 (analysis_mode="agent")
 
-**17. GetToolsNode (获取工具列表节点)**
-- **功能**：根据配置获取可用工具列表
+> Single Agent通过循环自主决策，直到分析充分或达到最大迭代次数
+
+**19. CollectToolsNode (工具收集节点)**
+- **功能**：收集所有可用的分析工具列表
 - **类型**：Regular Node
 - **控制参数**：`shared["config"]["tool_source"]`
 - **实现步骤**：
@@ -863,15 +1048,16 @@ shared = {
     - 若 `tool_source="local"`：返回本地注册的固定工具列表
   - *post*：将工具定义存储到 `shared["agent"]["available_tools"]`
 
-**18. DecisionToolsNode (工具决策节点)**
-- **功能**：LLM决定下一步调用哪个工具或结束
+**20. DecisionToolsNode (工具决策节点)**
+- **功能**：LLM决定下一步执行哪个分析工具，或判断分析已充分
 - **类型**：Regular Node (LLM Call)
+- **循环入口**：Agent Loop的决策起点
 - **实现步骤**：
-  - *prep*：读取数据概况、可用工具、执行历史
+  - *prep*：读取数据概况、可用工具、执行历史、当前迭代次数
   - *exec*：构建Prompt调用LLM，获取决策结果
   - *post*：解析决策，返回Action
-    - `"call_tool"`: 需要执行工具
-    - `"finish"`: 分析完成
+    - `"execute"`: 执行选定的工具
+    - `"finish"`: 分析已充分，结束循环
 
 **DecisionToolsNode Prompt结构**：
 ```
@@ -883,74 +1069,53 @@ shared = {
 ## 可用工具
 {tool_definitions}
 
-## 已执行的分析
+## 已执行的分析（迭代 {current_iteration}/{max_iterations}）
 {execution_history}
 
 ## 决策要求
-- 如需调用工具，输出：{"action": "call_tool", "tool_name": "...", "tool_params": {...}, "reason": "..."}
-- 如分析充分，输出：{"action": "finish", "reason": "..."}
+- 如需调用工具，输出：{"action": "execute", "tool_name": "...", "tool_params": {...}, "reason": "..."}
+- 如分析已充分，输出：{"action": "finish", "reason": "..."}
 ```
 
-**19. ExecuteToolsNode (工具执行节点)**
-- **功能**：执行指定的工具函数
+**21. ExecuteToolsNode (工具执行节点)**
+- **功能**：执行决策节点选定的分析工具
 - **类型**：Regular Node
 - **实现步骤**：
   - *prep*：读取决策结果中的工具名称和参数
-  - *exec*：调用对应的工具函数（本地或MCP）
+  - *exec*：调用对应的工具函数
   - *post*：
     - 存储结果到 `shared["results"]["analysis_outputs"]`
     - 注册图表到 `shared["results"]["generated_charts"]`
-    - 记录执行历史到 `shared["agent"]["execution_history"]`
-    - 返回 `"continue"` 继续循环
 
-**20. StoreToolResultNode (工具结果存储节点)**
-- **功能**：存储工具执行结果并更新状态
+**22. ProcessResultNode (结果处理节点)**
+- **功能**：简单分析工具执行结果，更新执行历史，判断是否继续循环
 - **类型**：Regular Node
+- **循环控制**：根据分析结果和迭代次数决定是否返回决策节点
 - **实现步骤**：
-  - *prep*：读取工具执行结果
-  - *exec*：格式化结果、提取关键发现
-  - *post*：更新 `shared["results"]` 和 `shared["agent"]["execution_history"]`
-
-### 预定义Workflow路径节点 (analysis_mode="workflow")
-
-> 这些节点按固定顺序执行，每个节点调用对应工具集的全部工具
-
-**21. SentimentTrendAnalysisNode (情感趋势分析节点)**
-- **功能**：执行情感趋势分析工具集
-- **类型**：Regular Node
-- **调用工具**：`sentiment_distribution_stats`, `sentiment_time_series`, `sentiment_anomaly_detection`, `sentiment_trend_chart`, `sentiment_pie_chart`
-- **实现步骤**：
-  - *prep*：读取增强数据
-  - *exec*：依次调用工具集中的全部函数
-  - *post*：存储结果到 `shared["results"]["analysis_outputs"]["sentiment_trend"]`
-
-**22. TopicEvolutionAnalysisNode (主题演化分析节点)**
-- **功能**：执行主题演化分析工具集
-- **类型**：Regular Node
-- **调用工具**：`topic_frequency_stats`, `topic_time_evolution`, `topic_cooccurrence_analysis`, `topic_ranking_chart`, `topic_evolution_chart`, `topic_network_chart`
-
-**23. GeographicAnalysisNode (地理分布分析节点)**
-- **功能**：执行地理分布分析工具集
-- **类型**：Regular Node
-- **调用工具**：`geographic_distribution_stats`, `geographic_hotspot_detection`, `geographic_sentiment_analysis`, `geographic_heatmap`, `geographic_bar_chart`
-
-**24. CrossDimensionAnalysisNode (多维交互分析节点)**
-- **功能**：执行多维交互分析工具集
-- **类型**：Regular Node
-- **调用工具**：`publisher_distribution_stats`, `cross_dimension_matrix`, `influence_analysis`, `correlation_analysis`, `interaction_heatmap`, `publisher_bar_chart`
+  - *prep*：读取工具执行结果和当前迭代次数
+  - *exec*：格式化结果、提取关键发现、更新迭代计数
+  - *post*：
+    - 更新 `shared["agent"]["execution_history"]`
+    - 增加迭代计数 `shared["agent"]["current_iteration"]` += 1
+    - 检查是否达到最大迭代次数
+    - 返回Action：`"continue"` 返回决策节点 或 `"finish"` 结束循环
 
 ---
 
-## 阶段3节点: 报告生成
+## 阶段3节点: 报告生成（对应需求：报告输出）
 
 ### 通用节点
 
 **25. LoadAnalysisResultsNode (加载分析结果节点)**
 - **功能**：加载阶段2产生的分析结果
 - **类型**：Regular Node
+- **前置检查**：验证阶段2输出文件是否存在（`report/analysis_data.json`、`report/images/`）
+- **数据来源**：
+  - 主要：阶段2输出的分析结果（图表、统计数据、洞察描述）
+  - 辅助：增强博文数据的少量样本（用于典型案例引用）
 - **实现步骤**：
-  - *prep*：读取分析结果文件路径
-  - *exec*：加载JSON数据和图表信息
+  - *prep*：读取分析结果文件路径，检查前置条件
+  - *exec*：加载JSON数据和图表信息，抽取少量博文样本
   - *post*：存储到 `shared["results"]`
 
 **26. FormatReportNode (报告格式化节点)**
@@ -1100,12 +1265,13 @@ shared = {
 
 ## 文件存储结构
 
-> Notes for AI: 基于实际项目结构
+> Notes for AI: 基于实际项目结构，明确各阶段的输入输出文件位置
 
 ```
 project_root/
 ├── data/                           # 数据文件
-│   ├── posts.json                  # 原始博文数据
+│   ├── posts.json                  # [输入] 原始博文数据
+│   ├── enhanced_posts.json         # [阶段1输出] 增强后博文数据
 │   ├── topics.json                 # 主题层次结构
 │   ├── sentiment_attributes.json   # 情感属性列表
 │   └── publisher_objects.json      # 发布者类型列表
@@ -1115,9 +1281,11 @@ project_root/
 │   ├── download_results.py         # 下载结果
 │   └── parse_and_integrate.py      # 解析并整合结果
 ├── report/                         # 分析结果与报告输出
-│   ├── images/                     # 可视化图表存储
+│   ├── images/                     # [阶段2输出] 可视化图表存储
+│   ├── analysis_data.json          # [阶段2输出] 分析统计数据
+│   ├── insights.json               # [阶段2输出] 洞察描述
 │   ├── template.md                 # 报告模板
-│   └── report.md                   # 最终生成的报告
+│   └── report.md                   # [阶段3输出] 最终生成的报告
 ├── utils/                          # 工具函数
 │   ├── call_llm.py                 # LLM调用封装
 │   └── data_loader.py              # 数据加载与保存
@@ -1130,23 +1298,36 @@ project_root/
 └── main.py                         # 入口文件
 ```
 
+### 阶段间数据传递约定
+
+| 阶段 | 输入文件 | 输出文件 | 前置检查 |
+|------|----------|----------|----------|
+| 阶段1 | `data/posts.json` | `data/enhanced_posts.json` | 无 |
+| 阶段2 | `data/enhanced_posts.json` | `report/analysis_data.json`<br>`report/insights.json`<br>`report/images/*` | 检查增强数据是否存在 |
+| 阶段3 | `report/analysis_data.json`<br>`report/insights.json`<br>`report/images/*`<br>`data/enhanced_posts.json`(少量样本) | `report/report.md` | 检查分析结果是否存在 |
+
 ### 输出约定
 
-- **分析结果**：存储在 `report/` 目录
-- **可视化图表**：存储在 `report/images/`，命名格式 `{type}_{timestamp}.png`
-- **最终报告**：输出到 `report/report.md`
+- **阶段1输出**：增强博文数据存储到 `data/enhanced_posts.json`
+- **阶段2输出**：分析结果存储在 `report/` 目录
+  - 可视化图表：`report/images/`，命名格式 `{type}_{timestamp}.png`
+  - 统计数据：`report/analysis_data.json`
+  - 洞察描述：`report/insights.json`
+- **阶段3输出**：最终报告 `report/report.md`
 
 ## 路径选择指南
 
 ### 设计理念
 
-系统采用**三阶段解耦 + 多路径执行**架构，每个阶段独立运行，各自支持多种执行方式：
+系统采用**三阶段顺序依赖 + 多路径执行**架构：
+- **顺序依赖**：阶段1 → 阶段2 → 阶段3，后序阶段依赖前序阶段的输出
+- **独立执行**：每个阶段可独立运行，前提是前序阶段已完成并存储数据到指定位置
 
-| 阶段 | 路径选项 | 特点 |
-|------|----------|------|
-| 阶段1: 增强处理 | 异步并行 / Batch API | 处理效率 vs API成本 |
-| 阶段2: 分析执行 | Agent调度 / Workflow | 灵活性 vs 可预测性 |
-| 阶段3: 报告生成 | 模板填充 / 多轮迭代 | 效率 vs 质量 |
+| 阶段 | 对应需求 | 路径选项 | 权衡点 | 前置条件 |
+|------|----------|----------|--------|----------|
+| 阶段1: 增强处理 | 四维度分析 | 异步并行 / Batch API | 处理效率 vs API成本 | 无 |
+| 阶段2: 分析执行 | 分析工具集 | Workflow(思路1) / Agent Loop(思路2) | 可预测性 vs 灵活性 | 阶段1输出存在 |
+| 阶段3: 报告生成 | 报告输出 | 模板填充 / 多轮迭代 | 效率 vs 质量 | 阶段2输出存在 |
 
 ### 阶段1: 增强处理路径选择
 
@@ -1162,7 +1343,18 @@ project_root/
 
 ### 阶段2: 分析执行路径选择
 
-#### Agent自主调度 (analysis_mode="agent")
+#### 预定义Workflow (analysis_mode="workflow") - 思路1
+- **执行流程**：执行固定脚本生成全部图形 → LLM补充洞察信息 → 填充shared字典
+- **适用场景**：
+  - 标准化的日常舆情监控
+  - 对分析路径有明确要求
+  - 计算资源和时间有限
+- **优势**：可预测性强、效率高、成本可控、易于调试
+- **劣势**：灵活性不足、可能遗漏非预定义洞察
+
+#### Agent自主调度 (analysis_mode="agent") - 思路2
+- **执行流程**：工具收集 → 工具决策 → 工具执行 → 结果处理 → 返回决策（循环）
+- **终止条件**：Agent判断分析已充分 或 达到最大迭代次数
 - **适用场景**：
   - 复杂的多维度舆情分析
   - 数据特征不明确或异常情况
@@ -1172,14 +1364,6 @@ project_root/
   - `tool_source="local"`: 固定工具列表，适合稳定的分析需求
 - **优势**：灵活性高、能发现隐藏模式、自适应能力强
 - **挑战**：结果不确定、成本较高、需要精心设计Prompt
-
-#### 预定义Workflow (analysis_mode="workflow")
-- **适用场景**：
-  - 标准化的日常舆情监控
-  - 对分析路径有明确要求
-  - 计算资源和时间有限
-- **优势**：可预测性强、效率高、成本可控、易于调试
-- **劣势**：灵活性不足、可能遗漏非预定义洞察
 
 ### 阶段3: 报告生成路径选择
 
@@ -1204,7 +1388,9 @@ project_root/
 - **优势**：质量有保障、可以自我完善
 - **挑战**：时间成本高、需要更多API调用
 
-## 增强处理实现要点
+## 阶段1增强处理实现要点
+
+> 对应需求分析中的"阶段1: 原始博文增强处理"
 
 ### 异步批量并行 (enhancement_mode="async")
 
@@ -1212,6 +1398,7 @@ project_root/
 - 通过 `max_concurrent` 参数控制并发数，使用 `asyncio.Semaphore` 进行限流
 - 四个分析维度（情感极性、情感属性、主题、发布者）可并行执行
 - 支持异步重试和优雅降级
+- 适用场景：中小规模数据（<5000条）、需要实时反馈
 
 ### Batch API并行 (enhancement_mode="batch_api")
 
@@ -1220,12 +1407,14 @@ project_root/
 - 轮询任务状态直到完成
 - 下载并解析结果文件，整合到增强数据中
 - 详细实现参考 `batch/` 目录
+- 适用场景：大规模数据（>5000条）、对时效要求不高
 
 ## 技术考虑
 
 ### 性能优化
-- **批量处理**：使用BatchFlow实现四个分析维度的批量处理
-- **并行执行**：四个BatchNode可以并行运行，提高处理效率
+- **三阶段解耦**：各阶段独立运行，可针对性优化
+- **阶段1批量处理**：使用BatchFlow实现四个分析维度的批量处理
+- **阶段1并行执行**：四个BatchNode可以并行运行，提高处理效率
 - **异步处理**：通过AsyncParallelBatchNode实现真正的并发处理，支持可配置的并发控制
 - **结果缓存**：避免重复分析相同内容
 - **分批加载**：大数据集分批处理避免内存溢出
@@ -1236,12 +1425,14 @@ project_root/
 - **降级策略**：关键模型不可用时的备用方案
 - **数据验证**：严格的数据格式和完整性检查
 - **异常处理**：完善的错误处理和恢复机制
-- **进度保存**：支持断点续传，避免重复处理
+- **前置检查**：各阶段独立执行前验证前序阶段输出文件是否存在
+- **断点续传**：三阶段解耦支持从任意阶段恢复执行（需满足前置条件）
 
 ### 扩展性设计
+- **三阶段独立扩展**：各阶段可独立添加新的执行路径
 - **模块化架构**：便于添加新的分析维度和工具
-- **插件化设计**：分析工具可插拔，易于扩展
-- **配置化管理**：通过配置文件灵活调整系统行为
+- **插件化设计**：阶段2分析工具可插拔，易于扩展
+- **配置化管理**：通过shared["config"]灵活调整系统行为
 - **接口标准化**：统一的数据接口和工具调用规范
 
 
