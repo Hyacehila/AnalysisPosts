@@ -16,19 +16,17 @@
    - AsyncParallelBatchNode: 带并发限制的异步并行批处理基类
 
 3. 阶段1节点: 原始博文增强处理
-   3.1 阶段1入口节点
-       - Stage1EntryNode: 阶段1入口，决定进入async或batch_api路径
-   3.2 通用节点
+   3.1 通用节点
        - DataLoadNode: 数据加载
        - SaveEnhancedDataNode: 保存增强数据
        - DataValidationAndOverviewNode: 数据验证与概况分析
        - Stage1CompletionNode: 阶段1完成节点，返回调度器
-   3.3 异步批量并行路径节点 (enhancement_mode="async")
+   3.2 异步批量并行路径节点 (enhancement_mode="async")
        - AsyncSentimentPolarityAnalysisBatchNode: 情感极性分析
        - AsyncSentimentAttributeAnalysisBatchNode: 情感属性分析
        - AsyncTwoLevelTopicAnalysisBatchNode: 两级主题分析
        - AsyncPublisherObjectAnalysisBatchNode: 发布者对象分析
-   3.4 Batch API路径节点 (enhancement_mode="batch_api")
+   3.3 Batch API路径节点 (enhancement_mode="batch_api")
        - BatchAPIEnhancementNode: 调用Batch API脚本处理
 
 4. 阶段2节点: 分析执行（待实现）
@@ -169,12 +167,12 @@ class TerminalNode(Node):
     def prep(self, shared):
         """读取执行结果摘要"""
         dispatcher = shared.get("dispatcher", {})
-        results = shared.get("results", {})
+        stage1_results = shared.get("stage1_results", {})
         
         return {
             "completed_stages": dispatcher.get("completed_stages", []),
-            "statistics": results.get("statistics", {}),
-            "data_save": results.get("data_save", {})
+            "statistics": stage1_results.get("statistics", {}),
+            "data_save": stage1_results.get("data_save", {})
         }
     
     def exec(self, prep_res):
@@ -258,90 +256,7 @@ class AsyncParallelBatchNode(AsyncNode, BatchNode):
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# 3.1 阶段1入口节点
-# -----------------------------------------------------------------------------
-
-class Stage1EntryNode(Node):
-    """
-    阶段1入口节点
-    
-    功能：
-    1. 加载原始博文数据和参考数据
-    2. 根据enhancement_mode配置决定进入哪个处理路径
-    3. 返回对应的Action: "async" 或 "batch_api"
-    """
-    
-    def prep(self, shared):
-        """读取配置参数"""
-        config = shared.get("config", {})
-        enhancement_mode = config.get("enhancement_mode", "async")
-        
-        return {"enhancement_mode": enhancement_mode}
-    
-    def exec(self, prep_res):
-        """确定处理路径"""
-        enhancement_mode = prep_res["enhancement_mode"]
-        
-        print(f"\n[Stage1] 进入阶段1: 原始博文增强处理")
-        print(f"[Stage1] 处理模式: {enhancement_mode}")
-        
-        return {"mode": enhancement_mode}
-    
-    def post(self, shared, prep_res, exec_res):
-        """返回对应的Action"""
-        mode = exec_res["mode"]
-        
-        # 返回对应的action，用于Flow路由
-        if mode == "batch_api":
-            return "batch_api"
-        else:
-            return "async"
-
-
-class Stage1CompletionNode(Node):
-    """
-    阶段1完成节点
-    
-    功能：
-    1. 标记阶段1完成
-    2. 更新dispatcher状态
-    3. 返回"dispatch" Action，跳转回DispatcherNode
-    """
-    
-    def prep(self, shared):
-        """读取当前状态"""
-        return {
-            "current_stage": shared.get("dispatcher", {}).get("current_stage", 1),
-            "completed_stages": shared.get("dispatcher", {}).get("completed_stages", [])
-        }
-    
-    def exec(self, prep_res):
-        """确认阶段完成"""
-        print(f"\n[Stage1] 阶段1处理完成")
-        return {"stage": 1}
-    
-    def post(self, shared, prep_res, exec_res):
-        """更新完成状态，返回dispatch"""
-        stage = exec_res["stage"]
-        
-        # 确保dispatcher存在
-        if "dispatcher" not in shared:
-            shared["dispatcher"] = {}
-        
-        # 更新已完成阶段列表
-        completed_stages = shared["dispatcher"].get("completed_stages", [])
-        if stage not in completed_stages:
-            completed_stages.append(stage)
-        shared["dispatcher"]["completed_stages"] = completed_stages
-        
-        print(f"[Stage1] 已完成阶段: {completed_stages}")
-        
-        # 返回dispatch，跳转回调度器
-        return "dispatch"
-
-
-# -----------------------------------------------------------------------------
-# 3.2 通用节点
+# 3.1 通用节点
 # -----------------------------------------------------------------------------
 
 class DataLoadNode(Node):
@@ -410,9 +325,9 @@ class DataLoadNode(Node):
             shared["data"]["sentiment_attributes"] = exec_res["sentiment_attributes"]
             shared["data"]["publisher_objects"] = exec_res["publisher_objects"]
         
-        if "results" not in shared:
-            shared["results"] = {"statistics": {}}
-        shared["results"]["statistics"]["total_blogs"] = len(exec_res["blog_data"])
+        if "stage1_results" not in shared:
+            shared["stage1_results"] = {"statistics": {}}
+        shared["stage1_results"]["statistics"]["total_blogs"] = len(exec_res["blog_data"])
         
         print(f"[DataLoad] 加载完成，共 {len(exec_res['blog_data'])} 条博文")
         
@@ -456,19 +371,19 @@ class SaveEnhancedDataNode(Node):
     
     def post(self, shared, prep_res, exec_res):
         """验证保存结果，更新保存状态信息"""
-        if "results" not in shared:
-            shared["results"] = {}
+        if "stage1_results" not in shared:
+            shared["stage1_results"] = {}
         
         if exec_res["success"]:
             print(f"[SaveData] ✓ 成功保存 {exec_res['data_count']} 条增强数据到: {exec_res['output_path']}")
-            shared["results"]["data_save"] = {
+            shared["stage1_results"]["data_save"] = {
                 "saved": True,
                 "output_path": exec_res["output_path"],
                 "data_count": exec_res["data_count"]
             }
         else:
             print(f"[SaveData] ✗ 保存增强数据失败: {exec_res['output_path']}")
-            shared["results"]["data_save"] = {
+            shared["stage1_results"]["data_save"] = {
                 "saved": False,
                 "output_path": exec_res["output_path"],
                 "error": "保存失败"
@@ -627,21 +542,123 @@ class DataValidationAndOverviewNode(Node):
         return stats
     
     def post(self, shared, prep_res, exec_res):
-        """将统计信息存储到shared中"""
-        if "results" not in shared:
-            shared["results"] = {}
-        if "statistics" not in shared["results"]:
-            shared["results"]["statistics"] = {}
+        """将统计信息存储到shared中，并打印详细统计报告"""
+        if "stage1_results" not in shared:
+            shared["stage1_results"] = {}
+        if "statistics" not in shared["stage1_results"]:
+            shared["stage1_results"]["statistics"] = {}
         
-        shared["results"]["statistics"].update(exec_res)
+        shared["stage1_results"]["statistics"].update(exec_res)
         
-        print(f"[Validation] 验证完成: {exec_res['processed_blogs']}/{exec_res['total_blogs']} 条博文已处理")
+        # 打印详细统计报告
+        stats = exec_res
+        print("\n" + "=" * 60)
+        print("阶段1 数据增强统计报告".center(52))
+        print("=" * 60)
+        
+        # 基础统计
+        print(f"\n📊 基础统计:")
+        print(f"  ├─ 总博文数: {stats.get('total_blogs', 0)}")
+        print(f"  └─ 已处理数: {stats.get('processed_blogs', 0)}")
+        
+        # 空字段统计
+        empty_fields = stats.get("empty_fields", {})
+        if empty_fields:
+            print(f"\n⚠️  增强字段空值统计:")
+            print(f"  ├─ 情感极性为空: {empty_fields.get('sentiment_polarity_empty', 0)}")
+            print(f"  ├─ 情感属性为空: {empty_fields.get('sentiment_attribute_empty', 0)}")
+            print(f"  ├─ 主题为空: {empty_fields.get('topics_empty', 0)}")
+            print(f"  └─ 发布者为空: {empty_fields.get('publisher_empty', 0)}")
+        
+        # 参与度统计
+        engagement = stats.get("engagement_statistics", {})
+        if engagement:
+            print(f"\n💬 参与度统计:")
+            print(f"  ├─ 总转发数: {engagement.get('total_reposts', 0)}")
+            print(f"  ├─ 总评论数: {engagement.get('total_comments', 0)}")
+            print(f"  ├─ 总点赞数: {engagement.get('total_likes', 0)}")
+            print(f"  ├─ 平均转发: {engagement.get('avg_reposts', 0):.2f}")
+            print(f"  ├─ 平均评论: {engagement.get('avg_comments', 0):.2f}")
+            print(f"  └─ 平均点赞: {engagement.get('avg_likes', 0):.2f}")
+        
+        # 用户统计
+        user_stats = stats.get("user_statistics", {})
+        if user_stats:
+            print(f"\n👥 用户统计:")
+            print(f"  ├─ 独立用户数: {user_stats.get('unique_users', 0)}")
+            user_type_dist = user_stats.get('user_type_distribution', {})
+            if user_type_dist:
+                print(f"  └─ 发布者类型分布:")
+                for i, (pub_type, count) in enumerate(sorted(user_type_dist.items(), key=lambda x: -x[1])):
+                    prefix = "      ├─" if i < len(user_type_dist) - 1 else "      └─"
+                    print(f"{prefix} {pub_type}: {count}")
+        
+        # 内容统计
+        content_stats = stats.get("content_statistics", {})
+        if content_stats:
+            print(f"\n📝 内容统计:")
+            print(f"  ├─ 含图博文数: {content_stats.get('blogs_with_images', 0)}")
+            print(f"  ├─ 总图片数: {content_stats.get('total_images', 0)}")
+            print(f"  └─ 平均内容长度: {content_stats.get('avg_content_length', 0):.1f} 字符")
+        
+        # 地理分布（前5）
+        geo_dist = stats.get("geographic_distribution", {})
+        if geo_dist:
+            print(f"\n🌍 地理分布 (Top 5):")
+            sorted_geo = sorted(geo_dist.items(), key=lambda x: -x[1])[:5]
+            for i, (location, count) in enumerate(sorted_geo):
+                prefix = "  ├─" if i < len(sorted_geo) - 1 else "  └─"
+                print(f"{prefix} {location}: {count}")
+        
+        print("\n" + "=" * 60 + "\n")
         
         return "default"
 
 
+class Stage1CompletionNode(Node):
+    """
+    阶段1完成节点
+    
+    功能：
+    1. 标记阶段1完成
+    2. 更新dispatcher状态
+    3. 返回"dispatch" Action，跳转回DispatcherNode
+    """
+    
+    def prep(self, shared):
+        """读取当前状态"""
+        return {
+            "current_stage": shared.get("dispatcher", {}).get("current_stage", 1),
+            "completed_stages": shared.get("dispatcher", {}).get("completed_stages", [])
+        }
+    
+    def exec(self, prep_res):
+        """确认阶段完成"""
+        print(f"\n[Stage1] 阶段1处理完成")
+        return {"stage": 1}
+    
+    def post(self, shared, prep_res, exec_res):
+        """更新完成状态，返回dispatch"""
+        stage = exec_res["stage"]
+        
+        # 确保dispatcher存在
+        if "dispatcher" not in shared:
+            shared["dispatcher"] = {}
+        
+        # 更新已完成阶段列表
+        completed_stages = shared["dispatcher"].get("completed_stages", [])
+        if stage not in completed_stages:
+            completed_stages.append(stage)
+        shared["dispatcher"]["completed_stages"] = completed_stages
+        
+        print(f"[Stage1] 已完成阶段: {completed_stages}")
+        
+        # 返回dispatch，跳转回调度器
+        return "dispatch"
+
+
 # -----------------------------------------------------------------------------
-# 3.3 异步批量并行路径节点 (enhancement_mode="async")
+# 3.2 异步批量并行路径节点 (enhancement_mode="async")
 # -----------------------------------------------------------------------------
 
 class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
@@ -959,7 +976,7 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
 
 
 # -----------------------------------------------------------------------------
-# 3.4 Batch API路径节点 (enhancement_mode="batch_api")
+# 3.3 Batch API路径节点 (enhancement_mode="batch_api")
 # -----------------------------------------------------------------------------
 
 class BatchAPIEnhancementNode(Node):
@@ -1054,29 +1071,29 @@ class BatchAPIEnhancementNode(Node):
                     
                     print(f"[BatchAPI] ✓ 成功加载 {len(enhanced_data)} 条增强数据")
                     
-                    if "results" not in shared:
-                        shared["results"] = {}
-                    shared["results"]["batch_api"] = {
+                    if "stage1_results" not in shared:
+                        shared["stage1_results"] = {}
+                    shared["stage1_results"]["batch_api"] = {
                         "success": True,
                         "data_count": len(enhanced_data)
                     }
                 except Exception as e:
                     print(f"[BatchAPI] ✗ 加载增强数据失败: {str(e)}")
-                    shared["results"]["batch_api"] = {
+                    shared["stage1_results"]["batch_api"] = {
                         "success": False,
                         "error": str(e)
                     }
             else:
                 print(f"[BatchAPI] ✗ 输出文件不存在: {output_path}")
-                shared["results"]["batch_api"] = {
+                shared["stage1_results"]["batch_api"] = {
                     "success": False,
                     "error": f"输出文件不存在: {output_path}"
                 }
         else:
             print(f"[BatchAPI] ✗ Batch API处理失败: {exec_res.get('error', 'Unknown error')}")
-            if "results" not in shared:
-                shared["results"] = {}
-            shared["results"]["batch_api"] = {
+            if "stage1_results" not in shared:
+                shared["stage1_results"] = {}
+            shared["stage1_results"]["batch_api"] = {
                 "success": False,
                 "error": exec_res.get("error", "Unknown error")
             }

@@ -128,48 +128,6 @@
 
 **实现方式**：通过在原始数据字典中附加新字段实现信息增强
 
-### 数据格式规范
-
-#### 输入数据格式
-- **数据结构**：JSON对象数组结构，一次性加载到内存
-- **博文结构**：
-  ```json
-  {
-    "username": "string",
-    "user_id": "string", 
-    "content": "string",
-    "publish_time": "string",
-    "location": "string",
-    "repost_count": "integer",
-    "comment_count": "integer", 
-    "like_count": "integer",
-    "image_urls": ["string"]
-  }
-  ```
-- **图片存储**：相对链接，存储在images/子文件夹
-- **数据量**：控制在3万条博文以内
-
-#### 输出数据格式
-- **处理方式**：通过在原始博文对象中附加新的字段实现信息增强
-- **增强后结构**：
-  ```json
-  {
-    "username": "string",
-    "user_id": "string",
-    "content": "string", 
-    "publish_time": "string",
-    "location": "string",
-    "repost_count": "integer",
-    "comment_count": "integer",
-    "like_count": "integer",
-    "image_urls": ["string"],
-    "sentiment_polarity": "dict",
-    "sentiment_attribute": "dict", 
-    "topics": "dict",
-    "publisher": "dict"
-  }
-  ```
-
 ### 处理规则
 
 #### 核心规则
@@ -314,17 +272,15 @@ flowchart TB
 - **灵活切换**：运行时可动态选择执行路径
 - **组合使用**：不同阶段可选择不同的执行路径组合
 
-```python
-# 调度控制参数示例
-shared["dispatcher"]["start_stage"] = 1             # 起始阶段
-shared["dispatcher"]["run_stages"] = [1, 2, 3]      # 执行阶段列表
+**调度控制参数**：
+- `shared["dispatcher"]["start_stage"]`：起始阶段（1/2/3）
+- `shared["dispatcher"]["run_stages"]`：执行阶段列表
 
-# 路径控制参数示例
-shared["config"]["enhancement_mode"] = "async"      # 或 "batch_api"
-shared["config"]["analysis_mode"] = "agent"         # 或 "workflow"
-shared["config"]["tool_source"] = "mcp"             # 或 "local"
-shared["config"]["report_mode"] = "template"        # 或 "iterative"
-```
+**路径控制参数**：
+- `shared["config"]["enhancement_mode"]`：`"async"` 或 `"batch_api"`
+- `shared["config"]["analysis_mode"]`：`"workflow"` 或 `"agent"`
+- `shared["config"]["tool_source"]`：`"local"` 或 `"mcp"`（Agent模式下）
+- `shared["config"]["report_mode"]`：`"template"` 或 `"iterative"`
 
 #### 4. 模块化设计
 - **独立模块**：每个功能模块都可以独立运行和测试
@@ -347,34 +303,6 @@ shared["config"]["report_mode"] = "template"        # 或 "iterative"
 > 4. 阶段3(报告生成)对应需求中的"报告输出"
 > 5. 每个阶段支持多种执行路径，通过shared["config"]参数控制
 > 6. 所有流程图使用清晰的节点描述
-
-### Applicable Design Pattern:
-
-1. **Central Dispatcher Pattern**: 系统入口和中央调度
-   - 综合调度节点作为Flow入口，统一管理三阶段的执行流程
-   - 根据配置决定启动阶段、执行路径
-   - 每个阶段完成后返回调度节点，决定下一步动作
-   - 实现阶段间的解耦和灵活组合
-
-2. **Batch Pattern**: 用于阶段1(增强处理)
-   - 对应需求：四维度分析（情感极性、情感属性、主题、发布者）
-   - 四个分析维度通过Batch节点独立处理
-   - 支持异步批量并行(async)和Batch API并行(batch_api)两种方式
-
-3. **Workflow Pattern**: 用于阶段2(分析执行)的预定义流程路径（思路1）
-   - 对应需求：分析工具集的预定义Workflow执行路径
-   - 流程：执行固定脚本生成全部图形 → LLM补充洞察信息 → 填充shared字典
-   - 特点：可预测、高效
-
-4. **Agent Loop Pattern**: 用于阶段2(分析执行)的智能体调度路径（思路2）
-   - 对应需求：分析工具集的Agent自主调度执行路径
-   - 流程：CollectTools → DecisionTools → ExecuteTools → ProcessResult → 返回Decision（循环）
-   - 终止条件：Agent判断分析充分 或 达到最大迭代次数
-   - 支持MCP动态查询和本地Function Calling两种工具来源
-
-5. **Iterative Pattern**: 用于阶段3(报告生成)的多轮迭代路径
-   - 对应需求：报告输出的多轮迭代执行路径
-   - 生成 → 评审 → 修改循环，直到满意或达到最大迭代次数
 
 ### Flow high-level Design:
 
@@ -456,22 +384,23 @@ flowchart TB
 flowchart TD
     subgraph AsyncEnhancementFlow[异步批量并行处理Flow]
         async_start[开始] --> async_load[DataLoadNode<br/>加载原始博文数据]
-        async_load --> async_validate[DataValidationNode<br/>验证数据格式]
-        async_validate --> async_parallel[AsyncParallelBatchFlow<br/>异步并行处理]
-        
-        subgraph async_parallel[AsyncParallelBatchFlow - 四维度并行]
-            async_sentiment_polarity[AsyncSentimentPolarityBatchNode<br/>情感极性分析]
-            async_sentiment_attribute[AsyncSentimentAttributeBatchNode<br/>情感属性分析]
-            async_topic[AsyncTopicAnalysisBatchNode<br/>两级主题分析]
-            async_publisher[AsyncPublisherAnalysisBatchNode<br/>发布者对象分析]
-        end
-        
-        async_parallel --> async_merge[DataMergeNode<br/>合并增强结果]
-        async_merge --> async_quality[QualityCheckNode<br/>质量检查]
-        async_quality --> async_save[SaveEnhancedDataNode<br/>保存增强数据]
-        async_save --> async_end[结束]
+        async_load --> async_sentiment_polarity[AsyncSentimentPolarityAnalysisBatchNode<br/>情感极性分析]
+        async_sentiment_polarity --> async_sentiment_attribute[AsyncSentimentAttributeAnalysisBatchNode<br/>情感属性分析]
+        async_sentiment_attribute --> async_topic[AsyncTwoLevelTopicAnalysisBatchNode<br/>两级主题分析]
+        async_topic --> async_publisher[AsyncPublisherObjectAnalysisBatchNode<br/>发布者对象分析]
+        async_publisher --> async_save[SaveEnhancedDataNode<br/>保存增强数据]
+        async_save --> async_validate[DataValidationAndOverviewNode<br/>验证与统计]
+        async_validate --> async_complete[Stage1CompletionNode<br/>阶段完成]
+        async_complete --> async_end[结束]
     end
+    
+    style async_sentiment_polarity fill:#e3f2fd
+    style async_sentiment_attribute fill:#e3f2fd
+    style async_topic fill:#e3f2fd
+    style async_publisher fill:#e3f2fd
 ```
+
+> **说明**：四个异步分析节点顺序执行，每个节点内部使用 `AsyncParallelBatchNode` 实现批量并发处理。各节点的 `post_async` 方法直接将分析结果写入博文对象，无需单独的合并节点。
 
 ##### 1.2 Batch API并行处理路径 (enhancement_mode="batch_api")
 
@@ -479,25 +408,16 @@ flowchart TD
 flowchart TD
     subgraph BatchAPIEnhancementFlow[Batch API并行处理Flow]
         batch_start[开始] --> batch_load[DataLoadNode<br/>加载原始博文数据]
-        batch_load --> batch_validate[DataValidationNode<br/>验证数据格式]
-        batch_validate --> batch_prepare[BatchRequestPrepareNode<br/>准备批量请求]
-        
-        subgraph batch_submit[Batch API提交 - 四维度]
-            batch_sentiment_polarity[SubmitBatchJobNode<br/>情感极性批量任务]
-            batch_sentiment_attribute[SubmitBatchJobNode<br/>情感属性批量任务]
-            batch_topic[SubmitBatchJobNode<br/>主题分析批量任务]
-            batch_publisher[SubmitBatchJobNode<br/>发布者分析批量任务]
-        end
-        
-        batch_prepare --> batch_submit
-        batch_submit --> batch_poll[BatchJobPollNode<br/>轮询任务状态]
-        batch_poll --> batch_retrieve[BatchResultRetrieveNode<br/>获取批量结果]
-        batch_retrieve --> batch_merge[DataMergeNode<br/>合并增强结果]
-        batch_merge --> batch_quality[QualityCheckNode<br/>质量检查]
-        batch_quality --> batch_save[SaveEnhancedDataNode<br/>保存增强数据]
-        batch_save --> batch_end[结束]
+        batch_load --> batch_api_node[BatchAPIEnhancementNode<br/>调用batch_run.py<br/>执行完整Batch API流程]
+        batch_api_node --> batch_validate[DataValidationAndOverviewNode<br/>验证与统计]
+        batch_validate --> batch_complete[Stage1CompletionNode<br/>阶段完成]
+        batch_complete --> batch_end[结束]
     end
+    
+    style batch_api_node fill:#e1f5fe
 ```
+
+> **说明**：`BatchAPIEnhancementNode` 内部调用 `batch/batch_run.py` 脚本，该脚本依次执行：生成JSONL请求 → 上传并启动任务 → 下载结果 → 解析并整合数据。所有子流程封装在脚本内部，对Flow层透明。
 
 ---
 
@@ -744,22 +664,171 @@ shared = {
         "current_draft": "",
         "revision_feedback": "",
         "review_history": []
+    },
+    
+    # === 阶段1执行结果（由阶段1节点填充） ===
+    "stage1_results": {
+        # 数据统计信息（DataValidationAndOverviewNode填充）
+        "statistics": {
+            "total_blogs": 0,               # 总博文数
+            "processed_blogs": 0,           # 已处理博文数（含增强字段）
+            "empty_fields": {               # 增强字段空值统计
+                "sentiment_polarity_empty": 0,
+                "sentiment_attribute_empty": 0,
+                "topics_empty": 0,
+                "publisher_empty": 0
+            },
+            "engagement_statistics": {      # 参与度统计
+                "total_reposts": 0,
+                "total_comments": 0,
+                "total_likes": 0,
+                "avg_reposts": 0.0,
+                "avg_comments": 0.0,
+                "avg_likes": 0.0
+            },
+            "user_statistics": {            # 用户统计
+                "unique_users": 0,          # 独立用户数
+                "top_active_users": [],     # 活跃用户Top10
+                "user_type_distribution": {} # 发布者类型分布
+            },
+            "content_statistics": {         # 内容统计
+                "total_images": 0,
+                "blogs_with_images": 0,
+                "avg_content_length": 0.0,
+                "time_distribution": {}     # 按小时的发布时间分布
+            },
+            "geographic_distribution": {}   # 地理位置分布
+        },
+        # 数据保存状态（SaveEnhancedDataNode填充）
+        "data_save": {
+            "saved": False,
+            "output_path": "",
+            "data_count": 0
+        },
+        # Batch API处理状态（BatchAPIEnhancementNode填充）
+        "batch_api": {
+            "success": False,
+            "data_count": 0,
+            "error": ""
+        }
+    },
+    
+    # === 阶段2执行结果（由阶段2节点填充，存储到report/目录） ===
+    "stage2_results": {
+        # 生成的可视化图表列表
+        "charts": [
+            # {
+            #     "id": "sentiment_trend_001",        # 图表唯一标识
+            #     "type": "line_chart",               # 图表类型
+            #     "title": "情感趋势变化图",           # 图表标题
+            #     "file_path": "report/images/xxx.png", # 图表文件路径
+            #     "source_tool": "sentiment_time_series", # 生成该图表的工具函数
+            #     "description": "展示情感极性随时间的变化趋势" # 简要描述
+            # }
+        ],
+        # 生成的数据表格列表
+        "tables": [
+            # {
+            #     "id": "topic_frequency_001",        # 表格唯一标识
+            #     "title": "主题频次统计表",           # 表格标题
+            #     "data": {},                         # 表格数据（JSON格式）
+            #     "source_tool": "topic_frequency_stats", # 生成该表格的工具函数
+            #     "description": "统计各主题出现的频次和占比"
+            # }
+        ],
+        # LLM生成的深度洞察分析
+        "insights": {
+            "sentiment_insight": "",     # 情感趋势洞察
+            "topic_insight": "",         # 主题演化洞察
+            "geographic_insight": "",    # 地理分布洞察
+            "cross_dimension_insight": "", # 多维交互洞察
+            "summary_insight": ""        # 综合洞察摘要
+        },
+        # 分析执行记录
+        "execution_log": {
+            "tools_executed": [],        # 已执行的工具列表
+            "total_charts": 0,           # 生成的图表总数
+            "total_tables": 0,           # 生成的表格总数
+            "execution_time": 0.0        # 执行耗时（秒）
+        },
+        # 阶段2输出文件路径（供阶段3加载）
+        "output_files": {
+            "charts_dir": "report/images/",          # 图表存储目录
+            "analysis_data": "report/analysis_data.json",  # 分析数据文件
+            "insights_file": "report/insights.json"  # 洞察描述文件
+        }
+    },
+    
+    # === 阶段3执行结果（由阶段3节点填充） ===
+    "stage3_results": {
+        "report_file": "report/report.md",  # 最终报告文件路径
+        "generation_mode": "",              # 生成模式：template | iterative
+        "iterations": 0,                    # 迭代次数（iterative模式）
+        "final_score": 0                    # 最终评分（iterative模式）
     }
 }
 ```
 
 **阶段间数据传递**：
-- **阶段1输出** → 阶段2输入：增强博文数据保存到 `data/enhanced_posts.json`
-- **阶段2输出** → 阶段3输入：分析结果存储在 `report/` 目录
-  - 图表文件：`report/images/`
-  - 统计数据：`report/analysis_data.json`
-  - 洞察描述：`report/insights.json`
-- **阶段3输出**：最终报告 `report/report.md`
+
+| 阶段 | shared字典存储 | 文件持久化 | 说明 |
+|------|---------------|-----------|------|
+| 阶段1 | `shared["stage1_results"]` | `data/enhanced_posts.json` | 增强博文数据 + 统计信息 |
+| 阶段2 | `shared["stage2_results"]` | `report/` 目录 | 图表、表格、洞察分析 |
+| 阶段3 | `shared["stage3_results"]` | `report/report.md` | 最终分析报告 |
+
+**阶段2输出文件结构**：
+- `report/images/` - 可视化图表（PNG格式）
+- `report/analysis_data.json` - 分析数据和表格
+- `report/insights.json` - LLM生成的洞察描述
 
 **独立执行说明**：
 - 阶段2独立执行：需先检查 `data/enhanced_posts.json` 是否存在
 - 阶段3独立执行：需先检查 `report/analysis_data.json` 和 `report/images/` 是否存在
-- 阶段3仅从增强数据中读取少量博文样本用于典型案例引用
+- 阶段3从 `report/` 目录加载阶段2结果，仅从增强数据中读取少量博文样本用于典型案例引用
+
+### 博文数据格式规范
+
+#### 原始博文数据结构
+
+```json
+{
+  "username": "string",           // 用户名
+  "user_id": "string",            // 用户ID
+  "content": "string",            // 博文正文内容
+  "publish_time": "string",       // 发布时间，格式如 "2024-07-20 14:30:00"
+  "location": "string",           // 发布位置
+  "repost_count": 0,              // 转发数
+  "comment_count": 0,             // 评论数
+  "like_count": 0,                // 点赞数
+  "image_urls": ["string"]        // 图片URL列表，相对路径存储在 images/ 子文件夹
+}
+```
+
+#### 增强后博文数据结构
+
+```json
+{
+  "username": "string",
+  "user_id": "string",
+  "content": "string",
+  "publish_time": "string",
+  "location": "string",
+  "repost_count": 0,
+  "comment_count": 0,
+  "like_count": 0,
+  "image_urls": ["string"],
+  "sentiment_polarity": 3,        // int: 情感极性 1-5 (1=极度悲观, 3=中性, 5=极度乐观)
+  "sentiment_attribute": ["string"], // List[str]: 情感属性列表，如 ["支持", "担忧"]
+  "topics": [                     // List[Dict]: 主题列表
+    {
+      "parent_topic": "string",   // 父主题
+      "sub_topic": "string"       // 子主题
+    }
+  ],
+  "publisher": "string"           // str: 发布者类型，如 "个人用户"、"官方新闻媒体"
+}
+```
 
 ### Node Steps
 
@@ -782,46 +851,9 @@ shared = {
 4. 所有阶段完成后，返回 `"done"` 结束流程
 
 **实现步骤**：
-- *prep*：读取调度配置和当前状态
-  ```python
-  dispatcher = shared.get("dispatcher", {})
-  config = shared.get("config", {})
-  return {
-      "start_stage": dispatcher.get("start_stage", 1),
-      "run_stages": dispatcher.get("run_stages", [1, 2, 3]),
-      "current_stage": dispatcher.get("current_stage", 0),
-      "completed_stages": dispatcher.get("completed_stages", []),
-      "enhancement_mode": config.get("enhancement_mode", "async"),
-      "analysis_mode": config.get("analysis_mode", "workflow"),
-      "report_mode": config.get("report_mode", "template")
-  }
-  ```
-- *exec*：计算下一步动作
-  ```python
-  # 确定下一个需要执行的阶段
-  if current_stage == 0:
-      next_stage = start_stage
-  else:
-      # 找到下一个在run_stages中且未完成的阶段
-      next_stage = find_next_stage(run_stages, completed_stages, current_stage)
-  
-  if next_stage is None:
-      return {"action": "done"}
-  
-  # 根据阶段确定具体路径
-  if next_stage == 1:
-      return {"action": f"stage1_{enhancement_mode}"}  # stage1_async 或 stage1_batch_api
-  elif next_stage == 2:
-      return {"action": f"stage2_{analysis_mode}"}     # stage2_workflow 或 stage2_agent
-  elif next_stage == 3:
-      return {"action": f"stage3_{report_mode}"}       # stage3_template 或 stage3_iterative
-  ```
-- *post*：更新调度状态，返回Action
-  ```python
-  shared["dispatcher"]["current_stage"] = next_stage
-  shared["dispatcher"]["next_action"] = exec_res["action"]
-  return exec_res["action"]  # 返回动作字符串作为Flow转移的Action
-  ```
+- *prep*：读取调度配置（起始阶段、执行阶段列表、当前状态）和各阶段路径配置
+- *exec*：根据当前状态计算下一步动作，确定进入哪个阶段的哪条路径
+- *post*：更新调度状态，返回对应的 Action 字符串触发 Flow 转移
 
 **返回的Action类型**：
 | Action | 说明 | 目标 |
@@ -853,31 +885,7 @@ shared = {
   - *exec*：加载JSON格式博文数据，验证数据格式完整性
   - *post*：将数据存储到 `shared["data"]["blog_data"]` 中
 
-**2. DataValidationNode (数据验证节点)**
-- **功能**：验证数据格式和完整性
-- **类型**：Regular Node
-- **实现步骤**：
-  - *prep*：读取博文数据
-  - *exec*：检查必需字段、数据类型、格式规范
-  - *post*：记录验证结果，返回下一步Action
-
-**3. DataMergeNode (数据合并节点)**
-- **功能**：合并四个维度的增强结果
-- **类型**：Regular Node
-- **实现步骤**：
-  - *prep*：读取四个维度的分析结果
-  - *exec*：将结果合并到原始博文对象中
-  - *post*：更新 `shared["data"]["blog_data"]`
-
-**4. QualityCheckNode (质量检查节点)**
-- **功能**：检查增强数据质量
-- **类型**：Regular Node
-- **实现步骤**：
-  - *prep*：读取增强后的博文数据
-  - *exec*：统计各字段填充率、验证候选列表匹配度
-  - *post*：记录质量报告到 `shared["results"]["statistics"]`
-
-**5. SaveEnhancedDataNode (保存增强数据节点)**
+**2. SaveEnhancedDataNode (保存增强数据节点)**
 - **功能**：将增强数据持久化到文件
 - **类型**：Regular Node
 - **实现步骤**：
@@ -885,9 +893,27 @@ shared = {
   - *exec*：写入JSON文件
   - *post*：记录保存状态
 
+**3. DataValidationAndOverviewNode (数据验证与概况分析节点)**
+- **功能**：验证增强数据的完整性并生成数据统计概况
+- **类型**：Regular Node
+- **设计目的**：合并数据验证和质量检查功能，统计各字段填充率、参与度、用户分布、地理分布等
+- **实现步骤**：
+  - *prep*：读取增强后的博文数据
+  - *exec*：验证必需字段、统计空字段数量、生成数据概况
+  - *post*：将统计信息存储到 `shared["results"]["statistics"]`
+
+**4. Stage1CompletionNode (阶段1完成节点)**
+- **功能**：标记阶段1完成，返回调度器
+- **类型**：Regular Node
+- **设计目的**：更新 `shared["dispatcher"]["completed_stages"]`，返回 `"dispatch"` Action 跳转回 DispatcherNode
+- **实现步骤**：
+  - *prep*：读取当前阶段状态
+  - *exec*：确认阶段完成
+  - *post*：更新已完成阶段列表，返回 `"dispatch"`
+
 ### 异步批量并行路径节点 (enhancement_mode="async")
 
-**6. AsyncSentimentPolarityBatchNode (异步情感极性分析节点)**
+**5. AsyncSentimentPolarityAnalysisBatchNode (异步情感极性分析节点)**
 - **功能**：异步批量分析博文情感极性
 - **类型**：AsyncParallelBatchNode
 - **并发控制**：通过 `max_concurrent` 参数限制并发数
@@ -896,7 +922,7 @@ shared = {
   - *exec_async*：对单条博文调用多模态LLM进行情感极性分析（1-5档）
   - *post_async*：将结果附加到博文对象的 `sentiment_polarity` 字段
 
-**7. AsyncSentimentAttributeBatchNode (异步情感属性分析节点)**
+**6. AsyncSentimentAttributeAnalysisBatchNode (异步情感属性分析节点)**
 - **功能**：异步批量分析博文情感属性
 - **类型**：AsyncParallelBatchNode
 - **实现步骤**：
@@ -904,7 +930,7 @@ shared = {
   - *exec_async*：对单条博文调用LLM进行情感属性分析
   - *post_async*：将结果附加到 `sentiment_attribute` 字段
 
-**8. AsyncTopicAnalysisBatchNode (异步主题分析节点)**
+**7. AsyncTwoLevelTopicAnalysisBatchNode (异步两级主题分析节点)**
 - **功能**：异步批量分析博文主题
 - **类型**：AsyncParallelBatchNode
 - **实现步骤**：
@@ -912,7 +938,7 @@ shared = {
   - *exec_async*：对单条博文调用多模态LLM进行两级主题匹配
   - *post_async*：将结果附加到 `topics` 字段
 
-**9. AsyncPublisherAnalysisBatchNode (异步发布者分析节点)**
+**8. AsyncPublisherObjectAnalysisBatchNode (异步发布者对象分析节点)**
 - **功能**：异步批量识别发布者类型
 - **类型**：AsyncParallelBatchNode
 - **实现步骤**：
@@ -922,37 +948,19 @@ shared = {
 
 ### Batch API并行路径节点 (enhancement_mode="batch_api")
 
-**10. BatchRequestPrepareNode (批量请求准备节点)**
-- **功能**：将博文数据转换为Batch API请求格式
+**9. BatchAPIEnhancementNode (Batch API增强处理节点)**
+- **功能**：调用 `batch/` 目录下的脚本进行批量处理
 - **类型**：Regular Node
+- **处理流程**：调用 `batch/batch_run.py` 脚本执行完整的 Batch API 流程
+- **Batch API 子流程**（由脚本内部处理）：
+  - `generate_jsonl.py`: 生成批量请求文件
+  - `upload_and_start.py`: 上传并启动任务
+  - `download_results.py`: 下载结果
+  - `parse_and_integrate.py`: 解析并整合结果
 - **实现步骤**：
-  - *prep*：读取博文数据和参考数据（主题列表、情感属性等）
-  - *exec*：为四个维度分别构建批量请求JSONL文件
-  - *post*：保存请求文件路径到 `shared["batch_api"]["request_files"]`
-
-**11. SubmitBatchJobNode (提交批量任务节点)**
-- **功能**：向API服务端提交批量任务
-- **类型**：Regular Node
-- **实现步骤**：
-  - *prep*：读取请求文件路径
-  - *exec*：调用Batch API接口提交任务，获取任务ID
-  - *post*：保存任务ID到 `shared["batch_api"]["job_ids"]`
-
-**12. BatchJobPollNode (任务状态轮询节点)**
-- **功能**：轮询批量任务执行状态
-- **类型**：Regular Node (with retry)
-- **实现步骤**：
-  - *prep*：读取任务ID列表
-  - *exec*：查询各任务状态，等待全部完成
-  - *post*：根据状态返回Action（"completed"/"polling"/"failed"）
-
-**13. BatchResultRetrieveNode (批量结果获取节点)**
-- **功能**：获取批量任务的执行结果
-- **类型**：Regular Node
-- **实现步骤**：
-  - *prep*：读取已完成的任务ID
-  - *exec*：下载并解析结果文件
-  - *post*：将结果存入 `shared["batch_api"]["results"]`
+  - *prep*：读取配置参数（脚本路径、输入输出路径等）
+  - *exec*：执行 `batch_run.py` 脚本，等待处理完成
+  - *post*：加载处理后的增强数据到 `shared["data"]["blog_data"]`，更新 `shared["results"]["batch_api"]`
 
 ---
 
@@ -960,7 +968,7 @@ shared = {
 
 ### 通用节点
 
-**14. LoadEnhancedDataNode (加载增强数据节点)**
+**10. LoadEnhancedDataNode (加载增强数据节点)**
 - **功能**：加载已完成增强处理的博文数据
 - **类型**：Regular Node
 - **前置检查**：验证阶段1输出文件是否存在（`data/enhanced_posts.json`）
@@ -969,7 +977,7 @@ shared = {
   - *exec*：加载JSON数据，验证增强字段完整性
   - *post*：存储到 `shared["data"]["blog_data"]`
 
-**15. DataSummaryNode (数据概况生成节点)**
+**11. DataSummaryNode (数据概况生成节点)**
 - **功能**：生成增强数据的统计概况
 - **类型**：Regular Node
 - **实现步骤**：
@@ -977,7 +985,7 @@ shared = {
   - *exec*：计算各维度分布、时间跨度、总量等统计信息
   - *post*：存储到 `shared["results"]["agent_state"]["data_summary"]`
 
-**16. SaveAnalysisResultsNode (保存分析结果节点)**
+**12. SaveAnalysisResultsNode (保存分析结果节点)**
 - **功能**：将分析结果持久化，供阶段3使用
 - **类型**：Regular Node
 - **输出位置**：
@@ -993,7 +1001,7 @@ shared = {
 
 > 执行固定的分析脚本生成全部图形，然后通过LLM补充洞察信息
 
-**17. ExecuteAnalysisScriptNode (执行分析脚本节点)**
+**13. ExecuteAnalysisScriptNode (执行分析脚本节点)**
 - **功能**：执行固定的分析脚本，生成全部所需图形
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1005,39 +1013,20 @@ shared = {
     - 多维交互分析工具集
   - *post*：存储图形到 `report/images/`，记录生成的图表列表
 
-**18. LLMInsightNode (LLM洞察补充节点)**
+**14. LLMInsightNode (LLM洞察补充节点)**
 - **功能**：调用LLM为生成的图形补充洞察信息，填充shared字典
 - **类型**：Regular Node (LLM Call)
+- **设计目的**：基于统计数据和图表，利用LLM生成各维度（情感趋势、主题演化、地理分布、多维交互）的洞察描述
 - **实现步骤**：
   - *prep*：读取生成的图表列表和统计数据
-  - *exec*：构建Prompt调用LLM，生成各维度的洞察描述
+  - *exec*：构建Prompt调用LLM，生成各维度的洞察描述（输出JSON格式）
   - *post*：填充 `shared["results"]["insights"]`
-
-**LLMInsightNode Prompt结构**：
-```
-你是一位资深舆情分析专家。根据以下分析数据，为每个维度生成洞察描述。
-
-## 统计数据
-{statistics_data}
-
-## 生成的图表
-{charts_list}
-
-## 要求
-为以下维度生成洞察：
-1. 情感趋势洞察
-2. 主题演化洞察
-3. 地理分布洞察
-4. 多维交互洞察
-
-输出JSON格式：{"sentiment": "...", "topic": "...", "geographic": "...", "cross_dimension": "..."}
-```
 
 ### Agent自主调度路径节点 (analysis_mode="agent")
 
 > Single Agent通过循环自主决策，直到分析充分或达到最大迭代次数
 
-**19. CollectToolsNode (工具收集节点)**
+**15. CollectToolsNode (工具收集节点)**
 - **功能**：收集所有可用的分析工具列表
 - **类型**：Regular Node
 - **控制参数**：`shared["config"]["tool_source"]`
@@ -1048,10 +1037,11 @@ shared = {
     - 若 `tool_source="local"`：返回本地注册的固定工具列表
   - *post*：将工具定义存储到 `shared["agent"]["available_tools"]`
 
-**20. DecisionToolsNode (工具决策节点)**
+**16. DecisionToolsNode (工具决策节点)**
 - **功能**：LLM决定下一步执行哪个分析工具，或判断分析已充分
 - **类型**：Regular Node (LLM Call)
 - **循环入口**：Agent Loop的决策起点
+- **设计目的**：基于数据概况、可用工具列表和执行历史，让LLM自主决策下一步动作（执行工具或结束分析）
 - **实现步骤**：
   - *prep*：读取数据概况、可用工具、执行历史、当前迭代次数
   - *exec*：构建Prompt调用LLM，获取决策结果
@@ -1059,25 +1049,7 @@ shared = {
     - `"execute"`: 执行选定的工具
     - `"finish"`: 分析已充分，结束循环
 
-**DecisionToolsNode Prompt结构**：
-```
-你是一位资深舆情分析专家。根据当前数据概况和已执行的分析，决定下一步行动。
-
-## 当前数据概况
-{data_summary}
-
-## 可用工具
-{tool_definitions}
-
-## 已执行的分析（迭代 {current_iteration}/{max_iterations}）
-{execution_history}
-
-## 决策要求
-- 如需调用工具，输出：{"action": "execute", "tool_name": "...", "tool_params": {...}, "reason": "..."}
-- 如分析已充分，输出：{"action": "finish", "reason": "..."}
-```
-
-**21. ExecuteToolsNode (工具执行节点)**
+**17. ExecuteToolsNode (工具执行节点)**
 - **功能**：执行决策节点选定的分析工具
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1087,7 +1059,7 @@ shared = {
     - 存储结果到 `shared["results"]["analysis_outputs"]`
     - 注册图表到 `shared["results"]["generated_charts"]`
 
-**22. ProcessResultNode (结果处理节点)**
+**18. ProcessResultNode (结果处理节点)**
 - **功能**：简单分析工具执行结果，更新执行历史，判断是否继续循环
 - **类型**：Regular Node
 - **循环控制**：根据分析结果和迭代次数决定是否返回决策节点
@@ -1106,7 +1078,7 @@ shared = {
 
 ### 通用节点
 
-**25. LoadAnalysisResultsNode (加载分析结果节点)**
+**19. LoadAnalysisResultsNode (加载分析结果节点)**
 - **功能**：加载阶段2产生的分析结果
 - **类型**：Regular Node
 - **前置检查**：验证阶段2输出文件是否存在（`report/analysis_data.json`、`report/images/`）
@@ -1118,7 +1090,7 @@ shared = {
   - *exec*：加载JSON数据和图表信息，抽取少量博文样本
   - *post*：存储到 `shared["results"]`
 
-**26. FormatReportNode (报告格式化节点)**
+**20. FormatReportNode (报告格式化节点)**
 - **功能**：格式化最终Markdown报告
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1126,7 +1098,7 @@ shared = {
   - *exec*：处理图片路径、修复格式问题、添加目录
   - *post*：更新 `shared["results"]["final_report_text"]`
 
-**27. SaveReportNode (保存报告节点)**
+**21. SaveReportNode (保存报告节点)**
 - **功能**：保存最终报告到文件
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1136,34 +1108,16 @@ shared = {
 
 ### 模板填充路径节点 (report_mode="template")
 
-**28. LoadTemplateNode (加载模板节点)**
+**22. LoadTemplateNode (加载模板节点)**
 - **功能**：加载预定义的报告模板
 - **类型**：Regular Node
-- **模板结构**：
-```markdown
-# 舆情深度分析报告
-
-## 一、综述
-{executive_summary}
-
-## 二、情感态势分析
-{sentiment_analysis}
-
-## 三、话题演变深度解析
-{topic_analysis}
-
-## 四、传播路径与人群画像
-{spread_analysis}
-
-## 五、研判与建议
-{recommendations}
-```
+- **设计目的**：加载包含章节占位符的Markdown模板（综述、情感分析、话题分析、传播分析、建议五大章节）
 - **实现步骤**：
   - *prep*：读取模板文件路径
   - *exec*：加载模板内容
   - *post*：存储到 `shared["report"]["template"]`
 
-**29. FillSectionNode (章节填充节点)**
+**23. FillSectionNode (章节填充节点)**
 - **功能**：使用LLM填充单个章节内容
 - **类型**：Regular Node (LLM Call)
 - **实现步骤**：
@@ -1171,7 +1125,7 @@ shared = {
   - *exec*：构建章节填充Prompt，调用LLM生成内容
   - *post*：存储章节内容到 `shared["report"]["sections"][section_name]`
 
-**30. AssembleReportNode (报告组装节点)**
+**24. AssembleReportNode (报告组装节点)**
 - **功能**：将各章节组装成完整报告
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1181,7 +1135,7 @@ shared = {
 
 ### 多轮迭代路径节点 (report_mode="iterative")
 
-**31. InitReportStateNode (初始化报告状态节点)**
+**25. InitReportStateNode (初始化报告状态节点)**
 - **功能**：初始化迭代报告生成的状态
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1189,40 +1143,19 @@ shared = {
   - *exec*：初始化迭代计数器、历史记录
   - *post*：设置 `shared["report"]["iteration"]` = 0, `shared["report"]["max_iterations"]`
 
-**32. GenerateReportNode (报告生成节点)**
+**26. GenerateReportNode (报告生成节点)**
 - **功能**：LLM生成或修改报告
 - **类型**：Regular Node (LLM Call)
+- **设计目的**：基于分析数据和可用图表，生成结构化的Markdown报告；支持根据修改意见迭代优化
 - **实现步骤**：
   - *prep*：读取分析结果、当前报告草稿、修改意见
   - *exec*：构建Prompt调用LLM生成/修改报告
   - *post*：存储报告草稿到 `shared["report"]["current_draft"]`
 
-**GenerateReportNode Prompt结构**：
-```
-你是资深舆情分析专家，请撰写/修改舆情分析报告。
-
-## 分析数据
-{analysis_results_summary}
-
-## 可用图表
-{charts_list}
-
-## 当前草稿（如有）
-{current_draft}
-
-## 修改意见（如有）
-{revision_feedback}
-
-## 要求
-- 格式：Markdown
-- 结构：综述、情感分析、话题分析、传播分析、建议
-- 必须引用可用图表（使用Markdown图片语法）
-- 基于数据进行深度解读
-```
-
-**33. ReviewReportNode (报告评审节点)**
+**27. ReviewReportNode (报告评审节点)**
 - **功能**：LLM评审报告质量并提出修改意见
 - **类型**：Regular Node (LLM Call)
+- **设计目的**：按评审标准（结构完整性、数据支撑、图表引用、逻辑连贯、建议可行性）评估报告质量，给出评分和修改意见
 - **实现步骤**：
   - *prep*：读取当前报告草稿
   - *exec*：构建评审Prompt，调用LLM评审
@@ -1230,29 +1163,7 @@ shared = {
     - `"satisfied"`: 报告质量合格
     - `"needs_revision"`: 需要修改
 
-**ReviewReportNode Prompt结构**：
-```
-你是资深舆情报告评审专家，请评审以下报告。
-
-## 报告内容
-{current_draft}
-
-## 评审标准
-1. 结构完整性：是否包含所有必需章节
-2. 数据支撑：结论是否有数据依据
-3. 图表引用：是否正确引用了分析图表
-4. 逻辑连贯：各章节是否逻辑通顺
-5. 建议可行性：应对建议是否具体可行
-
-## 输出格式
-{
-    "verdict": "satisfied" 或 "needs_revision",
-    "score": 0-100,
-    "feedback": "具体修改意见（如需修改）"
-}
-```
-
-**34. ApplyFeedbackNode (应用修改意见节点)**
+**28. ApplyFeedbackNode (应用修改意见节点)**
 - **功能**：处理评审意见，准备下一轮迭代
 - **类型**：Regular Node
 - **实现步骤**：

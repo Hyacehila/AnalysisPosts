@@ -12,8 +12,7 @@
     "sentiment_polarity": 2,
     "sentiment_attribute": [
       "焦虑",
-      "紧张",
-      "无奈"
+      "紧张"
     ],
     "topics": [
       {
@@ -44,13 +43,16 @@
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "感激",
-      "高兴",
-      "满意"
+      "高兴"
     ],
     "topics": [
       {
         "parent_topic": "交通运输",
-        "sub_topic": "出行安全"
+        "sub_topic": "运输保障"
+      },
+      {
+        "parent_topic": "民众反应",
+        "sub_topic": "民众情绪"
       }
     ],
     "publisher": "个人用户"
@@ -70,10 +72,14 @@
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "兴奋",
-      "高兴",
-      "自豪"
+      "激动"
     ],
-    "topics": [],
+    "topics": [
+      {
+        "parent_topic": "社会民生",
+        "sub_topic": "居民生活"
+      }
+    ],
     "publisher": "学生"
   },
   {
@@ -88,16 +94,20 @@
     "image_urls": [
       "media/5227847701_OuFdsEwJa/img_1.jpg"
     ],
-    "sentiment_polarity": 5,
+    "sentiment_polarity": 4,
     "sentiment_attribute": [
       "高兴",
-      "兴奋",
-      "欣慰"
+      "激动",
+      "满意"
     ],
     "topics": [
       {
         "parent_topic": "社会民生",
         "sub_topic": "居民生活"
+      },
+      {
+        "parent_topic": "媒体传播",
+        "sub_topic": "社交媒体"
       }
     ],
     "publisher": "个人用户"
@@ -117,13 +127,12 @@
     "sentiment_polarity": 2,
     "sentiment_attribute": [
       "担忧",
-      "不满",
-      "希望"
+      "焦虑"
     ],
     "topics": [
       {
         "parent_topic": "交通运输",
-        "sub_topic": "交通事故"
+        "sub_topic": "出行安全"
       },
       {
         "parent_topic": "社会民生",
@@ -144,9 +153,9 @@
     "image_urls": [],
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "期待",
-      "高兴",
-      "无奈"
+      "兴奋",
+      "困惑",
+      "高兴"
     ],
     "topics": [
       {
@@ -168,21 +177,21 @@
     "image_urls": [],
     "sentiment_polarity": 5,
     "sentiment_attribute": [
-      "兴奋",
       "高兴",
+      "兴奋",
       "期待"
     ],
     "topics": [
       {
-        "parent_topic": "媒体传播",
-        "sub_topic": "社交媒体"
+        "parent_topic": "社会民生",
+        "sub_topic": "居民生活"
       },
       {
         "parent_topic": "经济影响",
         "sub_topic": "餐饮业"
       }
     ],
-    "publisher": "自媒体"
+    "publisher": "美食博主"
   },
   {
     "username": "元气满满在逃公主椰",
@@ -206,11 +215,15 @@
     ],
     "topics": [
       {
+        "parent_topic": "交通运输",
+        "sub_topic": "出行安全"
+      },
+      {
         "parent_topic": "社会民生",
         "sub_topic": "居民生活"
       }
     ],
-    "publisher": "个人用户"
+    "publisher": "自媒体"
   },
   {
     "username": "EVA-hangzhou",
@@ -225,19 +238,20 @@
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "支持",
-      "赞赏"
+      "赞赏",
+      "感动"
     ],
     "topics": [
       {
-        "parent_topic": "公共事业",
-        "sub_topic": "环卫服务"
+        "parent_topic": "社会民生",
+        "sub_topic": "环境卫生"
       },
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
+        "parent_topic": "民众反应",
+        "sub_topic": "志愿服务"
       }
     ],
-    "publisher": "个人用户"
+    "publisher": "视频博主"
   },
   {
     "username": "偶像音乐潮流地",
@@ -252,6 +266,7 @@
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "赞赏",
+      "感动",
       "高兴"
     ],
     "topics": [
@@ -283,12 +298,12 @@
     ],
     "topics": [
       {
-        "parent_topic": "公共事业",
-        "sub_topic": "环卫服务"
-      },
-      {
         "parent_topic": "社会民生",
         "sub_topic": "环境卫生"
+      },
+      {
+        "parent_topic": "媒体传播",
+        "sub_topic": "社交媒体"
       }
     ],
     "publisher": "自媒体"
@@ -310,17 +325,17 @@
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "无奈",
-      "感动",
-      "支持"
+      "支持",
+      "欣慰"
     ],
     "topics": [
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
+        "parent_topic": "交通运输",
+        "sub_topic": "出行安全"
       },
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众情绪"
+        "parent_topic": "地理区域",
+        "sub_topic": "东城区"
       }
     ],
     "publisher": "个人用户"
@@ -341,15 +356,11 @@
     ],
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "尴尬",
-      "满意",
+      "欣慰",
+      "高兴",
       "无奈"
     ],
     "topics": [
-      {
-        "parent_topic": "交通运输",
-        "sub_topic": "出行安全"
-      },
       {
         "parent_topic": "社会民生",
         "sub_topic": "居民生活"
@@ -373,8 +384,8 @@
     ],
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "满意",
       "高兴",
+      "满意",
       "鼓励"
     ],
     "topics": [
@@ -383,11 +394,11 @@
         "sub_topic": "居民生活"
       },
       {
-        "parent_topic": "媒体传播",
-        "sub_topic": "社交媒体"
+        "parent_topic": "民众反应",
+        "sub_topic": "公众参与"
       }
     ],
-    "publisher": "个人用户"
+    "publisher": "旅游博主"
   },
   {
     "username": "乡村刘三好",
@@ -401,7 +412,7 @@
     "image_urls": [
       "media/1831575321_OtA0OiftS/img_1.jpg"
     ],
-    "sentiment_polarity": 5,
+    "sentiment_polarity": 4,
     "sentiment_attribute": [
       "高兴"
     ],
@@ -430,12 +441,12 @@
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "高兴",
-      "满意"
+      "平静"
     ],
     "topics": [
       {
-        "parent_topic": "交通运输",
-        "sub_topic": "出行安全"
+        "parent_topic": "社会民生",
+        "sub_topic": "居民生活"
       }
     ],
     "publisher": "个人用户"
@@ -457,10 +468,6 @@
       "高兴"
     ],
     "topics": [
-      {
-        "parent_topic": "交通运输",
-        "sub_topic": "运输保障"
-      },
       {
         "parent_topic": "社会民生",
         "sub_topic": "居民生活"
