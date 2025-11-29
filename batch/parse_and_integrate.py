@@ -208,11 +208,11 @@ def main():
         print(f"成功处理的分析结果: {total_processed}/{total_possible}")
         
         if overall_success_rate >= 90:
-            print("✓ 数据整合质量良好")
+            print("[OK] 数据整合质量良好")
         elif overall_success_rate >= 70:
-            print("⚠ 数据整合质量一般，建议检查缺失数据")
+            print("[警告] 数据整合质量一般，建议检查缺失数据")
         else:
-            print("✗ 数据整合质量较差，建议重新处理")
+            print("[ERROR] 数据整合质量较差，建议重新处理")
         
     except Exception as e:
         print(f"整合过程中发生错误: {e}")

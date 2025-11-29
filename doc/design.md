@@ -17,6 +17,29 @@
 - **多路径执行**：每阶段支持多种执行方式（异步/Batch API、Agent/Workflow、模板/迭代）
 - **大规模处理**：支持3万条博文数据的批量处理
 - **多模态支持**：文本与图像内容的综合分析
+- **全流程监测**：实时输出系统运行状态，提供详细的执行日志和进度提示
+- **思考过程记录**：记录LLM在工具调用决策和报告编排中的思考过程，支持终端实时提示和持久化存储
+- **数据引用验证**：确保最终报告中的所有结论都有数据支撑，避免模型幻觉，生成详细的编排原因说明
+
+### 监测与透明化设计
+
+#### 1. 全流程终端监测
+- **阶段转换提示**：进入/离开各个Stage时在终端输出清晰提示信息
+- **重要节点提示**：进入关键Flow、重要节点工作完成后输出执行状态
+- **实时进度反馈**：批量处理、Agent循环、迭代生成等过程中的进度提示
+- **错误处理提示**：异常发生时的详细错误信息和恢复建议
+
+#### 2. 思考过程透明化
+- **终端简短提示**：每次LLM思考决策后在终端输出关键信息摘要
+- **详细记录存储**：完整的思考过程保存到共享存储和文件系统
+- **时间戳追踪**：记录思考过程的时间线，便于性能分析和调试
+- **决策逻辑追溯**：记录工具选择、参数设置、决策依据等关键信息
+
+#### 3. 结论可靠性保障
+- **数据引用映射**：自动追踪报告中每个结论的数据来源
+- **编排原因说明**：详细记录报告结构组织、内容选择的逻辑依据
+- **幻觉检测机制**：通过数据引用验证识别潜在的模型幻觉
+- **质量评估报告**：生成报告质量评分和改进建议
 
 ---
 
@@ -152,8 +175,7 @@
 #### Agent工具调度方式
 | 方式 | 控制参数 | 说明 |
 |------|----------|------|
-| MCP动态查询 | `tool_source="mcp"` | 通过Model Context Protocol动态获取工具列表 |
-| 本地Function Calling | `tool_source="local"` | 返回本地注册的固定工具列表 |
+| MCP动态查询 | `tool_source="mcp"` | 通过Model Context Protocol动态获取工具列表 (唯一实现方式) |
 
 #### 质量保证
 - **结果验证**：所有分析结果必须通过预定义候选列表验证
@@ -161,6 +183,21 @@
 - **数据完整性**：确保增强数据的格式完整性和一致性
 - **迭代控制**：多轮迭代报告生成设置最大迭代次数保障
 - **前置验证**：阶段独立执行前验证前序输出文件存在且格式正确
+- **全流程监测**：系统运行过程中实时输出执行状态和进度信息
+  - 阶段进入/离开提示：`📍 [阶段名称] 开始/完成`
+  - 重要节点提示：`🔄 [节点名称] 执行中/已完成`
+  - 进度反馈：批量处理、Agent循环、迭代生成的实时进度
+  - 错误提示：异常发生时的详细信息和建议
+- **思考过程透明化**：记录并显示LLM在关键决策点的思考过程
+  - 终端简短提示：每次思考决策后的关键信息摘要
+  - 详细记录存储：完整思考过程保存到共享存储和文件
+  - 时间戳追踪：思考过程的时间线记录
+  - 决策逻辑追溯：工具选择、参数设置、决策依据记录
+- **数据引用完整性**：最终报告必须确保所有结论都有对应的数据支撑
+  - 数据引用映射：自动追踪结论的数据来源
+  - 编排原因说明：报告结构和内容选择的逻辑依据
+  - 幻觉检测机制：识别和标记潜在的模型幻觉
+  - 质量评估报告：生成报告质量评分和改进建议
 
 ## 架构设计
 
@@ -279,7 +316,7 @@ flowchart TB
 **路径控制参数**：
 - `shared["config"]["enhancement_mode"]`：`"async"` 或 `"batch_api"`
 - `shared["config"]["analysis_mode"]`：`"workflow"` 或 `"agent"`
-- `shared["config"]["tool_source"]`：`"local"` 或 `"mcp"`（Agent模式下）
+- `shared["config"]["tool_source"]`：`"mcp"`（Agent模式下的唯一工具来源）
 - `shared["config"]["report_mode"]`：`"template"` 或 `"iterative"`
 
 #### 4. 模块化设计
@@ -437,13 +474,15 @@ flowchart TD
         wf_start[开始] --> wf_load[LoadEnhancedDataNode<br/>加载增强数据]
         wf_load --> wf_script[ExecuteAnalysisScriptNode<br/>执行固定分析脚本<br/>生成全部图形]
         
-        wf_script --> wf_llm[LLMInsightNode<br/>LLM补充洞察信息<br/>填充shared字典]
-        
+        wf_script --> wf_chart[ChartAnalysisNode<br/>图表分析<br/>GLM4.5V详细分析]
+        wf_chart --> wf_llm[LLMInsightNode<br/>LLM补充洞察信息<br/>填充shared字典]
+
         wf_llm --> wf_save[SaveAnalysisResultsNode<br/>保存分析结果]
         wf_save --> wf_end[结束]
     end
-    
+
     style wf_script fill:#e1f5fe
+    style wf_chart fill:#e8f5e9
     style wf_llm fill:#e8f5e9
 ```
 
@@ -459,11 +498,12 @@ flowchart TD
         
         agent_summary --> collect_tools[CollectToolsNode<br/>工具收集节点<br/>获取可用工具列表]
         
-        collect_tools --> decision_node[DecisionToolsNode<br/>工具决策节点<br/>LLM决定执行哪个工具]
+        collect_tools --> decision_node[DecisionToolsNode<br/>工具决策节点<br/>GLM4.6智能体推理]
         
         decision_node --> execute_node[ExecuteToolsNode<br/>工具执行节点<br/>执行选定的分析工具]
-        
-        execute_node --> process_result[ProcessResultNode<br/>结果处理节点<br/>简单分析执行结果]
+
+        execute_node --> agent_chart[ChartAnalysisNode<br/>图表分析节点<br/>GLM4.5V详细分析]
+        agent_chart --> process_result[ProcessResultNode<br/>结果处理节点<br/>分析工具和图表结果]
         
         process_result --> check_finish{分析充分?<br/>或达到最大迭代?}
         
@@ -472,10 +512,11 @@ flowchart TD
         
         agent_save --> agent_end[结束]
     end
-    
+
     style collect_tools fill:#fff3e0
     style decision_node fill:#e3f2fd
     style execute_node fill:#e8f5e9
+    style agent_chart fill:#e8f5e9
     style process_result fill:#fce4ec
 ```
 
@@ -490,7 +531,7 @@ flowchart TD
     subgraph TemplateReportFlow[模板填充报告生成Flow]
         tmpl_start[开始] --> tmpl_load[LoadAnalysisResultsNode<br/>加载分析结果]
         tmpl_load --> tmpl_template[LoadTemplateNode<br/>加载报告模板]
-        
+
         subgraph tmpl_fill[章节填充 - LLM自主填充]
             tmpl_executive[FillSectionNode<br/>综述章节]
             tmpl_sentiment[FillSectionNode<br/>情感态势分析]
@@ -498,12 +539,14 @@ flowchart TD
             tmpl_spread[FillSectionNode<br/>传播路径分析]
             tmpl_recommend[FillSectionNode<br/>研判与建议]
         end
-        
+
         tmpl_template --> tmpl_fill
         tmpl_fill --> tmpl_assemble[AssembleReportNode<br/>组装完整报告]
         tmpl_assemble --> tmpl_format[FormatReportNode<br/>格式化Markdown]
         tmpl_format --> tmpl_save[SaveReportNode<br/>保存报告文件]
-        tmpl_save --> tmpl_end[结束]
+        tmpl_save --> tmpl_reasoning[ReportReasoningNode<br/>编排原因说明]
+        tmpl_reasoning --> tmpl_citation[DataCitationNode<br/>数据引用验证]
+        tmpl_citation --> tmpl_end[结束]
     end
 ```
 
@@ -514,25 +557,29 @@ flowchart TD
     subgraph IterativeReportFlow[多轮迭代报告生成Flow]
         iter_start[开始] --> iter_load[LoadAnalysisResultsNode<br/>加载分析结果]
         iter_load --> iter_init[InitReportStateNode<br/>初始化报告状态]
-        
+
         iter_init --> generate_report[GenerateReportNode<br/>LLM生成/修改报告]
         generate_report --> review_report[ReviewReportNode<br/>LLM评审报告]
-        
+
         review_report --> review_result{评审结果?}
         review_result -->|satisfied| iter_format[FormatReportNode<br/>格式化Markdown]
         review_result -->|needs_revision| check_iteration{迭代次数?}
-        
+
         check_iteration -->|未达上限| apply_feedback[ApplyFeedbackNode<br/>应用修改意见]
         check_iteration -->|达到上限| iter_format
-        
+
         apply_feedback --> generate_report
-        
+
         iter_format --> iter_save[SaveReportNode<br/>保存报告文件]
-        iter_save --> iter_end[结束]
+        iter_save --> iter_reasoning[ReportReasoningNode<br/>编排原因说明]
+        iter_reasoning --> iter_citation[DataCitationNode<br/>数据引用验证]
+        iter_citation --> iter_end[结束]
     end
-    
+
     style generate_report fill:#e3f2fd
     style review_report fill:#fce4ec
+    style iter_reasoning fill:#e8f5e9
+    style iter_citation fill:#fff3e0
 ```
 
 ---
@@ -587,7 +634,7 @@ flowchart TD
 1. **输入统一**：所有工具函数接收增强后的博文数据列表作为主要输入
 2. **输出标准化**：返回包含 `data`、`summary`、`charts`（可选）的标准字典结构
 3. **可视化自动存储**：可视化函数自动生成图表并存储到 `report/images/` 目录
-4. **支持Agent调用**：工具函数通过统一注册表暴露，支持MCP和本地Function Calling两种调用方式
+4. **支持Agent调用**：工具函数通过MCP服务器暴露，支持动态工具发现和调用
 
 ## Utility Functions
 
@@ -597,9 +644,12 @@ flowchart TD
 
 | 分类 | 文件位置 | 功能说明 |
 |------|----------|----------|
-| LLM调用 | `utils/call_llm.py` | 封装多种模型调用（纯文本、多模态、推理模式） |
+| LLM调用 | `utils/call_llm.py` | 封装多种模型调用（GLM4.5V+思考模式用于图文综合分析、纯文本分析等） |
 | 数据加载 | `utils/data_loader.py` | 博文数据、参考数据的加载与保存 |
-| 分析工具 | `utils/analysis_tools/` | 四类分析工具集的具体实现 |
+| 分析工具 | `utils/analysis_tools/` | 四类分析工具集的具体实现（通过MCP服务器暴露） |
+| MCP客户端 | `utils/mcp_client.py` | MCP协议客户端，用于工具发现和调用 |
+| 系统监测 | `utils/monitor.py` | 系统运行状态监测和日志输出 |
+| 思考记录 | `utils/thinking_logger.py` | LLM思考过程记录和终端提示 |
 
 ## Node Design
 
@@ -633,7 +683,7 @@ shared = {
         
         # 阶段2: 分析执行方式（对应需求：分析工具集）
         "analysis_mode": "workflow",   # "workflow" | "agent"
-        "tool_source": "local",        # "local" | "mcp" (Agent模式下的工具来源)
+        "tool_source": "mcp",          # "mcp" (Agent模式下的唯一工具来源)
         
         # 阶段3: 报告生成方式（对应需求：报告输出）
         "report_mode": "template",     # "template" | "iterative"
@@ -736,7 +786,26 @@ shared = {
             #     "description": "统计各主题出现的频次和占比"
             # }
         ],
-        # LLM生成的深度洞察分析
+        # 图表分析结果（每张图表的GLM4.5V详细分析）
+        "chart_analyses": [
+            # {
+            #     "chart_id": "sentiment_trend_001",       # 对应的图表ID
+            #     "chart_title": "情感趋势变化图",          # 图表标题
+            #     "chart_description": "GLM4.5V生成的图表详细描述",
+            #     "key_findings": [
+            #         "关键发现1：趋势分析要点",
+            #         "关键发现2：异常点识别"
+            #     ],
+            #     "insights": [
+            #         "洞察1：趋势背后的原因分析",
+            #         "洞察2：数据模式的业务含义"
+            #     ],
+            #     "recommendations": "基于图表分析的建议",
+            #     "analysis_timestamp": "2024-07-20 15:30:00",
+            #     "model_used": "GLM4.5V+思考模式"
+            # }
+        ],
+        # LLM生成的深度洞察分析（基于图表分析结果的综合洞察）
         "insights": {
             "sentiment_insight": "",     # 情感趋势洞察
             "topic_insight": "",         # 主题演化洞察
@@ -753,9 +822,10 @@ shared = {
         },
         # 阶段2输出文件路径（供阶段3加载）
         "output_files": {
-            "charts_dir": "report/images/",          # 图表存储目录
-            "analysis_data": "report/analysis_data.json",  # 分析数据文件
-            "insights_file": "report/insights.json"  # 洞察描述文件
+            "charts_dir": "report/images/",                    # 图表存储目录
+            "analysis_data": "report/analysis_data.json",     # 分析数据文件
+            "chart_analyses": "report/chart_analyses.json",  # 图表分析结果文件
+            "insights_file": "report/insights.json"         # 洞察描述文件
         }
     },
     
@@ -764,7 +834,85 @@ shared = {
         "report_file": "report/report.md",  # 最终报告文件路径
         "generation_mode": "",              # 生成模式：template | iterative
         "iterations": 0,                    # 迭代次数（iterative模式）
-        "final_score": 0                    # 最终评分（iterative模式）
+        "final_score": 0,                   # 最终评分（iterative模式）
+        "report_reasoning": "",             # 报告编排的原因和逻辑说明
+        "data_citations": {},               # 数据引用映射，确保结论有数据支撑
+        "hallucination_check": {}           # 幻觉检测结果
+    },
+
+    # === 系统运行监测（贯穿三阶段） ===
+    "monitor": {
+        "start_time": "",                   # 系统启动时间
+        "current_stage": "",                # 当前执行阶段
+        "current_node": "",                 # 当前执行节点
+        "execution_log": [],                # 执行日志列表
+        "progress_status": {},              # 进度状态信息
+        "error_log": []                     # 错误日志列表
+    },
+
+    # === LLM思考过程记录（Stage2和Stage3） ===
+    "thinking": {
+        "stage2_tool_decisions": [          # Stage2工具调用决策思考
+            # {
+            #     "iteration": 1,
+            #     "timestamp": "2024-07-20 14:30:00",
+            #     "context": "当前数据概况和可用工具",
+            #     "thinking_process": "详细的思考过程，包括为什么选择某个工具",
+            #     "decision": "选择的工具名称和参数",
+            #     "terminal_prompt": "思考完成，决策：[工具名称] - [简要原因]"
+            # }
+        ],
+        "stage3_report_planning": [         # Stage3报告编排思考
+            # {
+            #     "iteration": 1,
+            #     "timestamp": "2024-07-20 15:00:00",
+            #     "planning_process": "报告整体结构设计的详细思考过程",
+            #     "organization_logic": "章节顺序、数据选择逻辑",
+            #     "terminal_prompt": "报告编排完成：[主要思路] - [数据引用策略]"
+            # }
+        ],
+        "stage3_section_planning": {        # 各章节具体编排思考
+            # "section_name": {
+            #     "iteration": 1,
+            #     "timestamp": "2024-07-20 15:10:00",
+            #     "content_planning": "章节内容组织的详细思考",
+            #     "data_selection": "选择数据的原因和逻辑",
+            #     "terminal_prompt": "章节完成：[章节名] - [编排要点]"
+            # }
+        },
+        "thinking_timestamps": [            # 思考过程时间戳
+            # {
+            #     "event": "stage2_decision",
+            #     "timestamp": "2024-07-20 14:30:00",
+            #     "duration_ms": 1500
+            # }
+        ],
+        "terminal_history": []              # 终端输出历史记录
+    },
+
+    # === 数据引用验证（Stage3） ===
+    "data_citations": {
+        "conclusion_mapping": {             # 结论到数据的映射
+            # "conclusion_id": {
+            #     "conclusion_text": "结论文本",
+            #     "data_sources": ["source1", "source2"],
+            #     "chart_references": ["chart1.png"],
+            #     "confidence_score": 0.95
+            # }
+        },
+        "hallucination_check": {            # 幻觉检测结果
+            "total_conclusions": 0,
+            "supported_conclusions": 0,
+            "unsupported_conclusions": 0,
+            "suspicious_items": [
+                # {
+                #     "conclusion_text": "可疑结论",
+                #     "issue": "缺乏数据支撑",
+                #     "suggestion": "建议补充相关数据分析"
+                # }
+            ]
+        },
+        "citation_report": ""               # 数据引用验证报告
     }
 }
 ```
@@ -845,15 +993,25 @@ shared = {
 **类型**：Regular Node（Flow入口）
 
 **核心职责**：
-1. 首次进入时，根据 `shared["dispatcher"]["start_stage"]` 确定起始阶段
+1. 首次进入时，根据 `shared["dispatcher"]["start_stage"]` 确定起始阶段，并初始化监测系统
 2. 根据当前阶段的配置参数，决定进入哪个具体的Flow或Node
-3. 阶段完成后返回时，更新状态并决定下一步动作
-4. 所有阶段完成后，返回 `"done"` 结束流程
+3. 在阶段转换时输出详细的终端提示信息
+4. 阶段完成后返回时，更新状态并决定下一步动作
+5. 所有阶段完成后，返回 `"done"` 结束流程，并输出执行总结
 
 **实现步骤**：
-- *prep*：读取调度配置（起始阶段、执行阶段列表、当前状态）和各阶段路径配置
-- *exec*：根据当前状态计算下一步动作，确定进入哪个阶段的哪条路径
-- *post*：更新调度状态，返回对应的 Action 字符串触发 Flow 转移
+- *prep*：
+  - 初始化监测系统，设置系统启动时间
+  - 读取调度配置（起始阶段、执行阶段列表、当前状态）和各阶段路径配置
+  - 更新 `shared["monitor"]["current_stage"]` 和 `shared["monitor"]["current_node"]`
+- *exec*：
+  - 根据当前状态计算下一步动作，确定进入哪个阶段的哪条路径
+  - 在终端输出当前决策和下一步执行计划
+- *post*：
+  - 更新调度状态和监测信息
+  - 输出阶段转换的详细提示信息
+  - 记录执行日志到 `shared["monitor"]["execution_log"]`
+  - 返回对应的 Action 字符串触发 Flow 转移
 
 **返回的Action类型**：
 | Action | 说明 | 目标 |
@@ -1013,58 +1171,92 @@ shared = {
     - 多维交互分析工具集
   - *post*：存储图形到 `report/images/`，记录生成的图表列表
 
-**14. LLMInsightNode (LLM洞察补充节点)**
-- **功能**：调用LLM为生成的图形补充洞察信息，填充shared字典
+**14. ChartAnalysisNode (图表分析节点)**
+- **功能**：对每张生成的图表使用GLM4.5V模型进行详细分析，生成图表内容和洞察
 - **类型**：Regular Node (LLM Call)
-- **设计目的**：基于统计数据和图表，利用LLM生成各维度（情感趋势、主题演化、地理分布、多维交互）的洞察描述
+- **模型配置**：GLM4.5V + 思考模式（图文综合分析）
+- **设计目的**：为每张图表生成详细的分析内容，包括图表解读、关键发现、趋势洞察等
 - **实现步骤**：
-  - *prep*：读取生成的图表列表和统计数据
-  - *exec*：构建Prompt调用LLM，生成各维度的洞察描述（输出JSON格式）
+  - *prep*：读取生成的图表列表，准备图表文件路径和对应数据
+  - *exec*：对每张图表调用GLM4.5V模型，启用思考模式，进行图文综合分析
+    - 构建包含图表图像和对应数据的综合Prompt
+    - 要求模型分析图表内容、识别关键模式、解释数据趋势
+    - 生成结构化的分析结果（包含图表描述、关键发现、洞察分析）
+  - *post*：
+    - 将每张图表的分析结果存储到 `shared["stage2_results"]["chart_analyses"]`
+    - 在终端输出格式化提示：`📊 图表分析完成：[图表名称] - [分析要点]`
+
+**15. LLMInsightNode (LLM洞察补充节点)**
+- **功能**：基于图表分析结果，调用LLM生成各维度的综合洞察描述，填充shared字典
+- **类型**：Regular Node (LLM Call)
+- **模型配置**：GLM4.5V + 思考模式（综合推理分析）
+- **设计目的**：整合所有图表分析结果，生成各维度（情感趋势、主题演化、地理分布、多维交互）的综合洞察描述
+- **实现步骤**：
+  - *prep*：读取图表分析结果和统计数据
+  - *exec*：构建Prompt调用GLM4.5V模型，基于图表分析生成综合洞察描述（输出JSON格式）
   - *post*：填充 `shared["results"]["insights"]`
 
 ### Agent自主调度路径节点 (analysis_mode="agent")
 
 > Single Agent通过循环自主决策，直到分析充分或达到最大迭代次数
 
-**15. CollectToolsNode (工具收集节点)**
-- **功能**：收集所有可用的分析工具列表
+**16. CollectToolsNode (工具收集节点)**
+- **功能**：通过MCP服务器收集所有可用的分析工具列表
 - **类型**：Regular Node
-- **控制参数**：`shared["config"]["tool_source"]`
 - **实现步骤**：
-  - *prep*：读取 `tool_source` 配置
-  - *exec*：
-    - 若 `tool_source="mcp"`：调用MCP服务器查询可用工具
-    - 若 `tool_source="local"`：返回本地注册的固定工具列表
+  - *prep*：读取MCP服务器配置
+  - *exec*：调用MCP服务器查询可用工具列表，获取工具定义和描述
   - *post*：将工具定义存储到 `shared["agent"]["available_tools"]`
 
-**16. DecisionToolsNode (工具决策节点)**
-- **功能**：LLM决定下一步执行哪个分析工具，或判断分析已充分
+**17. DecisionToolsNode (工具决策节点)**
+- **功能**：GLM4.6智能体推理决定下一步执行哪个分析工具，或判断分析已充分，并记录思考过程
 - **类型**：Regular Node (LLM Call)
+- **模型配置**：GLM4.6 + 推理模式（智能体推理）
 - **循环入口**：Agent Loop的决策起点
-- **设计目的**：基于数据概况、可用工具列表和执行历史，让LLM自主决策下一步动作（执行工具或结束分析）
+- **设计目的**：基于数据概况、可用工具列表和执行历史，利用GLM4.6的强推理能力自主决策下一步动作（执行工具或结束分析）
 - **实现步骤**：
   - *prep*：读取数据概况、可用工具、执行历史、当前迭代次数
-  - *exec*：构建Prompt调用LLM，获取决策结果
-  - *post*：解析决策，返回Action
-    - `"execute"`: 执行选定的工具
-    - `"finish"`: 分析已充分，结束循环
+  - *exec*：
+    - 构建Prompt调用GLM4.6模型，开启推理模式，要求LLM输出决策过程和最终决策
+    - Prompt中要求LLM详细说明选择工具的原因、预期结果和下一步考虑
+    - 利用GLM4.6的智能体推理能力进行更精准的工具选择和执行时机判断
+  - *post*：
+    - 解析决策，返回Action（`"execute"`: 执行选定的工具, `"finish"`: 分析已充分）
+    - 将GLM4.6的思考过程记录到 `shared["thinking"]["stage2_tool_decisions"]`
+    - 在终端输出简短的思考提示："GLM4.6思考完成，决策：[工具名称] - [简要原因]"
+    - 记录决策时间戳到 `shared["thinking"]["thinking_timestamps"]`
 
-**17. ExecuteToolsNode (工具执行节点)**
-- **功能**：执行决策节点选定的分析工具
+**18. ExecuteToolsNode (工具执行节点)**
+- **功能**：通过MCP服务器执行决策节点选定的分析工具
 - **类型**：Regular Node
 - **实现步骤**：
   - *prep*：读取决策结果中的工具名称和参数
-  - *exec*：调用对应的工具函数
+  - *exec*：通过MCP协议调用对应的分析工具
   - *post*：
     - 存储结果到 `shared["results"]["analysis_outputs"]`
     - 注册图表到 `shared["results"]["generated_charts"]`
 
-**18. ProcessResultNode (结果处理节点)**
-- **功能**：简单分析工具执行结果，更新执行历史，判断是否继续循环
+**19. ChartAnalysisNode (图表分析节点)**
+- **功能**：对Agent执行的每张生成图表使用GLM4.5V模型进行详细分析
+- **类型**：Regular Node (LLM Call)
+- **模型配置**：GLM4.5V + 思考模式（图文综合分析）
+- **设计目的**：为Agent生成的每张图表生成详细的分析内容，包括图表解读、关键发现、趋势洞察等
+- **实现步骤**：
+  - *prep*：读取新生成的图表列表，准备图表文件路径和对应数据
+  - *exec*：对新生成的图表调用GLM4.5V模型，启用思考模式，进行图文综合分析
+    - 构建包含图表图像和对应数据的综合Prompt
+    - 要求模型分析图表内容、识别关键模式、解释数据趋势
+    - 生成结构化的分析结果（包含图表描述、关键发现、洞察分析）
+  - *post*：
+    - 将图表分析结果合并到 `shared["stage2_results"]["chart_analyses"]`
+    - 在终端输出格式化提示：`📊 Agent图表分析完成：[图表名称] - [分析要点]`
+
+**20. ProcessResultNode (结果处理节点)**
+- **功能**：分析工具执行结果和图表分析结果，更新执行历史，判断是否继续循环
 - **类型**：Regular Node
 - **循环控制**：根据分析结果和迭代次数决定是否返回决策节点
 - **实现步骤**：
-  - *prep*：读取工具执行结果和当前迭代次数
+  - *prep*：读取工具执行结果、图表分析结果和当前迭代次数
   - *exec*：格式化结果、提取关键发现、更新迭代计数
   - *post*：
     - 更新 `shared["agent"]["execution_history"]`
@@ -1078,7 +1270,7 @@ shared = {
 
 ### 通用节点
 
-**19. LoadAnalysisResultsNode (加载分析结果节点)**
+**21. LoadAnalysisResultsNode (加载分析结果节点)**
 - **功能**：加载阶段2产生的分析结果
 - **类型**：Regular Node
 - **前置检查**：验证阶段2输出文件是否存在（`report/analysis_data.json`、`report/images/`）
@@ -1090,7 +1282,7 @@ shared = {
   - *exec*：加载JSON数据和图表信息，抽取少量博文样本
   - *post*：存储到 `shared["results"]`
 
-**20. FormatReportNode (报告格式化节点)**
+**22. FormatReportNode (报告格式化节点)**
 - **功能**：格式化最终Markdown报告
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1098,7 +1290,7 @@ shared = {
   - *exec*：处理图片路径、修复格式问题、添加目录
   - *post*：更新 `shared["results"]["final_report_text"]`
 
-**21. SaveReportNode (保存报告节点)**
+**23. SaveReportNode (保存报告节点)**
 - **功能**：保存最终报告到文件
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1106,9 +1298,34 @@ shared = {
   - *exec*：写入Markdown文件
   - *post*：记录保存路径
 
+**23.1 ReportReasoningNode (报告编排原因说明节点)**
+- **功能**：生成报告编排的原因说明和逻辑解释
+- **类型**：Regular Node (LLM Call)
+- **实现步骤**：
+  - *prep*：读取最终报告内容和分析结果数据
+  - *exec*：
+    - 调用LLM分析报告整体结构和内容组织逻辑
+    - 生成详细的编排原因说明，包括章节顺序、数据选择、图表引用等
+  - *post*：
+    - 存储编排原因说明到 `shared["stage3_results"]["report_reasoning"]`
+    - 在终端输出："编排原因说明完成 - 长度：[字符数]"
+
+**23.2 DataCitationNode (数据引用验证节点)**
+- **功能**：验证报告中所有结论都有对应的数据支撑
+- **类型**：Regular Node (LLM Call)
+- **实现步骤**：
+  - *prep*：读取最终报告内容和分析结果数据
+  - *exec*：
+    - 调用LLM逐条分析报告中的结论和数据引用
+    - 生成数据引用映射表，检查可能存在的幻觉
+  - *post*：
+    - 存储数据引用映射到 `shared["stage3_results"]["data_citations"]`
+    - 存储幻觉检测结果到 `shared["stage3_results"]["hallucination_check"]`
+    - 在终端输出："数据引用验证完成 - 结论数：[数量]，未引用：[数量]"
+
 ### 模板填充路径节点 (report_mode="template")
 
-**22. LoadTemplateNode (加载模板节点)**
+**24. LoadTemplateNode (加载模板节点)**
 - **功能**：加载预定义的报告模板
 - **类型**：Regular Node
 - **设计目的**：加载包含章节占位符的Markdown模板（综述、情感分析、话题分析、传播分析、建议五大章节）
@@ -1117,15 +1334,20 @@ shared = {
   - *exec*：加载模板内容
   - *post*：存储到 `shared["report"]["template"]`
 
-**23. FillSectionNode (章节填充节点)**
-- **功能**：使用LLM填充单个章节内容
+**25. FillSectionNode (章节填充节点)**
+- **功能**：使用LLM填充单个章节内容，记录章节编排思考
 - **类型**：Regular Node (LLM Call)
 - **实现步骤**：
   - *prep*：读取章节模板和相关分析结果
-  - *exec*：构建章节填充Prompt，调用LLM生成内容
-  - *post*：存储章节内容到 `shared["report"]["sections"][section_name]`
+  - *exec*：
+    - 构建章节填充Prompt，调用LLM生成内容
+    - Prompt中要求LLM说明本章节的编排逻辑、数据选择原因和内容组织思路
+  - *post*：
+    - 存储章节内容到 `shared["report"]["sections"][section_name]`
+    - 将章节编排思考记录到 `shared["thinking"]["stage3_section_planning"][section_name]`
+    - 在终端输出："章节完成：[章节名] - [编排要点]"
 
-**24. AssembleReportNode (报告组装节点)**
+**26. AssembleReportNode (报告组装节点)**
 - **功能**：将各章节组装成完整报告
 - **类型**：Regular Node
 - **实现步骤**：
@@ -1144,13 +1366,20 @@ shared = {
   - *post*：设置 `shared["report"]["iteration"]` = 0, `shared["report"]["max_iterations"]`
 
 **26. GenerateReportNode (报告生成节点)**
-- **功能**：LLM生成或修改报告
+- **功能**：LLM生成或修改报告，记录编排思考过程
 - **类型**：Regular Node (LLM Call)
 - **设计目的**：基于分析数据和可用图表，生成结构化的Markdown报告；支持根据修改意见迭代优化
 - **实现步骤**：
   - *prep*：读取分析结果、当前报告草稿、修改意见
-  - *exec*：构建Prompt调用LLM生成/修改报告
-  - *post*：存储报告草稿到 `shared["report"]["current_draft"]`
+  - *exec*：
+    - 构建Prompt调用LLM，要求输出报告内容和编排逻辑
+    - Prompt中要求LLM说明各章节的编排原因、数据引用逻辑和整体结构考虑
+    - 要求LLM确保每个结论都有对应的数据支撑
+  - *post*：
+    - 存储报告草稿到 `shared["report"]["current_draft"]`
+    - 将编排思考过程记录到 `shared["thinking"]["stage3_report_planning"]`
+    - 在终端输出："报告编排完成：[主要思路] - [数据引用策略]"
+    - 记录时间戳到 `shared["thinking"]["thinking_timestamps"]`
 
 **27. ReviewReportNode (报告评审节点)**
 - **功能**：LLM评审报告质量并提出修改意见
@@ -1194,7 +1423,11 @@ project_root/
 ├── report/                         # 分析结果与报告输出
 │   ├── images/                     # [阶段2输出] 可视化图表存储
 │   ├── analysis_data.json          # [阶段2输出] 分析统计数据
+│   ├── chart_analyses.json         # [阶段2输出] 图表分析结果（GLM4.5V详细分析）
 │   ├── insights.json               # [阶段2输出] 洞察描述
+│   ├── thinking_log.json            # [阶段2-3输出] LLM思考过程记录
+│   ├── report_reasoning.md          # [阶段3输出] 报告编排原因说明
+│   ├── data_citations.json          # [阶段3输出] 数据引用验证结果
 │   ├── template.md                 # 报告模板
 │   └── report.md                   # [阶段3输出] 最终生成的报告
 ├── utils/                          # 工具函数
@@ -1214,8 +1447,8 @@ project_root/
 | 阶段 | 输入文件 | 输出文件 | 前置检查 |
 |------|----------|----------|----------|
 | 阶段1 | `data/posts.json` | `data/enhanced_posts.json` | 无 |
-| 阶段2 | `data/enhanced_posts.json` | `report/analysis_data.json`<br>`report/insights.json`<br>`report/images/*` | 检查增强数据是否存在 |
-| 阶段3 | `report/analysis_data.json`<br>`report/insights.json`<br>`report/images/*`<br>`data/enhanced_posts.json`(少量样本) | `report/report.md` | 检查分析结果是否存在 |
+| 阶段2 | `data/enhanced_posts.json` | `report/analysis_data.json`<br>`report/chart_analyses.json`<br>`report/insights.json`<br>`report/images/*` | 检查增强数据是否存在 |
+| 阶段3 | `report/analysis_data.json`<br>`report/chart_analyses.json`<br>`report/insights.json`<br>`report/images/*`<br>`data/enhanced_posts.json`(少量样本) | `report/report.md` | 检查分析结果是否存在 |
 
 ### 输出约定
 
@@ -1223,8 +1456,15 @@ project_root/
 - **阶段2输出**：分析结果存储在 `report/` 目录
   - 可视化图表：`report/images/`，命名格式 `{type}_{timestamp}.png`
   - 统计数据：`report/analysis_data.json`
-  - 洞察描述：`report/insights.json`
-- **阶段3输出**：最终报告 `report/report.md`
+  - 图表分析结果：`report/chart_analyses.json`（每张图表的GLM4.5V详细分析）
+  - 洞察描述：`report/insights.json`（基于图表分析的综合洞察）
+  - 思考记录：`report/thinking_log.json`（包含Stage2工具调用决策思考过程）
+
+- **阶段3输出**：
+  - 最终报告：`report/report.md`
+  - 报告编排原因说明：`report/report_reasoning.md`
+  - 数据引用验证结果：`report/data_citations.json`
+  - 完整思考记录：`report/thinking_log.json`（包含Stage3报告编排思考过程）
 
 ## 路径选择指南
 
@@ -1270,9 +1510,12 @@ project_root/
   - 复杂的多维度舆情分析
   - 数据特征不明确或异常情况
   - 需要探索性分析的舆情事件
-- **工具来源选择**：
-  - `tool_source="mcp"`: 动态发现工具，适合工具集频繁变化的场景
-  - `tool_source="local"`: 固定工具列表，适合稳定的分析需求
+- **工具调用机制**：
+  - 所有分析工具通过MCP服务器动态暴露
+  - 支持工具的动态发现、版本管理和热更新
+  - 适合工具集频繁变化和需要灵活扩展的场景
+  - **智能体决策**：使用GLM4.6+推理模式进行工具选择和执行时机判断
+  - **推理优化**：利用GLM4.6的强推理能力进行充分性评估、工具价值评估和执行顺序优化
 - **优势**：灵活性高、能发现隐藏模式、自适应能力强
 - **挑战**：结果不确定、成本较高、需要精心设计Prompt
 
@@ -1342,8 +1585,9 @@ project_root/
 ### 扩展性设计
 - **三阶段独立扩展**：各阶段可独立添加新的执行路径
 - **模块化架构**：便于添加新的分析维度和工具
-- **插件化设计**：阶段2分析工具可插拔，易于扩展
+- **插件化设计**：阶段2分析工具通过MCP服务器可插拔，支持热更新和动态扩展
 - **配置化管理**：通过shared["config"]灵活调整系统行为
-- **接口标准化**：统一的数据接口和工具调用规范
+- **接口标准化**：基于MCP协议的标准化工具调用接口
+- **工具解耦**：分析工具与系统核心解耦，便于独立开发和部署
 
 

@@ -76,47 +76,12 @@ def init_shared(
         run_stages = [1, 2]  # 默认执行阶段1和2
     
     return {
-        # === 调度控制（DispatcherNode使用） ===
-        "dispatcher": {
-            "start_stage": start_stage,
-            "run_stages": run_stages,
-            "current_stage": 0,
-            "completed_stages": [],
-            "next_action": None
-        },
-        
-        # === 三阶段路径控制 ===
-        "config": {
-            "enhancement_mode": enhancement_mode,
-            "analysis_mode": analysis_mode,
-            "tool_source": tool_source,
-            "report_mode": report_mode,
-            "data_source": {
-                "type": "original",
-                "enhanced_data_path": output_data_path
-            },
-            "batch_api_config": {
-                "script_path": batch_script_path,
-                "input_path": input_data_path,
-                "output_path": output_data_path,
-                "wait_for_completion": True
-            },
-            "agent_config": {
-                "max_iterations": agent_max_iterations
-            },
-            "iterative_report_config": {
-                "max_iterations": report_max_iterations,
-                "min_score_threshold": report_min_score
-            }
-        },
-        
-        # === 数据管理 ===
+        # === 数据管理（贯穿三阶段） ===
         "data": {
-            "blog_data": [],
-            "topics_hierarchy": [],
-            "sentiment_attributes": [],
-            "publisher_objects": [],
-            "load_type": "original",
+            "blog_data": [],              # 博文数据（原始或增强后）
+            "topics_hierarchy": [],        # 主题层次结构（从data/topics.json加载）
+            "sentiment_attributes": [],    # 情感属性列表（从data/sentiment_attributes.json加载）
+            "publisher_objects": [],       # 发布者类型列表（从data/publisher_objects.json加载）
             "data_paths": {
                 "blog_data_path": input_data_path,
                 "topics_path": topics_path,
@@ -124,35 +89,174 @@ def init_shared(
                 "publisher_objects_path": publisher_objects_path
             }
         },
-        
-        # === 结果存储 ===
-        "results": {
-            "statistics": {},
-            "data_save": {},
-            "batch_api": {}
+
+        # === 调度控制（DispatcherNode使用） ===
+        "dispatcher": {
+            "start_stage": start_stage,              # 起始阶段：1 | 2 | 3
+            "run_stages": run_stages,       # 需要执行的阶段列表
+            "current_stage": 0,            # 当前执行到的阶段（0表示未开始）
+            "completed_stages": [],        # 已完成的阶段列表
+            "next_action": "stage1"        # 下一步动作：stage1 | stage2 | stage3 | done
         },
-        
-        # === Agent运行时状态 ===
+
+        # === 三阶段路径控制（对应需求分析中的三阶段架构） ===
+        "config": {
+            # 阶段1: 增强处理方式（对应需求：四维度分析）
+            "enhancement_mode": enhancement_mode,   # "async" | "batch_api"
+
+            # 阶段2: 分析执行方式（对应需求：分析工具集）
+            "analysis_mode": analysis_mode,   # "workflow" | "agent"
+            "tool_source": tool_source,          # "mcp" (Agent模式下的唯一工具来源)
+
+            # 阶段3: 报告生成方式（对应需求：报告输出）
+            "report_mode": report_mode,     # "template" | "iterative"
+
+            # 阶段2 Agent配置
+            "agent_config": {
+                "max_iterations": agent_max_iterations
+            },
+
+            # 阶段3 迭代报告配置
+            "iterative_report_config": {
+                "max_iterations": report_max_iterations,
+            },
+
+            # 数据源配置
+            "data_source": {
+                "type": "enhanced" if start_stage == 2 else "original",
+                "enhanced_data_path": output_data_path
+            },
+
+            # Batch API配置
+            "batch_api_config": {
+                "script_path": batch_script_path,
+                "input_path": input_data_path,
+                "output_path": output_data_path,
+                "wait_for_completion": True
+            }
+        },
+
+        # === 阶段2运行时状态（Agent Loop模式） ===
         "agent": {
-            "available_tools": [],
-            "execution_history": [],
-            "current_iteration": 0,
-            "max_iterations": agent_max_iterations,
-            "is_finished": False
+            "available_tools": [],         # 工具收集节点获取的可用工具列表
+            "execution_history": [],       # 工具执行历史（每次循环记录）
+            "current_iteration": 0,        # 当前循环迭代次数
+            "max_iterations": agent_max_iterations,          # 最大迭代次数（防止无限循环）
+            "is_finished": False           # Agent是否判断分析已充分
         },
-        
-        # === 报告生成状态 ===
+
+        # === 阶段3报告生成状态 ===
         "report": {
             "iteration": 0,
             "current_draft": "",
             "revision_feedback": "",
-            "review_history": [],
-            "template": "",
-            "sections": {}
+            "review_history": []
         },
-        
-        # === 最终输出 ===
-        "final_summary": {}
+
+        # === 阶段1执行结果（由阶段1节点填充） ===
+        "stage1_results": {
+            # 数据统计信息（DataValidationAndOverviewNode填充）
+            "statistics": {
+                "total_blogs": 0,               # 总博文数
+                "processed_blogs": 0,           # 已处理博文数（含增强字段）
+                "empty_fields": {               # 增强字段空值统计
+                    "sentiment_polarity_empty": 0,
+                    "sentiment_attribute_empty": 0,
+                    "topics_empty": 0,
+                    "publisher_empty": 0
+                },
+                "engagement_statistics": {      # 参与度统计
+                    "total_reposts": 0,
+                    "total_comments": 0,
+                    "total_likes": 0,
+                    "avg_reposts": 0.0,
+                    "avg_comments": 0.0,
+                    "avg_likes": 0.0
+                },
+                "user_statistics": {            # 用户统计
+                    "unique_users": 0,          # 独立用户数
+                    "top_active_users": [],     # 活跃用户Top10
+                    "user_type_distribution": {} # 发布者类型分布
+                },
+                "content_statistics": {         # 内容统计
+                    "total_images": 0,
+                    "blogs_with_images": 0,
+                    "avg_content_length": 0.0,
+                    "time_distribution": {}     # 按小时的发布时间分布
+                },
+                "geographic_distribution": {}   # 地理位置分布
+            },
+            # 数据保存状态（SaveEnhancedDataNode填充）
+            "data_save": {
+                "saved": False,
+                "output_path": "",
+                "data_count": 0
+            },
+            # Batch API处理状态（BatchAPIEnhancementNode填充）
+            "batch_api": {
+                "success": False,
+                "data_count": 0,
+                "error": ""
+            }
+        },
+
+        # === 阶段2执行结果（由阶段2节点填充，存储到report/目录） ===
+        "stage2_results": {
+            # 生成的可视化图表列表
+            "charts": [],
+            # 生成的数据表格列表
+            "tables": [],
+            # LLM生成的深度洞察分析
+            "insights": {
+                "sentiment_insight": "",     # 情感趋势洞察
+                "topic_insight": "",         # 主题演化洞察
+                "geographic_insight": "",    # 地理分布洞察
+                "cross_dimension_insight": "", # 多维交互洞察
+                "summary_insight": ""        # 综合洞察摘要
+            },
+            # 分析执行记录
+            "execution_log": {
+                "tools_executed": [],        # 已执行的工具列表
+                "total_charts": 0,           # 生成的图表总数
+                "total_tables": 0,           # 生成的表格总数
+                "execution_time": 0.0        # 执行耗时（秒）
+            },
+            # 阶段2输出文件路径（供阶段3加载）
+            "output_files": {
+                "charts_dir": "report/images/",          # 图表存储目录
+                "analysis_data": "report/analysis_data.json",  # 分析数据文件
+                "insights_file": "report/insights.json"  # 洞察描述文件
+            }
+        },
+
+        # === 阶段3执行结果（由阶段3节点填充） ===
+        "stage3_results": {
+            "report_file": "report/report.md",  # 最终报告文件路径
+            "generation_mode": "",              # 生成模式：template | iterative
+            "iterations": 0,                    # 迭代次数（iterative模式）
+            "final_score": 0,                   # 最终评分（iterative模式）
+            "report_reasoning": "",             # 报告编排的原因和逻辑说明
+            "data_citations": {},               # 数据引用映射，确保结论有数据支撑
+            "hallucination_check": {}           # 幻觉检测结果
+        },
+
+        # === 系统运行监测（贯穿三阶段） ===
+        "monitor": {
+            "start_time": "",                   # 系统启动时间
+            "current_stage": "",                # 当前执行阶段
+            "current_node": "",                 # 当前执行节点
+            "execution_log": [],                # 执行日志列表
+            "progress_status": {},              # 进度状态信息
+            "error_log": []                     # 错误日志列表
+        },
+
+        # === LLM思考过程记录（Stage2和Stage3） ===
+        "thinking": {
+            "stage2_tool_decisions": [],        # Stage2工具调用决策思考
+            "stage3_report_planning": [],       # Stage3报告编排思考
+            "stage3_section_planning": {},      # 各章节具体编排思考
+            "thinking_timestamps": []           # 思考过程时间戳
+        }
     }
 
 
@@ -279,8 +383,11 @@ def main():
     # 3. 仅运行阶段1: RUN_STAGES = [1]
     #
     # 阶段2模式切换：
-    # - workflow: 预定义分析脚本 (推荐)
-    # - agent: LLM自主决策分析
+    # - workflow: 预定义分析脚本 (推荐，稳定)
+    # - agent: LLM自主决策分析 (通过MCP协议动态调用工具)
+    #
+    # Agent工具源：
+    # - mcp: 使用MCP协议动态发现和调用工具 (唯一实现方式)
     #
     
     # ----- 数据路径配置 -----
@@ -296,16 +403,15 @@ def main():
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
     # [1] = 仅阶段1, [2] = 仅阶段2, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2]  # 仅执行阶段2
+    RUN_STAGES = [2]  # 仅执行阶段2（测试用）
     
     # ----- 阶段1配置 -----
-    ENHANCEMENT_MODE = "async"  # "async" | "batch_api"
+    ENHANCEMENT_MODE = "batch_api"  # "async" | "batch_api"
     
     # ----- 阶段2配置 -----
-    ANALYSIS_MODE = "workflow"  # "workflow" | "agent"
-    TOOL_SOURCE = "local"       # "local" | "mcp"
-    AGENT_MAX_ITERATIONS = 10
-    
+    ANALYSIS_MODE = "agent"     # "workflow" | "agent"
+    TOOL_SOURCE = "mcp"            # Agent模式下的唯一工具来源 (MCP协议)
+    AGENT_MAX_ITERATIONS = 30    
     # ----- 阶段3配置（待实现） -----
     REPORT_MODE = "template"    # "template" | "iterative"
     REPORT_MAX_ITERATIONS = 5

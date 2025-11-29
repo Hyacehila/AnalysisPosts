@@ -46,11 +46,13 @@ from nodes import (
     Stage2CompletionNode,
     # 阶段2 Workflow路径节点
     ExecuteAnalysisScriptNode,
+    ChartAnalysisNode,
     LLMInsightNode,
     # 阶段2 Agent路径节点
     CollectToolsNode,
     DecisionToolsNode,
     ExecuteToolsNode,
+    ChartAnalysisNode,
     ProcessResultNode,
 )
 
@@ -130,9 +132,10 @@ def _create_workflow_analysis_flow() -> Flow:
     1. 加载增强数据
     2. 生成数据概况
     3. 执行固定分析脚本生成全部图形
-    4. LLM补充洞察信息
-    5. 保存分析结果
-    6. 返回调度器
+    4. GLM4.5V分析每个图表
+    5. LLM补充洞察信息
+    6. 保存分析结果
+    7. 返回调度器
     
     内部函数，由create_main_flow调用。
     """
@@ -140,21 +143,23 @@ def _create_workflow_analysis_flow() -> Flow:
     load_data_node = LoadEnhancedDataNode()
     data_summary_node = DataSummaryNode()
     execute_script_node = ExecuteAnalysisScriptNode()
+    chart_analysis_node = ChartAnalysisNode(max_retries=2, wait=3)
     llm_insight_node = LLMInsightNode()
     save_results_node = SaveAnalysisResultsNode()
     completion_node = Stage2CompletionNode()
-    
+
     # 连接节点
     load_data_node >> data_summary_node
     data_summary_node >> execute_script_node
-    execute_script_node >> llm_insight_node
+    execute_script_node >> chart_analysis_node
+    chart_analysis_node >> llm_insight_node
     llm_insight_node >> save_results_node
     save_results_node >> completion_node
-    
+
     return Flow(start=load_data_node)
 
 
-def _create_agent_analysis_flow() -> Flow:
+def _create_agent_analysis_flow() -> AsyncFlow:
     """
     创建Agent自主调度分析Flow (analysis_mode="agent")
     
@@ -163,9 +168,10 @@ def _create_agent_analysis_flow() -> Flow:
     2. 生成数据概况
     3. 收集可用工具
     4. Agent决策循环：决策 → 执行 → 处理 → 决策...
-    5. 生成洞察分析
-    6. 保存分析结果
-    7. 返回调度器
+    5. GLM4.5V分析生成的图表
+    6. 生成洞察分析
+    7. 保存分析结果
+    8. 返回调度器
     
     内部函数，由create_main_flow调用。
     """
@@ -176,28 +182,30 @@ def _create_agent_analysis_flow() -> Flow:
     decision_node = DecisionToolsNode()
     execute_node = ExecuteToolsNode()
     process_result_node = ProcessResultNode()
+    chart_analysis_node = ChartAnalysisNode(max_retries=2, wait=3)
     llm_insight_node = LLMInsightNode()
     save_results_node = SaveAnalysisResultsNode()
     completion_node = Stage2CompletionNode()
-    
+
     # 连接节点 - 线性部分
     load_data_node >> data_summary_node
     data_summary_node >> collect_tools_node
     collect_tools_node >> decision_node
-    
+
     # Agent循环部分
     decision_node - "execute" >> execute_node
     execute_node >> process_result_node
     process_result_node - "continue" >> decision_node  # 继续循环
-    
+
     # 结束循环的路径
-    decision_node - "finish" >> llm_insight_node  # Agent判断分析充分
-    process_result_node - "finish" >> llm_insight_node  # 达到最大迭代次数
-    
+    decision_node - "finish" >> chart_analysis_node  # Agent判断分析充分，先分析图表
+    process_result_node - "finish" >> chart_analysis_node  # 达到最大迭代次数，先分析图表
+
+    chart_analysis_node >> llm_insight_node  # 图表分析完成后生成洞察
     llm_insight_node >> save_results_node
     save_results_node >> completion_node
-    
-    return Flow(start=load_data_node)
+
+    return AsyncFlow(start=load_data_node)
 
 
 def create_main_flow(

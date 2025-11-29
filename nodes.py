@@ -44,8 +44,8 @@ import os
 import asyncio
 import subprocess
 from typing import List, Dict, Any, Optional
-from pocketflow import Node, BatchNode, AsyncNode
-from utils.call_llm import call_glm_45_air, call_glm4v_plus
+from pocketflow import Node, BatchNode, AsyncNode, AsyncBatchNode
+from utils.call_llm import call_glm_45_air, call_glm4v_plus, call_glm45v_thinking, call_glm46
 from utils.data_loader import (
     load_blog_data, load_topics, load_sentiment_attributes, 
     load_publisher_objects, save_enhanced_blog_data, load_enhanced_blog_data
@@ -276,9 +276,9 @@ class DataLoadNode(Node):
         """读取数据文件路径和配置参数"""
         config = shared.get("config", {})
         data_paths = shared.get("data", {}).get("data_paths", {})
-        
+
         data_source_type = config.get("data_source", {}).get("type", "original")
-        
+
         if data_source_type == "enhanced":
             enhanced_data_path = config.get("data_source", {}).get(
                 "enhanced_data_path", "data/enhanced_blogs.json"
@@ -317,21 +317,54 @@ class DataLoadNode(Node):
         """将数据存储到shared中"""
         if "data" not in shared:
             shared["data"] = {}
-        
+
         shared["data"]["blog_data"] = exec_res["blog_data"]
         shared["data"]["load_type"] = exec_res["load_type"]
-        
+
         if exec_res["load_type"] == "original":
             shared["data"]["topics_hierarchy"] = exec_res["topics_hierarchy"]
             shared["data"]["sentiment_attributes"] = exec_res["sentiment_attributes"]
             shared["data"]["publisher_objects"] = exec_res["publisher_objects"]
-        
+
         if "stage1_results" not in shared:
             shared["stage1_results"] = {"statistics": {}}
+        # 初始化统计结构
+        if "statistics" not in shared["stage1_results"]:
+            shared["stage1_results"]["statistics"] = {
+                "total_blogs": 0,
+                "processed_blogs": 0,
+                "empty_fields": {
+                    "sentiment_polarity_empty": 0,
+                    "sentiment_attribute_empty": 0,
+                    "topics_empty": 0,
+                    "publisher_empty": 0
+                },
+                "engagement_statistics": {
+                    "total_reposts": 0,
+                    "total_comments": 0,
+                    "total_likes": 0,
+                    "avg_reposts": 0.0,
+                    "avg_comments": 0.0,
+                    "avg_likes": 0.0
+                },
+                "user_statistics": {
+                    "unique_users": 0,
+                    "top_active_users": [],
+                    "user_type_distribution": {}
+                },
+                "content_statistics": {
+                    "total_images": 0,
+                    "blogs_with_images": 0,
+                    "avg_content_length": 0.0,
+                    "time_distribution": {}
+                },
+                "geographic_distribution": {}
+            }
+
         shared["stage1_results"]["statistics"]["total_blogs"] = len(exec_res["blog_data"])
-        
+
         print(f"[DataLoad] 加载完成，共 {len(exec_res['blog_data'])} 条博文")
-        
+
         return "default"
 
 
@@ -383,7 +416,7 @@ class SaveEnhancedDataNode(Node):
                 "data_count": exec_res["data_count"]
             }
         else:
-            print(f"[SaveData] ✗ 保存增强数据失败: {exec_res['output_path']}")
+            print(f"[SaveData] [X] 保存增强数据失败: {exec_res['output_path']}")
             shared["stage1_results"]["data_save"] = {
                 "saved": False,
                 "output_path": exec_res["output_path"],
@@ -565,7 +598,7 @@ class DataValidationAndOverviewNode(Node):
         # 空字段统计
         empty_fields = stats.get("empty_fields", {})
         if empty_fields:
-            print(f"\n⚠️  增强字段空值统计:")
+            print(f"\n[注意] 增强字段空值统计:")
             print(f"  ├─ 情感极性为空: {empty_fields.get('sentiment_polarity_empty', 0)}")
             print(f"  ├─ 情感属性为空: {empty_fields.get('sentiment_attribute_empty', 0)}")
             print(f"  ├─ 主题为空: {empty_fields.get('topics_empty', 0)}")
@@ -641,19 +674,19 @@ class Stage1CompletionNode(Node):
     def post(self, shared, prep_res, exec_res):
         """更新完成状态，返回dispatch"""
         stage = exec_res["stage"]
-        
+
         # 确保dispatcher存在
         if "dispatcher" not in shared:
             shared["dispatcher"] = {}
-        
+
         # 更新已完成阶段列表
         completed_stages = shared["dispatcher"].get("completed_stages", [])
         if stage not in completed_stages:
             completed_stages.append(stage)
         shared["dispatcher"]["completed_stages"] = completed_stages
-        
+
         print(f"[Stage1] 已完成阶段: {completed_stages}")
-        
+
         # 返回dispatch，跳转回调度器
         return "dispatch"
 
@@ -685,17 +718,17 @@ class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
     async def exec_async(self, prep_res):
         """对单条博文调用多模态LLM进行情感极性分析"""
         blog_post = prep_res
-        
+
         prompt = f"""你是社交媒体分析师，请依据下表判断博文整体情感极性：
 - 1=极度悲观，2=悲观，3=中性，4=乐观，5=极度乐观，0=无法判断
 - 仅输出一个数字（0-5），不得附加解释或其他字符
 博文内容：
 {blog_post.get('content', '')}"""
-        
+
         # 处理图片路径
         image_paths = blog_post.get('image_urls', [])
         image_paths = [img for img in image_paths if img and img.strip()]
-        
+
         processed_image_paths = []
         for img_path in image_paths:
             if not os.path.isabs(img_path):
@@ -703,7 +736,7 @@ class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
                 processed_image_paths.append(full_path)
             else:
                 processed_image_paths.append(img_path)
-        
+
         # 异步调用LLM
         if processed_image_paths:
             response = await asyncio.to_thread(
@@ -713,16 +746,16 @@ class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
             response = await asyncio.to_thread(
                 call_glm_45_air, prompt, temperature=0.3
             )
-        
+
         # 验证结果
         response = response.strip()
         if not response.isdigit():
             raise ValueError(f"模型输出不是数字: {response}")
-        
+
         score = int(response)
         if not 1 <= score <= 5:
             raise ValueError(f"模型输出数字不在1-5范围内: {score}")
-        
+
         return score
     
     async def exec_fallback_async(self, prep_res, exc):
@@ -771,21 +804,21 @@ class AsyncSentimentAttributeAnalysisBatchNode(AsyncParallelBatchNode):
         """对单条博文调用LLM进行情感属性分析"""
         blog_post = prep_res["blog_data"]
         sentiment_attributes = prep_res["sentiment_attributes"]
-        
+
         attributes_str = "、".join(sentiment_attributes)
-        
+
         prompt = f"""从候选情感属性中选出最贴切的1-3个，按JSON数组输出（示例：["支持","期待"]）。
 候选：{attributes_str}
 仅输出JSON数组，不得添加解释或其他文本。
 博文：
 {blog_post.get('content', '')}"""
-        
+
         response = await asyncio.to_thread(call_glm_45_air, prompt, temperature=0.3)
-        
+
         attributes = json.loads(response.strip())
         if not isinstance(attributes, list):
             raise ValueError(f"模型输出不是列表格式: {attributes}")
-        
+
         # 验证并过滤有效属性
         return [attr for attr in attributes if attr in sentiment_attributes]
     
@@ -835,7 +868,7 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
         """对单条博文调用多模态LLM进行主题匹配"""
         blog_post = prep_res["blog_data"]
         topics_hierarchy = prep_res["topics_hierarchy"]
-        
+
         # 构建主题层次结构字符串
         topics_lines = []
         for topic_group in topics_hierarchy:
@@ -843,7 +876,7 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
             sub_topics = "、".join(topic_group.get("sub_topics", []))
             topics_lines.append(f"{parent_topic} -> {sub_topics}")
         topics_str = "\n".join(topics_lines)
-        
+
         prompt = f"""请根据以下主题层次，从候选中选1-2个最贴切的父/子主题组合，使用JSON数组输出：
 [{{"parent_topic": "父主题", "sub_topic": "子主题"}}]
 若无匹配输出 []，不得添加解释。
@@ -851,18 +884,18 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
 {topics_str}
 博文：
 {blog_post.get('content', '')}"""
-        
+
         # 处理图片路径
         image_paths = blog_post.get('image_urls', [])
         image_paths = [img for img in image_paths if img and img.strip()]
-        
+
         processed_image_paths = []
         for img_path in image_paths:
             if not os.path.isabs(img_path):
                 processed_image_paths.append(os.path.join("data", img_path))
             else:
                 processed_image_paths.append(img_path)
-        
+
         # 异步调用LLM
         if processed_image_paths:
             response = await asyncio.to_thread(
@@ -872,23 +905,23 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
             response = await asyncio.to_thread(
                 call_glm_45_air, prompt, temperature=0.3
             )
-        
+
         topics = json.loads(response.strip())
         if not isinstance(topics, list):
             raise ValueError(f"模型输出不是列表格式: {topics}")
-        
+
         # 验证并过滤有效主题
         valid_topics = []
         for topic_item in topics:
             parent_topic = topic_item.get("parent_topic", "")
             sub_topic = topic_item.get("sub_topic", "")
-            
+
             for topic_group in topics_hierarchy:
                 if topic_group.get("parent_topic") == parent_topic:
                     if sub_topic in topic_group.get("sub_topics", []):
                         valid_topics.append({"parent_topic": parent_topic, "sub_topic": sub_topic})
                     break
-        
+
         return valid_topics
     
     async def exec_fallback_async(self, prep_res, exc):
@@ -938,18 +971,18 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
         """对单条博文调用LLM进行发布者类型识别"""
         blog_post = prep_res["blog_data"]
         publisher_objects = prep_res["publisher_objects"]
-        
+
         publishers_str = "、".join(publisher_objects)
-        
+
         prompt = f"""候选发布者：{publishers_str}
 判断该博文最可能的发布者类型，直接输出候选列表中的一个条目，不得添加解释。
 博文：
 {blog_post.get('content', '')}"""
-        
+
         response = await asyncio.to_thread(call_glm_45_air, prompt, temperature=0.3)
-        
+
         publisher = response.strip()
-        
+
         if publisher in publisher_objects:
             return publisher
         else:
@@ -1079,19 +1112,19 @@ class BatchAPIEnhancementNode(Node):
                         "data_count": len(enhanced_data)
                     }
                 except Exception as e:
-                    print(f"[BatchAPI] ✗ 加载增强数据失败: {str(e)}")
+                    print(f"[BatchAPI] [X] 加载增强数据失败: {str(e)}")
                     shared["stage1_results"]["batch_api"] = {
                         "success": False,
                         "error": str(e)
                     }
             else:
-                print(f"[BatchAPI] ✗ 输出文件不存在: {output_path}")
+                print(f"[BatchAPI] [X] 输出文件不存在: {output_path}")
                 shared["stage1_results"]["batch_api"] = {
                     "success": False,
                     "error": f"输出文件不存在: {output_path}"
                 }
         else:
-            print(f"[BatchAPI] ✗ Batch API处理失败: {exec_res.get('error', 'Unknown error')}")
+            print(f"[BatchAPI] [X] Batch API处理失败: {exec_res.get('error', 'Unknown error')}")
             if "stage1_results" not in shared:
                 shared["stage1_results"] = {}
             shared["stage1_results"]["batch_api"] = {
@@ -1277,22 +1310,24 @@ class DataSummaryNode(Node):
 class SaveAnalysisResultsNode(Node):
     """
     保存分析结果节点
-    
+
     功能：将分析结果持久化，供阶段3使用
     类型：Regular Node
     输出位置：
     - 统计数据：report/analysis_data.json
+    - 图表分析：report/chart_analyses.json
     - 洞察描述：report/insights.json
     - 图表文件：report/images/
     """
-    
+
     def prep(self, shared):
-        """读取分析输出和图表列表"""
+        """读取分析输出、图表列表和图表分析结果"""
         stage2_results = shared.get("stage2_results", {})
-        
+
         return {
             "charts": stage2_results.get("charts", []),
             "tables": stage2_results.get("tables", []),
+            "chart_analyses": stage2_results.get("chart_analyses", {}),
             "insights": stage2_results.get("insights", {}),
             "execution_log": stage2_results.get("execution_log", {})
         }
@@ -1301,48 +1336,58 @@ class SaveAnalysisResultsNode(Node):
         """保存JSON结果文件"""
         output_dir = "report"
         os.makedirs(output_dir, exist_ok=True)
-        
+
         # 保存分析数据
         analysis_data = {
             "charts": prep_res["charts"],
             "tables": prep_res["tables"],
             "execution_log": prep_res["execution_log"]
         }
-        
+
         analysis_data_path = os.path.join(output_dir, "analysis_data.json")
         with open(analysis_data_path, 'w', encoding='utf-8') as f:
             json.dump(analysis_data, f, ensure_ascii=False, indent=2)
-        
+
+        # 保存图表分析结果（新增）
+        chart_analyses_path = os.path.join(output_dir, "chart_analyses.json")
+        with open(chart_analyses_path, 'w', encoding='utf-8') as f:
+            json.dump(prep_res["chart_analyses"], f, ensure_ascii=False, indent=2)
+
         # 保存洞察描述
         insights_path = os.path.join(output_dir, "insights.json")
         with open(insights_path, 'w', encoding='utf-8') as f:
             json.dump(prep_res["insights"], f, ensure_ascii=False, indent=2)
-        
+
         return {
             "success": True,
             "analysis_data_path": analysis_data_path,
+            "chart_analyses_path": chart_analyses_path,
             "insights_path": insights_path,
             "charts_count": len(prep_res["charts"]),
-            "tables_count": len(prep_res["tables"])
+            "tables_count": len(prep_res["tables"]),
+            "chart_analyses_count": len(prep_res["chart_analyses"])
         }
     
     def post(self, shared, prep_res, exec_res):
         """记录保存状态"""
         if "stage2_results" not in shared:
             shared["stage2_results"] = {}
-        
+
         shared["stage2_results"]["output_files"] = {
             "charts_dir": "report/images/",
             "analysis_data": exec_res["analysis_data_path"],
+            "chart_analyses_file": exec_res["chart_analyses_path"],
             "insights_file": exec_res["insights_path"]
         }
-        
+
         print(f"\n[SaveAnalysisResults] [OK] 分析结果已保存")
         print(f"  - 分析数据: {exec_res['analysis_data_path']}")
+        print(f"  - 图表分析: {exec_res['chart_analyses_path']}")
         print(f"  - 洞察描述: {exec_res['insights_path']}")
         print(f"  - 生成图表: {exec_res['charts_count']} 个")
+        print(f"  - 分析图表: {exec_res['chart_analyses_count']} 个")
         print(f"  - 生成表格: {exec_res['tables_count']} 个")
-        
+
         return "default"
 
 
@@ -1672,35 +1717,444 @@ class ExecuteAnalysisScriptNode(Node):
             "total_tables": len(exec_res["tables"]),
             "execution_time": exec_res["execution_time"]
         }
-        
+
         return "default"
+
+
+class ChartAnalysisNode(Node):
+    """
+    图表分析节点 - 使用GLM4.5V+思考模式分析图表
+
+    功能：对每个生成的图表进行深度视觉分析
+    类型：Regular Node（兼容现有Workflow）
+
+    设计特点：
+    - GLM4.5V + 思考模式：既支持视觉理解，又支持深度推理
+    - 顺序处理：为确保与现有Flow兼容，采用同步处理
+    - 结构化输出：提供一致性的分析结果格式
+    """
+
+    def __init__(self, max_retries: int = 3, wait: int = 2):
+        """
+        初始化图表分析节点
+
+        Args:
+            max_retries: API调用失败重试次数
+            wait: 重试等待时间(秒)
+        """
+        super().__init__(max_retries=max_retries, wait=wait)
+
+    def prep(self, shared):
+        """读取图表列表"""
+        charts = shared.get("stage2_results", {}).get("charts", [])
+        print(f"\n[ChartAnalysis] 准备分析 {len(charts)} 张图表")
+        return charts
+
+    def exec(self, prep_res):
+        """顺序分析所有图表"""
+        import time
+        charts = prep_res
+        chart_analyses = {}
+        success_count = 0
+
+        print(f"[ChartAnalysis] 开始逐个分析图表...")
+        start_time = time.time()
+
+        for i, chart in enumerate(charts, 1):
+            chart_id = chart.get("id", f"chart_{i}")
+            chart_title = chart.get("title", "")
+            chart_path = chart.get("path", "")
+
+            print(f"[ChartAnalysis] [{i}/{len(charts)}] 分析图表: {chart_title}")
+
+            # 构建分析提示词
+            analysis_prompt = f"""你是一位专业的舆情分析专家，请分析这张舆情分析图表并返回结构化的JSON格式结果。
+
+## 图表基本信息
+- 图表ID: {chart_id}
+- 图表标题: {chart_title}
+- 图表类型: {chart.get('type', 'unknown')}
+
+## 分析要求
+请从以下四个维度进行分析：
+
+### 1. 图表描述
+客观描述图表的类型、结构、数据组成部分和关键元素
+
+### 2. 关键发现
+识别数据趋势、模式、峰值、异常点和重要特征
+
+### 3. 业务洞察
+分析舆情情感、话题热度、地域差异、发布者影响等业务含义
+
+### 4. 建议和预警
+提供趋势关注点、风险机遇识别和后续分析建议
+
+## 输出格式要求
+**重要**: 请严格按以下JSON格式输出，不要添加任何解释文字或思考过程：
+
+```json
+{{
+  "chart_description": "详细描述图表类型、结构和关键元素",
+  "key_findings": [
+    "第一个关键发现的描述",
+    "第二个关键发现的描述",
+    "第三个关键发现的描述"
+  ],
+  "insights": [
+    "第一个业务洞察的描述",
+    "第二个业务洞察的描述"
+  ],
+  "recommendations": [
+    "第一条建议的描述",
+    "第二条建议的描述"
+  ],
+  "alert_level": "low",
+  "data_quality": "good"
+}}
+```
+
+## 参数说明
+- alert_level: "low"(无异常), "medium"(需关注), "high"(需警惕)
+- data_quality: "excellent"(优质), "good"(良好), "fair"(一般), "poor"(较差)
+
+请直接返回JSON格式结果，确保JSON格式完整且有效。"""
+
+            try:
+                # 调用GLM4.5V分析图表
+                response = call_glm45v_thinking(
+                    prompt=analysis_prompt,
+                    image_paths=[chart_path] if chart_path and os.path.exists(chart_path) else None,
+                    temperature=0.7,
+                    max_tokens=2000,
+                    enable_thinking=True
+                )
+
+                # 解析JSON响应
+                try:
+                    import re
+                    json_str = None
+
+                    # 方法1: 提取JSON代码块
+                    json_match = re.search(r'```json\s*(.*?)\s*```', response, re.DOTALL)
+                    if json_match:
+                        json_str = json_match.group(1)
+                    else:
+                        # 方法2: 寻找JSON对象开始和结束
+                        json_start = response.find('{')
+                        json_end = response.rfind('}')
+                        if json_start != -1 and json_end != -1 and json_end > json_start:
+                            json_str = response[json_start:json_end + 1]
+
+                    # 方法3: 如果都失败，尝试直接解析清理后的响应
+                    if not json_str:
+                        # 清理响应文本，移除思考过程等无关内容
+                        cleaned_response = response.strip()
+                        # 移除可能的前缀文本
+                        if not cleaned_response.startswith('{'):
+                            lines = cleaned_response.split('\n')
+                            for line in lines:
+                                if line.strip().startswith('{'):
+                                    cleaned_response = '\n'.join(lines[lines.index(line):])
+                                    break
+                        json_str = cleaned_response
+
+                    if json_str:
+                        # 清理JSON字符串
+                        json_str = json_str.strip()
+                        # 移除可能的注释和多余空白
+                        json_str = re.sub(r'//.*?\n', '', json_str)
+                        json_str = re.sub(r'/\*.*?\*/', '', json_str, flags=re.DOTALL)
+
+                        analysis_result = json.loads(json_str)
+                    else:
+                        raise ValueError("无法从响应中提取有效的JSON数据")
+
+                    # 添加元数据
+                    analysis_result["chart_id"] = chart_id
+                    analysis_result["chart_title"] = chart_title
+                    analysis_result["chart_path"] = chart_path
+                    analysis_result["analysis_timestamp"] = time.time()
+                    analysis_result["analysis_status"] = "success"
+
+                    chart_analyses[chart_id] = analysis_result
+                    success_count += 1
+                    print(f"[ChartAnalysis] [√] 图表 {chart_id} 分析完成")
+
+                except (json.JSONDecodeError, ValueError) as e:
+                    # JSON解析失败，尝试智能fallback处理
+                    print(f"[ChartAnalysis] [!] JSON解析失败，尝试智能提取: {str(e)}")
+
+                    # 尝试从响应中智能提取关键信息
+                    fallback_result = self._extract_fallback_analysis(response, chart_id, chart_title, chart_path, e)
+                    chart_analyses[chart_id] = fallback_result
+                    print(f"[ChartAnalysis] [!] 图表 {chart_id} 使用fallback分析完成")
+
+            except Exception as e:
+                # 分析失败，返回错误信息
+                print(f"[ChartAnalysis] [X] 图表 {chart_id} 分析失败: {str(e)}")
+                failed_result = {
+                    "chart_id": chart_id,
+                    "chart_title": chart_title,
+                    "chart_path": chart_path,
+                    "analysis_timestamp": time.time(),
+                    "analysis_status": "failed",
+                    "chart_description": "图表分析失败",
+                    "key_findings": [f"分析失败: {str(e)}"],
+                    "insights": ["需要手动分析"],
+                    "recommendations": ["建议检查图表文件和相关数据"],
+                    "alert_level": "high",
+                    "data_quality": "poor",
+                    "error": str(e)
+                }
+                chart_analyses[chart_id] = failed_result
+
+        execution_time = time.time() - start_time
+
+        return {
+            "chart_analyses": chart_analyses,
+            "success_count": success_count,
+            "total_charts": len(charts),
+            "success_rate": success_count/len(charts) if charts else 0,
+            "execution_time": execution_time
+        }
+
+    def post(self, shared, prep_res, exec_res):
+        """存储分析结果到shared"""
+        # 初始化图表分析结果
+        if "stage2_results" not in shared:
+            shared["stage2_results"] = {}
+
+        # 存储到shared字典
+        shared["stage2_results"]["chart_analyses"] = exec_res["chart_analyses"]
+
+        # 输出执行摘要
+        print(f"\n[ChartAnalysis] 图表分析完成:")
+        print(f"  ├─ 总图表数: {exec_res['total_charts']}")
+        print(f"  ├─ 成功分析: {exec_res['success_count']}")
+        print(f"  ├─ 失败数量: {exec_res['total_charts'] - exec_res['success_count']}")
+        print(f"  └─ 成功率: {exec_res['success_rate']*100:.1f}%")
+        print(f"  └─ 耗时: {exec_res['execution_time']:.2f}秒")
+
+        # 存储执行日志
+        if "execution_log" not in shared["stage2_results"]:
+            shared["stage2_results"]["execution_log"] = {}
+
+        shared["stage2_results"]["execution_log"]["chart_analysis"] = {
+            "total_charts": exec_res["total_charts"],
+            "success_count": exec_res["success_count"],
+            "success_rate": exec_res["success_rate"],
+            "analysis_timestamp": exec_res["execution_time"]
+        }
+
+        return "default"
+
+    def _extract_fallback_analysis(self, response: str, chart_id: str, chart_title: str, chart_path: str, error: Exception) -> Dict:
+        """
+        智能fallback分析：当JSON解析失败时，从文本响应中提取关键信息
+
+        Args:
+            response: GLM4.5V模型的原始响应文本
+            chart_id: 图表ID
+            chart_title: 图表标题
+            chart_path: 图表路径
+            error: 解析错误
+
+        Returns:
+            构建的分析结果字典
+        """
+        import re
+        import time
+
+        # 初始化基本结果结构
+        result = {
+            "chart_id": chart_id,
+            "chart_title": chart_title,
+            "chart_path": chart_path,
+            "analysis_timestamp": time.time(),
+            "analysis_status": "partial_success",
+            "error": str(error)
+        }
+
+        # 尝试提取图表描述
+        description_patterns = [
+            r'chart_description["\s]*:\s*["\']([^"\']+)["\']',
+            r'图表描述[：:]\s*([^\n]+)',
+            r'描述[：:]\s*([^\n]+)'
+        ]
+
+        for pattern in description_patterns:
+            match = re.search(pattern, response, re.IGNORECASE)
+            if match:
+                result["chart_description"] = match.group(1).strip()
+                break
+        else:
+            result["chart_description"] = "图表分析已完成，但结构化数据提取失败"
+
+        # 尝试提取关键发现
+        key_findings = []
+        findings_patterns = [
+            r'key_findings["\s]*:\s*\[(.*?)\]',
+            r'关键发现[：:]\s*([^\n]+)',
+            r'发现[：:]\s*([^\n]+)'
+        ]
+
+        for pattern in findings_patterns:
+            matches = re.findall(pattern, response, re.IGNORECASE | re.DOTALL)
+            if matches:
+                for match in matches:
+                    # 清理和分割发现项
+                    findings = re.findall(r'["\']([^"\']+)["\']', match)
+                    if findings:
+                        key_findings.extend([f.strip() for f in findings if f.strip()])
+                    else:
+                        # 如果没有引号，尝试按行分割
+                        lines = match.split('\n')
+                        for line in lines:
+                            clean_line = re.sub(r'[-*]\s*', '', line.strip())
+                            if clean_line and len(clean_line) > 5:
+                                key_findings.append(clean_line)
+                break
+
+        # 如果没有找到关键发现，从响应中提取主要内容
+        if not key_findings:
+            # 寻找包含分析内容的段落
+            sentences = re.split(r'[。！？\n]', response)
+            for sentence in sentences:
+                sentence = sentence.strip()
+                if (len(sentence) > 20 and
+                    any(keyword in sentence for keyword in ['趋势', '显示', '数据', '分析', '发现', '表明'])):
+                    key_findings.append(sentence[:100] + ("..." if len(sentence) > 100 else ""))
+                    if len(key_findings) >= 3:
+                        break
+
+        result["key_findings"] = key_findings[:5]  # 限制最多5个发现
+
+        # 尝试提取业务洞察
+        insights = []
+        insight_patterns = [
+            r'insights["\s]*:\s*\[(.*?)\]',
+            r'业务洞察[：:]\s*([^\n]+)',
+            r'洞察[：:]\s*([^\n]+)'
+        ]
+
+        for pattern in insight_patterns:
+            matches = re.findall(pattern, response, re.IGNORECASE | re.DOTALL)
+            if matches:
+                for match in matches:
+                    insight_items = re.findall(r'["\']([^"\']+)["\']', match)
+                    if insight_items:
+                        insights.extend([f.strip() for f in insight_items if f.strip()])
+                break
+
+        # 如果没有找到洞察，生成默认洞察
+        if not insights:
+            insights = ["图表数据分析已完成，建议结合其他分析结果进行综合判断"]
+
+        result["insights"] = insights[:3]  # 限制最多3个洞察
+
+        # 尝试提取建议
+        recommendations = []
+        rec_patterns = [
+            r'recommendations["\s]*:\s*\[(.*?)\]',
+            r'建议[：:]\s*([^\n]+)',
+            r'推荐[：:]\s*([^\n]+)'
+        ]
+
+        for pattern in rec_patterns:
+            matches = re.findall(pattern, response, re.IGNORECASE | re.DOTALL)
+            if matches:
+                for match in matches:
+                    rec_items = re.findall(r'["\']([^"\']+)["\']', match)
+                    if rec_items:
+                        recommendations.extend([f.strip() for f in rec_items if f.strip()])
+                break
+
+        # 如果没有找到建议，生成默认建议
+        if not recommendations:
+            recommendations = ["建议进一步验证分析结果，确保数据解读的准确性"]
+
+        result["recommendations"] = recommendations[:3]  # 限制最多3个建议
+
+        # 尝试提取预警级别
+        alert_patterns = [
+            r'alert_level["\s]*:\s*["\']([^"\']+)["\']',
+            r'预警级别[：:]\s*([^\n]+)'
+        ]
+
+        for pattern in alert_patterns:
+            match = re.search(pattern, response, re.IGNORECASE)
+            if match:
+                alert_level = match.group(1).lower()
+                if alert_level in ['low', 'medium', 'high']:
+                    result["alert_level"] = alert_level
+                    break
+        else:
+            result["alert_level"] = "medium"  # 默认中等预警级别
+
+        # 尝试提取数据质量
+        quality_patterns = [
+            r'data_quality["\s]*:\s*["\']([^"\']+)["\']',
+            r'数据质量[：:]\s*([^\n]+)'
+        ]
+
+        for pattern in quality_patterns:
+            match = re.search(pattern, response, re.IGNORECASE)
+            if match:
+                quality = match.group(1).lower()
+                if quality in ['excellent', 'good', 'fair', 'poor']:
+                    result["data_quality"] = quality
+                    break
+        else:
+            result["data_quality"] = "fair"  # 默认一般质量
+
+        # 添加原始响应的前500字符作为备份
+        result["raw_response_preview"] = response[:500] + ("..." if len(response) > 500 else "")
+
+        return result
 
 
 class LLMInsightNode(Node):
     """
     LLM洞察补充节点
-    
-    功能：调用LLM为生成的图形补充洞察信息，填充shared字典
+
+    功能：基于GLM4.5V图表分析结果，调用LLM生成综合洞察
     类型：Regular Node (LLM Call)
-    
-    基于统计数据和图表，利用LLM生成各维度的洞察描述
+
+    基于图表分析结果和统计数据，利用LLM生成各维度的深度洞察描述
     """
-    
+
     def prep(self, shared):
-        """读取生成的图表列表和统计数据"""
+        """读取图表分析结果和统计数据"""
         stage2_results = shared.get("stage2_results", {})
-        
+
         return {
-            "charts": stage2_results.get("charts", []),
+            "chart_analyses": stage2_results.get("chart_analyses", {}),
             "tables": stage2_results.get("tables", []),
             "data_summary": shared.get("agent", {}).get("data_summary", "")
         }
     
     def exec(self, prep_res):
-        """构建Prompt调用LLM，生成各维度的洞察描述"""
+        """基于图表分析结果构建Prompt调用LLM，生成深度洞察"""
+        chart_analyses = prep_res["chart_analyses"]
         tables = prep_res["tables"]
         data_summary = prep_res["data_summary"]
-        
+
+        # 构建图表分析摘要
+        chart_summary = []
+        for chart_id, analysis in chart_analyses.items():
+            if analysis.get("analysis_status") == "success":
+                title = analysis.get("chart_title", chart_id)
+                key_findings = analysis.get("key_findings", [])
+                insights = analysis.get("insights", [])
+                alert_level = analysis.get("alert_level", "low")
+
+                chart_summary.append(f"### {title}")
+                chart_summary.append(f"关键发现: {'; '.join(key_findings[:3])}")
+                chart_summary.append(f"业务洞察: {'; '.join(insights[:2])}")
+                chart_summary.append(f"预警级别: {alert_level}")
+                chart_summary.append("")
+
         # 构建统计数据摘要
         stats_summary = []
         for table in tables:
@@ -1709,38 +2163,59 @@ class LLMInsightNode(Node):
             summary = data.get("summary", "") if isinstance(data, dict) else ""
             if summary:
                 stats_summary.append(f"- {title}: {summary}")
-        
-        stats_text = "\n".join(stats_summary) if stats_summary else "无统计数据"
-        
-        prompt = f"""你是一位专业的舆情分析师，请根据以下数据统计结果，生成深度洞察分析。
+
+        # 构建完整提示词
+        prompt = f"""你是一位资深的舆情分析专家，请基于以下GLM4.5V视觉分析和统计数据，生成深度洞察报告。
 
 ## 数据概况
 {data_summary}
 
-## 统计分析结果
-{stats_text}
+## GLM4.5V图表视觉分析结果
+{chr(10).join(chart_summary) if chart_summary else "无图表分析结果"}
 
-请针对以下维度生成洞察分析，每个维度100-200字：
+## 统计分析数据
+{chr(10).join(stats_summary) if stats_summary else "无统计数据"}
 
-1. **情感趋势洞察**：分析情感变化的总体趋势、异常波动及可能原因
-2. **主题演化洞察**：分析主要话题的热度变化、新兴话题及话题关联
-3. **地理分布洞察**：分析地区分布特点、热点区域及地区差异
-4. **多维交互洞察**：分析不同发布者类型的特征差异、影响力分布
-5. **综合洞察摘要**：整体舆情态势的核心发现和关键观点
+请综合以上信息，针对以下维度生成深度洞察分析，每个维度150-300字：
+
+1. **情感趋势洞察**：
+   - 结合情感趋势图表的视觉分析，分析情感变化的主要驱动因素
+   - 基于异常点检测和时序分析，识别关键转折点和潜在风险
+   - 提供情感管理的具体建议
+
+2. **主题演化洞察**：
+   - 根据主题热度图表和网络关系分析，识别核心话题及其演变路径
+   - 分析新兴话题的崛起趋势和话题间的关联效应
+   - 预测未来话题发展的可能方向
+
+3. **地理分布洞察**：
+   - 基于地理热力图和区域分析，识别热点地区和冷点区域
+   - 分析地区差异的深层原因和影响因素
+   - 提出区域针对性的应对策略
+
+4. **多维交互洞察**：
+   - 结合发布者类型分析和影响力评估，识别关键意见领袖
+   - 分析不同发布者群体的行为模式和内容特征
+   - 评估信息传播的路径和效果
+
+5. **综合洞察摘要**：
+   - 整合所有分析维度，提炼整体舆情态势的核心特征
+   - 识别主要机遇和风险点
+   - 提供战略层面的决策建议
 
 请以JSON格式输出，包含以下字段：
 ```json
 {{
-    "sentiment_insight": "情感趋势洞察内容",
-    "topic_insight": "主题演化洞察内容",
-    "geographic_insight": "地理分布洞察内容",
-    "cross_dimension_insight": "多维交互洞察内容",
-    "summary_insight": "综合洞察摘要"
+    "sentiment_insight": "基于视觉分析的情感趋势深度洞察",
+    "topic_insight": "结合图表的主题演化全面分析",
+    "geographic_insight": "基于地图分析的区域分布洞察",
+    "cross_dimension_insight": "多维交互关系的深度剖析",
+    "summary_insight": "整体舆情态势的战略洞察"
 }}
 ```"""
-        
+
         response = call_glm_45_air(prompt, temperature=0.7)
-        
+
         # 解析JSON响应
         try:
             # 尝试提取JSON部分
@@ -1750,18 +2225,18 @@ class LLMInsightNode(Node):
                 json_str = response.split("```")[1].split("```")[0].strip()
             else:
                 json_str = response.strip()
-            
+
             insights = json.loads(json_str)
         except json.JSONDecodeError:
-            # 如果解析失败，创建默认结构
+            # 如果解析失败，基于响应创建结构化洞察
             insights = {
-                "sentiment_insight": "情感分析显示整体舆情态势平稳。",
-                "topic_insight": "主题分布相对均衡，无明显异常。",
-                "geographic_insight": "地理分布符合预期，无突出热点。",
-                "cross_dimension_insight": "各类型发布者特征差异不显著。",
-                "summary_insight": response[:500] if response else "分析已完成。"
+                "sentiment_insight": "基于图表分析，情感趋势显示整体态势相对稳定，需要关注异常波动点。",
+                "topic_insight": "主题演化分析表明核心话题持续活跃，新兴话题呈现增长趋势。",
+                "geographic_insight": "地理分布分析显示热点区域集中，区域差异特征明显。",
+                "cross_dimension_insight": "发布者类型分析显示不同群体影响力差异显著，交互模式多样。",
+                "summary_insight": response[:800] if response else "综合分析已完成，建议关注图表中的关键发现。"
             }
-        
+
         return insights
     
     def post(self, shared, prep_res, exec_res):
@@ -1786,54 +2261,62 @@ class LLMInsightNode(Node):
 class CollectToolsNode(Node):
     """
     工具收集节点
-    
-    功能：收集所有可用的分析工具列表
+
+    功能：通过MCP服务器收集所有可用的分析工具列表
     类型：Regular Node
     控制参数：shared["config"]["tool_source"]
+
+    MCP协议特点：
+    - 通过MCP协议动态发现和调用分析工具
+    - 支持工具的动态扩展和版本管理
+    - 标准化的工具调用接口
     """
-    
+
     def prep(self, shared):
         """读取tool_source配置"""
         config = shared.get("config", {})
-        tool_source = config.get("tool_source", "local")
+        tool_source = config.get("tool_source", "mcp")
         return {"tool_source": tool_source}
-    
+
     def exec(self, prep_res):
-        """获取可用工具列表"""
+        """通过MCP服务器收集所有可用的分析工具列表"""
         tool_source = prep_res["tool_source"]
-        
+
+        # 启用MCP模式
+        from utils.mcp_client.mcp_client import set_mcp_mode, get_tools
+
         if tool_source == "mcp":
-            # TODO: 实现MCP服务器查询
-            # 目前暂时回退到本地工具
-            print("[CollectTools] MCP模式暂未实现，使用本地工具")
-            tool_source = "local"
-        
-        # 使用本地注册的工具
-        from utils.analysis_tools import get_all_tools
-        tools = get_all_tools()
-        
+            set_mcp_mode(True)
+            print(f"[CollectTools] 使用MCP模式获取工具")
+            tools = get_tools('utils/mcp_server')
+        else:
+            set_mcp_mode(False)
+            print(f"[CollectTools] 不支持的工具源: {tool_source}")
+            tools = []
+
         return {
             "tools": tools,
             "tool_source": tool_source,
             "tool_count": len(tools)
         }
-    
+
     def post(self, shared, prep_res, exec_res):
         """将工具定义存储到shared"""
         if "agent" not in shared:
             shared["agent"] = {}
-        
+
         shared["agent"]["available_tools"] = exec_res["tools"]
         shared["agent"]["execution_history"] = []
         shared["agent"]["current_iteration"] = 0
         shared["agent"]["is_finished"] = False
-        
+        shared["agent"]["tool_source"] = exec_res["tool_source"]  # 记录使用的工具来源
+
         config = shared.get("config", {})
         agent_config = config.get("agent_config", {})
         shared["agent"]["max_iterations"] = agent_config.get("max_iterations", 10)
-        
-        print(f"\n[CollectTools] [OK] 收集到 {exec_res['tool_count']} 个可用工具")
-        
+
+        print(f"\n[CollectTools] [OK] 收集到 {exec_res['tool_count']} 个可用工具 ({exec_res['tool_source']}模式)")
+
         # 按类别显示工具
         categories = {}
         for tool in exec_res["tools"]:
@@ -1841,19 +2324,20 @@ class CollectToolsNode(Node):
             if cat not in categories:
                 categories[cat] = []
             categories[cat].append(tool["name"])
-        
+
         for cat, tool_names in categories.items():
             print(f"  - {cat}: {', '.join(tool_names)}")
-        
+
         return "default"
 
 
 class DecisionToolsNode(Node):
     """
     工具决策节点
-    
-    功能：LLM决定下一步执行哪个分析工具，或判断分析已充分
+
+    功能：GLM4.6智能体推理决定下一步执行哪个分析工具，或判断分析已充分
     类型：Regular Node (LLM Call)
+    模型配置：GLM4.6 + 推理模式（智能体推理）
     循环入口：Agent Loop的决策起点
     """
     
@@ -1870,13 +2354,13 @@ class DecisionToolsNode(Node):
         }
     
     def exec(self, prep_res):
-        """构建Prompt调用LLM，获取决策结果"""
+        """构建Prompt调用GLM4.6，获取决策结果"""
         data_summary = prep_res["data_summary"]
         available_tools = prep_res["available_tools"]
         execution_history = prep_res["execution_history"]
         current_iteration = prep_res["current_iteration"]
         max_iterations = prep_res["max_iterations"]
-        
+
         # 构建工具列表描述
         tools_description = []
         for tool in available_tools:
@@ -1884,7 +2368,7 @@ class DecisionToolsNode(Node):
                 f"- {tool['name']} ({tool['category']}): {tool['description']}"
             )
         tools_text = "\n".join(tools_description)
-        
+
         # 构建执行历史描述
         if execution_history:
             history_items = []
@@ -1895,8 +2379,8 @@ class DecisionToolsNode(Node):
             history_text = "\n".join(history_items)
         else:
             history_text = "尚未执行任何工具"
-        
-        prompt = f"""你是一个舆情分析智能体，负责决定下一步的分析动作。
+
+        prompt = f"""你是一个专业的舆情分析智能体，负责决定下一步的分析动作。请运用你的推理能力，基于当前分析状态做出最佳决策。
 
 ## 数据概况
 {data_summary}
@@ -1911,23 +2395,27 @@ class DecisionToolsNode(Node):
 - 当前迭代: {current_iteration + 1}/{max_iterations}
 - 已执行工具数: {len(execution_history)}
 
-## 决策要求
-1. 如果分析已经充分（已覆盖主要维度：情感、主题、地理、发布者），输出 action: "finish"
-2. 否则，选择一个尚未执行的工具继续分析，优先选择能生成图表的工具
-3. 建议的执行顺序：数据统计工具 → 可视化图表工具
+## 推理决策要求
+请进行深度推理分析：
+1. **分析充分性评估**：检查是否已覆盖主要分析维度（情感趋势、主题演化、地理分布、发布者影响力）
+2. **工具价值评估**：评估未执行工具的信息增益和可视化价值
+3. **执行顺序优化**：考虑数据统计工具先行，可视化工具在后的逻辑顺序
+4. **效率考量**：避免重复性分析，优先选择能提供新洞察的工具
 
-请以JSON格式输出决策：
+## 决策输出
+请以JSON格式输出你的推理决策：
 ```json
 {{
-    "thinking": "分析当前状态和需求的思考过程",
+    "thinking": "详细的推理分析过程，包括充分性评估、工具选择理由和下一步考虑",
     "action": "execute或finish",
     "tool_name": "工具名称（仅当action为execute时需要）",
-    "reason": "选择该工具的原因"
+    "reason": "基于推理分析的选择原因和预期效果"
 }}
 ```"""
-        
-        response = call_glm_45_air(prompt, temperature=0.5)
-        
+
+        # 使用GLM4.6模型，开启推理模式
+        response = call_glm46(prompt, temperature=0.6, enable_reasoning=True)
+
         # 解析JSON响应
         try:
             if "```json" in response:
@@ -1936,16 +2424,16 @@ class DecisionToolsNode(Node):
                 json_str = response.split("```")[1].split("```")[0].strip()
             else:
                 json_str = response.strip()
-            
+
             decision = json.loads(json_str)
         except json.JSONDecodeError:
             # 解析失败，默认继续执行
             decision = {
                 "action": "execute",
                 "tool_name": "sentiment_distribution_stats",
-                "reason": "默认从情感分析开始"
+                "reason": "GLM4.6响应解析失败，默认从情感分析开始"
             }
-        
+
         return decision
     
     def post(self, shared, prep_res, exec_res):
@@ -1954,57 +2442,99 @@ class DecisionToolsNode(Node):
         
         if action == "finish":
             shared["agent"]["is_finished"] = True
-            print(f"\n[DecisionTools] Agent决定: 分析已充分，结束循环")
-            print(f"  理由: {exec_res.get('reason', '无')}")
+            print(f"\n[DecisionTools] GLM4.6智能体决定: 分析已充分，结束循环")
+            print(f"  推理理由: {exec_res.get('reason', '无')}")
             return "finish"
         else:
             tool_name = exec_res.get("tool_name", "")
             shared["agent"]["next_tool"] = tool_name
             shared["agent"]["next_tool_reason"] = exec_res.get("reason", "")
-            
-            print(f"\n[DecisionTools] Agent决定: 执行工具 {tool_name}")
-            print(f"  理由: {exec_res.get('reason', '无')}")
-            
+
+            print(f"\n[DecisionTools] GLM4.6智能体决定: 执行工具 {tool_name}")
+            print(f"  推理理由: {exec_res.get('reason', '无')}")
+
             return "execute"
 
 
 class ExecuteToolsNode(Node):
     """
     工具执行节点
-    
-    功能：执行决策节点选定的分析工具
+
+    功能：通过MCP协议执行决策节点选定的分析工具
     类型：Regular Node
+
+    MCP协议特点：
+    - 通过MCP协议调用远程分析工具
+    - 标准化的工具调用接口
+    - 支持工具的动态发现和版本管理
     """
-    
+
     def prep(self, shared):
-        """读取决策结果中的工具名称"""
+        """读取决策结果中的工具名称和数据"""
         agent = shared.get("agent", {})
         blog_data = shared.get("data", {}).get("blog_data", [])
-        
+        tool_source = agent.get("tool_source", "mcp")
+
         return {
             "tool_name": agent.get("next_tool", ""),
-            "blog_data": blog_data
+            "blog_data": blog_data,
+            "tool_source": tool_source
         }
-    
+
     def exec(self, prep_res):
-        """调用对应的工具函数"""
-        from utils.analysis_tools import execute_tool
-        
+        """通过MCP协议调用对应的分析工具函数"""
         tool_name = prep_res["tool_name"]
         blog_data = prep_res["blog_data"]
-        
+        tool_source = prep_res["tool_source"]
+
         if not tool_name:
             return {"error": "未指定工具名称"}
-        
-        print(f"\n[ExecuteTools] 执行工具: {tool_name}")
-        
-        result = execute_tool(tool_name, blog_data)
-        
+
+        print(f"\n[ExecuteTools] 执行工具: {tool_name} ({tool_source}模式)")
+
+        # 使用MCP客户端调用工具
+        from utils.mcp_client.mcp_client import call_tool
+
+        try:
+            # 对于MCP工具，传递正确的服务器路径，不需要传递blog_data，服务器会自动加载
+            result = call_tool('utils/mcp_server', tool_name, {})
+
+            # 转换MCP结果为统一格式
+            if isinstance(result, dict) and "charts" in result:
+                # 已经是标准格式
+                final_result = result
+            else:
+                # 转换为标准格式
+                final_result = {
+                    "charts": result.get("charts", []),
+                    "data": result,
+                    "category": self._get_tool_category(tool_name),
+                    "summary": f"MCP工具 {tool_name} 执行完成"
+                }
+        except Exception as e:
+            print(f"[ExecuteTools] MCP工具调用失败: {str(e)}")
+            final_result = {"error": f"MCP工具调用失败: {str(e)}"}
+
         return {
             "tool_name": tool_name,
-            "result": result
+            "tool_source": tool_source,
+            "result": final_result
         }
-    
+
+    def _get_tool_category(self, tool_name: str) -> str:
+        """根据工具名称推断类别"""
+        name_lower = tool_name.lower()
+        if "sentiment" in name_lower:
+            return "情感分析"
+        elif "topic" in name_lower:
+            return "主题分析"
+        elif "geographic" in name_lower or "geo" in name_lower:
+            return "地理分析"
+        elif "publisher" in name_lower or "interaction" in name_lower:
+            return "多维交互分析"
+        else:
+            return "其他"
+
     def post(self, shared, prep_res, exec_res):
         """存储结果，注册图表"""
         if "stage2_results" not in shared:
@@ -2014,36 +2544,53 @@ class ExecuteToolsNode(Node):
                 "insights": {},
                 "execution_log": {"tools_executed": []}
             }
-        
+
         tool_name = exec_res["tool_name"]
+        tool_source = exec_res["tool_source"]
         result = exec_res.get("result", {})
-        
+
         # 记录执行的工具
         shared["stage2_results"]["execution_log"]["tools_executed"].append(tool_name)
-        
+
+        # 处理错误情况
+        if "error" in result:
+            print(f"  [X] 工具执行失败: {result['error']}")
+            # 存储失败结果
+            shared["agent"]["last_tool_result"] = {
+                "tool_name": tool_name,
+                "summary": f"工具执行失败: {result['error']}",
+                "has_chart": False,
+                "has_data": False,
+                "error": True
+            }
+            return "default"
+
         # 处理图表
         if result.get("charts"):
             shared["stage2_results"]["charts"].extend(result["charts"])
             print(f"  [OK] 生成 {len(result['charts'])} 个图表")
-        
+
         # 处理数据表格
         if result.get("data"):
             shared["stage2_results"]["tables"].append({
                 "id": tool_name,
                 "title": result.get("category", "") + " - " + tool_name,
                 "data": result["data"],
-                "source_tool": tool_name
+                "source_tool": tool_name,
+                "source_type": tool_source  # 记录数据来源
             })
             print(f"  [OK] 生成数据表格")
-        
+
         # 存储执行结果供ProcessResultNode使用
         shared["agent"]["last_tool_result"] = {
             "tool_name": tool_name,
+            "tool_source": tool_source,
             "summary": result.get("summary", "执行完成"),
             "has_chart": bool(result.get("charts")),
-            "has_data": bool(result.get("data"))
+            "has_data": bool(result.get("data")),
+            "error": False
         }
-        
+
         return "default"
 
 

@@ -1,0 +1,196 @@
+{
+  "sentiment_trend_20251130_001315": {
+    "chart_id": "sentiment_trend_20251130_001315",
+    "chart_title": "情感趋势变化图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433197.5674038,
+    "analysis_status": "partial_success",
+    "chart_description": "图表分析完成，但JSON解析失败",
+    "key_findings": [
+      "\n<|begin_of_box|>{\n  \"chart_description\": \"该图表为折线图（line_chart），用于展示情感趋势随时间的变化规律。图表核心结构包括：横轴（X轴）表示时间维度（推测为连续的时间序列，如日期或时间段），纵轴（Y轴）表示情感量化指标（通常为[-1,1]区间，负值代表负面情感，正值代表正面情感，0为中性）；图表包含多条折线，每条折线对应一种情感类别（如“正面情..."
+    ],
+    "insights": [
+      "需要手动检查分析结果"
+    ],
+    "recommendations": [
+      "建议手动审查图表"
+    ],
+    "alert_level": "medium",
+    "data_quality": "fair",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  "sentiment_pie_20251130_001315": {
+    "chart_id": "sentiment_pie_20251130_001315",
+    "chart_title": "情感分布饼图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433226.5559914,
+    "analysis_status": "partial_success",
+    "chart_description": "图表分析完成，但JSON解析失败",
+    "key_findings": [
+      "\n<|begin_of_box|>{\n  \"chart_description\": \"这是一张情感分布饼图，采用圆形结构将数据划分为多个扇形区域，每个扇形代表一种情感类别及其所占比例。图表中不同颜色的扇形块通过标签标注了情感类别名称和对应百分比，图例可能位于图表合适位置解释颜色与情感类别的对应关系，整体布局简洁直观地展示了各类情感的比例构成。\",\n  \"key_findings\": [\n    \"..."
+    ],
+    "insights": [
+      "需要手动检查分析结果"
+    ],
+    "recommendations": [
+      "建议手动审查图表"
+    ],
+    "alert_level": "medium",
+    "data_quality": "fair",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  "geographic_bar_20251130_001451": {
+    "chart_description": "该图表为柱状图（bar_chart），标题为\"Top15 地区分布图\"，用于展示特定指标在15个地区的分布情况。图表结构上，横轴列出Top15地区的名称（未明确具体地区，但从标题推测为按某指标排序的前15位地区），纵轴表示对应地区的指标数值（如舆情数量、情感得分、话题热度等，具体指标未明确）。图表无图例（因仅展示单一维度的地区分布），每个柱子的高度直观反映对应地区的指标水平。",
+    "key_findings": [
+      "地区间指标数值差异显著，排名第一的地区（如假设为\"北京\"）数值远高于其他地区，呈现明显的头部效应；",
+      "排名前5的地区数值差距较大，而排名6-15的地区数值逐步递减且趋于平缓，形成\"头部集中、尾部趋同\"的分布模式；",
+      "末尾几个地区（如排名第13-15位）的数值接近，无明显 outliers（异常点），整体分布相对稳定"
+    ],
+    "insights": [
+      "舆情情感倾向：若纵轴为\"正面情感占比\"，则高数值地区（如头部地区）可能存在更多正面舆情，反映当地公众对相关话题的态度较积极；反之若为\"负面情感占比\"，则需警惕这些地区的舆论风险；",
+      "话题热度分布：东部沿海发达地区（如假设的\"上海、广州\"）数值较高，可能与当地经济活跃度、网络普及率及公众关注度更高有关，而中西部地区数值偏低，反映区域间舆情参与度的差距；",
+      "地理区域参与度：一线城市及省会城市占据Top15多数席位，说明人口密集、信息传播快的地区更易成为舆情的核心场域，而偏远地区参与度低，可能存在舆情监测盲区"
+    ],
+    "recommendations": [
+      "重点关注头部地区（如Top5）的舆情动态，针对其高关注度特点制定差异化引导策略（如加强正面信息投放、及时回应热点问题）；",
+      "对尾部地区（如排名后5位）开展专项调研，分析其舆情参与度低的原因（如网络基础设施不足、公众关注度低），可通过本地化内容创作、线下活动等方式提升互动性；",
+      "建立跨区域舆情联动机制，利用头部地区的舆情热度带动尾部地区的信息传播，平衡区域间的舆情影响力"
+    ],
+    "alert_level": "medium",
+    "data_quality": "good",
+    "chart_id": "geographic_bar_20251130_001451",
+    "chart_title": "Top15 地区分布图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433256.0070882,
+    "analysis_status": "success"
+  },
+  "topic_ranking_20251130_001644": {
+    "chart_description": "该图表为柱状图（bar_chart），标题为\"Top10 主题热度排行\"，用于展示当前排名前10的热门主题及其热度值。图表结构上，横轴（X轴）列出Top1至Top10的主题名称（具体主题未显示），纵轴（Y轴）表示各主题的热度量化指标（如讨论量、提及频次等）。每个主题对应一根垂直柱子，柱子高度直观反映该主题的热度水平，无额外图例（因仅展示单一热度指标）。",
+    "key_findings": [
+      "头部主题热度呈现显著断层效应：排名第一的主题热度远高于后续主题，形成明显的\"一骑绝尘\"格局，反映出该主题在舆论场中的绝对主导地位。",
+      "中游主题热度梯度下降且差距稳定：第2至第5名主题热度依次递减，相邻主题间的热度差值相对均衡，表明这些主题处于竞争激烈的第二梯队。",
+      "尾部主题热度普遍偏低且分布分散：第6至第10名主题的热度值均处于较低区间，且彼此间差距不大，显示出这些主题的关注度较弱且尚未形成集中焦点。"
+    ],
+    "insights": [
+      "舆情情感与热度关联待验证：若头部主题涉及负面事件（如产品质量争议、公共安全事件），需警惕其情绪传染性；若为正面事件（如公益行动、政策利好），则可作为正面案例推广。",
+      "话题生命周期存在分化：头部主题若已进入成熟期，需关注其衰减速度；中游主题若出现热度异动（如突然上升），可能是新热点萌芽信号，需提前介入分析。",
+      "发布者类型影响力隐含规律：若官方账号主导头部主题讨论，说明权威信源占优；若自媒体/用户生成内容（UGC）推动中尾部主题升温，则反映民间话语权的崛起，需调整传播策略。"
+    ],
+    "recommendations": [
+      "建立头部主题动态监测机制：针对排名第一的主题，每日追踪其热度变化、情感倾向及传播渠道，防止负面舆情发酵。",
+      "启动中尾部主题潜力挖掘计划：对第3-7名的主题进行深度调研，识别其中具有增长潜力的细分方向，提前布局内容生产与资源投放。",
+      "完善异常热度预警系统：设定热度阈值（如单日涨幅超过50%），对第8-10名中突然飙升的主题自动触发分析流程，避免错过小众但关键的舆情线索。"
+    ],
+    "alert_level": "medium",
+    "data_quality": "good",
+    "chart_id": "topic_ranking_20251130_001644",
+    "chart_title": "Top10 主题热度排行",
+    "chart_path": "",
+    "analysis_timestamp": 1764433284.9615827,
+    "analysis_status": "success"
+  },
+  "topic_evolution_20251130_001644": {
+    "chart_id": "topic_evolution_20251130_001644",
+    "chart_title": "主题热度时序演化",
+    "chart_path": "",
+    "analysis_timestamp": 1764433341.370802,
+    "analysis_status": "partial_success",
+    "chart_description": "图表分析完成，但JSON解析失败",
+    "key_findings": [
+      "\n<|begin_of_box|>{\n  \"chart_description\": \"该图表为折线图，用于展示不同主题热度随时间的演化趋势。x轴为时间维度（如日期序列），y轴为热度量化指标（如讨论量、搜索指数）。图中包含多条折线，每条折线对应一个特定主题或分类（例如不同事件、地域、发布者类型）。图例位于图表右侧或上方，标注各折线的主题名称；坐标轴带有刻度和单位标签，标题清晰表明图表用途为\\\"主题热..."
+    ],
+    "insights": [
+      "需要手动检查分析结果"
+    ],
+    "recommendations": [
+      "建议手动审查图表"
+    ],
+    "alert_level": "medium",
+    "data_quality": "fair",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  "topic_network_20251130_001644": {
+    "chart_id": "topic_network_20251130_001644",
+    "chart_title": "主题关联网络图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433364.7575953,
+    "analysis_status": "partial_success",
+    "chart_description": "图表分析完成，但JSON解析失败",
+    "key_findings": [
+      "\n<|begin_of_box|>{\n  \"chart_description\": \"该图表为「主题关联网络图」（network_chart），采用无向网络结构呈现数据。核心构成要素包括：①节点（代表不同主题/关键词，通过大小体现话题热度，颜色可能反映情感倾向）；②边（代表主题间的关联强度，边越粗表示关联性越高）。图表未使用传统坐标轴，节点布局由力导向算法自动生成以优化可视化效果；虽未明确提及图例..."
+    ],
+    "insights": [
+      "需要手动检查分析结果"
+    ],
+    "recommendations": [
+      "建议手动审查图表"
+    ],
+    "alert_level": "medium",
+    "data_quality": "fair",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  "sentiment_trend_20251130_001655": {
+    "chart_id": "sentiment_trend_20251130_001655",
+    "chart_title": "情感趋势变化图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433392.5098717,
+    "analysis_status": "partial_success",
+    "chart_description": "图表分析完成，但JSON解析失败",
+    "key_findings": [
+      "\n<|begin_of_box|>{\n  \"chart_description\": \"该图表为折线图（line_chart），用于展示情感趋势随时间的变化规律。图表核心结构包括：横轴代表时间维度（推测为日期或时间区间，因未明确标注需结合业务场景判断），纵轴代表情感得分（通常范围为[-1,1]，负值表示消极情感，正值表示积极情感，0为中性）；图中包含多条折线（推测至少有“正面情感”“负面情感”“中性..."
+    ],
+    "insights": [
+      "需要手动检查分析结果"
+    ],
+    "recommendations": [
+      "建议手动审查图表"
+    ],
+    "alert_level": "medium",
+    "data_quality": "fair",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  "sentiment_pie_20251130_001655": {
+    "chart_description": "该图表为情感分布饼图，采用圆形结构展示不同情感类别的占比情况。主要数据组成为“正面”“负面”“中性”三类情感，每类情感对应不同颜色的扇形区域，并配有百分比标签及图例说明，无坐标轴设计。",
+    "key_findings": [
+      "正面情感占比最高，约为62%，是舆情主流倾向",
+      "负面情感占比约28%，处于中等水平，需警惕潜在风险",
+      "中性情感占比最小，仅10%左右，表明公众态度分化程度较低"
+    ],
+    "insights": [
+      "整体舆情呈现积极导向，但负面情绪仍有一定规模，可能反映特定议题的争议性",
+      "若负面情感集中于某一细分领域（如产品体验、服务投诉），需优先排查核心矛盾点"
+    ],
+    "recommendations": [
+      "对负面情感集中区域开展深度调研，明确问题根源并制定改进方案",
+      "加大正面案例的宣传力度，通过内容营销巩固积极舆论场",
+      "建立负面舆情的实时监测机制，防止局部问题扩散为系统性危机"
+    ],
+    "alert_level": "medium",
+    "data_quality": "good",
+    "chart_id": "sentiment_pie_20251130_001655",
+    "chart_title": "情感分布饼图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433410.5780942,
+    "analysis_status": "success"
+  },
+  "geographic_bar_20251130_001727": {
+    "chart_id": "geographic_bar_20251130_001727",
+    "chart_title": "Top15 地区分布图",
+    "chart_path": "",
+    "analysis_timestamp": 1764433442.178284,
+    "analysis_status": "partial_success",
+    "chart_description": "图表分析完成，但JSON解析失败",
+    "key_findings": [
+      "\n<|begin_of_box|>{\n  \"chart_description\": \"这是一张柱状图（bar chart），用于展示\\\"Top15 地区分布\\\"的舆情数据。图表横轴（X轴）列出排名前15的地区名称，纵轴（Y轴）表示对应地区的舆情相关指标（如讨论量、提及次数或情感强度等）。每个地区对应一根垂直柱子，柱子高度直观反映该地区的舆情活跃程度。图表包含标题\\\"Top15 地区分布图\\\"，无额..."
+    ],
+    "insights": [
+      "需要手动检查分析结果"
+    ],
+    "recommendations": [
+      "建议手动审查图表"
+    ],
+    "alert_level": "medium",
+    "data_quality": "fair",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  }
+}

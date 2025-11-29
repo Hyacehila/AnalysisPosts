@@ -7,8 +7,10 @@ requires-python = ">=3.12"
 dependencies = [
     "matplotlib>=3.10.7",
     "mcp[cli]>=1.22.0",
+    "fastmcp>=2.13.0",
     "numpy>=2.3.5",
     "pocketflow>=0.0.3",
     "requests>=2.32.5",
     "zai-sdk>=0.0.4.2",
+    "pydantic>=2.0.0",
 ]
