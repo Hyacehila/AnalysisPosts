@@ -83,25 +83,6 @@ def sentiment_anomaly() -> Dict[str, Any]:
     result = sentiment_anomaly_detection(blog_data)
     return result
 
-@mcp.tool()
-def generate_sentiment_chart() -> Dict[str, Any]:
-    """生成情感分析图表"""
-    blog_data = get_blog_data()
-    # 生成趋势图和饼图
-    trend_result = sentiment_trend_chart(blog_data)
-    pie_result = sentiment_pie_chart(blog_data)
-
-    charts = []
-    if trend_result.get("charts"):
-        charts.extend(trend_result["charts"])
-    if pie_result.get("charts"):
-        charts.extend(pie_result["charts"])
-
-    return {
-        "charts": charts,
-        "chart_count": len(charts),
-        "type": "sentiment_visualization"
-    }
 
 # =============================================================================
 # 主题分析工具
@@ -128,25 +109,6 @@ def topic_cooccurrence() -> Dict[str, Any]:
     result = topic_cooccurrence_analysis(blog_data)
     return result
 
-@mcp.tool()
-def generate_topic_charts() -> Dict[str, Any]:
-    """生成主题分析图表"""
-    blog_data = get_blog_data()
-    # 生成排行图、演化图和网络图
-    ranking_result = topic_ranking_chart(blog_data, top_n=10)
-    evolution_result = topic_evolution_chart(blog_data)
-    network_result = topic_network_chart(blog_data)
-
-    charts = []
-    for result in [ranking_result, evolution_result, network_result]:
-        if result.get("charts"):
-            charts.extend(result["charts"])
-
-    return {
-        "charts": charts,
-        "chart_count": len(charts),
-        "type": "topic_visualization"
-    }
 
 # =============================================================================
 # 地理分析工具
@@ -173,24 +135,6 @@ def geographic_sentiment() -> Dict[str, Any]:
     result = geographic_sentiment_analysis(blog_data)
     return result
 
-@mcp.tool()
-def generate_geographic_charts() -> Dict[str, Any]:
-    """生成地理分析图表"""
-    blog_data = get_blog_data()
-    # 生成热力图和柱状图
-    heatmap_result = geographic_heatmap(blog_data)
-    bar_result = geographic_bar_chart(blog_data)
-
-    charts = []
-    for result in [heatmap_result, bar_result]:
-        if result.get("charts"):
-            charts.extend(result["charts"])
-
-    return {
-        "charts": charts,
-        "chart_count": len(charts),
-        "type": "geographic_visualization"
-    }
 
 # =============================================================================
 # 多维交互分析工具
@@ -224,162 +168,7 @@ def correlation_analysis() -> Dict[str, Any]:
     result = correlation_analysis(blog_data)
     return result
 
-@mcp.tool()
-def generate_interaction_charts() -> Dict[str, Any]:
-    """生成多维交互分析图表"""
-    blog_data = get_blog_data()
-    # 生成热力图和柱状图
-    heatmap_result = interaction_heatmap(blog_data)
-    bar_result = publisher_bar_chart(blog_data)
 
-    charts = []
-    for result in [heatmap_result, bar_result]:
-        if result.get("charts"):
-            charts.extend(result["charts"])
-
-    return {
-        "charts": charts,
-        "chart_count": len(charts),
-        "type": "interaction_visualization"
-    }
-
-# =============================================================================
-# 综合分析工具
-# =============================================================================
-
-# 综合分析内部函数（不使用MCP装饰器，供内部调用）
-def _comprehensive_analysis_internal() -> Dict[str, Any]:
-    """内部综合分析函数，生成所有图表和统计数据"""
-    blog_data = get_blog_data()
-
-    all_charts = []
-    all_tables = []
-
-    try:
-        # 情感分析
-        print("[ComprehensiveAnalysis] 执行情感分析...")
-        sentiment_trend = sentiment_trend_chart(blog_data)
-        sentiment_pie = sentiment_pie_chart(blog_data)
-        all_tables.extend([
-            {"id": "sentiment_distribution", "data": sentiment_distribution_stats(blog_data)["data"]},
-            {"id": "sentiment_time_series", "data": sentiment_time_series(blog_data)["data"]},
-            {"id": "sentiment_anomaly", "data": sentiment_anomaly_detection(blog_data)["data"]},
-        ])
-        print(f"[ComprehensiveAnalysis] 情感分析完成，生成 {len(sentiment_trend.get('charts', []))} 张图表")
-
-        # 主题分析
-        print("[ComprehensiveAnalysis] 执行主题分析...")
-        topic_ranking = topic_ranking_chart(blog_data, top_n=10)
-        topic_evolution = topic_evolution_chart(blog_data)
-        topic_network = topic_network_chart(blog_data)
-        all_tables.extend([
-            {"id": "topic_frequency", "data": topic_frequency_stats(blog_data)["data"]},
-            {"id": "topic_evolution", "data": topic_time_evolution(blog_data)["data"]},
-            {"id": "topic_cooccurrence", "data": topic_cooccurrence_analysis(blog_data)["data"]},
-        ])
-        print(f"[ComprehensiveAnalysis] 主题分析完成，生成 {len(topic_ranking.get('charts', [])) + len(topic_evolution.get('charts', [])) + len(topic_network.get('charts', []))} 张图表")
-
-        # 地理分析
-        print("[ComprehensiveAnalysis] 执行地理分析...")
-        geo_heatmap = geographic_heatmap(blog_data)
-        geo_bar = geographic_bar_chart(blog_data)
-        all_tables.extend([
-            {"id": "geographic_distribution", "data": geographic_distribution_stats(blog_data)["data"]},
-            {"id": "geographic_hotspot", "data": geographic_hotspot_detection(blog_data)["data"]},
-            {"id": "geographic_sentiment", "data": geographic_sentiment_analysis(blog_data)["data"]},
-        ])
-        print(f"[ComprehensiveAnalysis] 地理分析完成，生成 {len(geo_heatmap.get('charts', [])) + len(geo_bar.get('charts', []))} 张图表")
-
-        # 多维交互分析
-        print("[ComprehensiveAnalysis] 执行多维交互分析...")
-        interaction_heatmap_chart = interaction_heatmap(blog_data)
-        publisher_bar = publisher_bar_chart(blog_data)
-
-        # 单独调用这些函数以测试
-        try:
-            publisher_dist_result = publisher_distribution_stats(blog_data)
-            print(f"[ComprehensiveAnalysis] publisher_distribution_stats 调用成功")
-            all_tables.append({"id": "publisher_distribution", "data": publisher_dist_result["data"]})
-        except Exception as e:
-            print(f"[ComprehensiveAnalysis] publisher_distribution_stats 调用失败: {str(e)}")
-            print(f"[ComprehensiveAnalysis] 函数类型: {type(publisher_distribution_stats)}")
-
-        try:
-            cross_matrix_result = cross_dimension_matrix(blog_data)
-            print(f"[ComprehensiveAnalysis] cross_dimension_matrix 调用成功")
-            all_tables.append({"id": "cross_dimension_matrix", "data": cross_matrix_result["data"]})
-        except Exception as e:
-            print(f"[ComprehensiveAnalysis] cross_dimension_matrix 调用失败: {str(e)}")
-            print(f"[ComprehensiveAnalysis] 函数类型: {type(cross_dimension_matrix)}")
-
-        try:
-            influence_result = influence_analysis(blog_data)
-            print(f"[ComprehensiveAnalysis] influence_analysis 调用成功")
-            all_tables.append({"id": "influence_analysis", "data": influence_result["data"]})
-        except Exception as e:
-            print(f"[ComprehensiveAnalysis] influence_analysis 调用失败: {str(e)}")
-            print(f"[ComprehensiveAnalysis] 函数类型: {type(influence_analysis)}")
-
-        try:
-            correlation_result = correlation_analysis(blog_data)
-            print(f"[ComprehensiveAnalysis] correlation_analysis 调用成功")
-            all_tables.append({"id": "correlation_analysis", "data": correlation_result["data"]})
-        except Exception as e:
-            print(f"[ComprehensiveAnalysis] correlation_analysis 调用失败: {str(e)}")
-            print(f"[ComprehensiveAnalysis] 函数类型: {type(correlation_analysis)}")
-
-        print(f"[ComprehensiveAnalysis] 多维交互分析完成，生成 {len(interaction_heatmap_chart.get('charts', [])) + len(publisher_bar.get('charts', []))} 张图表")
-
-    except Exception as e:
-        print(f"[ComprehensiveAnalysis] 分析过程中出现错误: {str(e)}")
-        import traceback
-        traceback.print_exc()
-
-    # 收集所有图表
-    for result in [
-        sentiment_trend, sentiment_pie,
-        topic_ranking, topic_evolution, topic_network,
-        geo_heatmap, geo_bar,
-        interaction_heatmap_chart, publisher_bar
-    ]:
-        if result and isinstance(result, dict) and result.get("charts"):
-            all_charts.extend(result["charts"])
-
-    return {
-        "charts": all_charts,
-        "tables": all_tables,
-        "summary": {
-            "total_charts": len(all_charts),
-            "total_tables": len(all_tables),
-            "analysis_types": ["sentiment", "topic", "geographic", "interaction"],
-            "data_points": len(blog_data)
-        },
-        "type": "comprehensive_analysis"
-    }
-
-@mcp.tool()
-def comprehensive_analysis() -> Dict[str, Any]:
-    """执行综合分析，生成所有图表和统计数据"""
-    try:
-        return _comprehensive_analysis_internal()
-    except Exception as e:
-        error_msg = f"综合分析失败: {str(e)}"
-        print(f"[ComprehensiveAnalysis] {error_msg}")
-        import traceback
-        traceback.print_exc()
-
-        return {
-            "error": error_msg,
-            "charts": [],
-            "tables": [],
-            "summary": {
-                "total_charts": 0,
-                "total_tables": 0,
-                "analysis_types": [],
-                "data_points": 0
-            },
-            "type": "comprehensive_analysis"
-        }
 
 # 启动服务器
 if __name__ == "__main__":
