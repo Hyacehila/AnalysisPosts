@@ -1,0 +1,1346 @@
+{
+  "charts": [
+    {
+      "id": "sentiment_trend_20251129_201050",
+      "type": "line_chart",
+      "title": "情感趋势变化图",
+      "file_path": "report/images\\sentiment_trend_20251129_201050.png",
+      "source_tool": "sentiment_trend_chart",
+      "description": "展示情感极性随时间的变化趋势及正负面占比"
+    },
+    {
+      "id": "sentiment_pie_20251129_201050",
+      "type": "pie_chart",
+      "title": "情感分布饼图",
+      "file_path": "report/images\\sentiment_pie_20251129_201050.png",
+      "source_tool": "sentiment_pie_chart",
+      "description": "展示博文情感极性的整体分布情况"
+    },
+    {
+      "id": "topic_ranking_20251129_201050",
+      "type": "bar_chart",
+      "title": "Top10 主题热度排行",
+      "file_path": "report/images\\topic_ranking_20251129_201050.png",
+      "source_tool": "topic_ranking_chart",
+      "description": "展示热度最高的10个主题及其博文数量"
+    },
+    {
+      "id": "topic_evolution_20251129_201050",
+      "type": "line_chart",
+      "title": "主题热度时序演化",
+      "file_path": "report/images\\topic_evolution_20251129_201050.png",
+      "source_tool": "topic_evolution_chart",
+      "description": "展示Top5主题随时间的热度变化趋势"
+    },
+    {
+      "id": "topic_network_20251129_201051",
+      "type": "network_chart",
+      "title": "主题关联网络图",
+      "file_path": "report/images\\topic_network_20251129_201051.png",
+      "source_tool": "topic_network_chart",
+      "description": "展示主题之间的共现关联关系，线条粗细表示关联强度"
+    },
+    {
+      "id": "geographic_bar_20251129_201051",
+      "type": "bar_chart",
+      "title": "Top15 地区分布图",
+      "file_path": "report/images\\geographic_bar_20251129_201051.png",
+      "source_tool": "geographic_bar_chart",
+      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
+    },
+    {
+      "id": "interaction_heatmap_20251129_201051",
+      "type": "heatmap",
+      "title": "发布者类型 × 情感极性 热力图",
+      "file_path": "report/images\\interaction_heatmap_20251129_201051.png",
+      "source_tool": "interaction_heatmap",
+      "description": "展示发布者类型与情感极性的交叉分布"
+    },
+    {
+      "id": "publisher_bar_20251129_201051",
+      "type": "bar_chart",
+      "title": "发布者类型分布图",
+      "file_path": "report/images\\publisher_bar_20251129_201051.png",
+      "source_tool": "publisher_bar_chart",
+      "description": "展示不同发布者类型的博文数量及情感倾向"
+    }
+  ],
+  "tables": [
+    {
+      "id": "sentiment_distribution",
+      "title": "情感极性分布统计",
+      "data": {
+        "distribution": {
+          "极度悲观": {
+            "count": 0,
+            "percentage": 0.0,
+            "polarity_value": 1
+          },
+          "悲观": {
+            "count": 3,
+            "percentage": 17.65,
+            "polarity_value": 2
+          },
+          "中性": {
+            "count": 0,
+            "percentage": 0.0,
+            "polarity_value": 3
+          },
+          "乐观": {
+            "count": 13,
+            "percentage": 76.47,
+            "polarity_value": 4
+          },
+          "极度乐观": {
+            "count": 1,
+            "percentage": 5.88,
+            "polarity_value": 5
+          }
+        },
+        "total_count": 17,
+        "valid_count": 17,
+        "avg_polarity": 3.71,
+        "dominant_polarity": "乐观"
+      },
+      "source_tool": "sentiment_distribution_stats"
+    },
+    {
+      "id": "sentiment_time_series",
+      "title": "情感时序趋势数据",
+      "data": {
+        "time_series": {
+          "2024-08-22 00:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-23 04:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-23 11:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-23 21:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-24 21:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-24 22:00": {
+            "count": 3,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-25 19:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-26 12:00": {
+            "count": 1,
+            "avg_polarity": 2.0,
+            "positive_ratio": 0.0,
+            "negative_ratio": 100.0
+          },
+          "2024-08-28 22:00": {
+            "count": 1,
+            "avg_polarity": 5.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-29 00:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-29 14:00": {
+            "count": 1,
+            "avg_polarity": 2.0,
+            "positive_ratio": 0.0,
+            "negative_ratio": 100.0
+          },
+          "2024-08-30 14:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-30 22:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-31 01:00": {
+            "count": 1,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0
+          },
+          "2024-08-31 22:00": {
+            "count": 1,
+            "avg_polarity": 2.0,
+            "positive_ratio": 0.0,
+            "negative_ratio": 100.0
+          }
+        },
+        "granularity": "hour",
+        "time_range": {
+          "start": "2024-08-22 00:00",
+          "end": "2024-08-31 22:00"
+        },
+        "trend": "下降"
+      },
+      "source_tool": "sentiment_time_series"
+    },
+    {
+      "id": "sentiment_anomaly",
+      "title": "情感异常点",
+      "data": {
+        "anomalies": [
+          {
+            "time": "2024-08-24 22:00",
+            "avg_polarity": 4.0,
+            "count": 3,
+            "reasons": [
+              "发帖量异常(偏离3.7个标准差)"
+            ]
+          }
+        ],
+        "threshold": 2.0,
+        "baseline": {
+          "mean_polarity": 3.67,
+          "std_polarity": 0.87,
+          "mean_count": 1.13,
+          "std_count": 0.5
+        }
+      },
+      "source_tool": "sentiment_anomaly_detection"
+    },
+    {
+      "id": "topic_frequency",
+      "title": "主题频次统计",
+      "data": {
+        "parent_topics": {
+          "社会民生": {
+            "count": 14,
+            "percentage": 82.35
+          },
+          "交通运输": {
+            "count": 5,
+            "percentage": 29.41
+          },
+          "民众反应": {
+            "count": 5,
+            "percentage": 29.41
+          },
+          "媒体传播": {
+            "count": 2,
+            "percentage": 11.76
+          },
+          "经济影响": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "公共事业": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "地理区域": {
+            "count": 1,
+            "percentage": 5.88
+          }
+        },
+        "sub_topics": {
+          "居民生活": {
+            "count": 10,
+            "percentage": 58.82
+          },
+          "出行安全": {
+            "count": 4,
+            "percentage": 23.53
+          },
+          "民众情绪": {
+            "count": 3,
+            "percentage": 17.65
+          },
+          "环境卫生": {
+            "count": 3,
+            "percentage": 17.65
+          },
+          "社交媒体": {
+            "count": 2,
+            "percentage": 11.76
+          },
+          "运输保障": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "公共秩序": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "餐饮业": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "志愿服务": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "环卫服务": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "东城区": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "公众参与": {
+            "count": 1,
+            "percentage": 5.88
+          }
+        },
+        "top_topic_pairs": [
+          {
+            "topic": "社会民生 > 居民生活",
+            "count": 10,
+            "percentage": 58.82
+          },
+          {
+            "topic": "交通运输 > 出行安全",
+            "count": 4,
+            "percentage": 23.53
+          },
+          {
+            "topic": "民众反应 > 民众情绪",
+            "count": 3,
+            "percentage": 17.65
+          },
+          {
+            "topic": "社会民生 > 环境卫生",
+            "count": 3,
+            "percentage": 17.65
+          },
+          {
+            "topic": "媒体传播 > 社交媒体",
+            "count": 2,
+            "percentage": 11.76
+          },
+          {
+            "topic": "交通运输 > 运输保障",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "topic": "社会民生 > 公共秩序",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "topic": "经济影响 > 餐饮业",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "topic": "民众反应 > 志愿服务",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "topic": "公共事业 > 环卫服务",
+            "count": 1,
+            "percentage": 5.88
+          }
+        ],
+        "coverage": {
+          "posts_with_topics": 17,
+          "total_posts": 17,
+          "percentage": 100.0
+        }
+      },
+      "source_tool": "topic_frequency_stats"
+    },
+    {
+      "id": "topic_evolution",
+      "title": "主题演化数据",
+      "data": {
+        "time_series": {
+          "2024-08-22": {
+            "社会民生": 1
+          },
+          "2024-08-23": {
+            "社会民生": 3,
+            "民众反应": 2
+          },
+          "2024-08-24": {
+            "社会民生": 3,
+            "媒体传播": 1,
+            "交通运输": 1
+          },
+          "2024-08-25": {
+            "社会民生": 1,
+            "民众反应": 1
+          },
+          "2024-08-26": {
+            "交通运输": 1,
+            "社会民生": 1
+          },
+          "2024-08-28": {
+            "社会民生": 1,
+            "经济影响": 1
+          },
+          "2024-08-29": {
+            "交通运输": 1,
+            "社会民生": 2
+          },
+          "2024-08-30": {
+            "社会民生": 2,
+            "媒体传播": 1
+          },
+          "2024-08-31": {
+            "交通运输": 2,
+            "民众反应": 2
+          }
+        },
+        "top_topics": [
+          "社会民生",
+          "交通运输",
+          "民众反应",
+          "媒体传播",
+          "经济影响"
+        ],
+        "trends": {
+          "社会民生": {
+            "first_period_avg": 2.33,
+            "last_period_avg": 1.33,
+            "change_percentage": -42.86,
+            "trend": "下降"
+          },
+          "交通运输": {
+            "first_period_avg": 0.33,
+            "last_period_avg": 1.0,
+            "change_percentage": 200.0,
+            "trend": "上升"
+          },
+          "民众反应": {
+            "first_period_avg": 0.67,
+            "last_period_avg": 0.67,
+            "change_percentage": 0.0,
+            "trend": "平稳"
+          },
+          "媒体传播": {
+            "first_period_avg": 0.33,
+            "last_period_avg": 0.33,
+            "change_percentage": 0.0,
+            "trend": "平稳"
+          },
+          "经济影响": {
+            "first_period_avg": 0,
+            "last_period_avg": 0.0,
+            "change_percentage": 0,
+            "trend": "平稳"
+          }
+        },
+        "granularity": "day",
+        "time_range": {
+          "start": "2024-08-22",
+          "end": "2024-08-31"
+        }
+      },
+      "source_tool": "topic_time_evolution"
+    },
+    {
+      "id": "topic_cooccurrence",
+      "title": "主题共现关系",
+      "data": {
+        "cooccurrence_pairs": [
+          {
+            "topic_pair": [
+              "民众反应",
+              "社会民生"
+            ],
+            "count": 3,
+            "support": 17.65
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "民众反应"
+            ],
+            "count": 2,
+            "support": 11.76
+          },
+          {
+            "topic_pair": [
+              "媒体传播",
+              "社会民生"
+            ],
+            "count": 2,
+            "support": 11.76
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "社会民生"
+            ],
+            "count": 2,
+            "support": 11.76
+          }
+        ],
+        "association_matrix": {
+          "民众反应": {
+            "媒体传播": 0,
+            "社会民生": 3,
+            "交通运输": 2
+          },
+          "媒体传播": {
+            "民众反应": 0,
+            "社会民生": 2,
+            "交通运输": 0
+          },
+          "社会民生": {
+            "民众反应": 3,
+            "媒体传播": 2,
+            "交通运输": 2
+          },
+          "交通运输": {
+            "民众反应": 2,
+            "媒体传播": 0,
+            "社会民生": 2
+          }
+        },
+        "min_support": 2,
+        "total_pairs_analyzed": 7
+      },
+      "source_tool": "topic_cooccurrence_analysis"
+    },
+    {
+      "id": "geographic_distribution",
+      "title": "地理分布统计",
+      "data": {
+        "distribution": {
+          "北京": {
+            "count": 5,
+            "percentage": 29.41
+          },
+          "湖北": {
+            "count": 2,
+            "percentage": 11.76
+          },
+          "上海": {
+            "count": 2,
+            "percentage": 11.76
+          },
+          "四川": {
+            "count": 2,
+            "percentage": 11.76
+          },
+          "云南": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "辽宁": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "重庆": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "无位置信息": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "浙江": {
+            "count": 1,
+            "percentage": 5.88
+          },
+          "吉林": {
+            "count": 1,
+            "percentage": 5.88
+          }
+        },
+        "total_posts": 17,
+        "posts_with_location": 17,
+        "coverage_percentage": 100.0,
+        "unique_locations": 10,
+        "top_locations": [
+          {
+            "location": "北京",
+            "count": 5,
+            "percentage": 29.41
+          },
+          {
+            "location": "湖北",
+            "count": 2,
+            "percentage": 11.76
+          },
+          {
+            "location": "上海",
+            "count": 2,
+            "percentage": 11.76
+          },
+          {
+            "location": "四川",
+            "count": 2,
+            "percentage": 11.76
+          },
+          {
+            "location": "云南",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "location": "辽宁",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "location": "重庆",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "location": "无位置信息",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "location": "浙江",
+            "count": 1,
+            "percentage": 5.88
+          },
+          {
+            "location": "吉林",
+            "count": 1,
+            "percentage": 5.88
+          }
+        ]
+      },
+      "source_tool": "geographic_distribution_stats"
+    },
+    {
+      "id": "geographic_hotspot",
+      "title": "热点区域",
+      "data": {
+        "hotspots": [
+          {
+            "location": "北京",
+            "count": 5,
+            "percentage": 29.41,
+            "is_hotspot": true
+          }
+        ],
+        "threshold": 2.3,
+        "threshold_percentile": 90,
+        "hotspot_concentration": 29.41
+      },
+      "source_tool": "geographic_hotspot_detection"
+    },
+    {
+      "id": "geographic_sentiment",
+      "title": "地区情感分析",
+      "data": {
+        "regional_analysis": {
+          "北京": {
+            "post_count": 5,
+            "avg_polarity": 4.0,
+            "positive_ratio": 100.0,
+            "negative_ratio": 0.0,
+            "sentiment_label": "正面主导"
+          }
+        },
+        "min_posts_threshold": 5,
+        "regions_analyzed": 1
+      },
+      "source_tool": "geographic_sentiment_analysis"
+    },
+    {
+      "id": "publisher_distribution",
+      "title": "发布者分布统计",
+      "data": {
+        "distribution": {
+          "个人用户": {
+            "count": 9,
+            "percentage": 52.94,
+            "avg_reposts": 0.11,
+            "avg_comments": 1.78,
+            "avg_likes": 1.0,
+            "avg_sentiment": 3.78,
+            "total_engagement": 26
+          },
+          "自媒体": {
+            "count": 3,
+            "percentage": 17.65,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.67,
+            "avg_likes": 0.67,
+            "avg_sentiment": 3.33,
+            "total_engagement": 4
+          },
+          "学生": {
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.0,
+            "avg_likes": 0.0,
+            "avg_sentiment": 4.0,
+            "total_engagement": 0
+          },
+          "官方新闻媒体": {
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 1.0,
+            "avg_comments": 3.0,
+            "avg_likes": 5.0,
+            "avg_sentiment": 2.0,
+            "total_engagement": 9
+          },
+          "美食博主": {
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.0,
+            "avg_likes": 0.0,
+            "avg_sentiment": 5.0,
+            "total_engagement": 0
+          },
+          "视频博主": {
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 0.0,
+            "avg_comments": 29.0,
+            "avg_likes": 19.0,
+            "avg_sentiment": 4.0,
+            "total_engagement": 48
+          },
+          "旅游博主": {
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 0.0,
+            "avg_comments": 8.0,
+            "avg_likes": 8.0,
+            "avg_sentiment": 4.0,
+            "total_engagement": 16
+          }
+        },
+        "total_posts": 17,
+        "publisher_types": 7,
+        "top_publishers": [
+          {
+            "publisher": "个人用户",
+            "count": 9,
+            "percentage": 52.94,
+            "avg_reposts": 0.11,
+            "avg_comments": 1.78,
+            "avg_likes": 1.0,
+            "avg_sentiment": 3.78,
+            "total_engagement": 26
+          },
+          {
+            "publisher": "自媒体",
+            "count": 3,
+            "percentage": 17.65,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.67,
+            "avg_likes": 0.67,
+            "avg_sentiment": 3.33,
+            "total_engagement": 4
+          },
+          {
+            "publisher": "学生",
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.0,
+            "avg_likes": 0.0,
+            "avg_sentiment": 4.0,
+            "total_engagement": 0
+          },
+          {
+            "publisher": "官方新闻媒体",
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 1.0,
+            "avg_comments": 3.0,
+            "avg_likes": 5.0,
+            "avg_sentiment": 2.0,
+            "total_engagement": 9
+          },
+          {
+            "publisher": "美食博主",
+            "count": 1,
+            "percentage": 5.88,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.0,
+            "avg_likes": 0.0,
+            "avg_sentiment": 5.0,
+            "total_engagement": 0
+          }
+        ]
+      },
+      "source_tool": "publisher_distribution_stats"
+    },
+    {
+      "id": "cross_dimension_matrix",
+      "title": "发布者×情感交叉矩阵",
+      "data": {
+        "matrix": {
+          "个人用户": {
+            "乐观": {
+              "count": 8,
+              "row_percentage": 88.89,
+              "col_percentage": 61.54
+            },
+            "悲观": {
+              "count": 1,
+              "row_percentage": 11.11,
+              "col_percentage": 33.33
+            },
+            "极度乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "自媒体": {
+            "乐观": {
+              "count": 2,
+              "row_percentage": 66.67,
+              "col_percentage": 15.38
+            },
+            "悲观": {
+              "count": 1,
+              "row_percentage": 33.33,
+              "col_percentage": 33.33
+            },
+            "极度乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "学生": {
+            "乐观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 7.69
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "极度乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "官方新闻媒体": {
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 33.33
+            },
+            "极度乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "美食博主": {
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "极度乐观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 100.0
+            }
+          },
+          "视频博主": {
+            "乐观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 7.69
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "极度乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "旅游博主": {
+            "乐观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 7.69
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "极度乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          }
+        },
+        "dimensions": {
+          "dim1": "publisher",
+          "dim2": "sentiment_polarity"
+        },
+        "dim1_values": [
+          "个人用户",
+          "自媒体",
+          "学生",
+          "官方新闻媒体",
+          "美食博主",
+          "视频博主",
+          "旅游博主"
+        ],
+        "dim2_values": [
+          "乐观",
+          "悲观",
+          "极度乐观"
+        ],
+        "dim1_totals": {
+          "个人用户": 9,
+          "自媒体": 3,
+          "学生": 1,
+          "官方新闻媒体": 1,
+          "美食博主": 1,
+          "视频博主": 1,
+          "旅游博主": 1
+        },
+        "dim2_totals": {
+          "乐观": 13,
+          "悲观": 3,
+          "极度乐观": 1
+        }
+      },
+      "source_tool": "cross_dimension_matrix"
+    },
+    {
+      "id": "influence_analysis",
+      "title": "影响力分析",
+      "data": {
+        "top_influential_posts": [
+          {
+            "index": 8,
+            "username": "EVA-hangzhou",
+            "content_preview": "#张艺兴夜骑主动停车捡垃圾# zyx#张艺兴2024世界巡演# 🈲️快～转，会降双方权重🙏 “夜”上海Vlog city walk city ride 骑上共享单车逛一逛 随手捡一捡公园地上的空瓶子 ...",
+            "publish_time": "2024-08-25 19:52:00",
+            "repost_count": 0,
+            "comment_count": 29,
+            "like_count": 19,
+            "influence_score": 77,
+            "sentiment_polarity": 4,
+            "publisher": "视频博主"
+          },
+          {
+            "index": 13,
+            "username": "V妮佳沙",
+            "content_preview": "#此沙[超话]# 很久没上环城绿道，今天心血来潮下班后蹬个共享单车就去了。晚上去比我想象中有意思很多，🚴没有白天那么多，有很多散步、跑步、夜骑的人也不少，有人气但不拥挤。要不是忘记带充电宝，我能骑完一...",
+            "publish_time": "2024-08-23 21:33:00",
+            "repost_count": 0,
+            "comment_count": 8,
+            "like_count": 8,
+            "influence_score": 24,
+            "sentiment_polarity": 4,
+            "publisher": "旅游博主"
+          },
+          {
+            "index": 4,
+            "username": "风闻社区",
+            "content_preview": "【“青少年骑行热”乱象调查：儿童骑行上路，车比人大隐患重重】有孩子在绿灯亮起那一刻立即加速冲出骑行道，在人流与车流间横冲直撞，把家长甩到了“九霄云外”；也有孩子骑着尺寸比自己小小的身板大出不少的自行车...",
+            "publish_time": "2024-08-29 14:58:00",
+            "repost_count": 1,
+            "comment_count": 3,
+            "like_count": 5,
+            "influence_score": 14,
+            "sentiment_polarity": 2,
+            "publisher": "官方新闻媒体"
+          },
+          {
+            "index": 15,
+            "username": "重生之我是狄仁杰的侄女",
+            "content_preview": "夜骑好爽，没有专业设备，就是随手扫的共享单车慢慢吹晚风好舒服 http://t.cn/A6R4r1rP ​​​",
+            "publish_time": "2024-08-23 04:23:00",
+            "repost_count": 0,
+            "comment_count": 4,
+            "like_count": 3,
+            "influence_score": 11,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 11,
+            "username": "小七请早睡",
+            "content_preview": "夜骑长安街，最难的是找到一辆共享单车[笑cry] ❤️北京+1 收获力量！！！ ​​​",
+            "publish_time": "2024-08-24 22:19:00",
+            "repost_count": 0,
+            "comment_count": 4,
+            "like_count": 1,
+            "influence_score": 9,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 12,
+            "username": "KA_khoo",
+            "content_preview": "第二盘儿用共享单车跟到去夜骑 主打一个各耍各[裂开] 今天运动达标＋昨天做饭达标 ​​​",
+            "publish_time": "2024-08-24 21:45:00",
+            "repost_count": 0,
+            "comment_count": 4,
+            "like_count": 0,
+            "influence_score": 8,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 14,
+            "username": "乡村刘三好",
+            "content_preview": "共享单车夜骑🚴哈哈哈 ​​​",
+            "publish_time": "2024-08-23 11:45:00",
+            "repost_count": 0,
+            "comment_count": 3,
+            "like_count": 1,
+            "influence_score": 7,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 7,
+            "username": "元气满满在逃公主椰",
+            "content_preview": "解锁共享单车夜骑新体验之—— 再也不夜骑了🙃 11点半出发 历时7+小时 骑行60公里 人已废在工位 ​​​",
+            "publish_time": "2024-08-26 12:51:00",
+            "repost_count": 0,
+            "comment_count": 2,
+            "like_count": 2,
+            "influence_score": 6,
+            "sentiment_polarity": 2,
+            "publisher": "自媒体"
+          },
+          {
+            "index": 0,
+            "username": "天使鮟鱇",
+            "content_preview": "太烦躁了所以在公园夜骑共享单车一段没有路灯的盲骑好像没有骑单车不能忘记的烦 ​​​",
+            "publish_time": "2024-08-31 22:02:00",
+            "repost_count": 1,
+            "comment_count": 0,
+            "like_count": 1,
+            "influence_score": 4,
+            "sentiment_polarity": 2,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 1,
+            "username": "徐志摩在第二乐章里说",
+            "content_preview": "学校旁就是海。 将一切刚好赶到的日落、恰如其分的小雨、泥泞渔村的小路、八里长街上久违的夜骑、公路上放肆高唱的艳阳天、天气中未差半毫的湿度与温度——通通归功于四辆半的共享电单车。 ​​​",
+            "publish_time": "2024-08-31 01:49:00",
+            "repost_count": 0,
+            "comment_count": 1,
+            "like_count": 1,
+            "influence_score": 3,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 3,
+            "username": "gluewoodpecker",
+            "content_preview": "翻相册翻到月初一个人在天津解放北路夜骑共享单车，不在乎时间像没有明天一样地活着。好幸福，欢迎收看我的私生活，余虹在天津的时候。 ​​​",
+            "publish_time": "2024-08-30 14:50:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 2,
+            "influence_score": 2,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 2,
+            "username": "剃头发电热爱唱歌",
+            "content_preview": "表现叛逆的方式，是在没有共享单车的城市的校园里，疯狂骑行，真的很爱夜骑，闷闷热热的空气因为脚蹬车的速度加快而变得凉爽，感受大腿肌肉一点点变酸，第一张骑行卡，毕业 ​​​",
+            "publish_time": "2024-08-30 22:52:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 0,
+            "influence_score": 0,
+            "sentiment_polarity": 4,
+            "publisher": "学生"
+          },
+          {
+            "index": 5,
+            "username": "滴di滴叭ba叭呜皮啊",
+            "content_preview": "好想买自行车🚲 好纠结，买了没地方放，骑的次数也不算多 想夜骑了不如扫个共享单车 可是还是想买啊哈哈哈哈哈哈哈哈 ​​​",
+            "publish_time": "2024-08-29 00:15:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 0,
+            "influence_score": 0,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          },
+          {
+            "index": 6,
+            "username": "卡通胶片笑声",
+            "content_preview": "#每一场夜骑终点都是夜宵摊# 🌟夜晚不再寂寞！随着暑热来袭，&quot;夜骑&quot;一族悄然兴起，北京、上海、成都...各大城市的夜空下，共享單車成为最靓的风景線🌈 在北京，18-22时的夜騎時長...",
+            "publish_time": "2024-08-28 22:10:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 0,
+            "influence_score": 0,
+            "sentiment_polarity": 5,
+            "publisher": "美食博主"
+          },
+          {
+            "index": 9,
+            "username": "偶像音乐潮流地",
+            "content_preview": "#张艺兴夜骑主动停车捡垃圾# 张艺兴实在太可爱了！在上海江边夜骑共享单车，看到垃圾赶紧停车去捡起。细节处见人品，张艺兴一直都做的很好啊！http://t.cn/A6RqOLzZ ​​​",
+            "publish_time": "2024-08-24 22:23:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 0,
+            "influence_score": 0,
+            "sentiment_polarity": 4,
+            "publisher": "自媒体"
+          },
+          {
+            "index": 10,
+            "username": "爱张哥的人生易如反掌",
+            "content_preview": "#张艺兴夜骑主动停车捡垃圾#一个环保的要坐地铁骑共享单车的张哥 ​​​",
+            "publish_time": "2024-08-24 22:21:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 0,
+            "influence_score": 0,
+            "sentiment_polarity": 4,
+            "publisher": "自媒体"
+          },
+          {
+            "index": 16,
+            "username": "没有碳酸不能活",
+            "content_preview": "虽然骑的是共享单车，但夜骑真的很快乐🚴 ​​​",
+            "publish_time": "2024-08-22 00:36:00",
+            "repost_count": 0,
+            "comment_count": 0,
+            "like_count": 0,
+            "influence_score": 0,
+            "sentiment_polarity": 4,
+            "publisher": "个人用户"
+          }
+        ],
+        "influence_concentration": 100.0,
+        "total_posts": 17,
+        "total_engagement": 165,
+        "avg_influence_score": 9.71,
+        "publisher_influence": [
+          {
+            "publisher": "视频博主",
+            "total_influence": 77
+          },
+          {
+            "publisher": "个人用户",
+            "total_influence": 44
+          },
+          {
+            "publisher": "旅游博主",
+            "total_influence": 24
+          },
+          {
+            "publisher": "官方新闻媒体",
+            "total_influence": 14
+          },
+          {
+            "publisher": "自媒体",
+            "total_influence": 6
+          },
+          {
+            "publisher": "学生",
+            "total_influence": 0
+          },
+          {
+            "publisher": "美食博主",
+            "total_influence": 0
+          }
+        ]
+      },
+      "source_tool": "influence_analysis"
+    },
+    {
+      "id": "correlation_analysis",
+      "title": "维度相关性分析",
+      "data": {
+        "correlation_matrix": {
+          "sentiment_polarity": {
+            "sentiment_polarity": 1.0,
+            "repost_count": -0.756,
+            "comment_count": 0.075,
+            "like_count": -0.052,
+            "content_length": -0.496,
+            "image_count": -0.121,
+            "topic_count": -0.231
+          },
+          "repost_count": {
+            "sentiment_polarity": -0.756,
+            "repost_count": 1.0,
+            "comment_count": -0.103,
+            "like_count": 0.037,
+            "content_length": 0.676,
+            "image_count": -0.198,
+            "topic_count": 0.236
+          },
+          "comment_count": {
+            "sentiment_polarity": 0.075,
+            "repost_count": -0.103,
+            "comment_count": 1.0,
+            "like_count": 0.956,
+            "content_length": 0.026,
+            "image_count": -0.036,
+            "topic_count": 0.173
+          },
+          "like_count": {
+            "sentiment_polarity": -0.052,
+            "repost_count": 0.037,
+            "comment_count": 0.956,
+            "like_count": 1.0,
+            "content_length": 0.177,
+            "image_count": -0.067,
+            "topic_count": 0.27
+          },
+          "content_length": {
+            "sentiment_polarity": -0.496,
+            "repost_count": 0.676,
+            "comment_count": 0.026,
+            "like_count": 0.177,
+            "content_length": 1.0,
+            "image_count": -0.048,
+            "topic_count": 0.18
+          },
+          "image_count": {
+            "sentiment_polarity": -0.121,
+            "repost_count": -0.198,
+            "comment_count": -0.036,
+            "like_count": -0.067,
+            "content_length": -0.048,
+            "image_count": 1.0,
+            "topic_count": 0.091
+          },
+          "topic_count": {
+            "sentiment_polarity": -0.231,
+            "repost_count": 0.236,
+            "comment_count": 0.173,
+            "like_count": 0.27,
+            "content_length": 0.18,
+            "image_count": 0.091,
+            "topic_count": 1.0
+          }
+        },
+        "feature_names": [
+          "sentiment_polarity",
+          "repost_count",
+          "comment_count",
+          "like_count",
+          "content_length",
+          "image_count",
+          "topic_count"
+        ],
+        "significant_correlations": [
+          {
+            "feature1": "comment_count",
+            "feature2": "like_count",
+            "correlation": 0.956,
+            "strength": "强"
+          },
+          {
+            "feature1": "repost_count",
+            "feature2": "sentiment_polarity",
+            "correlation": -0.756,
+            "strength": "强"
+          },
+          {
+            "feature1": "content_length",
+            "feature2": "repost_count",
+            "correlation": 0.676,
+            "strength": "中"
+          },
+          {
+            "feature1": "content_length",
+            "feature2": "sentiment_polarity",
+            "correlation": -0.496,
+            "strength": "弱"
+          }
+        ],
+        "sample_size": 17
+      },
+      "source_tool": "correlation_analysis"
+    }
+  ],
+  "execution_log": {
+    "tools_executed": [
+      "sentiment_distribution_stats",
+      "sentiment_time_series",
+      "sentiment_anomaly_detection",
+      "sentiment_trend_chart",
+      "sentiment_pie_chart",
+      "topic_frequency_stats",
+      "topic_time_evolution",
+      "topic_cooccurrence_analysis",
+      "topic_ranking_chart",
+      "topic_evolution_chart",
+      "topic_network_chart",
+      "geographic_distribution_stats",
+      "geographic_hotspot_detection",
+      "geographic_sentiment_analysis",
+      "geographic_heatmap",
+      "geographic_bar_chart",
+      "publisher_distribution_stats",
+      "cross_dimension_matrix",
+      "influence_analysis",
+      "correlation_analysis",
+      "interaction_heatmap",
+      "publisher_bar_chart"
+    ],
+    "total_charts": 8,
+    "total_tables": 13,
+    "execution_time": 1.6779475212097168
+  }
+}

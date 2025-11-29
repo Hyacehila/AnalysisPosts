@@ -59,7 +59,7 @@ def init_shared(
         sentiment_attributes_path: 情感属性列表文件路径
         publisher_objects_path: 发布者类型列表文件路径
         start_stage: 起始阶段 (1/2/3)
-        run_stages: 需要执行的阶段列表，默认[1]（目前仅阶段1可用）
+        run_stages: 需要执行的阶段列表，默认[1, 2]
         enhancement_mode: 阶段1处理模式 ("async" | "batch_api")
         analysis_mode: 阶段2分析模式 ("workflow" | "agent")
         tool_source: Agent工具来源 ("local" | "mcp")
@@ -73,7 +73,7 @@ def init_shared(
         Dict: 初始化完成的shared字典
     """
     if run_stages is None:
-        run_stages = [1]  # 目前仅阶段1可用
+        run_stages = [1, 2]  # 默认执行阶段1和2
     
     return {
         # === 调度控制（DispatcherNode使用） ===
@@ -192,22 +192,22 @@ def print_results(shared: Dict[str, Any], elapsed_time: float):
     print("=" * 60)
     
     completed_stages = shared.get("dispatcher", {}).get("completed_stages", [])
-    print(f"\n✅ 已完成阶段: {completed_stages}")
+    print(f"\n[OK] 已完成阶段: {completed_stages}")
     
     # 数据保存状态（阶段1结果）
     data_save = shared.get("stage1_results", {}).get("data_save", {})
     if data_save.get("saved"):
-        print(f"\n💾 数据保存:")
+        print(f"\n[DATA] 数据保存:")
         print(f"  ├─ 保存路径: {data_save.get('output_path', 'N/A')}")
         print(f"  └─ 保存数量: {data_save.get('data_count', 0)} 条")
     
     # 耗时和效率
-    print(f"\n⏱️  总耗时: {elapsed_time:.2f} 秒")
+    print(f"\n[TIME] 总耗时: {elapsed_time:.2f} 秒")
     
     stats = shared.get("stage1_results", {}).get("statistics", {})
     processed_blogs = stats.get('processed_blogs', 0)
     if processed_blogs > 0 and elapsed_time > 0:
-        print(f"📈 处理效率: {processed_blogs / elapsed_time:.2f} 条/秒")
+        print(f"[RATE] 处理效率: {processed_blogs / elapsed_time:.2f} 条/秒")
     
     print("\n" + "=" * 60 + "\n")
 
@@ -256,8 +256,8 @@ async def run(
         
     except Exception as e:
         elapsed_time = time.time() - start_time
-        print(f"\n❌ 执行出错: {str(e)}")
-        print(f"⏱️  运行时间: {elapsed_time:.2f} 秒")
+        print(f"\n[X] 执行出错: {str(e)}")
+        print(f"[T] 运行时间: {elapsed_time:.2f} 秒")
         import traceback
         traceback.print_exc()
 
@@ -272,6 +272,16 @@ def main():
     # =========================================================================
     # 配置区域 - 修改以下参数调整运行配置
     # =========================================================================
+    #
+    # 快速切换运行模式：
+    # 1. 仅运行阶段2 (当前配置): RUN_STAGES = [2]
+    # 2. 运行完整流程: RUN_STAGES = [1, 2]
+    # 3. 仅运行阶段1: RUN_STAGES = [1]
+    #
+    # 阶段2模式切换：
+    # - workflow: 预定义分析脚本 (推荐)
+    # - agent: LLM自主决策分析
+    #
     
     # ----- 数据路径配置 -----
     INPUT_DATA_PATH = "data/test_posts.json"
@@ -279,16 +289,19 @@ def main():
     TOPICS_PATH = "data/topics.json"
     SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
     PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
+
+    # 阶段2需要读取的增强数据文件路径（确保阶段1已生成）
+    ENHANCED_DATA_PATH = OUTPUT_DATA_PATH
     
     # ----- 执行阶段配置 -----
-    # 设置需要执行的阶段列表，目前仅阶段1可用
-    # [1] = 仅阶段1, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [1]
+    # 设置需要执行的阶段列表
+    # [1] = 仅阶段1, [2] = 仅阶段2, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
+    RUN_STAGES = [2]  # 仅执行阶段2
     
     # ----- 阶段1配置 -----
     ENHANCEMENT_MODE = "async"  # "async" | "batch_api"
     
-    # ----- 阶段2配置（待实现） -----
+    # ----- 阶段2配置 -----
     ANALYSIS_MODE = "workflow"  # "workflow" | "agent"
     TOOL_SOURCE = "local"       # "local" | "mcp"
     AGENT_MAX_ITERATIONS = 10
@@ -302,9 +315,20 @@ def main():
     BATCH_SCRIPT_PATH = "batch/batch_run.py"
     
     # =========================================================================
-    # 初始化shared字典并运行
+    # 检查前置条件并初始化shared字典
     # =========================================================================
-    
+
+    # 如果只运行阶段2，检查增强数据文件是否存在
+    if RUN_STAGES == [2]:
+        import os
+        if not os.path.exists(OUTPUT_DATA_PATH):
+            print(f"[X] 错误: 增强数据文件不存在: {OUTPUT_DATA_PATH}")
+            print(f"请先运行阶段1生成增强数据，或设置 RUN_STAGES = [1, 2] 运行完整流程")
+            return
+
+    # 根据运行阶段设置数据源类型
+    data_source_type = "enhanced" if RUN_STAGES == [2] else "original"
+
     shared = init_shared(
         input_data_path=INPUT_DATA_PATH,
         output_data_path=OUTPUT_DATA_PATH,
@@ -320,9 +344,14 @@ def main():
         report_max_iterations=REPORT_MAX_ITERATIONS,
         report_min_score=REPORT_MIN_SCORE,
         batch_script_path=BATCH_SCRIPT_PATH,
+        start_stage=2 if RUN_STAGES == [2] else 1,  # 如果只运行阶段2，设置起始阶段为2
     )
+
+    # 如果只运行阶段2，设置数据源为增强数据
+    if RUN_STAGES == [2]:
+        shared["config"]["data_source"]["type"] = "enhanced"
     
-    # 运行系统 - DispatcherNode会根据配置自动调度
+    # 运行系统 - DispatcherNode会根据配置自动调度仅执行阶段2的workflow模式
     # 性能参数使用run函数的默认值：concurrent_num=60, max_retries=3, wait_time=8
     asyncio.run(run(shared=shared))
 

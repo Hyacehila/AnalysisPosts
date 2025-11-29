@@ -29,8 +29,9 @@
    3.3 Batch API路径节点 (enhancement_mode="batch_api")
        - BatchAPIEnhancementNode: 调用Batch API脚本处理
 
-4. 阶段2节点: 分析执行（待实现）
-   - Stage2EntryNode, WorkflowAnalysisNode, AgentAnalysisFlow节点等
+4. 阶段2节点: 分析执行
+   - LoadEnhancedDataNode, DataSummaryNode, ExecuteAnalysisScriptNode等
+   - LLMInsightNode, SaveAnalysisResultsNode, Stage2CompletionNode等
 
 5. 阶段3节点: 报告生成（待实现）
    - Stage3EntryNode, TemplateReportNode, IterativeReportFlow节点等
@@ -375,7 +376,7 @@ class SaveEnhancedDataNode(Node):
             shared["stage1_results"] = {}
         
         if exec_res["success"]:
-            print(f"[SaveData] ✓ 成功保存 {exec_res['data_count']} 条增强数据到: {exec_res['output_path']}")
+            print(f"[SaveData] [OK] 成功保存 {exec_res['data_count']} 条增强数据到: {exec_res['output_path']}")
             shared["stage1_results"]["data_save"] = {
                 "saved": True,
                 "output_path": exec_res["output_path"],
@@ -557,7 +558,7 @@ class DataValidationAndOverviewNode(Node):
         print("=" * 60)
         
         # 基础统计
-        print(f"\n📊 基础统计:")
+        print(f"\n[CHART] 基础统计:")
         print(f"  ├─ 总博文数: {stats.get('total_blogs', 0)}")
         print(f"  └─ 已处理数: {stats.get('processed_blogs', 0)}")
         
@@ -573,7 +574,7 @@ class DataValidationAndOverviewNode(Node):
         # 参与度统计
         engagement = stats.get("engagement_statistics", {})
         if engagement:
-            print(f"\n💬 参与度统计:")
+            print(f"\n[CHAT] 参与度统计:")
             print(f"  ├─ 总转发数: {engagement.get('total_reposts', 0)}")
             print(f"  ├─ 总评论数: {engagement.get('total_comments', 0)}")
             print(f"  ├─ 总点赞数: {engagement.get('total_likes', 0)}")
@@ -584,7 +585,7 @@ class DataValidationAndOverviewNode(Node):
         # 用户统计
         user_stats = stats.get("user_statistics", {})
         if user_stats:
-            print(f"\n👥 用户统计:")
+            print(f"\n[USERS] 用户统计:")
             print(f"  ├─ 独立用户数: {user_stats.get('unique_users', 0)}")
             user_type_dist = user_stats.get('user_type_distribution', {})
             if user_type_dist:
@@ -596,7 +597,7 @@ class DataValidationAndOverviewNode(Node):
         # 内容统计
         content_stats = stats.get("content_statistics", {})
         if content_stats:
-            print(f"\n📝 内容统计:")
+            print(f"\n[CONTENT] 内容统计:")
             print(f"  ├─ 含图博文数: {content_stats.get('blogs_with_images', 0)}")
             print(f"  ├─ 总图片数: {content_stats.get('total_images', 0)}")
             print(f"  └─ 平均内容长度: {content_stats.get('avg_content_length', 0):.1f} 字符")
@@ -604,7 +605,7 @@ class DataValidationAndOverviewNode(Node):
         # 地理分布（前5）
         geo_dist = stats.get("geographic_distribution", {})
         if geo_dist:
-            print(f"\n🌍 地理分布 (Top 5):")
+            print(f"\n[MAP] 地理分布 (Top 5):")
             sorted_geo = sorted(geo_dist.items(), key=lambda x: -x[1])[:5]
             for i, (location, count) in enumerate(sorted_geo):
                 prefix = "  ├─" if i < len(sorted_geo) - 1 else "  └─"
@@ -1069,7 +1070,7 @@ class BatchAPIEnhancementNode(Node):
                     enhanced_data = load_enhanced_blog_data(output_path)
                     shared["data"]["blog_data"] = enhanced_data
                     
-                    print(f"[BatchAPI] ✓ 成功加载 {len(enhanced_data)} 条增强数据")
+                    print(f"[BatchAPI] [OK] 成功加载 {len(enhanced_data)} 条增强数据")
                     
                     if "stage1_results" not in shared:
                         shared["stage1_results"] = {}
@@ -1102,17 +1103,1019 @@ class BatchAPIEnhancementNode(Node):
 
 
 # =============================================================================
-# 4. 阶段2节点: 分析执行（待实现）
+# 4. 阶段2节点: 分析执行
 # =============================================================================
 
-# TODO: 实现以下节点
-# - Stage2EntryNode: 阶段2入口节点
-# - WorkflowAnalysisNode: 固定脚本分析节点
-# - CollectToolsNode: 工具收集节点
-# - DecisionToolsNode: 工具决策节点
-# - ExecuteToolsNode: 工具执行节点
-# - ProcessResultNode: 结果处理节点
-# - Stage2CompletionNode: 阶段2完成节点
+# -----------------------------------------------------------------------------
+# 4.1 通用节点
+# -----------------------------------------------------------------------------
+
+class LoadEnhancedDataNode(Node):
+    """
+    加载增强数据节点
+    
+    功能：加载已完成增强处理的博文数据
+    类型：Regular Node
+    前置检查：验证阶段1输出文件是否存在
+    """
+    
+    def prep(self, shared):
+        """读取增强数据文件路径，检查前置条件"""
+        config = shared.get("config", {})
+        enhanced_data_path = config.get("data_source", {}).get(
+            "enhanced_data_path", "data/enhanced_blogs.json"
+        )
+        
+        # 检查文件是否存在
+        if not os.path.exists(enhanced_data_path):
+            raise FileNotFoundError(
+                f"阶段1输出文件不存在: {enhanced_data_path}\n"
+                f"请先运行阶段1（增强处理）或确保文件路径正确"
+            )
+        
+        return {"data_path": enhanced_data_path}
+    
+    def exec(self, prep_res):
+        """加载JSON数据，验证增强字段完整性"""
+        data_path = prep_res["data_path"]
+        
+        print(f"\n[LoadEnhancedData] 加载增强数据: {data_path}")
+        blog_data = load_enhanced_blog_data(data_path)
+        
+        # 验证增强字段
+        enhanced_fields = ["sentiment_polarity", "sentiment_attribute", "topics", "publisher"]
+        valid_count = 0
+        for post in blog_data:
+            has_all_fields = all(post.get(field) is not None for field in enhanced_fields)
+            if has_all_fields:
+                valid_count += 1
+        
+        return {
+            "blog_data": blog_data,
+            "total_count": len(blog_data),
+            "valid_count": valid_count,
+            "enhancement_rate": round(valid_count / len(blog_data) * 100, 2) if blog_data else 0
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """存储数据到shared"""
+        if "data" not in shared:
+            shared["data"] = {}
+        
+        shared["data"]["blog_data"] = exec_res["blog_data"]
+        
+        print(f"[LoadEnhancedData] [√] 加载 {exec_res['total_count']} 条博文")
+        print(f"[LoadEnhancedData] [√] 完整增强率: {exec_res['enhancement_rate']}%")
+        
+        return "default"
+
+
+class DataSummaryNode(Node):
+    """
+    数据概况生成节点
+    
+    功能：生成增强数据的统计概况（供Agent决策参考）
+    类型：Regular Node
+    """
+    
+    def prep(self, shared):
+        """读取增强数据"""
+        return shared.get("data", {}).get("blog_data", [])
+    
+    def exec(self, prep_res):
+        """计算各维度分布、时间跨度、总量等统计信息"""
+        blog_data = prep_res
+        
+        if not blog_data:
+            return {"summary": "无数据", "statistics": {}}
+        
+        from collections import Counter
+        from datetime import datetime
+        
+        # 基础统计
+        total = len(blog_data)
+        
+        # 情感分布
+        sentiment_dist = Counter(p.get("sentiment_polarity") for p in blog_data if p.get("sentiment_polarity"))
+        
+        # 发布者分布
+        publisher_dist = Counter(p.get("publisher") for p in blog_data if p.get("publisher"))
+        
+        # 主题分布
+        parent_topics = Counter()
+        for p in blog_data:
+            for t in p.get("topics", []):
+                if t.get("parent_topic"):
+                    parent_topics[t["parent_topic"]] += 1
+        
+        # 地理分布
+        location_dist = Counter(p.get("location") for p in blog_data if p.get("location"))
+        
+        # 时间范围
+        publish_times = []
+        for p in blog_data:
+            pt = p.get("publish_time")
+            if pt:
+                try:
+                    publish_times.append(datetime.strptime(pt, "%Y-%m-%d %H:%M:%S"))
+                except:
+                    pass
+        
+        time_range = None
+        if publish_times:
+            time_range = {
+                "start": min(publish_times).strftime("%Y-%m-%d %H:%M:%S"),
+                "end": max(publish_times).strftime("%Y-%m-%d %H:%M:%S"),
+                "span_hours": round((max(publish_times) - min(publish_times)).total_seconds() / 3600, 1)
+            }
+        
+        # 互动统计
+        total_reposts = sum(p.get("repost_count", 0) for p in blog_data)
+        total_comments = sum(p.get("comment_count", 0) for p in blog_data)
+        total_likes = sum(p.get("like_count", 0) for p in blog_data)
+        
+        summary_text = f"""数据概况:
+- 总博文数: {total}
+- 时间范围: {time_range['start'] if time_range else '未知'} 至 {time_range['end'] if time_range else '未知'}
+- 情感分布: {dict(sentiment_dist.most_common(5))}
+- 热门主题Top3: {[t[0] for t in parent_topics.most_common(3)]}
+- 主要地区Top3: {[l[0] for l in location_dist.most_common(3)]}
+- 发布者类型: {list(publisher_dist.keys())}
+- 总互动量: 转发{total_reposts}, 评论{total_comments}, 点赞{total_likes}"""
+        
+        return {
+            "summary": summary_text,
+            "statistics": {
+                "total_posts": total,
+                "time_range": time_range,
+                "sentiment_distribution": dict(sentiment_dist),
+                "publisher_distribution": dict(publisher_dist),
+                "topic_distribution": dict(parent_topics.most_common(10)),
+                "location_distribution": dict(location_dist.most_common(10)),
+                "engagement": {
+                    "total_reposts": total_reposts,
+                    "total_comments": total_comments,
+                    "total_likes": total_likes
+                }
+            }
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """存储统计信息"""
+        if "agent" not in shared:
+            shared["agent"] = {}
+        
+        shared["agent"]["data_summary"] = exec_res["summary"]
+        shared["agent"]["data_statistics"] = exec_res["statistics"]
+        
+        print(f"\n[DataSummary] 数据概况已生成")
+        print(exec_res["summary"])
+        
+        return "default"
+
+
+class SaveAnalysisResultsNode(Node):
+    """
+    保存分析结果节点
+    
+    功能：将分析结果持久化，供阶段3使用
+    类型：Regular Node
+    输出位置：
+    - 统计数据：report/analysis_data.json
+    - 洞察描述：report/insights.json
+    - 图表文件：report/images/
+    """
+    
+    def prep(self, shared):
+        """读取分析输出和图表列表"""
+        stage2_results = shared.get("stage2_results", {})
+        
+        return {
+            "charts": stage2_results.get("charts", []),
+            "tables": stage2_results.get("tables", []),
+            "insights": stage2_results.get("insights", {}),
+            "execution_log": stage2_results.get("execution_log", {})
+        }
+    
+    def exec(self, prep_res):
+        """保存JSON结果文件"""
+        output_dir = "report"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # 保存分析数据
+        analysis_data = {
+            "charts": prep_res["charts"],
+            "tables": prep_res["tables"],
+            "execution_log": prep_res["execution_log"]
+        }
+        
+        analysis_data_path = os.path.join(output_dir, "analysis_data.json")
+        with open(analysis_data_path, 'w', encoding='utf-8') as f:
+            json.dump(analysis_data, f, ensure_ascii=False, indent=2)
+        
+        # 保存洞察描述
+        insights_path = os.path.join(output_dir, "insights.json")
+        with open(insights_path, 'w', encoding='utf-8') as f:
+            json.dump(prep_res["insights"], f, ensure_ascii=False, indent=2)
+        
+        return {
+            "success": True,
+            "analysis_data_path": analysis_data_path,
+            "insights_path": insights_path,
+            "charts_count": len(prep_res["charts"]),
+            "tables_count": len(prep_res["tables"])
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """记录保存状态"""
+        if "stage2_results" not in shared:
+            shared["stage2_results"] = {}
+        
+        shared["stage2_results"]["output_files"] = {
+            "charts_dir": "report/images/",
+            "analysis_data": exec_res["analysis_data_path"],
+            "insights_file": exec_res["insights_path"]
+        }
+        
+        print(f"\n[SaveAnalysisResults] [OK] 分析结果已保存")
+        print(f"  - 分析数据: {exec_res['analysis_data_path']}")
+        print(f"  - 洞察描述: {exec_res['insights_path']}")
+        print(f"  - 生成图表: {exec_res['charts_count']} 个")
+        print(f"  - 生成表格: {exec_res['tables_count']} 个")
+        
+        return "default"
+
+
+class Stage2CompletionNode(Node):
+    """
+    阶段2完成节点
+    
+    功能：
+    1. 标记阶段2完成
+    2. 更新dispatcher状态
+    3. 返回"dispatch" Action，跳转回DispatcherNode
+    """
+    
+    def prep(self, shared):
+        """读取当前状态"""
+        return {
+            "current_stage": shared.get("dispatcher", {}).get("current_stage", 2),
+            "completed_stages": shared.get("dispatcher", {}).get("completed_stages", [])
+        }
+    
+    def exec(self, prep_res):
+        """确认阶段完成"""
+        print(f"\n[Stage2] 阶段2分析执行完成")
+        return {"stage": 2}
+    
+    def post(self, shared, prep_res, exec_res):
+        """更新完成状态，返回dispatch"""
+        stage = exec_res["stage"]
+        
+        if "dispatcher" not in shared:
+            shared["dispatcher"] = {}
+        
+        completed_stages = shared["dispatcher"].get("completed_stages", [])
+        if stage not in completed_stages:
+            completed_stages.append(stage)
+        shared["dispatcher"]["completed_stages"] = completed_stages
+        
+        print(f"[Stage2] 已完成阶段: {completed_stages}")
+        
+        return "dispatch"
+
+
+# -----------------------------------------------------------------------------
+# 4.2 预定义Workflow路径节点 (analysis_mode="workflow")
+# -----------------------------------------------------------------------------
+
+class ExecuteAnalysisScriptNode(Node):
+    """
+    执行分析脚本节点
+    
+    功能：执行固定的分析脚本，生成全部所需图形
+    类型：Regular Node
+    
+    执行四类工具集的全部工具函数：
+    - 情感趋势分析工具集
+    - 主题演化分析工具集
+    - 地理分布分析工具集
+    - 多维交互分析工具集
+    """
+    
+    def prep(self, shared):
+        """读取增强数据"""
+        return shared.get("data", {}).get("blog_data", [])
+    
+    def exec(self, prep_res):
+        """执行预定义的分析脚本"""
+        from utils.analysis_tools import (
+            # 情感工具
+            sentiment_distribution_stats,
+            sentiment_time_series,
+            sentiment_anomaly_detection,
+            sentiment_trend_chart,
+            sentiment_pie_chart,
+            # 主题工具
+            topic_frequency_stats,
+            topic_time_evolution,
+            topic_cooccurrence_analysis,
+            topic_ranking_chart,
+            topic_evolution_chart,
+            topic_network_chart,
+            # 地理工具
+            geographic_distribution_stats,
+            geographic_hotspot_detection,
+            geographic_sentiment_analysis,
+            geographic_heatmap,
+            geographic_bar_chart,
+            # 交互工具
+            publisher_distribution_stats,
+            cross_dimension_matrix,
+            influence_analysis,
+            correlation_analysis,
+            interaction_heatmap,
+            publisher_bar_chart,
+        )
+        import time
+        
+        blog_data = prep_res
+        start_time = time.time()
+        
+        charts = []
+        tables = []
+        tools_executed = []
+        
+        print("\n[ExecuteAnalysisScript] 开始执行预定义分析脚本...")
+        
+        # === 1. 情感趋势分析 ===
+        print("\n  [CHART] 执行情感趋势分析...")
+        
+        # 情感分布统计
+        result = sentiment_distribution_stats(blog_data)
+        tables.append({
+            "id": "sentiment_distribution",
+            "title": "情感极性分布统计",
+            "data": result["data"],
+            "source_tool": "sentiment_distribution_stats"
+        })
+        tools_executed.append("sentiment_distribution_stats")
+        
+        # 情感时序分析
+        result = sentiment_time_series(blog_data, granularity="hour")
+        tables.append({
+            "id": "sentiment_time_series",
+            "title": "情感时序趋势数据",
+            "data": result["data"],
+            "source_tool": "sentiment_time_series"
+        })
+        tools_executed.append("sentiment_time_series")
+        
+        # 情感异常检测
+        result = sentiment_anomaly_detection(blog_data)
+        tables.append({
+            "id": "sentiment_anomaly",
+            "title": "情感异常点",
+            "data": result["data"],
+            "source_tool": "sentiment_anomaly_detection"
+        })
+        tools_executed.append("sentiment_anomaly_detection")
+        
+        # 情感趋势图
+        result = sentiment_trend_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("sentiment_trend_chart")
+        
+        # 情感饼图
+        result = sentiment_pie_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("sentiment_pie_chart")
+        
+        # === 2. 主题演化分析 ===
+        print("  [CHART] 执行主题演化分析...")
+        
+        # 主题频次统计
+        result = topic_frequency_stats(blog_data)
+        tables.append({
+            "id": "topic_frequency",
+            "title": "主题频次统计",
+            "data": result["data"],
+            "source_tool": "topic_frequency_stats"
+        })
+        tools_executed.append("topic_frequency_stats")
+        
+        # 主题演化分析
+        result = topic_time_evolution(blog_data, granularity="day", top_n=5)
+        tables.append({
+            "id": "topic_evolution",
+            "title": "主题演化数据",
+            "data": result["data"],
+            "source_tool": "topic_time_evolution"
+        })
+        tools_executed.append("topic_time_evolution")
+        
+        # 主题共现分析
+        result = topic_cooccurrence_analysis(blog_data)
+        tables.append({
+            "id": "topic_cooccurrence",
+            "title": "主题共现关系",
+            "data": result["data"],
+            "source_tool": "topic_cooccurrence_analysis"
+        })
+        tools_executed.append("topic_cooccurrence_analysis")
+        
+        # 主题排行图
+        result = topic_ranking_chart(blog_data, top_n=10)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("topic_ranking_chart")
+        
+        # 主题演化图
+        result = topic_evolution_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("topic_evolution_chart")
+        
+        # 主题网络图
+        result = topic_network_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("topic_network_chart")
+        
+        # === 3. 地理分布分析 ===
+        print("  [CHART] 执行地理分布分析...")
+        
+        # 地理分布统计
+        result = geographic_distribution_stats(blog_data)
+        tables.append({
+            "id": "geographic_distribution",
+            "title": "地理分布统计",
+            "data": result["data"],
+            "source_tool": "geographic_distribution_stats"
+        })
+        tools_executed.append("geographic_distribution_stats")
+        
+        # 热点区域识别
+        result = geographic_hotspot_detection(blog_data)
+        tables.append({
+            "id": "geographic_hotspot",
+            "title": "热点区域",
+            "data": result["data"],
+            "source_tool": "geographic_hotspot_detection"
+        })
+        tools_executed.append("geographic_hotspot_detection")
+        
+        # 地区情感分析
+        result = geographic_sentiment_analysis(blog_data)
+        tables.append({
+            "id": "geographic_sentiment",
+            "title": "地区情感分析",
+            "data": result["data"],
+            "source_tool": "geographic_sentiment_analysis"
+        })
+        tools_executed.append("geographic_sentiment_analysis")
+        
+        # 地理热力图
+        result = geographic_heatmap(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("geographic_heatmap")
+        
+        # 地区分布图
+        result = geographic_bar_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("geographic_bar_chart")
+        
+        # === 4. 多维交互分析 ===
+        print("  [CHART] 执行多维交互分析...")
+        
+        # 发布者分布统计
+        result = publisher_distribution_stats(blog_data)
+        tables.append({
+            "id": "publisher_distribution",
+            "title": "发布者分布统计",
+            "data": result["data"],
+            "source_tool": "publisher_distribution_stats"
+        })
+        tools_executed.append("publisher_distribution_stats")
+        
+        # 交叉矩阵分析
+        result = cross_dimension_matrix(blog_data, dim1="publisher", dim2="sentiment_polarity")
+        tables.append({
+            "id": "cross_dimension_matrix",
+            "title": "发布者×情感交叉矩阵",
+            "data": result["data"],
+            "source_tool": "cross_dimension_matrix"
+        })
+        tools_executed.append("cross_dimension_matrix")
+        
+        # 影响力分析
+        result = influence_analysis(blog_data, top_n=20)
+        tables.append({
+            "id": "influence_analysis",
+            "title": "影响力分析",
+            "data": result["data"],
+            "source_tool": "influence_analysis"
+        })
+        tools_executed.append("influence_analysis")
+        
+        # 相关性分析
+        result = correlation_analysis(blog_data)
+        tables.append({
+            "id": "correlation_analysis",
+            "title": "维度相关性分析",
+            "data": result["data"],
+            "source_tool": "correlation_analysis"
+        })
+        tools_executed.append("correlation_analysis")
+        
+        # 交互热力图
+        result = interaction_heatmap(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("interaction_heatmap")
+        
+        # 发布者分布图
+        result = publisher_bar_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("publisher_bar_chart")
+        
+        execution_time = time.time() - start_time
+        
+        print(f"\n[ExecuteAnalysisScript] [OK] 分析脚本执行完成")
+        print(f"  - 执行工具: {len(tools_executed)} 个")
+        print(f"  - 生成图表: {len(charts)} 个")
+        print(f"  - 生成表格: {len(tables)} 个")
+        print(f"  - 耗时: {execution_time:.2f} 秒")
+        
+        return {
+            "charts": charts,
+            "tables": tables,
+            "tools_executed": tools_executed,
+            "execution_time": execution_time
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """存储图形和表格到shared"""
+        if "stage2_results" not in shared:
+            shared["stage2_results"] = {}
+        
+        shared["stage2_results"]["charts"] = exec_res["charts"]
+        shared["stage2_results"]["tables"] = exec_res["tables"]
+        shared["stage2_results"]["execution_log"] = {
+            "tools_executed": exec_res["tools_executed"],
+            "total_charts": len(exec_res["charts"]),
+            "total_tables": len(exec_res["tables"]),
+            "execution_time": exec_res["execution_time"]
+        }
+        
+        return "default"
+
+
+class LLMInsightNode(Node):
+    """
+    LLM洞察补充节点
+    
+    功能：调用LLM为生成的图形补充洞察信息，填充shared字典
+    类型：Regular Node (LLM Call)
+    
+    基于统计数据和图表，利用LLM生成各维度的洞察描述
+    """
+    
+    def prep(self, shared):
+        """读取生成的图表列表和统计数据"""
+        stage2_results = shared.get("stage2_results", {})
+        
+        return {
+            "charts": stage2_results.get("charts", []),
+            "tables": stage2_results.get("tables", []),
+            "data_summary": shared.get("agent", {}).get("data_summary", "")
+        }
+    
+    def exec(self, prep_res):
+        """构建Prompt调用LLM，生成各维度的洞察描述"""
+        tables = prep_res["tables"]
+        data_summary = prep_res["data_summary"]
+        
+        # 构建统计数据摘要
+        stats_summary = []
+        for table in tables:
+            title = table.get("title", "")
+            data = table.get("data", {})
+            summary = data.get("summary", "") if isinstance(data, dict) else ""
+            if summary:
+                stats_summary.append(f"- {title}: {summary}")
+        
+        stats_text = "\n".join(stats_summary) if stats_summary else "无统计数据"
+        
+        prompt = f"""你是一位专业的舆情分析师，请根据以下数据统计结果，生成深度洞察分析。
+
+## 数据概况
+{data_summary}
+
+## 统计分析结果
+{stats_text}
+
+请针对以下维度生成洞察分析，每个维度100-200字：
+
+1. **情感趋势洞察**：分析情感变化的总体趋势、异常波动及可能原因
+2. **主题演化洞察**：分析主要话题的热度变化、新兴话题及话题关联
+3. **地理分布洞察**：分析地区分布特点、热点区域及地区差异
+4. **多维交互洞察**：分析不同发布者类型的特征差异、影响力分布
+5. **综合洞察摘要**：整体舆情态势的核心发现和关键观点
+
+请以JSON格式输出，包含以下字段：
+```json
+{{
+    "sentiment_insight": "情感趋势洞察内容",
+    "topic_insight": "主题演化洞察内容",
+    "geographic_insight": "地理分布洞察内容",
+    "cross_dimension_insight": "多维交互洞察内容",
+    "summary_insight": "综合洞察摘要"
+}}
+```"""
+        
+        response = call_glm_45_air(prompt, temperature=0.7)
+        
+        # 解析JSON响应
+        try:
+            # 尝试提取JSON部分
+            if "```json" in response:
+                json_str = response.split("```json")[1].split("```")[0].strip()
+            elif "```" in response:
+                json_str = response.split("```")[1].split("```")[0].strip()
+            else:
+                json_str = response.strip()
+            
+            insights = json.loads(json_str)
+        except json.JSONDecodeError:
+            # 如果解析失败，创建默认结构
+            insights = {
+                "sentiment_insight": "情感分析显示整体舆情态势平稳。",
+                "topic_insight": "主题分布相对均衡，无明显异常。",
+                "geographic_insight": "地理分布符合预期，无突出热点。",
+                "cross_dimension_insight": "各类型发布者特征差异不显著。",
+                "summary_insight": response[:500] if response else "分析已完成。"
+            }
+        
+        return insights
+    
+    def post(self, shared, prep_res, exec_res):
+        """填充insights到shared"""
+        if "stage2_results" not in shared:
+            shared["stage2_results"] = {}
+        
+        shared["stage2_results"]["insights"] = exec_res
+        
+        print(f"\n[LLMInsight] [OK] 洞察分析生成完成")
+        for key, value in exec_res.items():
+            preview = value[:80] + "..." if len(value) > 80 else value
+            print(f"  - {key}: {preview}")
+        
+        return "default"
+
+
+# -----------------------------------------------------------------------------
+# 4.3 Agent自主调度路径节点 (analysis_mode="agent")
+# -----------------------------------------------------------------------------
+
+class CollectToolsNode(Node):
+    """
+    工具收集节点
+    
+    功能：收集所有可用的分析工具列表
+    类型：Regular Node
+    控制参数：shared["config"]["tool_source"]
+    """
+    
+    def prep(self, shared):
+        """读取tool_source配置"""
+        config = shared.get("config", {})
+        tool_source = config.get("tool_source", "local")
+        return {"tool_source": tool_source}
+    
+    def exec(self, prep_res):
+        """获取可用工具列表"""
+        tool_source = prep_res["tool_source"]
+        
+        if tool_source == "mcp":
+            # TODO: 实现MCP服务器查询
+            # 目前暂时回退到本地工具
+            print("[CollectTools] MCP模式暂未实现，使用本地工具")
+            tool_source = "local"
+        
+        # 使用本地注册的工具
+        from utils.analysis_tools import get_all_tools
+        tools = get_all_tools()
+        
+        return {
+            "tools": tools,
+            "tool_source": tool_source,
+            "tool_count": len(tools)
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """将工具定义存储到shared"""
+        if "agent" not in shared:
+            shared["agent"] = {}
+        
+        shared["agent"]["available_tools"] = exec_res["tools"]
+        shared["agent"]["execution_history"] = []
+        shared["agent"]["current_iteration"] = 0
+        shared["agent"]["is_finished"] = False
+        
+        config = shared.get("config", {})
+        agent_config = config.get("agent_config", {})
+        shared["agent"]["max_iterations"] = agent_config.get("max_iterations", 10)
+        
+        print(f"\n[CollectTools] [OK] 收集到 {exec_res['tool_count']} 个可用工具")
+        
+        # 按类别显示工具
+        categories = {}
+        for tool in exec_res["tools"]:
+            cat = tool.get("category", "其他")
+            if cat not in categories:
+                categories[cat] = []
+            categories[cat].append(tool["name"])
+        
+        for cat, tool_names in categories.items():
+            print(f"  - {cat}: {', '.join(tool_names)}")
+        
+        return "default"
+
+
+class DecisionToolsNode(Node):
+    """
+    工具决策节点
+    
+    功能：LLM决定下一步执行哪个分析工具，或判断分析已充分
+    类型：Regular Node (LLM Call)
+    循环入口：Agent Loop的决策起点
+    """
+    
+    def prep(self, shared):
+        """读取数据概况、可用工具、执行历史、当前迭代次数"""
+        agent = shared.get("agent", {})
+        
+        return {
+            "data_summary": agent.get("data_summary", ""),
+            "available_tools": agent.get("available_tools", []),
+            "execution_history": agent.get("execution_history", []),
+            "current_iteration": agent.get("current_iteration", 0),
+            "max_iterations": agent.get("max_iterations", 10)
+        }
+    
+    def exec(self, prep_res):
+        """构建Prompt调用LLM，获取决策结果"""
+        data_summary = prep_res["data_summary"]
+        available_tools = prep_res["available_tools"]
+        execution_history = prep_res["execution_history"]
+        current_iteration = prep_res["current_iteration"]
+        max_iterations = prep_res["max_iterations"]
+        
+        # 构建工具列表描述
+        tools_description = []
+        for tool in available_tools:
+            tools_description.append(
+                f"- {tool['name']} ({tool['category']}): {tool['description']}"
+            )
+        tools_text = "\n".join(tools_description)
+        
+        # 构建执行历史描述
+        if execution_history:
+            history_items = []
+            for item in execution_history[-5:]:  # 只显示最近5条
+                history_items.append(
+                    f"- {item['tool_name']}: {item.get('summary', '已执行')}"
+                )
+            history_text = "\n".join(history_items)
+        else:
+            history_text = "尚未执行任何工具"
+        
+        prompt = f"""你是一个舆情分析智能体，负责决定下一步的分析动作。
+
+## 数据概况
+{data_summary}
+
+## 可用分析工具
+{tools_text}
+
+## 已执行历史（最近5条）
+{history_text}
+
+## 当前状态
+- 当前迭代: {current_iteration + 1}/{max_iterations}
+- 已执行工具数: {len(execution_history)}
+
+## 决策要求
+1. 如果分析已经充分（已覆盖主要维度：情感、主题、地理、发布者），输出 action: "finish"
+2. 否则，选择一个尚未执行的工具继续分析，优先选择能生成图表的工具
+3. 建议的执行顺序：数据统计工具 → 可视化图表工具
+
+请以JSON格式输出决策：
+```json
+{{
+    "thinking": "分析当前状态和需求的思考过程",
+    "action": "execute或finish",
+    "tool_name": "工具名称（仅当action为execute时需要）",
+    "reason": "选择该工具的原因"
+}}
+```"""
+        
+        response = call_glm_45_air(prompt, temperature=0.5)
+        
+        # 解析JSON响应
+        try:
+            if "```json" in response:
+                json_str = response.split("```json")[1].split("```")[0].strip()
+            elif "```" in response:
+                json_str = response.split("```")[1].split("```")[0].strip()
+            else:
+                json_str = response.strip()
+            
+            decision = json.loads(json_str)
+        except json.JSONDecodeError:
+            # 解析失败，默认继续执行
+            decision = {
+                "action": "execute",
+                "tool_name": "sentiment_distribution_stats",
+                "reason": "默认从情感分析开始"
+            }
+        
+        return decision
+    
+    def post(self, shared, prep_res, exec_res):
+        """解析决策，返回Action"""
+        action = exec_res.get("action", "execute")
+        
+        if action == "finish":
+            shared["agent"]["is_finished"] = True
+            print(f"\n[DecisionTools] Agent决定: 分析已充分，结束循环")
+            print(f"  理由: {exec_res.get('reason', '无')}")
+            return "finish"
+        else:
+            tool_name = exec_res.get("tool_name", "")
+            shared["agent"]["next_tool"] = tool_name
+            shared["agent"]["next_tool_reason"] = exec_res.get("reason", "")
+            
+            print(f"\n[DecisionTools] Agent决定: 执行工具 {tool_name}")
+            print(f"  理由: {exec_res.get('reason', '无')}")
+            
+            return "execute"
+
+
+class ExecuteToolsNode(Node):
+    """
+    工具执行节点
+    
+    功能：执行决策节点选定的分析工具
+    类型：Regular Node
+    """
+    
+    def prep(self, shared):
+        """读取决策结果中的工具名称"""
+        agent = shared.get("agent", {})
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        
+        return {
+            "tool_name": agent.get("next_tool", ""),
+            "blog_data": blog_data
+        }
+    
+    def exec(self, prep_res):
+        """调用对应的工具函数"""
+        from utils.analysis_tools import execute_tool
+        
+        tool_name = prep_res["tool_name"]
+        blog_data = prep_res["blog_data"]
+        
+        if not tool_name:
+            return {"error": "未指定工具名称"}
+        
+        print(f"\n[ExecuteTools] 执行工具: {tool_name}")
+        
+        result = execute_tool(tool_name, blog_data)
+        
+        return {
+            "tool_name": tool_name,
+            "result": result
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """存储结果，注册图表"""
+        if "stage2_results" not in shared:
+            shared["stage2_results"] = {
+                "charts": [],
+                "tables": [],
+                "insights": {},
+                "execution_log": {"tools_executed": []}
+            }
+        
+        tool_name = exec_res["tool_name"]
+        result = exec_res.get("result", {})
+        
+        # 记录执行的工具
+        shared["stage2_results"]["execution_log"]["tools_executed"].append(tool_name)
+        
+        # 处理图表
+        if result.get("charts"):
+            shared["stage2_results"]["charts"].extend(result["charts"])
+            print(f"  [OK] 生成 {len(result['charts'])} 个图表")
+        
+        # 处理数据表格
+        if result.get("data"):
+            shared["stage2_results"]["tables"].append({
+                "id": tool_name,
+                "title": result.get("category", "") + " - " + tool_name,
+                "data": result["data"],
+                "source_tool": tool_name
+            })
+            print(f"  [OK] 生成数据表格")
+        
+        # 存储执行结果供ProcessResultNode使用
+        shared["agent"]["last_tool_result"] = {
+            "tool_name": tool_name,
+            "summary": result.get("summary", "执行完成"),
+            "has_chart": bool(result.get("charts")),
+            "has_data": bool(result.get("data"))
+        }
+        
+        return "default"
+
+
+class ProcessResultNode(Node):
+    """
+    结果处理节点
+    
+    功能：简单分析工具执行结果，更新执行历史，判断是否继续循环
+    类型：Regular Node
+    循环控制：根据分析结果和迭代次数决定是否返回决策节点
+    """
+    
+    def prep(self, shared):
+        """读取工具执行结果和当前迭代次数"""
+        agent = shared.get("agent", {})
+        
+        return {
+            "last_result": agent.get("last_tool_result", {}),
+            "execution_history": agent.get("execution_history", []),
+            "current_iteration": agent.get("current_iteration", 0),
+            "max_iterations": agent.get("max_iterations", 10),
+            "is_finished": agent.get("is_finished", False)
+        }
+    
+    def exec(self, prep_res):
+        """格式化结果、更新迭代计数"""
+        last_result = prep_res["last_result"]
+        execution_history = prep_res["execution_history"]
+        current_iteration = prep_res["current_iteration"]
+        max_iterations = prep_res["max_iterations"]
+        is_finished = prep_res["is_finished"]
+        
+        # 添加到执行历史
+        if last_result:
+            execution_history.append(last_result)
+        
+        # 更新迭代计数
+        new_iteration = current_iteration + 1
+        
+        # 判断是否继续
+        should_continue = (
+            not is_finished and 
+            new_iteration < max_iterations
+        )
+        
+        return {
+            "execution_history": execution_history,
+            "new_iteration": new_iteration,
+            "should_continue": should_continue,
+            "reason": (
+                "Agent判断分析已充分" if is_finished else
+                f"达到最大迭代次数({max_iterations})" if new_iteration >= max_iterations else
+                "继续分析"
+            )
+        }
+    
+    def post(self, shared, prep_res, exec_res):
+        """更新状态，返回Action"""
+        if "agent" not in shared:
+            shared["agent"] = {}
+        
+        shared["agent"]["execution_history"] = exec_res["execution_history"]
+        shared["agent"]["current_iteration"] = exec_res["new_iteration"]
+        
+        print(f"\n[ProcessResult] 迭代 {exec_res['new_iteration']}: {exec_res['reason']}")
+        
+        if exec_res["should_continue"]:
+            return "continue"
+        else:
+            # 结束循环前，生成洞察
+            print("[ProcessResult] Agent循环结束，准备生成洞察分析")
+            return "finish"
 
 
 # =============================================================================
@@ -1121,7 +2124,13 @@ class BatchAPIEnhancementNode(Node):
 
 # TODO: 实现以下节点
 # - Stage3EntryNode: 阶段3入口节点
-# - TemplateReportNode: 模板填充报告节点
+# - LoadAnalysisResultsNode: 加载分析结果节点
+# - LoadTemplateNode: 加载模板节点
+# - FillSectionNode: 章节填充节点
+# - AssembleReportNode: 报告组装节点
+# - FormatReportNode: 报告格式化节点
+# - SaveReportNode: 保存报告节点
+# - InitReportStateNode: 初始化报告状态节点
 # - GenerateReportNode: 报告生成节点
 # - ReviewReportNode: 报告评审节点
 # - ApplyFeedbackNode: 应用修改意见节点

@@ -140,3 +140,144 @@ def load_enhanced_blog_data(enhanced_data_path: str) -> List[Dict[str, Any]]:
         logger.error(f"加载增强博文数据失败: {e}")
         raise
 
+
+def save_analysis_results(results: Dict[str, Any], output_path: str) -> bool:
+    """
+    保存分析结果
+    
+    Args:
+        results: 分析结果字典
+        output_path: 输出文件路径
+        
+    Returns:
+        bool: 保存是否成功
+    """
+    try:
+        output_dir = os.path.dirname(output_path)
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(results, f, ensure_ascii=False, indent=2)
+        
+        logger.info(f"成功保存分析结果到 {output_path}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"保存分析结果失败: {e}")
+        return False
+
+
+def load_analysis_results(results_path: str) -> Dict[str, Any]:
+    """
+    加载分析结果
+    
+    Args:
+        results_path: 分析结果文件路径
+        
+    Returns:
+        Dict[str, Any]: 分析结果字典
+    """
+    try:
+        with open(results_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        logger.info(f"成功加载分析结果: {results_path}")
+        return data
+        
+    except Exception as e:
+        logger.error(f"加载分析结果失败: {e}")
+        raise
+
+
+def check_stage_output_exists(stage: int) -> Dict[str, bool]:
+    """
+    检查指定阶段的输出文件是否存在
+    
+    Args:
+        stage: 阶段编号 (1, 2, 3)
+        
+    Returns:
+        Dict[str, bool]: 各输出文件的存在状态
+    """
+    if stage == 1:
+        return {
+            "enhanced_posts": os.path.exists("data/enhanced_blogs.json")
+        }
+    elif stage == 2:
+        return {
+            "analysis_data": os.path.exists("report/analysis_data.json"),
+            "insights": os.path.exists("report/insights.json"),
+            "images_dir": os.path.exists("report/images")
+        }
+    elif stage == 3:
+        return {
+            "report": os.path.exists("report/report.md")
+        }
+    else:
+        return {}
+
+
+def get_sample_posts(blog_data: List[Dict[str, Any]], 
+                     sample_size: int = 10,
+                     strategy: str = "random") -> List[Dict[str, Any]]:
+    """
+    从博文数据中抽取样本
+    
+    Args:
+        blog_data: 博文数据列表
+        sample_size: 样本数量
+        strategy: 抽样策略 - "random"随机, "influential"高影响力, "diverse"多样性
+        
+    Returns:
+        List[Dict[str, Any]]: 样本博文列表
+    """
+    import random
+    
+    if not blog_data:
+        return []
+    
+    if len(blog_data) <= sample_size:
+        return blog_data
+    
+    if strategy == "random":
+        return random.sample(blog_data, sample_size)
+    
+    elif strategy == "influential":
+        # 按影响力排序（转发+评论+点赞）
+        sorted_posts = sorted(
+            blog_data,
+            key=lambda x: (
+                x.get("repost_count", 0) + 
+                x.get("comment_count", 0) + 
+                x.get("like_count", 0)
+            ),
+            reverse=True
+        )
+        return sorted_posts[:sample_size]
+    
+    elif strategy == "diverse":
+        # 尝试覆盖不同情感和主题
+        samples = []
+        sentiment_buckets = {1: [], 2: [], 3: [], 4: [], 5: []}
+        
+        for post in blog_data:
+            polarity = post.get("sentiment_polarity", 3)
+            if polarity in sentiment_buckets:
+                sentiment_buckets[polarity].append(post)
+        
+        # 从每个情感桶中均匀抽取
+        per_bucket = max(1, sample_size // 5)
+        for polarity, posts in sentiment_buckets.items():
+            if posts:
+                samples.extend(random.sample(posts, min(per_bucket, len(posts))))
+        
+        # 如果不够，随机补充
+        if len(samples) < sample_size:
+            remaining = [p for p in blog_data if p not in samples]
+            additional = random.sample(remaining, min(sample_size - len(samples), len(remaining)))
+            samples.extend(additional)
+        
+        return samples[:sample_size]
+    
+    return random.sample(blog_data, sample_size)
