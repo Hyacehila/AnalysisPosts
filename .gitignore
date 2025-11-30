@@ -11,6 +11,7 @@ wheels/
 
 # Media files
 data/media/
+report/images/
 *.jpg
 *.gif
 *.png
