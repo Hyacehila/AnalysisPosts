@@ -1,130 +1,66 @@
 {
   "charts": [
     {
-      "id": "topic_ranking_20251130_010557",
-      "type": "bar_chart",
-      "title": "Top10 主题热度排行",
-      "file_path": "report/images\\topic_ranking_20251130_010557.png",
-      "source_tool": "topic_ranking_chart",
-      "description": "展示热度最高的10个主题及其博文数量"
-    },
-    {
-      "id": "topic_evolution_20251130_010558",
-      "type": "line_chart",
-      "title": "主题热度时序演化",
-      "file_path": "report/images\\topic_evolution_20251130_010558.png",
-      "source_tool": "topic_evolution_chart",
-      "description": "展示Top5主题随时间的热度变化趋势"
-    },
-    {
-      "id": "topic_network_20251130_010558",
-      "type": "network_chart",
-      "title": "主题关联网络图",
-      "file_path": "report/images\\topic_network_20251130_010558.png",
-      "source_tool": "topic_network_chart",
-      "description": "展示主题之间的共现关联关系，线条粗细表示关联强度"
-    },
-    {
-      "id": "sentiment_trend_20251130_010609",
-      "type": "line_chart",
-      "title": "情感趋势变化图",
-      "file_path": "report/images\\sentiment_trend_20251130_010609.png",
-      "source_tool": "sentiment_trend_chart",
-      "description": "展示情感极性随时间的变化趋势及正负面占比"
-    },
-    {
-      "id": "sentiment_pie_20251130_010610",
+      "id": "sentiment_pie_20251130_214725",
       "type": "pie_chart",
       "title": "情感分布饼图",
-      "file_path": "report/images\\sentiment_pie_20251130_010610.png",
+      "file_path": "report/images\\sentiment_pie_20251130_214725.png",
       "source_tool": "sentiment_pie_chart",
       "description": "展示博文情感极性的整体分布情况"
     },
     {
-      "id": "geographic_bar_20251130_010619",
-      "type": "bar_chart",
-      "title": "Top15 地区分布图",
-      "file_path": "report/images\\geographic_bar_20251130_010619.png",
-      "source_tool": "geographic_bar_chart",
-      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
-    },
-    {
-      "id": "interaction_heatmap_20251130_010628",
-      "type": "heatmap",
-      "title": "发布者类型 × 情感极性 热力图",
-      "file_path": "report/images\\interaction_heatmap_20251130_010628.png",
-      "source_tool": "interaction_heatmap",
-      "description": "展示发布者类型与情感极性的交叉分布"
-    },
-    {
-      "id": "publisher_bar_20251130_010628",
-      "type": "bar_chart",
-      "title": "发布者类型分布图",
-      "file_path": "report/images\\publisher_bar_20251130_010628.png",
-      "source_tool": "publisher_bar_chart",
-      "description": "展示不同发布者类型的博文数量及情感倾向"
-    },
-    {
-      "id": "sentiment_trend_20251130_010644",
-      "type": "line_chart",
-      "title": "情感趋势变化图",
-      "file_path": "report/images\\sentiment_trend_20251130_010644.png",
-      "source_tool": "sentiment_trend_chart",
-      "description": "展示情感极性随时间的变化趋势及正负面占比"
-    },
-    {
-      "id": "sentiment_pie_20251130_010644",
-      "type": "pie_chart",
-      "title": "情感分布饼图",
-      "file_path": "report/images\\sentiment_pie_20251130_010644.png",
-      "source_tool": "sentiment_pie_chart",
-      "description": "展示博文情感极性的整体分布情况"
-    },
-    {
-      "id": "topic_ranking_20251130_010644",
+      "id": "topic_ranking_20251130_214759",
       "type": "bar_chart",
       "title": "Top10 主题热度排行",
-      "file_path": "report/images\\topic_ranking_20251130_010644.png",
+      "file_path": "report/images\\topic_ranking_20251130_214759.png",
       "source_tool": "topic_ranking_chart",
       "description": "展示热度最高的10个主题及其博文数量"
     },
     {
-      "id": "topic_evolution_20251130_010644",
+      "id": "sentiment_trend_20251130_214817",
+      "type": "line_chart",
+      "title": "情感趋势变化图",
+      "file_path": "report/images\\sentiment_trend_20251130_214817.png",
+      "source_tool": "sentiment_trend_chart",
+      "description": "展示情感极性随时间的变化趋势及正负面占比"
+    },
+    {
+      "id": "topic_evolution_20251130_214905",
       "type": "line_chart",
       "title": "主题热度时序演化",
-      "file_path": "report/images\\topic_evolution_20251130_010644.png",
+      "file_path": "report/images\\topic_evolution_20251130_214905.png",
       "source_tool": "topic_evolution_chart",
       "description": "展示Top5主题随时间的热度变化趋势"
     },
     {
-      "id": "topic_network_20251130_010644",
+      "id": "topic_network_20251130_214921",
       "type": "network_chart",
       "title": "主题关联网络图",
-      "file_path": "report/images\\topic_network_20251130_010644.png",
+      "file_path": "report/images\\topic_network_20251130_214921.png",
       "source_tool": "topic_network_chart",
       "description": "展示主题之间的共现关联关系，线条粗细表示关联强度"
     },
     {
-      "id": "geographic_bar_20251130_010645",
-      "type": "bar_chart",
-      "title": "Top15 地区分布图",
-      "file_path": "report/images\\geographic_bar_20251130_010645.png",
-      "source_tool": "geographic_bar_chart",
-      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
-    },
-    {
-      "id": "interaction_heatmap_20251130_010645",
+      "id": "interaction_heatmap_20251130_215002",
       "type": "heatmap",
       "title": "发布者类型 × 情感极性 热力图",
-      "file_path": "report/images\\interaction_heatmap_20251130_010645.png",
+      "file_path": "report/images\\interaction_heatmap_20251130_215002.png",
       "source_tool": "interaction_heatmap",
       "description": "展示发布者类型与情感极性的交叉分布"
     },
     {
-      "id": "publisher_bar_20251130_010645",
+      "id": "geographic_bar_20251130_215023",
+      "type": "bar_chart",
+      "title": "Top15 地区分布图",
+      "file_path": "report/images\\geographic_bar_20251130_215023.png",
+      "source_tool": "geographic_bar_chart",
+      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
+    },
+    {
+      "id": "publisher_bar_20251130_215041",
       "type": "bar_chart",
       "title": "发布者类型分布图",
-      "file_path": "report/images\\publisher_bar_20251130_010645.png",
+      "file_path": "report/images\\publisher_bar_20251130_215041.png",
       "source_tool": "publisher_bar_chart",
       "description": "展示不同发布者类型的博文数量及情感倾向"
     }
@@ -669,28 +605,6 @@
       "source_type": "mcp"
     },
     {
-      "id": "geographic_sentiment",
-      "title": "情感分析 - geographic_sentiment",
-      "data": {
-        "data": {
-          "regional_analysis": {
-            "北京": {
-              "post_count": 5,
-              "avg_polarity": 4.0,
-              "positive_ratio": 100.0,
-              "negative_ratio": 0.0,
-              "sentiment_label": "正面主导"
-            }
-          },
-          "min_posts_threshold": 5,
-          "regions_analyzed": 1
-        },
-        "summary": "最正面地区「北京」(4.0)"
-      },
-      "source_tool": "geographic_sentiment",
-      "source_type": "mcp"
-    },
-    {
       "id": "topic_evolution",
       "title": "主题分析 - topic_evolution",
       "data": {
@@ -781,6 +695,106 @@
         "summary": "分析Top5主题演化，上升趋势主题: 交通运输"
       },
       "source_tool": "topic_evolution",
+      "source_type": "mcp"
+    },
+    {
+      "id": "geographic_sentiment",
+      "title": "情感分析 - geographic_sentiment",
+      "data": {
+        "data": {
+          "regional_analysis": {
+            "北京": {
+              "post_count": 5,
+              "avg_polarity": 4.0,
+              "positive_ratio": 100.0,
+              "negative_ratio": 0.0,
+              "sentiment_label": "正面主导"
+            }
+          },
+          "min_posts_threshold": 5,
+          "regions_analyzed": 1
+        },
+        "summary": "最正面地区「北京」(4.0)"
+      },
+      "source_tool": "geographic_sentiment",
+      "source_type": "mcp"
+    },
+    {
+      "id": "influence_analysis",
+      "title": "其他 - influence_analysis",
+      "data": {
+        "result": "Error calling tool 'influence_analysis': 'FunctionTool' object is not callable"
+      },
+      "source_tool": "influence_analysis",
+      "source_type": "mcp"
+    },
+    {
+      "id": "topic_cooccurrence",
+      "title": "主题分析 - topic_cooccurrence",
+      "data": {
+        "data": {
+          "cooccurrence_pairs": [
+            {
+              "topic_pair": [
+                "民众反应",
+                "社会民生"
+              ],
+              "count": 3,
+              "support": 17.65
+            },
+            {
+              "topic_pair": [
+                "交通运输",
+                "民众反应"
+              ],
+              "count": 2,
+              "support": 11.76
+            },
+            {
+              "topic_pair": [
+                "媒体传播",
+                "社会民生"
+              ],
+              "count": 2,
+              "support": 11.76
+            },
+            {
+              "topic_pair": [
+                "交通运输",
+                "社会民生"
+              ],
+              "count": 2,
+              "support": 11.76
+            }
+          ],
+          "association_matrix": {
+            "媒体传播": {
+              "交通运输": 0,
+              "民众反应": 0,
+              "社会民生": 2
+            },
+            "交通运输": {
+              "媒体传播": 0,
+              "民众反应": 2,
+              "社会民生": 2
+            },
+            "民众反应": {
+              "媒体传播": 0,
+              "交通运输": 2,
+              "社会民生": 3
+            },
+            "社会民生": {
+              "媒体传播": 2,
+              "交通运输": 2,
+              "民众反应": 3
+            }
+          },
+          "min_support": 2,
+          "total_pairs_analyzed": 7
+        },
+        "summary": "发现4对显著共现主题（阈值≥2）"
+      },
+      "source_tool": "topic_cooccurrence",
       "source_type": "mcp"
     },
     {
@@ -948,112 +962,12 @@
       "source_type": "mcp"
     },
     {
-      "id": "influence_analysis",
-      "title": "其他 - influence_analysis",
-      "data": {
-        "result": "Error calling tool 'influence_analysis': 'FunctionTool' object is not callable"
-      },
-      "source_tool": "influence_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "topic_cooccurrence",
-      "title": "主题分析 - topic_cooccurrence",
-      "data": {
-        "data": {
-          "cooccurrence_pairs": [
-            {
-              "topic_pair": [
-                "民众反应",
-                "社会民生"
-              ],
-              "count": 3,
-              "support": 17.65
-            },
-            {
-              "topic_pair": [
-                "交通运输",
-                "民众反应"
-              ],
-              "count": 2,
-              "support": 11.76
-            },
-            {
-              "topic_pair": [
-                "媒体传播",
-                "社会民生"
-              ],
-              "count": 2,
-              "support": 11.76
-            },
-            {
-              "topic_pair": [
-                "交通运输",
-                "社会民生"
-              ],
-              "count": 2,
-              "support": 11.76
-            }
-          ],
-          "association_matrix": {
-            "民众反应": {
-              "社会民生": 3,
-              "媒体传播": 0,
-              "交通运输": 2
-            },
-            "社会民生": {
-              "民众反应": 3,
-              "媒体传播": 2,
-              "交通运输": 2
-            },
-            "媒体传播": {
-              "民众反应": 0,
-              "社会民生": 2,
-              "交通运输": 0
-            },
-            "交通运输": {
-              "民众反应": 2,
-              "社会民生": 2,
-              "媒体传播": 0
-            }
-          },
-          "min_support": 2,
-          "total_pairs_analyzed": 7
-        },
-        "summary": "发现4对显著共现主题（阈值≥2）"
-      },
-      "source_tool": "topic_cooccurrence",
-      "source_type": "mcp"
-    },
-    {
       "id": "correlation_analysis",
       "title": "其他 - correlation_analysis",
       "data": {
         "result": "Error calling tool 'correlation_analysis': 'FunctionTool' object is not callable"
       },
       "source_tool": "correlation_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "geographic_hotspot",
-      "title": "地理分析 - geographic_hotspot",
-      "data": {
-        "data": {
-          "hotspots": [
-            {
-              "location": "北京",
-              "count": 5,
-              "percentage": 29.41,
-              "is_hotspot": true
-            }
-          ],
-          "threshold": 2.3,
-          "threshold_percentile": 90,
-          "hotspot_concentration": 29.41
-        },
-        "summary": "识别出1个热点区域，占总量的29.41%"
-      },
-      "source_tool": "geographic_hotspot",
       "source_type": "mcp"
     },
     {
@@ -1083,6 +997,28 @@
       },
       "source_tool": "sentiment_anomaly",
       "source_type": "mcp"
+    },
+    {
+      "id": "geographic_hotspot",
+      "title": "地理分析 - geographic_hotspot",
+      "data": {
+        "data": {
+          "hotspots": [
+            {
+              "location": "北京",
+              "count": 5,
+              "percentage": 29.41,
+              "is_hotspot": true
+            }
+          ],
+          "threshold": 2.3,
+          "threshold_percentile": 90,
+          "hotspot_concentration": 29.41
+        },
+        "summary": "识别出1个热点区域，占总量的29.41%"
+      },
+      "source_tool": "geographic_hotspot",
+      "source_type": "mcp"
     }
   ],
   "execution_log": {
@@ -1092,28 +1028,32 @@
       "geographic_distribution",
       "publisher_distribution",
       "sentiment_timeseries",
-      "geographic_sentiment",
       "topic_evolution",
-      "cross_matrix",
+      "geographic_sentiment",
       "influence_analysis",
       "topic_cooccurrence",
+      "cross_matrix",
       "correlation_analysis",
-      "geographic_hotspot",
       "sentiment_anomaly",
-      "generate_topic_charts",
-      "generate_sentiment_chart",
-      "generate_geographic_charts",
-      "generate_interaction_charts",
-      "comprehensive_analysis"
+      "geographic_hotspot",
+      "generate_sentiment_pie_chart",
+      "generate_topic_ranking_chart",
+      "generate_sentiment_trend_chart",
+      "generate_topic_evolution_chart",
+      "generate_topic_network_chart",
+      "generate_geographic_heatmap",
+      "generate_interaction_heatmap",
+      "generate_geographic_bar_chart",
+      "generate_publisher_bar_chart"
     ],
     "total_charts": 0,
     "total_tables": 0,
     "execution_time": 0.0,
     "chart_analysis": {
-      "total_charts": 16,
-      "success_count": 15,
-      "success_rate": 0.9375,
-      "analysis_timestamp": 308.48706793785095
+      "total_charts": 8,
+      "success_count": 8,
+      "success_rate": 1.0,
+      "analysis_timestamp": 142.93310546875
     }
   }
 }

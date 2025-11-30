@@ -169,6 +169,73 @@ def correlation_analysis() -> Dict[str, Any]:
     return result
 
 
+# =============================================================================
+# 图表生成工具
+# =============================================================================
+
+@mcp.tool()
+def generate_sentiment_trend_chart() -> Dict[str, Any]:
+    """生成情感趋势折线图/面积图"""
+    blog_data = get_blog_data()
+    result = sentiment_trend_chart(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def generate_sentiment_pie_chart() -> Dict[str, Any]:
+    """生成情感分布饼图"""
+    blog_data = get_blog_data()
+    result = sentiment_pie_chart(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def generate_topic_ranking_chart(top_n: int = 10) -> Dict[str, Any]:
+    """生成主题排行柱状图"""
+    blog_data = get_blog_data()
+    result = topic_ranking_chart(blog_data, top_n=top_n)
+    return result
+
+@mcp.tool()
+def generate_topic_evolution_chart() -> Dict[str, Any]:
+    """生成主题演化图"""
+    blog_data = get_blog_data()
+    result = topic_evolution_chart(blog_data)
+    return result
+
+@mcp.tool()
+def generate_topic_network_chart() -> Dict[str, Any]:
+    """生成主题关系网络图"""
+    blog_data = get_blog_data()
+    result = topic_network_chart(blog_data)
+    return result
+
+@mcp.tool()
+def generate_geographic_heatmap() -> Dict[str, Any]:
+    """生成地理分布热力图"""
+    blog_data = get_blog_data()
+    result = geographic_heatmap(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def generate_geographic_bar_chart() -> Dict[str, Any]:
+    """生成地区分布柱状图"""
+    blog_data = get_blog_data()
+    result = geographic_bar_chart(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def generate_interaction_heatmap() -> Dict[str, Any]:
+    """生成多维交互热力图"""
+    blog_data = get_blog_data()
+    result = interaction_heatmap(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def generate_publisher_bar_chart() -> Dict[str, Any]:
+    """生成发布者分布柱状图"""
+    blog_data = get_blog_data()
+    result = publisher_bar_chart(blog_data, output_dir="report/images")
+    return result
+
 
 # 启动服务器
 if __name__ == "__main__":
