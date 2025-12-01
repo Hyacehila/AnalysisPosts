@@ -45,6 +45,8 @@ def init_shared(
     report_min_score: int = 80,
     # Batch API配置
     batch_script_path: str = "batch/batch_run.py",
+    # 数据源配置
+    data_source_type: str = "original",
 ) -> Dict[str, Any]:
     """
     初始化shared字典
@@ -73,7 +75,7 @@ def init_shared(
         Dict: 初始化完成的shared字典
     """
     if run_stages is None:
-        run_stages = [1, 2]  # 默认执行阶段1和2
+        run_stages = [1,2,3]  # 默认执行阶段1，2，3
     
     return {
         # === 数据管理（贯穿三阶段） ===
@@ -119,11 +121,14 @@ def init_shared(
             # 阶段3 迭代报告配置
             "iterative_report_config": {
                 "max_iterations": report_max_iterations,
+                "satisfaction_threshold": 80,      # 满意度阈值（默认80分）
+                "enable_review": True,            # 启用评审机制
+                "quality_check": True             # 启用质量检查
             },
 
             # 数据源配置
             "data_source": {
-                "type": "enhanced" if start_stage == 2 else "original",
+                "type": data_source_type,
                 "enhanced_data_path": output_data_path
             },
 
@@ -402,19 +407,20 @@ def main():
     
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
-    # [1] = 仅阶段1, [2] = 仅阶段2, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2]  # 仅执行阶段2（测试用）
-    
+    # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
+    RUN_STAGES = [2,3]  # 执行阶段2和3（测试用）
+
     # ----- 阶段1配置 -----
-    ENHANCEMENT_MODE = "batch_api"  # "async" | "batch_api"
-    
+    ENHANCEMENT_MODE = "async"  # "async" | "batch_api"
+
     # ----- 阶段2配置 -----
     ANALYSIS_MODE = "agent"     # "workflow" | "agent"
     TOOL_SOURCE = "mcp"            # Agent模式下的唯一工具来源 (MCP协议)
-    AGENT_MAX_ITERATIONS = 30    
-    # ----- 阶段3配置（待实现） -----
+    AGENT_MAX_ITERATIONS = 30
+
+    # ----- 阶段3配置 -----
     REPORT_MODE = "template"    # "template" | "iterative"
-    REPORT_MAX_ITERATIONS = 5
+    REPORT_MAX_ITERATIONS = 10
     REPORT_MIN_SCORE = 80
     
     # ----- Batch API配置 -----
@@ -424,16 +430,62 @@ def main():
     # 检查前置条件并初始化shared字典
     # =========================================================================
 
-    # 如果只运行阶段2，检查增强数据文件是否存在
+    import os
+
+    # 检查不同阶段的文件前置条件
     if RUN_STAGES == [2]:
-        import os
+        # 只运行阶段2：检查增强数据文件是否存在
         if not os.path.exists(OUTPUT_DATA_PATH):
             print(f"[X] 错误: 增强数据文件不存在: {OUTPUT_DATA_PATH}")
             print(f"请先运行阶段1生成增强数据，或设置 RUN_STAGES = [1, 2] 运行完整流程")
             return
+    elif RUN_STAGES == [3]:
+        # 只运行阶段3：检查阶段2输出文件是否存在
+        required_files = [
+            "report/analysis_data.json",
+            "report/chart_analyses.json",
+            "report/insights.json"
+        ]
+        missing_files = [f for f in required_files if not os.path.exists(f)]
+        if missing_files:
+            print(f"[X] 错误: 阶段2输出文件不存在: {missing_files}")
+            print(f"请先运行阶段2生成分析结果，或设置 RUN_STAGES = [1, 2, 3] 运行完整流程")
+            return
+    elif RUN_STAGES == [2, 3]:
+        # 运行阶段2和3：检查增强数据文件是否存在
+        if not os.path.exists(OUTPUT_DATA_PATH):
+            print(f"[X] 错误: 增强数据文件不存在: {OUTPUT_DATA_PATH}")
+            print(f"请先运行阶段1生成增强数据，或设置 RUN_STAGES = [1, 2, 3] 运行完整流程")
+            return
+    elif RUN_STAGES == [1, 2, 3]:
+        # 运行完整流程：无需额外检查
+        pass
 
     # 根据运行阶段设置数据源类型
-    data_source_type = "enhanced" if RUN_STAGES == [2] else "original"
+    if RUN_STAGES == [2]:
+        # 只运行阶段2：需要加载已增强的数据
+        data_source_type = "enhanced"
+    elif RUN_STAGES == [3]:
+        # 只运行阶段3：需要加载已增强的数据
+        data_source_type = "enhanced"
+    elif RUN_STAGES == [2, 3]:
+        # 运行阶段2和3：需要加载已增强的数据
+        data_source_type = "enhanced"
+    elif RUN_STAGES == [1, 2, 3] or RUN_STAGES == [1]:
+        # 运行阶段1或完整流程：从原始数据开始
+        data_source_type = "original"
+    else:
+        data_source_type = "original"
+
+    # 确定起始阶段
+    if RUN_STAGES == [2]:
+        start_stage = 2
+    elif RUN_STAGES == [3]:
+        start_stage = 3
+    elif RUN_STAGES == [2, 3]:
+        start_stage = 2  # 从阶段2开始
+    else:
+        start_stage = 1
 
     shared = init_shared(
         input_data_path=INPUT_DATA_PATH,
@@ -442,6 +494,7 @@ def main():
         sentiment_attributes_path=SENTIMENT_ATTRS_PATH,
         publisher_objects_path=PUBLISHER_OBJS_PATH,
         run_stages=RUN_STAGES,
+        start_stage=start_stage,
         enhancement_mode=ENHANCEMENT_MODE,
         analysis_mode=ANALYSIS_MODE,
         tool_source=TOOL_SOURCE,
@@ -450,14 +503,12 @@ def main():
         report_max_iterations=REPORT_MAX_ITERATIONS,
         report_min_score=REPORT_MIN_SCORE,
         batch_script_path=BATCH_SCRIPT_PATH,
-        start_stage=2 if RUN_STAGES == [2] else 1,  # 如果只运行阶段2，设置起始阶段为2
+        data_source_type=data_source_type,  # 添加数据源类型参数
     )
 
-    # 如果只运行阶段2，设置数据源为增强数据
-    if RUN_STAGES == [2]:
-        shared["config"]["data_source"]["type"] = "enhanced"
-    
-    # 运行系统 - DispatcherNode会根据配置自动调度仅执行阶段2的workflow模式
+        
+    # 运行系统 - DispatcherNode会根据配置自动调度执行相应阶段
+    # 当前配置：仅执行阶段3的模板模式
     # 性能参数使用run函数的默认值：concurrent_num=60, max_retries=3, wait_time=8
     asyncio.run(run(shared=shared))
 

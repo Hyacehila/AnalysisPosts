@@ -54,6 +54,21 @@ from nodes import (
     ExecuteToolsNode,
     ChartAnalysisNode,
     ProcessResultNode,
+    # 阶段3通用节点
+    LoadAnalysisResultsNode,
+    FormatReportNode,
+    SaveReportNode,
+    Stage3CompletionNode,
+    # 阶段3模板填充路径节点
+    GenerateFullReportNode,
+    LoadTemplateNode,
+    FillSectionNode,
+    AssembleReportNode,
+    # 阶段3多轮迭代路径节点
+    InitReportStateNode,
+    GenerateReportNode,
+    ReviewReportNode,
+    ApplyFeedbackNode,
 )
 
 
@@ -245,24 +260,28 @@ def create_main_flow(
     # 阶段2 Flow
     workflow_analysis_flow = _create_workflow_analysis_flow()
     agent_analysis_flow = _create_agent_analysis_flow()
-    
+
+    # 阶段3 Flow
+    template_report_flow = _create_template_report_flow()
+    iterative_report_flow = _create_iterative_report_flow()
+
     # === 阶段1路径 ===
     dispatcher - "stage1_async" >> async_enhancement_flow
     dispatcher - "stage1_batch_api" >> batch_api_enhancement_flow
     async_enhancement_flow - "dispatch" >> dispatcher
     batch_api_enhancement_flow - "dispatch" >> dispatcher
-    
+
     # === 阶段2路径 ===
     dispatcher - "stage2_workflow" >> workflow_analysis_flow
     dispatcher - "stage2_agent" >> agent_analysis_flow
     workflow_analysis_flow - "dispatch" >> dispatcher
     agent_analysis_flow - "dispatch" >> dispatcher
-    
-    # === 阶段3路径（待实现） ===
-    # dispatcher - "stage3_template" >> template_report_flow
-    # dispatcher - "stage3_iterative" >> iterative_report_flow
-    # template_report_flow - "dispatch" >> dispatcher
-    # iterative_report_flow - "dispatch" >> dispatcher
+
+    # === 阶段3路径 ===
+    dispatcher - "stage3_template" >> template_report_flow
+    dispatcher - "stage3_iterative" >> iterative_report_flow
+    template_report_flow - "dispatch" >> dispatcher
+    iterative_report_flow - "dispatch" >> dispatcher
     
     # === 结束路径 ===
     dispatcher - "done" >> terminal
@@ -270,15 +289,90 @@ def create_main_flow(
     return AsyncFlow(start=dispatcher)
 
 
+def _create_template_report_flow() -> Flow:
+    """
+    创建模板填充报告Flow (report_mode="template")
+
+    执行流程：
+    1. 加载分析结果
+    2. 一次性生成完整报告（替代分章节生成）
+    3. 格式化报告
+    4. 保存报告文件
+    5. 返回调度器
+
+    内部函数，由create_main_flow调用。
+    """
+    # 创建节点
+    load_results_node = LoadAnalysisResultsNode()
+    generate_report_node = GenerateFullReportNode()
+    format_node = FormatReportNode()
+    save_node = SaveReportNode()
+    completion_node = Stage3CompletionNode()
+
+    # 连接节点 - 简化为一次性生成流程
+    load_results_node >> generate_report_node
+    generate_report_node >> format_node
+    format_node >> save_node
+    save_node >> completion_node
+
+    return Flow(start=load_results_node)
+
+
+def _create_iterative_report_flow() -> AsyncFlow:
+    """
+    创建多轮迭代报告Flow (report_mode="iterative")
+
+    执行流程：
+    1. 加载分析结果
+    2. 初始化报告状态
+    3. 生成初始报告
+    4. LLM评审报告质量
+    5. 根据评审决定是否修改
+    6. 如果需要修改：应用反馈 -> 重新生成 -> 评审
+    7. 重复直到满足条件或达到最大迭代次数
+    8. 格式化并保存最终报告
+    9. 返回调度器
+
+    内部函数，由create_main_flow调用。
+    """
+    # 创建节点
+    load_results_node = LoadAnalysisResultsNode()
+    init_state_node = InitReportStateNode()
+    generate_node = GenerateReportNode()
+    review_node = ReviewReportNode()
+    apply_feedback_node = ApplyFeedbackNode()
+    format_node = FormatReportNode()
+    save_node = SaveReportNode()
+    completion_node = Stage3CompletionNode()
+
+    # 连接节点
+    load_results_node >> init_state_node
+    init_state_node >> generate_node
+    generate_node >> review_node
+
+    # 迭代循环部分
+    review_node - "needs_revision" >> apply_feedback_node
+    apply_feedback_node - "continue_iteration" >> generate_node
+
+    # 结束循环的路径
+    review_node - "satisfied" >> format_node
+    apply_feedback_node - "max_iterations_reached" >> format_node
+
+    format_node >> save_node
+    save_node >> completion_node
+
+    return AsyncFlow(start=load_results_node)
+
+
 def create_stage2_only_flow(analysis_mode: str = "workflow") -> Flow:
     """
     创建仅阶段2的Flow - 用于独立运行阶段2
-    
+
     前置条件：阶段1已完成，增强数据已保存到 data/enhanced_blogs.json
-    
+
     Args:
         analysis_mode: 分析模式，"workflow" 或 "agent"
-    
+
     Returns:
         Flow: 配置好的阶段2 Flow
     """
@@ -286,3 +380,21 @@ def create_stage2_only_flow(analysis_mode: str = "workflow") -> Flow:
         return _create_workflow_analysis_flow()
     else:
         return _create_agent_analysis_flow()
+
+
+def create_stage3_only_flow(report_mode: str = "template") -> Flow:
+    """
+    创建仅阶段3的Flow - 用于独立运行阶段3
+
+    前置条件：阶段2已完成，分析结果已保存到 report/ 目录
+
+    Args:
+        report_mode: 报告模式，"template" 或 "iterative"
+
+    Returns:
+        Flow: 配置好的阶段3 Flow
+    """
+    if report_mode == "template":
+        return _create_template_report_flow()
+    else:
+        return _create_iterative_report_flow()

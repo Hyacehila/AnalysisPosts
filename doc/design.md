@@ -232,9 +232,8 @@ flowchart TB
         end
         
         subgraph Stage3[阶段3: 报告生成]
-            s3_switch{report_mode?}
-            template_node[TemplateReportNode<br/>模板填充]
-            iterative_flow[IterativeReportFlow<br/>多轮迭代]
+            s3_mode{report_mode?}
+            template_flow[TemplateReportFlow<br/>一次性生成报告]
         end
     end
     
@@ -524,63 +523,24 @@ flowchart TD
 
 #### 阶段3详细设计: 报告生成Flow
 
-##### 3.1 模板填充路径 (report_mode="template")
+##### 3.1 一次性生成报告路径 (report_mode="template")
 
 ```mermaid
 flowchart TD
-    subgraph TemplateReportFlow[模板填充报告生成Flow]
+    subgraph TemplateReportFlow[一次性生成报告Flow]
         tmpl_start[开始] --> tmpl_load[LoadAnalysisResultsNode<br/>加载分析结果]
-        tmpl_load --> tmpl_template[LoadTemplateNode<br/>加载报告模板]
-
-        subgraph tmpl_fill[章节填充 - LLM自主填充]
-            tmpl_executive[FillSectionNode<br/>综述章节]
-            tmpl_sentiment[FillSectionNode<br/>情感态势分析]
-            tmpl_topic[FillSectionNode<br/>话题演变分析]
-            tmpl_spread[FillSectionNode<br/>传播路径分析]
-            tmpl_recommend[FillSectionNode<br/>研判与建议]
-        end
-
-        tmpl_template --> tmpl_fill
-        tmpl_fill --> tmpl_assemble[AssembleReportNode<br/>组装完整报告]
-        tmpl_assemble --> tmpl_format[FormatReportNode<br/>格式化Markdown]
+        tmpl_load --> tmpl_generate[GenerateFullReportNode<br/>一次性生成完整报告]
+        tmpl_generate --> tmpl_format[FormatReportNode<br/>格式化Markdown]
         tmpl_format --> tmpl_save[SaveReportNode<br/>保存报告文件]
-        tmpl_save --> tmpl_reasoning[ReportReasoningNode<br/>编排原因说明]
-        tmpl_reasoning --> tmpl_citation[DataCitationNode<br/>数据引用验证]
-        tmpl_citation --> tmpl_end[结束]
+        tmpl_save --> tmpl_end[结束]
     end
 ```
 
-##### 3.2 多轮迭代路径 (report_mode="iterative")
-
-```mermaid
-flowchart TD
-    subgraph IterativeReportFlow[多轮迭代报告生成Flow]
-        iter_start[开始] --> iter_load[LoadAnalysisResultsNode<br/>加载分析结果]
-        iter_load --> iter_init[InitReportStateNode<br/>初始化报告状态]
-
-        iter_init --> generate_report[GenerateReportNode<br/>LLM生成/修改报告]
-        generate_report --> review_report[ReviewReportNode<br/>LLM评审报告]
-
-        review_report --> review_result{评审结果?}
-        review_result -->|satisfied| iter_format[FormatReportNode<br/>格式化Markdown]
-        review_result -->|needs_revision| check_iteration{迭代次数?}
-
-        check_iteration -->|未达上限| apply_feedback[ApplyFeedbackNode<br/>应用修改意见]
-        check_iteration -->|达到上限| iter_format
-
-        apply_feedback --> generate_report
-
-        iter_format --> iter_save[SaveReportNode<br/>保存报告文件]
-        iter_save --> iter_reasoning[ReportReasoningNode<br/>编排原因说明]
-        iter_reasoning --> iter_citation[DataCitationNode<br/>数据引用验证]
-        iter_citation --> iter_end[结束]
-    end
-
-    style generate_report fill:#e3f2fd
-    style review_report fill:#fce4ec
-    style iter_reasoning fill:#e8f5e9
-    style iter_citation fill:#fff3e0
-```
+**设计说明（2025-12-01更新）**：
+- **一次性生成**：采用单次LLM调用生成完整报告，确保报告的整体一致性和连贯性
+- **严格数据驱动**：基于Stage2输出的JSON分析结果生成所有内容，禁止模型自由发挥
+- **相对路径引用**：使用`./images/`相对路径确保图片引用正确
+- **简化架构**：移除了原有的分章节生成和多轮迭代模式，统一采用高效的一次性生成模式
 
 ---
 
@@ -1283,11 +1243,12 @@ shared = {
   - *post*：存储到 `shared["results"]`
 
 **22. FormatReportNode (报告格式化节点)**
-- **功能**：格式化最终Markdown报告
+- **功能**：格式化最终Markdown报告，处理图片路径、修复格式问题、添加目录
 - **类型**：Regular Node
+- **设计改进（2025-12-01）**：优先读取一次性生成的完整报告内容
 - **实现步骤**：
-  - *prep*：读取报告内容
-  - *exec*：处理图片路径、修复格式问题、添加目录
+  - *prep*：优先读取`shared["report"]["full_content"]`，否则读取当前草稿
+  - *exec*：修复图片路径为相对格式、添加目录、优化Markdown格式
   - *post*：更新 `shared["results"]["final_report_text"]`
 
 **23. SaveReportNode (保存报告节点)**
@@ -1298,62 +1259,28 @@ shared = {
   - *exec*：写入Markdown文件
   - *post*：记录保存路径
 
-**23.1 ReportReasoningNode (报告编排原因说明节点)**
-- **功能**：生成报告编排的原因说明和逻辑解释
-- **类型**：Regular Node (LLM Call)
-- **实现步骤**：
-  - *prep*：读取最终报告内容和分析结果数据
-  - *exec*：
-    - 调用LLM分析报告整体结构和内容组织逻辑
-    - 生成详细的编排原因说明，包括章节顺序、数据选择、图表引用等
-  - *post*：
-    - 存储编排原因说明到 `shared["stage3_results"]["report_reasoning"]`
-    - 在终端输出："编排原因说明完成 - 长度：[字符数]"
-
-**23.2 DataCitationNode (数据引用验证节点)**
-- **功能**：验证报告中所有结论都有对应的数据支撑
-- **类型**：Regular Node (LLM Call)
-- **实现步骤**：
-  - *prep*：读取最终报告内容和分析结果数据
-  - *exec*：
-    - 调用LLM逐条分析报告中的结论和数据引用
-    - 生成数据引用映射表，检查可能存在的幻觉
-  - *post*：
-    - 存储数据引用映射到 `shared["stage3_results"]["data_citations"]`
-    - 存储幻觉检测结果到 `shared["stage3_results"]["hallucination_check"]`
-    - 在终端输出："数据引用验证完成 - 结论数：[数量]，未引用：[数量]"
 
 ### 模板填充路径节点 (report_mode="template")
 
-**24. LoadTemplateNode (加载模板节点)**
-- **功能**：加载预定义的报告模板
-- **类型**：Regular Node
-- **设计目的**：加载包含章节占位符的Markdown模板（综述、情感分析、话题分析、传播分析、建议五大章节）
-- **实现步骤**：
-  - *prep*：读取模板文件路径
-  - *exec*：加载模板内容
-  - *post*：存储到 `shared["report"]["template"]`
-
-**25. FillSectionNode (章节填充节点)**
-- **功能**：使用LLM填充单个章节内容，记录章节编排思考
+**24. GenerateFullReportNode (一次性完整报告生成节点)**
+- **功能**：基于模板和分析结果，一次性生成完整的舆情分析报告
 - **类型**：Regular Node (LLM Call)
+- **设计目的**：替代原有的分章节生成模式，确保报告的一致性和数据引用的准确性
+- **设计改进（2025-12-01）**：
+  - 严格数据驱动：确保所有内容基于Stage2输出的JSON分析结果，禁止自由发挥
+  - 相对路径引用：修正图片路径问题，使用`./images/`相对路径
+  - 一次性生成：避免多次LLM调用导致的不一致性
 - **实现步骤**：
-  - *prep*：读取章节模板和相关分析结果
+  - *prep*：读取分析结果、图表数据、模板内容
   - *exec*：
-    - 构建章节填充Prompt，调用LLM生成内容
-    - Prompt中要求LLM说明本章节的编排逻辑、数据选择原因和内容组织思路
+    - 严格基于Stage2输出的JSON分析结果（analysis_data.json、chart_analyses.json、insights.json）
+    - 构建一次性生成的提示词，要求所有结论必须有数据支撑
+    - 确保图片路径使用相对格式（`./images/文件名.png`）
+    - 禁止LLM自由发挥，所有数字和分析结果都要有明确索引
   - *post*：
-    - 存储章节内容到 `shared["report"]["sections"][section_name]`
-    - 将章节编排思考记录到 `shared["thinking"]["stage3_section_planning"][section_name]`
-    - 在终端输出："章节完成：[章节名] - [编排要点]"
-
-**26. AssembleReportNode (报告组装节点)**
-- **功能**：将各章节组装成完整报告
-- **类型**：Regular Node
-- **实现步骤**：
-  - *prep*：读取所有已填充的章节
-  - *exec*：按模板顺序组装报告
-  - *post*：存储到 `shared["results"]["final_report_text"]`
+    - 存储完整报告到 `shared["report"]["full_content"]`
+    - 设置生成模式为 `shared["report"]["generation_mode"] = "one_shot"`
+    - 统计并输出图片引用数量
 
 ### 多轮迭代路径节点 (report_mode="iterative")
 
@@ -1366,31 +1293,41 @@ shared = {
   - *post*：设置 `shared["report"]["iteration"]` = 0, `shared["report"]["max_iterations"]`
 
 **26. GenerateReportNode (报告生成节点)**
-- **功能**：LLM生成或修改报告，记录编排思考过程
+- **功能**：LLM生成或修改报告，确保数据引用和减少幻觉
 - **类型**：Regular Node (LLM Call)
 - **设计目的**：基于分析数据和可用图表，生成结构化的Markdown报告；支持根据修改意见迭代优化
 - **实现步骤**：
-  - *prep*：读取分析结果、当前报告草稿、修改意见
+  - *prep*：读取分析结果、可视化图表数据、当前报告草稿、修改意见
   - *exec*：
-    - 构建Prompt调用LLM，要求输出报告内容和编排逻辑
-    - Prompt中要求LLM说明各章节的编排原因、数据引用逻辑和整体结构考虑
-    - 要求LLM确保每个结论都有对应的数据支撑
+    - 构建Prompt调用LLM，严格要求基于实际数据生成内容
+    - 强制要求每个结论都必须引用具体的图表或数据来源
+    - 要求LLM在报告中明确标注数据支撑点（如：图表引用、数据统计等）
+    - 禁止LLM生成无数据支撑的推测性内容
+    - 要求LLM识别并标注任何缺乏数据支撑的内容
   - *post*：
     - 存储报告草稿到 `shared["report"]["current_draft"]`
     - 将编排思考过程记录到 `shared["thinking"]["stage3_report_planning"]`
-    - 在终端输出："报告编排完成：[主要思路] - [数据引用策略]"
+    - 在终端输出："报告生成完成：包含数据引用[数量]个，识别无支撑内容[数量]个"
     - 记录时间戳到 `shared["thinking"]["thinking_timestamps"]`
 
 **27. ReviewReportNode (报告评审节点)**
-- **功能**：LLM评审报告质量并提出修改意见
+- **功能**：LLM评审报告质量，重点核查数据支撑和减少幻觉
 - **类型**：Regular Node (LLM Call)
-- **设计目的**：按评审标准（结构完整性、数据支撑、图表引用、逻辑连贯、建议可行性）评估报告质量，给出评分和修改意见
+- **设计目的**：按评审标准（结构完整性、数据支撑充分性、图表引用准确性、逻辑连贯性、建议可行性、幻觉检测）评估报告质量，给出评分和修改意见
 - **实现步骤**：
-  - *prep*：读取当前报告草稿
-  - *exec*：构建评审Prompt，调用LLM评审
-  - *post*：根据评审结果返回Action
-    - `"satisfied"`: 报告质量合格
-    - `"needs_revision"`: 需要修改
+  - *prep*：读取当前报告草稿、分析结果数据、可视化图表信息
+  - *exec*：
+    - 构建评审Prompt，调用LLM进行深度评审
+    - 重点核查每个结论是否有足够的数据支撑
+    - 验证图表引用的准确性和完整性
+    - 识别潜在的幻觉内容和无数据支撑的推测
+    - 评估数据与结论的逻辑一致性
+    - 统计有数据支撑的结论比例
+  - *post*：
+    - 根据评审结果返回Action
+    - `"satisfied"`：报告质量合格，数据支撑充分
+    - `"needs_revision"`：需要修改（缺乏数据支撑或存在幻觉）
+    - 在终端输出："评审完成 - 数据支撑率：[百分比]，发现问题：[数量]个"
 
 **28. ApplyFeedbackNode (应用修改意见节点)**
 - **功能**：处理评审意见，准备下一轮迭代
@@ -1527,6 +1464,7 @@ project_root/
   - 需要快速生成报告
   - 对报告结构有明确规范
 - **模板结构**：预定义章节大纲（综述、情感分析、话题分析、传播分析、建议）
+- **推理优化**：利用GLM4.6的强推理能力进行报告生成
 - **优势**：效率高、格式一致、可控性强
 - **劣势**：灵活性受限于模板结构
 
@@ -1539,29 +1477,10 @@ project_root/
   - 生成 → 评审 → 修改 → 再评审
   - 最大迭代次数限制（默认5次）
   - 满意度阈值控制（默认80分）
+- **推理优化**：利用GLM4.6的强推理能力进行报告生成以及迭代的评审工作
 - **优势**：质量有保障、可以自我完善
 - **挑战**：时间成本高、需要更多API调用
 
-## 阶段1增强处理实现要点
-
-> 对应需求分析中的"阶段1: 原始博文增强处理"
-
-### 异步批量并行 (enhancement_mode="async")
-
-- 基于PocketFlow的 `AsyncParallelBatchNode` 实现
-- 通过 `max_concurrent` 参数控制并发数，使用 `asyncio.Semaphore` 进行限流
-- 四个分析维度（情感极性、情感属性、主题、发布者）可并行执行
-- 支持异步重试和优雅降级
-- 适用场景：中小规模数据（<5000条）、需要实时反馈
-
-### Batch API并行 (enhancement_mode="batch_api")
-
-- 将博文数据转换为JSONL请求文件
-- 通过智谱Batch API一次性提交批量任务
-- 轮询任务状态直到完成
-- 下载并解析结果文件，整合到增强数据中
-- 详细实现参考 `batch/` 目录
-- 适用场景：大规模数据（>5000条）、对时效要求不高
 
 ## 技术考虑
 
