@@ -11,6 +11,7 @@
 """
 
 import os
+import re
 from datetime import datetime
 from typing import List, Dict, Any, Tuple
 from collections import Counter, defaultdict
@@ -18,10 +19,49 @@ from itertools import combinations
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
+
+WORD_PATTERN = re.compile(r"[A-Za-z]{3,}|[\u4e00-\u9fff]{2,}")
+
+
+def _normalize_topic_df(blog_data: List[Dict[str, Any]]) -> pd.DataFrame:
+    df = pd.DataFrame(blog_data)
+    if df.empty:
+        return df
+    if "publish_time" in df.columns:
+        df["publish_time"] = pd.to_datetime(df["publish_time"], errors="coerce")
+    if "topics" not in df.columns:
+        df["topics"] = []
+    return df
+
+
+def _detect_focus_window(df: pd.DataFrame, window_days: int = 14) -> Dict[str, Any]:
+    if df.empty or "publish_time" not in df.columns:
+        return {}
+    daily = df.set_index("publish_time").resample("D").size()
+    if daily.empty:
+        return {}
+    roll = daily.rolling(window_days, min_periods=1).sum()
+    end = roll.idxmax()
+    start = end - pd.Timedelta(days=window_days - 1)
+    return {"start": start.normalize(), "end": end.normalize()}
+
+
+def _tokenize_content(text: str) -> Counter:
+    """轻量分词，匹配英文>=3 或中文>=2 连续字符，并过滤 url/数字等。"""
+    if not isinstance(text, str) or not text:
+        return Counter()
+    tokens = []
+    for raw in WORD_PATTERN.findall(text):
+        token = raw.lower()
+        if token.startswith(("http", "www")) or token.isdigit():
+            continue
+        tokens.append(token)
+    return Counter(tokens)
 
 
 def topic_frequency_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -125,7 +165,8 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
             "data": {},
             "summary": "没有可分析的博文数据"
         }
-    
+
+    df_norm = _normalize_topic_df(blog_data)
     # 首先获取最热门的父主题
     parent_topic_counts = Counter()
     for post in blog_data:
@@ -193,6 +234,54 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
                     "trend": "新兴" if last_avg > 0 else "平稳"
                 }
     
+    # 焦点窗口（按滚动14天）与焦点期关键词/趋势
+    focus = _detect_focus_window(df_norm[["publish_time"]], window_days=14)
+    focus_trend = []
+    focus_keywords = {}
+    if focus:
+        start = focus["start"]
+        end = focus["end"] + pd.Timedelta(days=1)
+        fdf = df_norm[(df_norm["publish_time"] >= start) & (df_norm["publish_time"] < end)].copy()
+        if not fdf.empty:
+            fdf["focus_time_key"] = fdf["publish_time"].dt.strftime("%Y-%m-%d")
+            fseries = defaultdict(Counter)
+            for _, row in fdf.iterrows():
+                key = row.get("focus_time_key")
+                for topic in row.get("topics", []):
+                    parent = topic.get("parent_topic", "")
+                    if parent and key:
+                        fseries[key][parent] += 1
+            for key in sorted(fseries.keys()):
+                entry = {"time": key}
+                entry.update({k: v for k, v in fseries[key].most_common(top_n)})
+                focus_trend.append(entry)
+
+            daily_counter: Dict[pd.Timestamp, Counter] = defaultdict(Counter)
+            total_counter: Counter = Counter()
+            fdf["date"] = fdf["publish_time"].dt.normalize()
+            for _, row in fdf.iterrows():
+                tokens = _tokenize_content(row.get("content", ""))
+                if not tokens:
+                    continue
+                day = row["date"]
+                daily_counter[day].update(tokens)
+                total_counter.update(tokens)
+            if total_counter:
+                top_words = [w for w, _ in total_counter.most_common(12)]
+                kw_trend = []
+                for day in pd.date_range(start.normalize(), (end - pd.Timedelta(days=1)).normalize()):
+                    row = {"time": day.strftime("%Y-%m-%d")}
+                    counts_row = daily_counter.get(day, Counter())
+                    for word in top_words:
+                        if counts_row.get(word, 0):
+                            row[word] = counts_row[word]
+                    kw_trend.append(row)
+                focus_keywords = {
+                    "window": {"start": str(focus["start"].date()), "end": str(focus["end"].date())},
+                    "top_words": top_words,
+                    "trend": kw_trend,
+                }
+
     rising_topics = [t for t, v in trends.items() if v.get("trend") == "上升"]
     summary = f"分析Top{top_n}主题演化，上升趋势主题: {', '.join(rising_topics) if rising_topics else '无'}"
     
@@ -205,7 +294,10 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
             "time_range": {
                 "start": min(time_topic_counts.keys()) if time_topic_counts else None,
                 "end": max(time_topic_counts.keys()) if time_topic_counts else None
-            }
+            },
+            "focus_window": {"start": str(focus["start"].date()), "end": str(focus["end"].date())} if focus else {},
+            "focus_trend": focus_trend,
+            "focus_keywords": focus_keywords,
         },
         "summary": summary
     }
@@ -535,3 +627,143 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
         "summary": f"已生成主题关联网络图，保存至 {file_path}"
     }
 
+
+def topic_focus_evolution_chart(blog_data: List[Dict[str, Any]],
+                                output_dir: str = "report/images",
+                                granularity: str = "day",
+                                top_n: int = 5) -> Dict[str, Any]:
+    """
+    结合热点窗口高亮的主题演化趋势图，方便在报告中标注关键阶段。
+    """
+    evo_result = topic_time_evolution(blog_data, granularity, top_n)
+    time_series = evo_result["data"].get("time_series", {})
+    top_topics = evo_result["data"].get("top_topics", [])
+    if not time_series or not top_topics:
+        return {"charts": [], "summary": "没有可绘制的主题演化数据"}
+
+    times = list(time_series.keys())
+    x_idx = range(len(times))
+    focus = _detect_focus_window(_normalize_topic_df(blog_data)[["publish_time"]], window_days=14)
+
+    fig, ax = plt.subplots(figsize=(14, 8))
+    colors = plt.cm.Set2(np.linspace(0, 1, len(top_topics)))
+    for topic, color in zip(top_topics, colors):
+        counts = [time_series.get(t, {}).get(topic, 0) for t in times]
+        ax.plot(x_idx, counts, marker="o", markersize=4, linewidth=2, label=topic, color=color)
+
+    if focus:
+        try:
+            start_str, end_str = focus["start"].strftime("%Y-%m-%d"), focus["end"].strftime("%Y-%m-%d")
+            time_to_idx = {t: i for i, t in enumerate(times)}
+            start_idx = time_to_idx.get(start_str)
+            end_idx = time_to_idx.get(end_str)
+            if start_idx is not None and end_idx is not None:
+                ax.axvspan(start_idx, end_idx, color="gold", alpha=0.08, label="焦点窗口")
+        except Exception:
+            pass
+
+    ax.set_ylabel("博文数量", fontsize=12)
+    ax.set_xlabel("时间", fontsize=12)
+    ax.set_title("主题演化趋势（焦点窗口高亮）", fontsize=16, fontweight="bold", pad=15)
+    ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1), fontsize=10)
+    ax.grid(True, alpha=0.3)
+    if len(times) > 15:
+        step = max(1, len(times) // 10)
+        ax.set_xticks(list(x_idx)[::step])
+        ax.set_xticklabels([times[i] for i in range(0, len(times), step)], rotation=45, ha="right")
+    else:
+        ax.set_xticks(list(x_idx))
+        ax.set_xticklabels(times, rotation=45, ha="right")
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"topic_focus_evolution_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"topic_focus_evolution_{timestamp}",
+            "type": "line_chart",
+            "title": "主题演化趋势（焦点窗口）",
+            "file_path": file_path,
+            "source_tool": "topic_focus_evolution_chart",
+            "description": "Top主题的时序变化，突出焦点窗口与峰值阶段"
+        }],
+        "summary": f"已生成带焦点窗口的主题演化图，保存至 {file_path}"
+    }
+
+
+def topic_keyword_trend_chart(blog_data: List[Dict[str, Any]],
+                              output_dir: str = "report/images",
+                              granularity: str = "day",
+                              top_n: int = 8) -> Dict[str, Any]:
+    """
+    基于内容关键词的时间演化趋势，用于支撑焦点词热度变化。
+    """
+    df = _normalize_topic_df(blog_data)
+    if df.empty or "publish_time" not in df.columns:
+        return {"charts": [], "summary": "没有可用的内容或时间字段"}
+
+    df = df.copy()
+    fmt = "%Y-%m-%d %H:00" if granularity == "hour" else "%Y-%m-%d"
+    df["time_key"] = df["publish_time"].dt.strftime(fmt)
+
+    time_keyword_counts: Dict[str, Counter] = defaultdict(Counter)
+    total_counter = Counter()
+    for _, row in df.iterrows():
+        tokens = _tokenize_content(row.get("content", ""))
+        time_key = row["time_key"]
+        for token, cnt in tokens.items():
+            time_keyword_counts[time_key][token] += cnt
+            total_counter[token] += cnt
+
+    if not total_counter:
+        return {"charts": [], "summary": "未提取到有效关键词"}
+
+    top_keywords = [kw for kw, _ in total_counter.most_common(top_n)]
+    rows = []
+    for time_key in sorted(time_keyword_counts.keys()):
+        row = {"time": time_key}
+        for kw in top_keywords:
+            row[kw] = time_keyword_counts[time_key].get(kw, 0)
+        rows.append(row)
+
+    df_kw = pd.DataFrame(rows).fillna(0)
+    x_idx = range(len(df_kw))
+    fig, ax = plt.subplots(figsize=(14, 8))
+    palette = plt.cm.tab10(np.linspace(0, 1, len(top_keywords)))
+    for kw, color in zip(top_keywords, palette):
+        ax.plot(x_idx, df_kw[kw], label=kw, linewidth=2, marker="o", markersize=4, color=color)
+
+    ax.set_title("焦点关键词热度趋势", fontsize=16, fontweight="bold", pad=15)
+    ax.set_ylabel("出现次数", fontsize=12)
+    if len(df_kw) > 20:
+        step = max(1, len(df_kw) // 10)
+        ax.set_xticks(list(x_idx)[::step])
+        ax.set_xticklabels(df_kw["time"].tolist()[::step], rotation=45, ha="right")
+    else:
+        ax.set_xticks(list(x_idx))
+        ax.set_xticklabels(df_kw["time"].tolist(), rotation=45, ha="right")
+    ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1), fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"topic_keyword_trend_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"topic_keyword_trend_{timestamp}",
+            "type": "line_chart",
+            "title": "焦点关键词热度趋势",
+            "file_path": file_path,
+            "source_tool": "topic_keyword_trend_chart",
+            "description": "按时间粒度展示焦点关键词热度，支持地理与主题差异解读"
+        }],
+        "summary": f"已生成关键词趋势图，保存至 {file_path}"
+    }

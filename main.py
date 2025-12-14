@@ -30,6 +30,8 @@ def init_shared(
     topics_path: str = "data/topics.json",
     sentiment_attributes_path: str = "data/sentiment_attributes.json",
     publisher_objects_path: str = "data/publisher_objects.json",
+    belief_system_path: str = "data/believe_system_common.json",
+    publisher_decision_path: str = "data/publisher_decision.json",
     # 调度配置
     start_stage: int = 1,
     run_stages: List[int] = None,
@@ -75,7 +77,7 @@ def init_shared(
         Dict: 初始化完成的shared字典
     """
     if run_stages is None:
-        run_stages = [1,2,3]  # 默认执行阶段1，2，3
+        run_stages = [1]  # 默认执行阶段1，2，3
     
     return {
         # === 数据管理（贯穿三阶段） ===
@@ -88,7 +90,9 @@ def init_shared(
                 "blog_data_path": input_data_path,
                 "topics_path": topics_path,
                 "sentiment_attributes_path": sentiment_attributes_path,
-                "publisher_objects_path": publisher_objects_path
+                "publisher_objects_path": publisher_objects_path,
+                "belief_system_path": belief_system_path,
+                "publisher_decision_path": publisher_decision_path
             }
         },
 
@@ -396,11 +400,13 @@ def main():
     #
     
     # ----- 数据路径配置 -----
-    INPUT_DATA_PATH = "data/test_posts.json"
-    OUTPUT_DATA_PATH = "data/test_enhanced_blogs.json"
+    INPUT_DATA_PATH = "data/small.json"
+    OUTPUT_DATA_PATH = "data/small_enhanced_blogs.json"
     TOPICS_PATH = "data/topics.json"
     SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
     PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
+    BELIEF_SYSTEM_PATH = "data/believe_system_common.json"
+    PUBLISHER_DECISION_PATH = "data/publisher_decision.json"
 
     # 阶段2需要读取的增强数据文件路径（确保阶段1已生成）
     ENHANCED_DATA_PATH = OUTPUT_DATA_PATH
@@ -408,7 +414,7 @@ def main():
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
     # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2,3]  # 执行阶段2和3（测试用）
+    RUN_STAGES = [1]  # 执行阶段2和3（测试用）
 
     # ----- 阶段1配置 -----
     ENHANCEMENT_MODE = "async"  # "async" | "batch_api"
@@ -493,6 +499,8 @@ def main():
         topics_path=TOPICS_PATH,
         sentiment_attributes_path=SENTIMENT_ATTRS_PATH,
         publisher_objects_path=PUBLISHER_OBJS_PATH,
+        belief_system_path=BELIEF_SYSTEM_PATH,
+        publisher_decision_path=PUBLISHER_DECISION_PATH,
         run_stages=RUN_STAGES,
         start_stage=start_stage,
         enhancement_mode=ENHANCEMENT_MODE,

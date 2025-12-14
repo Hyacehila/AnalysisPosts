@@ -37,6 +37,8 @@ from nodes import (
     AsyncSentimentAttributeAnalysisBatchNode,
     AsyncTwoLevelTopicAnalysisBatchNode,
     AsyncPublisherObjectAnalysisBatchNode,
+    AsyncBeliefSystemAnalysisBatchNode,
+    AsyncPublisherDecisionAnalysisBatchNode,
     # 阶段1 Batch API节点
     BatchAPIEnhancementNode,
     # 阶段2通用节点
@@ -104,6 +106,16 @@ def _create_async_enhancement_flow(
         wait=wait_time, 
         max_concurrent=concurrent_num
     )
+    belief_analysis_node = AsyncBeliefSystemAnalysisBatchNode(
+        max_retries=max_retries,
+        wait=wait_time,
+        max_concurrent=concurrent_num
+    )
+    publisher_decision_node = AsyncPublisherDecisionAnalysisBatchNode(
+        max_retries=max_retries,
+        wait=wait_time,
+        max_concurrent=concurrent_num
+    )
     
     save_data_node = SaveEnhancedDataNode()
     validation_node = DataValidationAndOverviewNode()
@@ -114,7 +126,9 @@ def _create_async_enhancement_flow(
     sentiment_polarity_node >> sentiment_attribute_node
     sentiment_attribute_node >> topic_analysis_node
     topic_analysis_node >> publisher_analysis_node
-    publisher_analysis_node >> save_data_node
+    publisher_analysis_node >> belief_analysis_node
+    belief_analysis_node >> publisher_decision_node
+    publisher_decision_node >> save_data_node
     save_data_node >> validation_node
     validation_node >> completion_node
     

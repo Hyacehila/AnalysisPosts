@@ -85,7 +85,8 @@ from pocketflow import Node, BatchNode, AsyncNode, AsyncBatchNode
 from utils.call_llm import call_glm_45_air, call_glm4v_plus, call_glm45v_thinking, call_glm46
 from utils.data_loader import (
     load_blog_data, load_topics, load_sentiment_attributes, 
-    load_publisher_objects, save_enhanced_blog_data, load_enhanced_blog_data
+    load_publisher_objects, save_enhanced_blog_data, load_enhanced_blog_data,
+    load_belief_system, load_publisher_decisions
 )
 
 
@@ -330,7 +331,9 @@ class DataLoadNode(Node):
                 "blog_data_path": data_paths.get("blog_data_path", "data/beijing_rainstorm_posts.json"),
                 "topics_path": data_paths.get("topics_path", "data/topics.json"),
                 "sentiment_attributes_path": data_paths.get("sentiment_attributes_path", "data/sentiment_attributes.json"),
-                "publisher_objects_path": data_paths.get("publisher_objects_path", "data/publisher_objects.json")
+                "publisher_objects_path": data_paths.get("publisher_objects_path", "data/publisher_objects.json"),
+                "belief_system_path": data_paths.get("belief_system_path", "data/believe_system_common.json"),
+                "publisher_decision_path": data_paths.get("publisher_decision_path", "data/publisher_decision.json")
             }
     
     def exec(self, prep_res):
@@ -347,6 +350,8 @@ class DataLoadNode(Node):
                 "topics_hierarchy": load_topics(prep_res["topics_path"]),
                 "sentiment_attributes": load_sentiment_attributes(prep_res["sentiment_attributes_path"]),
                 "publisher_objects": load_publisher_objects(prep_res["publisher_objects_path"]),
+                "belief_system": load_belief_system(prep_res["belief_system_path"]),
+                "publisher_decisions": load_publisher_decisions(prep_res["publisher_decision_path"]),
                 "load_type": "original"
             }
     
@@ -362,6 +367,9 @@ class DataLoadNode(Node):
             shared["data"]["topics_hierarchy"] = exec_res["topics_hierarchy"]
             shared["data"]["sentiment_attributes"] = exec_res["sentiment_attributes"]
             shared["data"]["publisher_objects"] = exec_res["publisher_objects"]
+            shared["data"]["belief_system"] = exec_res["belief_system"]
+            shared["data"]["publisher_decisions"] = exec_res["publisher_decisions"]
+            print(f"[DataLoad] belief_system loaded: {len(exec_res['belief_system'])} items")
 
         if "stage1_results" not in shared:
             shared["stage1_results"] = {"statistics": {}}
@@ -375,6 +383,9 @@ class DataLoadNode(Node):
                     "sentiment_attribute_empty": 0,
                     "topics_empty": 0,
                     "publisher_empty": 0
+                    ,
+                    "belief_system_empty": 0,
+                    "publisher_decision_empty": 0
                 },
                 "engagement_statistics": {
                     "total_reposts": 0,
@@ -507,7 +518,9 @@ class DataValidationAndOverviewNode(Node):
                 "sentiment_polarity_empty": 0,
                 "sentiment_attribute_empty": 0,
                 "topics_empty": 0,
-                "publisher_empty": 0
+                "publisher_empty": 0,
+                "belief_system_empty": 0,
+                "publisher_decision_empty": 0
             }
         }
         
@@ -578,6 +591,11 @@ class DataValidationAndOverviewNode(Node):
                 stats["empty_fields"]["topics_empty"] += 1
             if blog_post.get('publisher') is None:
                 stats["empty_fields"]["publisher_empty"] += 1
+            belief_signals = blog_post.get('belief_signals')
+            if not belief_signals:
+                stats["empty_fields"]["belief_system_empty"] += 1
+            if blog_post.get('publisher_decision') is None:
+                stats["empty_fields"]["publisher_decision_empty"] += 1
             
             # 发布者类型分布
             publisher = blog_post.get('publisher')
@@ -639,7 +657,9 @@ class DataValidationAndOverviewNode(Node):
             print(f"  ├─ 情感极性为空: {empty_fields.get('sentiment_polarity_empty', 0)}")
             print(f"  ├─ 情感属性为空: {empty_fields.get('sentiment_attribute_empty', 0)}")
             print(f"  ├─ 主题为空: {empty_fields.get('topics_empty', 0)}")
-            print(f"  └─ 发布者为空: {empty_fields.get('publisher_empty', 0)}")
+            print(f"  ├─ 发布者为空: {empty_fields.get('publisher_empty', 0)}")
+            print(f"  ├─ 信念分类为空: {empty_fields.get('belief_system_empty', 0)}")
+            print(f"  └─ 事件关联身份为空: {empty_fields.get('publisher_decision_empty', 0)}")
         
         # 参与度统计
         engagement = stats.get("engagement_statistics", {})
@@ -1043,6 +1063,201 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
         
         print(f"[AsyncPublisher] 完成 {len(exec_res)} 条博文的发布者分析")
         
+        return "default"
+
+
+class AsyncBeliefSystemAnalysisBatchNode(AsyncParallelBatchNode):
+    """
+    信念体系分类识别（多选）
+    """
+    def prep(self, shared):
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        belief_system = shared.get("data", {}).get("belief_system", [])
+        return [{
+            "blog_data": blog_post,
+            "belief_system": belief_system
+        } for blog_post in blog_data]
+
+    async def exec_async(self, prep_res):
+        blog_post = prep_res["blog_data"]
+        belief_system_raw = prep_res["belief_system"]
+        belief_system = []
+
+        def _clean(text: str) -> str:
+            if not isinstance(text, str):
+                return text
+            try:
+                # 修正常见乱码（utf-8 内容被当 latin1 读取）
+                return text.encode("latin1").decode("utf-8")
+            except Exception:
+                return text
+
+        for item in belief_system_raw or []:
+            belief_system.append({
+                "category": _clean(item.get("category", "")),
+                "subcategories": [_clean(sub) for sub in item.get("subcategories", [])]
+            })
+        if not belief_system:
+            return []
+
+        # 构建信念体系层次字符串，类似两级主题提示
+        belief_lines = []
+        for bs in belief_system:
+            cat = bs.get("category", "")
+            subs = "、".join(bs.get("subcategories", []))
+            belief_lines.append(f"{cat} -> {subs}")
+        belief_str = "\n".join(belief_lines)
+
+        prompt = f"""请从下列信念体系主题列表中为博文的讨论内容选择1-3个最贴切的 category/subcategory 组合。
+必须以 [ 开头、以 ] 结尾，仅输出 JSON 数组，格式示例：
+[{{"category": "类别", "subcategories": ["子类1","子类2"]}}]
+若无匹配输出 []，不得添加任何说明、Markdown 代码块或多余文本。子类必须来自给定列表。
+信念体系：
+{belief_str}
+博文：
+{blog_post.get('content', '')}"""
+
+        # 调用LLM
+        response = await asyncio.to_thread(
+            call_glm_45_air, prompt, temperature=0.2, max_tokens=512
+        )
+
+        # 解析与校验
+        candidate = response.strip()
+        fence_match = re.search(r"```(?:json)?\s*(.*?)\s*```", candidate, re.S)
+        if fence_match:
+            candidate = fence_match.group(1).strip()
+        else:
+            start = candidate.find('[')
+            end = candidate.rfind(']')
+            if start != -1 and end != -1 and end > start:
+                candidate = candidate[start:end + 1].strip()
+
+        try:
+            parsed = json.loads(candidate)
+        except Exception:
+            # 再尝试提取首个 JSON 数组
+            arr_match = re.search(r"\[\s*{.*}\s*]", candidate, re.S)
+            if arr_match:
+                candidate = arr_match.group(0).strip()
+                try:
+                    parsed = json.loads(candidate)
+                except Exception as e:
+                    print(f"[BeliefSystem] 解析失败（二次）: {e}, 原始输出: {response!r}")
+                    return []
+            else:
+                print(f"[BeliefSystem] 解析失败：未找到有效JSON数组，原始输出: {response!r}")
+                return []
+        if not isinstance(parsed, list):
+            raise ValueError(f"信念分类模型输出不是列表格式: {parsed}")
+
+        # 过滤合法的分类/子类
+        valid_results = []
+        for item in parsed:
+            cat = item.get("category", "")
+            subs = item.get("subcategories", []) or []
+            # 找到对应的定义
+            matched_def = next((bs for bs in belief_system if bs.get("category") == cat), None)
+            if not matched_def:
+                continue
+            valid_subs = [sub for sub in subs if sub in matched_def.get("subcategories", [])]
+            valid_results.append({"category": cat, "subcategories": valid_subs})
+
+        return valid_results
+
+    async def exec_fallback_async(self, prep_res, exc):
+        print(f"[BeliefSystem] 调用失败，返回空: {exc}")
+        return []
+
+    async def post_async(self, shared, prep_res, exec_res):
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        # 容错：长度不匹配时填充空列表
+        if len(exec_res) < len(blog_data):
+            exec_res = list(exec_res) + [[] for _ in range(len(blog_data) - len(exec_res))]
+        elif len(exec_res) > len(blog_data):
+            exec_res = exec_res[:len(blog_data)]
+
+        for i, blog_post in enumerate(blog_data):
+            blog_post["belief_signals"] = exec_res[i] if exec_res[i] is not None else []
+
+        print(f"[BeliefSystem] 完成 {len(blog_data)} 条博文的信念分类增强")
+        return "default"
+
+
+class AsyncPublisherDecisionAnalysisBatchNode(AsyncParallelBatchNode):
+    """
+    发布者事件关联身份分类（四选一）
+    """
+    def prep(self, shared):
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        publisher_decisions = shared.get("data", {}).get("publisher_decisions", [])
+        return [{
+            "blog_data": blog_post,
+            "publisher_decisions": publisher_decisions
+        } for blog_post in blog_data]
+
+    async def exec_async(self, prep_res):
+        blog_post = prep_res["blog_data"]
+        publisher_decisions_raw = prep_res["publisher_decisions"]
+        def _clean(text: str) -> str:
+            if not isinstance(text, str):
+                return text
+            try:
+                return text.encode("latin1").decode("utf-8")
+            except Exception:
+                return text
+        publisher_decisions = [{"category": _clean(item.get("category", ""))} for item in (publisher_decisions_raw or [])]
+        if not publisher_decisions:
+            return None
+
+        prompt = f"""请选择博文发布者与舆情事件“河南大学生夜骑事件”的“事件关联身份”，只能从下列候选中选1个：
+{json.dumps(publisher_decisions, ensure_ascii=False, indent=2)}
+若无法判断，选择最接近的类型。只输出候选中的category文本，不要输出解释。
+博文内容：{blog_post.get('content', '')}"""
+        try:
+            response = await asyncio.to_thread(call_glm_45_air, prompt, temperature=0.2)
+            chosen = response.strip().replace('"', '')
+            # 验证是否在候选中
+            candidates = [item.get("category") for item in publisher_decisions]
+            for cand in candidates:
+                if cand and cand in chosen:
+                    return cand
+            return candidates[0] if candidates else None
+        except Exception as e:
+            print(f"[PublisherDecision] 调用失败: {e}")
+            candidates = [item.get("category") for item in publisher_decisions if item.get("category")]
+            return candidates[0] if candidates else None
+
+    async def exec_fallback_async(self, prep_res, exc):
+        print(f"[PublisherDecision] 调用失败，返回None: {exc}")
+        candidates = [item.get("category") for item in prep_res.get("publisher_decisions", []) if item.get("category")]
+        return candidates[0] if candidates else None
+
+    async def post_async(self, shared, prep_res, exec_res):
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        def _clean(text: str):
+            if not isinstance(text, str):
+                return text
+            try:
+                return text.encode("latin1").decode("utf-8")
+            except Exception:
+                return text
+
+        candidates = [_clean(item.get("category")) for item in shared.get("data", {}).get("publisher_decisions", []) if item.get("category")]
+        fallback_value = candidates[0] if candidates else "未知"
+
+        if len(exec_res) < len(blog_data):
+            exec_res = list(exec_res) + [fallback_value for _ in range(len(blog_data) - len(exec_res))]
+        elif len(exec_res) > len(blog_data):
+            exec_res = exec_res[:len(blog_data)]
+
+        for i, blog_post in enumerate(blog_data):
+            value = exec_res[i] if i < len(exec_res) else fallback_value
+            if value is None:
+                value = fallback_value
+            blog_post["publisher_decision"] = value
+
+        print(f"[PublisherDecision] 完成 {len(blog_data)} 条博文的事件关联身份增强")
         return "default"
 
 
@@ -1498,6 +1713,8 @@ class ExecuteAnalysisScriptNode(Node):
             sentiment_anomaly_detection,
             sentiment_trend_chart,
             sentiment_pie_chart,
+            sentiment_bucket_trend_chart,
+            sentiment_attribute_trend_chart,
             # 主题工具
             topic_frequency_stats,
             topic_time_evolution,
@@ -1505,12 +1722,17 @@ class ExecuteAnalysisScriptNode(Node):
             topic_ranking_chart,
             topic_evolution_chart,
             topic_network_chart,
+            topic_focus_evolution_chart,
+            topic_keyword_trend_chart,
             # 地理工具
             geographic_distribution_stats,
             geographic_hotspot_detection,
             geographic_sentiment_analysis,
             geographic_heatmap,
             geographic_bar_chart,
+            geographic_sentiment_bar_chart,
+            geographic_topic_heatmap,
+            geographic_temporal_heatmap,
             # 交互工具
             publisher_distribution_stats,
             cross_dimension_matrix,
@@ -1518,6 +1740,9 @@ class ExecuteAnalysisScriptNode(Node):
             correlation_analysis,
             interaction_heatmap,
             publisher_bar_chart,
+            publisher_sentiment_bucket_chart,
+            publisher_topic_distribution_chart,
+            participant_trend_chart,
         )
         import time
         
@@ -1544,14 +1769,26 @@ class ExecuteAnalysisScriptNode(Node):
         tools_executed.append("sentiment_distribution_stats")
         
         # 情感时序分析
-        result = sentiment_time_series(blog_data, granularity="hour")
+        sentiment_ts_result = sentiment_time_series(blog_data, granularity="hour")
         tables.append({
             "id": "sentiment_time_series",
             "title": "情感时序趋势数据",
-            "data": result["data"],
+            "data": sentiment_ts_result["data"],
             "source_tool": "sentiment_time_series"
         })
         tools_executed.append("sentiment_time_series")
+
+        tables.append({
+            "id": "sentiment_peaks",
+            "title": "情感峰值与拐点",
+            "data": {
+                "peak_periods": sentiment_ts_result["data"].get("peak_periods", []),
+                "peak_hours": sentiment_ts_result["data"].get("peak_hours", []),
+                "turning_points": sentiment_ts_result["data"].get("turning_points", []),
+                "volume_spikes": sentiment_ts_result["data"].get("volume_spikes", [])
+            },
+            "source_tool": "sentiment_time_series"
+        })
         
         # 情感异常检测
         result = sentiment_anomaly_detection(blog_data)
@@ -1568,6 +1805,18 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("sentiment_trend_chart")
+
+        # 情感桶趋势
+        result = sentiment_bucket_trend_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("sentiment_bucket_trend_chart")
+
+        # 情感属性趋势
+        result = sentiment_attribute_trend_chart(blog_data, granularity="day")
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("sentiment_attribute_trend_chart")
         
         # 情感饼图
         result = sentiment_pie_chart(blog_data)
@@ -1619,6 +1868,18 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("topic_evolution_chart")
+
+        # 主题焦点演化
+        result = topic_focus_evolution_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("topic_focus_evolution_chart")
+
+        # 焦点关键词趋势
+        result = topic_keyword_trend_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("topic_keyword_trend_chart")
         
         # 主题网络图
         result = topic_network_chart(blog_data)
@@ -1670,6 +1931,24 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("geographic_bar_chart")
+
+        # 地区正负面对比
+        result = geographic_sentiment_bar_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("geographic_sentiment_bar_chart")
+
+        # 地区 × 主题热力图
+        result = geographic_topic_heatmap(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("geographic_topic_heatmap")
+
+        # 地区 × 时间热力图（天粒度）
+        result = geographic_temporal_heatmap(blog_data, granularity="day")
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("geographic_temporal_heatmap")
         
         # === 4. 多维交互分析 ===
         print("  [CHART] 执行多维交互分析...")
@@ -1725,6 +2004,24 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("publisher_bar_chart")
+
+        # 发布者情绪桶对比
+        result = publisher_sentiment_bucket_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("publisher_sentiment_bucket_chart")
+
+        # 发布者话题偏好
+        result = publisher_topic_distribution_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("publisher_topic_distribution_chart")
+
+        # 参与人数趋势
+        result = participant_trend_chart(blog_data, granularity="day")
+        if result.get("charts"):
+            charts.extend(result["charts"])
+        tools_executed.append("participant_trend_chart")
         
         execution_time = time.time() - start_time
         
@@ -2852,19 +3149,19 @@ class FillSectionNode(Node):
         elif section_name == "trend":
             return f"""
 ### 趋势分析要点
-- 必须包含情感趋势变化图
-- 必须包含主题演化时序图
-- 使用表格展示趋势统计数据
-- 分析转折点和异常值
+- 必须包含情感趋势/情绪桶/情绪属性趋势图，点出拐点与爆点
+- 必须包含主题演化时序与焦点关键词趋势图
+- 使用表格展示趋势统计数据（峰值、拐点、爆点）
+- 分析转折点和异常值，注明发生时间
 """
 
         elif section_name == "spread":
             return f"""
 ### 传播分析要点
-- 使用发布者类型分布图
-- 使用地区分布热力图
-- 使用交叉分析热力图
-- 用表格展示传播数据统计
+- 使用发布者类型/情绪桶/话题偏好图
+- 使用地区分布/地区正负面对比/地区×时间热力图
+- 使用交叉分析热力图或参与人数趋势
+- 用表格展示传播数据统计与高峰时段
 """
 
         elif section_name == "content":

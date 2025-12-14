@@ -16,6 +16,8 @@ from .sentiment_tools import (
     sentiment_anomaly_detection,
     sentiment_trend_chart,
     sentiment_pie_chart,
+    sentiment_bucket_trend_chart,
+    sentiment_attribute_trend_chart,
 )
 
 from .topic_tools import (
@@ -25,6 +27,8 @@ from .topic_tools import (
     topic_ranking_chart,
     topic_evolution_chart,
     topic_network_chart,
+    topic_focus_evolution_chart,
+    topic_keyword_trend_chart,
 )
 
 from .geographic_tools import (
@@ -33,6 +37,9 @@ from .geographic_tools import (
     geographic_sentiment_analysis,
     geographic_heatmap,
     geographic_bar_chart,
+    geographic_sentiment_bar_chart,
+    geographic_topic_heatmap,
+    geographic_temporal_heatmap,
 )
 
 from .interaction_tools import (
@@ -42,6 +49,9 @@ from .interaction_tools import (
     correlation_analysis,
     interaction_heatmap,
     publisher_bar_chart,
+    publisher_sentiment_bucket_chart,
+    publisher_topic_distribution_chart,
+    participant_trend_chart,
 )
 
 
@@ -108,6 +118,33 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "output_type": "chart",
         "generates_chart": True
     },
+    "sentiment_bucket_trend_chart": {
+        "name": "sentiment_bucket_trend_chart",
+        "category": "情感趋势分析",
+        "description": "正/负/中性情绪桶时序堆叠图，定位阶段差异和峰值",
+        "function": sentiment_bucket_trend_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "hour"}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "sentiment_attribute_trend_chart": {
+        "name": "sentiment_attribute_trend_chart",
+        "category": "情感趋势分析",
+        "description": "Top情绪属性热度随时间的折线图，支持焦点窗口标注",
+        "function": sentiment_attribute_trend_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
+            "top_n": {"type": "int", "description": "展示的属性数量", "required": False, "default": 6}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
     
     # ===== 主题演化分析工具集 =====
     "topic_frequency_stats": {
@@ -169,6 +206,34 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
             "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
             "top_n": {"type": "int", "description": "显示的主题数量", "required": False, "default": 5}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "topic_focus_evolution_chart": {
+        "name": "topic_focus_evolution_chart",
+        "category": "主题演化分析",
+        "description": "带焦点窗口高亮的主题演化趋势图，定位峰值阶段",
+        "function": topic_focus_evolution_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
+            "top_n": {"type": "int", "description": "展示的主题数量", "required": False, "default": 5}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "topic_keyword_trend_chart": {
+        "name": "topic_keyword_trend_chart",
+        "category": "主题演化分析",
+        "description": "焦点关键词热度趋势，用于话题词演化分析",
+        "function": topic_keyword_trend_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
+            "top_n": {"type": "int", "description": "展示的关键词数量", "required": False, "default": 8}
         },
         "output_type": "chart",
         "generates_chart": True
@@ -248,6 +313,47 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "output_type": "chart",
         "generates_chart": True
     },
+    "geographic_sentiment_bar_chart": {
+        "name": "geographic_sentiment_bar_chart",
+        "category": "地理分布分析",
+        "description": "地区正/负面占比与平均极性的对比条形图",
+        "function": geographic_sentiment_bar_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_n": {"type": "int", "description": "展示的地区数", "required": False, "default": 12}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "geographic_topic_heatmap": {
+        "name": "geographic_topic_heatmap",
+        "category": "地理分布分析",
+        "description": "地区 × 主题热力图，呈现各地话题差异",
+        "function": geographic_topic_heatmap,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_regions": {"type": "int", "description": "展示的地区数量", "required": False, "default": 10},
+            "top_topics": {"type": "int", "description": "展示的主题数量", "required": False, "default": 8}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "geographic_temporal_heatmap": {
+        "name": "geographic_temporal_heatmap",
+        "category": "地理分布分析",
+        "description": "地区 × 时间热力图，定位地区高峰与差异",
+        "function": geographic_temporal_heatmap,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
+            "top_regions": {"type": "int", "description": "展示的地区数", "required": False, "default": 8}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
     
     # ===== 多维交互分析工具集 =====
     "publisher_distribution_stats": {
@@ -319,6 +425,46 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "parameters": {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
             "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "publisher_sentiment_bucket_chart": {
+        "name": "publisher_sentiment_bucket_chart",
+        "category": "多维交互分析",
+        "description": "发布者维度的正/中/负面情绪桶堆叠对比",
+        "function": publisher_sentiment_bucket_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_n": {"type": "int", "description": "展示的发布者数量", "required": False, "default": 10}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "publisher_topic_distribution_chart": {
+        "name": "publisher_topic_distribution_chart",
+        "category": "多维交互分析",
+        "description": "发布者 × 主题堆叠图，呈现发布者话题偏好差异",
+        "function": publisher_topic_distribution_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_publishers": {"type": "int", "description": "展示的发布者数", "required": False, "default": 8},
+            "top_topics": {"type": "int", "description": "展示的主题数", "required": False, "default": 8}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "participant_trend_chart": {
+        "name": "participant_trend_chart",
+        "category": "多维交互分析",
+        "description": "按时间粒度统计新增/累计参与用户趋势",
+        "function": participant_trend_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"}
         },
         "output_type": "chart",
         "generates_chart": True
@@ -444,4 +590,3 @@ def get_data_tools() -> List[str]:
         工具名称列表
     """
     return [name for name, info in TOOL_REGISTRY.items() if not info["generates_chart"]]
-

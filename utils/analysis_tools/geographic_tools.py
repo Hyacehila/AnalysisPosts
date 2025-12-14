@@ -16,6 +16,7 @@ from collections import Counter, defaultdict
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
@@ -433,3 +434,191 @@ def geographic_bar_chart(blog_data: List[Dict[str, Any]],
         "summary": f"已生成地区分布柱状图，保存至 {file_path}"
     }
 
+
+def geographic_sentiment_bar_chart(blog_data: List[Dict[str, Any]],
+                                   output_dir: str = "report/images",
+                                   top_n: int = 12) -> Dict[str, Any]:
+    """
+    正负面占比的地区对比条形图，突出地区情绪差异。
+    """
+    sentiment_result = geographic_sentiment_analysis(blog_data)
+    regional = sentiment_result.get("data", {}).get("regional_analysis", {})
+    if not regional:
+        return {"charts": [], "summary": "没有可用的地区情绪数据"}
+
+    sorted_regions = sorted(regional.items(), key=lambda x: x[1]["post_count"], reverse=True)[:top_n]
+    locations = [loc for loc, _ in sorted_regions]
+    positives = [stats.get("positive_ratio", 0) for _, stats in sorted_regions]
+    negatives = [stats.get("negative_ratio", 0) for _, stats in sorted_regions]
+    avg_polarity = [stats.get("avg_polarity", 0) for _, stats in sorted_regions]
+
+    x = np.arange(len(locations))
+    width = 0.35
+    fig, ax = plt.subplots(figsize=(14, 8))
+    ax.bar(x - width / 2, positives, width, color="#4caf50", alpha=0.85, label="正面占比")
+    ax.bar(x + width / 2, negatives, width, color="#f44336", alpha=0.85, label="负面占比")
+
+    # 覆盖平均极性折线
+    ax2 = ax.twinx()
+    ax2.plot(x, avg_polarity, color="#2196f3", linewidth=2, marker="o", markersize=4, label="平均极性")
+    ax2.set_ylabel("平均情感极性", fontsize=12)
+    ax2.set_ylim(1, 5)
+
+    ax.set_ylabel("占比 (%)", fontsize=12)
+    ax.set_xlabel("地区", fontsize=12)
+    ax.set_xticks(x)
+    ax.set_xticklabels(locations, rotation=45, ha="right", fontsize=10)
+    ax.set_title(f"Top{top_n} 地区正负面对比", fontsize=16, fontweight="bold", pad=15)
+    ax.legend(loc="upper left")
+    ax.grid(True, alpha=0.3, axis="y")
+    ax2.legend(loc="upper right")
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"geographic_sentiment_bar_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"geographic_sentiment_bar_{timestamp}",
+            "type": "bar_chart",
+            "title": "地区正负面差异",
+            "file_path": file_path,
+            "source_tool": "geographic_sentiment_bar_chart",
+            "description": "正负面占比与平均极性对比，体现地区情绪差异"
+        }],
+        "summary": f"已生成地区情绪对比图，保存至 {file_path}"
+    }
+
+
+def geographic_topic_heatmap(blog_data: List[Dict[str, Any]],
+                             output_dir: str = "report/images",
+                             top_regions: int = 10,
+                             top_topics: int = 8) -> Dict[str, Any]:
+    """
+    地区 × 主题的差异热力图，用于地理可视化叙事。
+    """
+    region_topic = defaultdict(Counter)
+    for post in blog_data:
+        loc = (post.get("location") or "").strip()
+        for topic in post.get("topics", []) or []:
+            parent = topic.get("parent_topic")
+            if loc and parent:
+                region_topic[loc][parent] += 1
+
+    if not region_topic:
+        return {"charts": [], "summary": "没有地区主题组合数据"}
+
+    top_region_items = sorted(region_topic.items(), key=lambda x: sum(x[1].values()), reverse=True)[:top_regions]
+    topic_counter = Counter()
+    for _, counter in top_region_items:
+        topic_counter.update(counter)
+    top_topic_names = [t for t, _ in topic_counter.most_common(top_topics)]
+
+    matrix = []
+    regions = []
+    for loc, counter in top_region_items:
+        regions.append(loc)
+        row = [counter.get(t, 0) for t in top_topic_names]
+        matrix.append(row)
+
+    matrix = np.array(matrix)
+    fig, ax = plt.subplots(figsize=(14, max(8, len(regions) * 0.5)))
+    im = ax.imshow(matrix, cmap="YlGnBu", aspect="auto")
+    ax.set_xticks(np.arange(len(top_topic_names)))
+    ax.set_xticklabels(top_topic_names, rotation=45, ha="right", fontsize=10)
+    ax.set_yticks(np.arange(len(regions)))
+    ax.set_yticklabels(regions, fontsize=10)
+    ax.set_title("地区 × 主题热力图", fontsize=16, fontweight="bold", pad=15)
+
+    for i in range(len(regions)):
+        for j in range(len(top_topic_names)):
+            ax.text(j, i, int(matrix[i, j]), ha="center", va="center",
+                    color="white" if matrix[i, j] > matrix.max() * 0.6 else "black", fontsize=9)
+
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8)
+    cbar.set_label("博文数", fontsize=10)
+    plt.tight_layout()
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"geographic_topic_heatmap_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"geographic_topic_heatmap_{timestamp}",
+            "type": "heatmap",
+            "title": "地区话题差异热力图",
+            "file_path": file_path,
+            "source_tool": "geographic_topic_heatmap",
+            "description": "地区 × 主题的热度差异，支持地理可视化叙事"
+        }],
+        "summary": f"已生成地区话题热力图，保存至 {file_path}"
+    }
+
+
+def geographic_temporal_heatmap(blog_data: List[Dict[str, Any]],
+                                output_dir: str = "report/images",
+                                granularity: str = "day",
+                                top_regions: int = 8) -> Dict[str, Any]:
+    """
+    地区随时间的发帖量热力图，支持天/小时粒度，定位地区差异和高峰特征。
+    """
+    df = pd.DataFrame(blog_data)
+    if df.empty or "publish_time" not in df.columns or "location" not in df.columns:
+        return {"charts": [], "summary": "缺少时间或地区字段"}
+
+    df = df.copy()
+    df["publish_time"] = pd.to_datetime(df["publish_time"], errors="coerce")
+    df = df[pd.notna(df["publish_time"])]
+    fmt = "%Y-%m-%d %H:00" if granularity == "hour" else "%Y-%m-%d"
+    df["time_key"] = df["publish_time"].dt.strftime(fmt)
+
+    grouped = df.groupby(["location", "time_key"]).size().unstack(fill_value=0)
+    if grouped.empty:
+        return {"charts": [], "summary": "没有可用的地区时间分布数据"}
+
+    top_regions_names = grouped.sum(axis=1).sort_values(ascending=False).head(top_regions).index.tolist()
+    grouped = grouped.loc[top_regions_names]
+    time_order = sorted(grouped.columns.tolist())
+    grouped = grouped[time_order]
+
+    fig, ax = plt.subplots(figsize=(14, max(6, len(top_regions_names) * 0.6)))
+    im = ax.imshow(grouped.values, cmap="OrRd", aspect="auto")
+    if len(time_order) > 20:
+        step = max(1, len(time_order) // 12)
+        ticks = np.arange(0, len(time_order), step)
+        ax.set_xticks(ticks)
+        ax.set_xticklabels([time_order[i] for i in ticks], rotation=45, ha="right")
+    else:
+        ax.set_xticks(np.arange(len(time_order)))
+        ax.set_xticklabels(time_order, rotation=45, ha="right")
+    ax.set_yticks(np.arange(len(top_regions_names)))
+    ax.set_yticklabels(top_regions_names)
+    ax.set_title(f"地区 × 时间热力图（{granularity}）", fontsize=16, fontweight="bold", pad=15)
+
+    cbar = plt.colorbar(im, ax=ax, shrink=0.8)
+    cbar.set_label("博文数", fontsize=10)
+    plt.tight_layout()
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"geographic_temporal_heatmap_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"geographic_temporal_heatmap_{timestamp}",
+            "type": "heatmap",
+            "title": "地区时间差异热力图",
+            "file_path": file_path,
+            "source_tool": "geographic_temporal_heatmap",
+            "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
+        }],
+        "summary": f"已生成地区时间热力图，保存至 {file_path}"
+    }

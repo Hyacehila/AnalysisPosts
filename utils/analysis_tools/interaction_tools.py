@@ -17,6 +17,7 @@ from collections import Counter, defaultdict
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
@@ -85,6 +86,38 @@ def publisher_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
             "avg_sentiment": round(stats["sentiment_sum"] / stats["sentiment_count"], 2) if stats["sentiment_count"] > 0 else None,
             "total_engagement": stats["total_reposts"] + stats["total_comments"] + stats["total_likes"]
         }
+
+    # 高互动账号与代表性帖子（融合新工具能力，保持旧接口向后兼容）
+    def _engagement(post):
+        return post.get("repost_count", 0) + post.get("comment_count", 0) + post.get("like_count", 0)
+
+    sorted_posts = sorted(blog_data, key=_engagement, reverse=True)
+    top_accounts = []
+    seen = set()
+    for post in sorted_posts:
+        name = post.get("username") or post.get("publisher") or "未知"
+        if name in seen:
+            continue
+        seen.add(name)
+        top_accounts.append({
+            "username": name,
+            "publisher": post.get("publisher", "未知"),
+            "engagement": _engagement(post),
+            "followers_count": post.get("followers_count")
+        })
+        if len(top_accounts) >= 20:
+            break
+
+    representative_posts = [
+        {
+            "username": p.get("username"),
+            "publisher": p.get("publisher", "未知"),
+            "publish_time": p.get("publish_time"),
+            "engagement": _engagement(p),
+            "content": p.get("content")
+        }
+        for p in sorted_posts[:50]
+    ]
     
     # 排序
     sorted_publishers = sorted(distribution.items(), key=lambda x: x[1]["count"], reverse=True)
@@ -99,7 +132,9 @@ def publisher_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
             "publisher_types": len(distribution),
             "top_publishers": [
                 {"publisher": p, **stats} for p, stats in sorted_publishers[:5]
-            ]
+            ],
+            "top_accounts": top_accounts,
+            "representative_posts": representative_posts
         },
         "summary": summary
     }
@@ -557,3 +592,200 @@ def publisher_bar_chart(blog_data: List[Dict[str, Any]],
         "summary": f"已生成发布者分布柱状图，保存至 {file_path}"
     }
 
+
+def publisher_sentiment_bucket_chart(blog_data: List[Dict[str, Any]],
+                                     output_dir: str = "report/images",
+                                     top_n: int = 10) -> Dict[str, Any]:
+    """
+    按发布者的正/中/负面占比堆叠图，用于对齐示例中的情绪桶分布。
+    """
+    bucket_counts: Dict[str, Counter] = defaultdict(Counter)
+
+    def _bucket(polarity: Any) -> str:
+        if polarity is None:
+            return "未知"
+        try:
+            v = float(polarity)
+        except Exception:
+            return "未知"
+        if v <= 2:
+            return "负面"
+        if v >= 4:
+            return "正面"
+        return "中性"
+
+    for post in blog_data:
+        pub = post.get("publisher") or "未知"
+        bucket = _bucket(post.get("sentiment_polarity"))
+        bucket_counts[pub][bucket] += 1
+
+    if not bucket_counts:
+        return {"charts": [], "summary": "没有可用的发布者情绪桶数据"}
+
+    sorted_pub = sorted(bucket_counts.items(), key=lambda x: sum(x[1].values()), reverse=True)[:top_n]
+    publishers = [p for p, _ in sorted_pub]
+    buckets = ["负面", "中性", "正面", "未知"]
+    colors = {"负面": "#f44336", "中性": "#9e9e9e", "正面": "#4caf50", "未知": "#bdbdbd"}
+
+    fig, ax = plt.subplots(figsize=(14, 8))
+    bottom = np.zeros(len(publishers))
+    for bucket in buckets:
+        values = np.array([counts.get(bucket, 0) for _, counts in sorted_pub], dtype=float)
+        ax.bar(publishers, values, bottom=bottom, label=bucket, color=colors.get(bucket, "#607d8b"), edgecolor="white", linewidth=0.5)
+        bottom += values
+
+    ax.set_ylabel("博文数", fontsize=12)
+    ax.set_title(f"Top{top_n} 发布者情绪桶分布", fontsize=16, fontweight="bold", pad=15)
+    ax.set_xticklabels(publishers, rotation=45, ha="right", fontsize=10)
+    ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1), fontsize=10)
+    ax.grid(True, axis="y", alpha=0.3)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"publisher_sentiment_bucket_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"publisher_sentiment_bucket_{timestamp}",
+            "type": "bar_chart",
+            "title": "发布者情绪桶分布",
+            "file_path": file_path,
+            "source_tool": "publisher_sentiment_bucket_chart",
+            "description": "按发布者对比正/中/负面占比，突出情绪差异"
+        }],
+        "summary": f"已生成发布者情绪桶分布图，保存至 {file_path}"
+    }
+
+
+def publisher_topic_distribution_chart(blog_data: List[Dict[str, Any]],
+                                       output_dir: str = "report/images",
+                                       top_publishers: int = 8,
+                                       top_topics: int = 8) -> Dict[str, Any]:
+    """
+    发布者 × 主题堆叠图，对齐示例中的主题偏好分布。
+    """
+    pub_topic = defaultdict(Counter)
+    for post in blog_data:
+        pub = post.get("publisher") or "未知"
+        for topic in post.get("topics", []) or []:
+            parent = topic.get("parent_topic")
+            if parent:
+                pub_topic[pub][parent] += 1
+
+    if not pub_topic:
+        return {"charts": [], "summary": "没有可用的发布者主题数据"}
+
+    top_pub_items = sorted(pub_topic.items(), key=lambda x: sum(x[1].values()), reverse=True)[:top_publishers]
+    topic_counter = Counter()
+    for _, counter in top_pub_items:
+        topic_counter.update(counter)
+    topic_names = [t for t, _ in topic_counter.most_common(top_topics)]
+
+    publishers = [p for p, _ in top_pub_items]
+    fig, ax = plt.subplots(figsize=(14, 8))
+    bottom = np.zeros(len(publishers))
+    palette = plt.cm.tab20(np.linspace(0, 1, len(topic_names)))
+    for topic, color in zip(topic_names, palette):
+        values = np.array([counter.get(topic, 0) for _, counter in top_pub_items], dtype=float)
+        ax.bar(publishers, values, bottom=bottom, label=topic, color=color, edgecolor="white", linewidth=0.3)
+        bottom += values
+
+    ax.set_ylabel("博文数", fontsize=12)
+    ax.set_title("发布者话题偏好分布", fontsize=16, fontweight="bold", pad=15)
+    ax.set_xticklabels(publishers, rotation=45, ha="right", fontsize=10)
+    ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1), fontsize=9, ncol=2)
+    ax.grid(True, axis="y", alpha=0.3)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"publisher_topic_distribution_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"publisher_topic_distribution_{timestamp}",
+            "type": "bar_chart",
+            "title": "发布者话题偏好分布",
+            "file_path": file_path,
+            "source_tool": "publisher_topic_distribution_chart",
+            "description": "堆叠展示不同发布者的主题偏好差异"
+        }],
+        "summary": f"已生成发布者主题分布图，保存至 {file_path}"
+    }
+
+
+def participant_trend_chart(blog_data: List[Dict[str, Any]],
+                            output_dir: str = "report/images",
+                            granularity: str = "day") -> Dict[str, Any]:
+    """
+    参与人数趋势：按时间粒度累计唯一 user_id，用于评估参与规模演化。
+    """
+    df = pd.DataFrame(blog_data)
+    if df.empty or "user_id" not in df.columns or "publish_time" not in df.columns:
+        return {"charts": [], "summary": "缺少用户或时间字段"}
+
+    df = df.copy()
+    df["publish_time"] = pd.to_datetime(df["publish_time"], errors="coerce")
+    df = df[pd.notna(df["publish_time"])]
+    fmt = "%Y-%m-%d %H:00" if granularity == "hour" else "%Y-%m-%d"
+    df["time_key"] = df["publish_time"].dt.strftime(fmt)
+    df = df.sort_values("publish_time")
+
+    seen: set = set()
+    rows = []
+    for time_key, group in df.groupby("time_key"):
+        user_ids = group["user_id"].astype(str).tolist()
+        new_users = [u for u in user_ids if u not in seen]
+        seen.update(new_users)
+        rows.append({
+            "time": time_key,
+            "active_posts": int(len(group)),
+            "active_users": int(group["user_id"].nunique()),
+            "new_users": int(len(new_users)),
+            "cumulative_users": int(len(seen))
+        })
+
+    if not rows:
+        return {"charts": [], "summary": "没有可用的参与数据"}
+
+    trend_df = pd.DataFrame(rows).sort_values("time")
+    x_idx = range(len(trend_df))
+    fig, ax1 = plt.subplots(figsize=(14, 8))
+    ax1.plot(x_idx, trend_df["cumulative_users"], color="#4caf50", linewidth=2, marker="o", markersize=4, label="累计参与人数")
+    ax1.bar(x_idx, trend_df["new_users"], color="#2196f3", alpha=0.6, label="当期新增用户")
+    ax1.set_ylabel("人数", fontsize=12)
+    ax1.set_xlabel("时间", fontsize=12)
+    ax1.set_title("参与人数演化趋势", fontsize=16, fontweight="bold", pad=15)
+    if len(trend_df) > 20:
+        step = max(1, len(trend_df) // 10)
+        ax1.set_xticks(list(x_idx)[::step])
+        ax1.set_xticklabels(trend_df["time"].tolist()[::step], rotation=45, ha="right")
+    else:
+        ax1.set_xticks(list(x_idx))
+        ax1.set_xticklabels(trend_df["time"].tolist(), rotation=45, ha="right")
+    ax1.legend(loc="upper left")
+    ax1.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"participant_trend_{timestamp}.png")
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"participant_trend_{timestamp}",
+            "type": "line_chart",
+            "title": "参与人数演化趋势",
+            "file_path": file_path,
+            "source_tool": "participant_trend_chart",
+            "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
+        }],
+        "summary": f"已生成参与人数趋势图，保存至 {file_path}"
+    }

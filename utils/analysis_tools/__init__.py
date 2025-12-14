@@ -16,6 +16,8 @@ from .sentiment_tools import (
     sentiment_anomaly_detection,
     sentiment_trend_chart,
     sentiment_pie_chart,
+    sentiment_bucket_trend_chart,
+    sentiment_attribute_trend_chart,
 )
 
 from .topic_tools import (
@@ -25,6 +27,8 @@ from .topic_tools import (
     topic_ranking_chart,
     topic_evolution_chart,
     topic_network_chart,
+    topic_focus_evolution_chart,
+    topic_keyword_trend_chart,
 )
 
 from .geographic_tools import (
@@ -33,6 +37,9 @@ from .geographic_tools import (
     geographic_sentiment_analysis,
     geographic_heatmap,
     geographic_bar_chart,
+    geographic_sentiment_bar_chart,
+    geographic_topic_heatmap,
+    geographic_temporal_heatmap,
 )
 
 from .interaction_tools import (
@@ -42,6 +49,9 @@ from .interaction_tools import (
     correlation_analysis,
     interaction_heatmap,
     publisher_bar_chart,
+    publisher_sentiment_bucket_chart,
+    publisher_topic_distribution_chart,
+    participant_trend_chart,
 )
 
 from .tool_registry import (
@@ -58,6 +68,8 @@ __all__ = [
     "sentiment_anomaly_detection",
     "sentiment_trend_chart",
     "sentiment_pie_chart",
+    "sentiment_bucket_trend_chart",
+    "sentiment_attribute_trend_chart",
     # 主题工具
     "topic_frequency_stats",
     "topic_time_evolution",
@@ -65,12 +77,17 @@ __all__ = [
     "topic_ranking_chart",
     "topic_evolution_chart",
     "topic_network_chart",
+    "topic_focus_evolution_chart",
+    "topic_keyword_trend_chart",
     # 地理工具
     "geographic_distribution_stats",
     "geographic_hotspot_detection",
     "geographic_sentiment_analysis",
     "geographic_heatmap",
     "geographic_bar_chart",
+    "geographic_sentiment_bar_chart",
+    "geographic_topic_heatmap",
+    "geographic_temporal_heatmap",
     # 交互工具
     "publisher_distribution_stats",
     "cross_dimension_matrix",
@@ -78,10 +95,12 @@ __all__ = [
     "correlation_analysis",
     "interaction_heatmap",
     "publisher_bar_chart",
+    "publisher_sentiment_bucket_chart",
+    "publisher_topic_distribution_chart",
+    "participant_trend_chart",
     # 工具注册
     "TOOL_REGISTRY",
     "get_all_tools",
     "get_tool_by_name",
     "execute_tool",
 ]
-
