@@ -324,6 +324,10 @@ def correlation_analysis(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         if polarity is None:
             continue
         
+        topics = post.get("topics") or []
+        if not isinstance(topics, list):
+            topics = []
+
         features.append({
             "sentiment_polarity": polarity,
             "repost_count": post.get("repost_count", 0),
@@ -331,7 +335,7 @@ def correlation_analysis(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
             "like_count": post.get("like_count", 0),
             "content_length": len(post.get("content", "")),
             "image_count": len(post.get("image_urls", [])),
-            "topic_count": len(post.get("topics", []))
+            "topic_count": len(topics)
         })
     
     if len(features) < 10:
@@ -657,6 +661,71 @@ def publisher_sentiment_bucket_chart(blog_data: List[Dict[str, Any]],
             "description": "按发布者对比正/中/负面占比，突出情绪差异"
         }],
         "summary": f"已生成发布者情绪桶分布图，保存至 {file_path}"
+    }
+
+
+def publisher_focus_distribution_chart(blog_data: List[Dict[str, Any]],
+                                       output_dir: str = "report/images",
+                                       window_days: int = 14,
+                                       top_n: int = 5) -> Dict[str, Any]:
+    """
+    焦点窗口内发布者类型发布量趋势（仅绘制窗口内数据）
+    """
+    if not blog_data:
+        return {"charts": [], "summary": "没有可分析的博文数据"}
+
+    import pandas as pd
+    df = pd.DataFrame(blog_data)
+    if df.empty or "publish_time" not in df.columns:
+        return {"charts": [], "summary": "缺少时间字段"}
+    df["publish_time"] = pd.to_datetime(df["publish_time"], errors="coerce")
+    df["publisher"] = df.get("publisher", "未知").fillna("未知")
+
+    daily = df.set_index("publish_time").resample("D").size()
+    if daily.empty:
+        return {"charts": [], "summary": "无有效时间数据"}
+    rolling = daily.rolling(window_days, min_periods=1).sum()
+    end = rolling.idxmax()
+    start = end - pd.Timedelta(days=window_days - 1)
+
+    fdf = df[(df["publish_time"] >= start) & (df["publish_time"] <= end)].copy()
+    if fdf.empty:
+        return {"charts": [], "summary": "焦点窗口内无数据"}
+    fdf["date"] = fdf["publish_time"].dt.strftime("%Y-%m-%d")
+
+    top_publishers = fdf["publisher"].value_counts().head(top_n).index.tolist()
+    fdf = fdf[fdf["publisher"].isin(top_publishers)]
+
+    pivot = fdf.pivot_table(index="date", columns="publisher", values="content", aggfunc="count").fillna(0)
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"publisher_focus_distribution_{timestamp}.png")
+
+    ax = pivot.plot(figsize=(12, 6), marker='o')
+    ax.set_title(f"焦点窗口发布者类型发布量趋势（{start.date()} - {end.date()}）")
+    ax.set_ylabel("发布量")
+    ax.set_xlabel("日期")
+    ax.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"publisher_focus_distribution_{timestamp}",
+            "type": "line_chart",
+            "title": "焦点窗口发布者类型发布趋势",
+            "file_path": file_path,
+            "source_tool": "publisher_focus_distribution_chart",
+            "description": f"焦点窗口内 Top{top_n} 发布者类型的日发布量趋势"
+        }],
+        "data": {
+            "focus_window": {"start": str(start.date()), "end": str(end.date())},
+            "series": pivot.reset_index().to_dict(orient="records"),
+            "top_publishers": top_publishers
+        },
+        "summary": f"焦点窗口（{start.date()}~{end.date()}）内发布者类型发布趋势。"
     }
 
 

@@ -18,6 +18,8 @@ from .sentiment_tools import (
     sentiment_pie_chart,
     sentiment_bucket_trend_chart,
     sentiment_attribute_trend_chart,
+    sentiment_focus_window_chart,
+    sentiment_focus_publisher_chart,
 )
 
 from .topic_tools import (
@@ -29,6 +31,7 @@ from .topic_tools import (
     topic_network_chart,
     topic_focus_evolution_chart,
     topic_keyword_trend_chart,
+    topic_focus_distribution_chart,
 )
 
 from .geographic_tools import (
@@ -52,6 +55,7 @@ from .interaction_tools import (
     publisher_sentiment_bucket_chart,
     publisher_topic_distribution_chart,
     participant_trend_chart,
+    publisher_focus_distribution_chart,
 )
 
 
@@ -145,6 +149,33 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "output_type": "chart",
         "generates_chart": True
     },
+    "sentiment_focus_window_chart": {
+        "name": "sentiment_focus_window_chart",
+        "category": "焦点窗口分析",
+        "description": "焦点窗口内的情感极性均值与三分类趋势（独立图表）",
+        "function": sentiment_focus_window_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "window_days": {"type": "int", "description": "焦点窗口天数", "required": False, "default": 14}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "sentiment_focus_publisher_chart": {
+        "name": "sentiment_focus_publisher_chart",
+        "category": "焦点窗口分析",
+        "description": "焦点窗口内 TopN 发布者的情感均值趋势",
+        "function": sentiment_focus_publisher_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "window_days": {"type": "int", "description": "焦点窗口天数", "required": False, "default": 14},
+            "top_n": {"type": "int", "description": "发布者数量", "required": False, "default": 5}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
     
     # ===== 主题演化分析工具集 =====
     "topic_frequency_stats": {
@@ -220,6 +251,20 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
             "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
             "top_n": {"type": "int", "description": "展示的主题数量", "required": False, "default": 5}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "topic_focus_distribution_chart": {
+        "name": "topic_focus_distribution_chart",
+        "category": "焦点窗口分析",
+        "description": "焦点窗口内 TopN 父主题的发布趋势（仅窗口数据）",
+        "function": topic_focus_distribution_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "window_days": {"type": "int", "description": "焦点窗口天数", "required": False, "default": 14},
+            "top_n": {"type": "int", "description": "展示的主题数", "required": False, "default": 5}
         },
         "output_type": "chart",
         "generates_chart": True
@@ -465,6 +510,34 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
             "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
             "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "publisher_focus_distribution_chart": {
+        "name": "publisher_focus_distribution_chart",
+        "category": "焦点窗口分析",
+        "description": "焦点窗口内 TopN 发布者类型的日发布量趋势（仅窗口数据）",
+        "function": publisher_focus_distribution_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "window_days": {"type": "int", "description": "焦点窗口天数", "required": False, "default": 14},
+            "top_n": {"type": "int", "description": "发布者数量", "required": False, "default": 5}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    "publisher_focus_distribution_chart": {
+        "name": "publisher_focus_distribution_chart",
+        "category": "焦点窗口分析",
+        "description": "焦点窗口内 TopN 发布者类型的日发布量趋势（仅窗口数据）",
+        "function": publisher_focus_distribution_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "window_days": {"type": "int", "description": "焦点窗口天数", "required": False, "default": 14},
+            "top_n": {"type": "int", "description": "发布者数量", "required": False, "default": 5}
         },
         "output_type": "chart",
         "generates_chart": True

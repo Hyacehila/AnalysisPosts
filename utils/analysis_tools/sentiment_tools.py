@@ -698,6 +698,140 @@ def sentiment_trend_chart(blog_data: List[Dict[str, Any]],
     }
 
 
+def sentiment_focus_window_chart(blog_data: List[Dict[str, Any]],
+                                 output_dir: str = "report/images",
+                                 window_days: int = 14) -> Dict[str, Any]:
+    """
+    焦点窗口情感趋势图（仅绘制高峰窗口内的数据）
+
+    Args:
+        blog_data: 增强后的博文数据列表
+        output_dir: 图表输出目录
+        window_days: 焦点窗口天数
+    """
+    if not blog_data:
+        return {"charts": [], "summary": "没有可分析的博文数据"}
+
+    df_norm = _normalize_blog_df(blog_data)
+    focus = _detect_focus_window(df_norm[["publish_time"]], window_days=window_days)
+    if not focus:
+        return {"charts": [], "summary": "未找到焦点窗口，无法绘制"}
+
+    start = focus["start"]
+    end = focus["end"] + pd.Timedelta(days=1)
+    fdf = df_norm[(df_norm["publish_time"] >= start) & (df_norm["publish_time"] < end)].copy()
+    if fdf.empty:
+        return {"charts": [], "summary": "焦点窗口内无数据"}
+
+    fdf["date"] = fdf["publish_time"].dt.strftime("%Y-%m-%d")
+
+    # 1) 极性均值趋势
+    daily_avg = fdf.groupby("date")["sentiment_polarity"].mean()
+
+    # 2) 三分类数量趋势
+    fdf["bucket"] = fdf["sentiment_polarity"].apply(
+        lambda v: "负面" if v <= 2 else ("正面" if v >= 4 else "中性")
+    )
+    bucket_counts = fdf.groupby(["date", "bucket"]).size().unstack(fill_value=0)
+    bucket_counts = bucket_counts[["正面", "中性", "负面"]] if set(bucket_counts.columns) >= {"正面", "中性", "负面"} else bucket_counts
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"sentiment_focus_window_{timestamp}.png")
+
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+
+    # 极性均值
+    axes[0].plot(daily_avg.index, daily_avg.values, marker='o', color="#1f77b4")
+    axes[0].set_title(f"焦点窗口情感极性均值（{start.date()} - {focus['end'].date()}）")
+    axes[0].set_ylabel("平均极性")
+    axes[0].grid(alpha=0.3)
+
+    # 三分类趋势
+    bucket_counts.plot(kind="line", ax=axes[1], marker='o')
+    axes[1].set_title("焦点窗口三分类情绪发布量")
+    axes[1].set_ylabel("数量")
+    axes[1].set_xlabel("日期")
+    axes[1].grid(alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"sentiment_focus_window_{timestamp}",
+            "type": "line_chart",
+            "title": "焦点窗口情感分析",
+            "file_path": file_path,
+            "source_tool": "sentiment_focus_window_chart",
+            "description": f"焦点窗口（{start.date()}~{focus['end'].date()}）内的极性均值与三分类趋势"
+        }],
+        "data": {
+            "focus_window": {"start": str(start.date()), "end": str(focus["end"].date())},
+            "daily_avg": daily_avg.to_dict(),
+            "bucket_trend": bucket_counts.reset_index().to_dict(orient="records"),
+        },
+        "summary": f"焦点窗口：{start.date()}~{focus['end'].date()}，平均极性趋势与三分类发布量趋势。"
+    }
+
+
+def sentiment_focus_publisher_chart(blog_data: List[Dict[str, Any]],
+                                    output_dir: str = "report/images",
+                                    window_days: int = 14,
+                                    top_n: int = 5) -> Dict[str, Any]:
+    """
+    焦点窗口内按发布者的情感极性均值趋势
+    """
+    if not blog_data:
+        return {"charts": [], "summary": "没有可分析的博文数据"}
+    df_norm = _normalize_blog_df(blog_data)
+    focus = _detect_focus_window(df_norm[["publish_time"]], window_days=window_days)
+    if not focus:
+        return {"charts": [], "summary": "未找到焦点窗口，无法绘制"}
+    start = focus["start"]
+    end = focus["end"] + pd.Timedelta(days=1)
+    fdf = df_norm[(df_norm["publish_time"] >= start) & (df_norm["publish_time"] < end)].copy()
+    if fdf.empty:
+        return {"charts": [], "summary": "焦点窗口内无数据"}
+
+    fdf["date"] = fdf["publish_time"].dt.strftime("%Y-%m-%d")
+    pub_counts = fdf["publisher"].value_counts()
+    top_publishers = pub_counts.head(top_n).index.tolist()
+    fdf = fdf[fdf["publisher"].isin(top_publishers)]
+
+    pivot = fdf.pivot_table(index="date", columns="publisher", values="sentiment_polarity", aggfunc="mean")
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"sentiment_focus_publisher_{timestamp}.png")
+
+    ax = pivot.plot(figsize=(12, 6), marker='o')
+    ax.set_title(f"焦点窗口发布者情感均值（{start.date()} - {focus['end'].date()}）")
+    ax.set_ylabel("平均极性")
+    ax.set_xlabel("日期")
+    ax.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return {
+        "charts": [{
+            "id": f"sentiment_focus_publisher_{timestamp}",
+            "type": "line_chart",
+            "title": "焦点窗口发布者情感均值",
+            "file_path": file_path,
+            "source_tool": "sentiment_focus_publisher_chart",
+            "description": f"焦点窗口内 Top{top_n} 发布者的情感均值趋势"
+        }],
+        "data": {
+            "focus_window": {"start": str(start.date()), "end": str(focus["end"].date())},
+            "publisher_mean": pivot.reset_index().to_dict(orient="records")
+        },
+        "summary": f"焦点窗口 Top{top_n} 发布者的情感均值变化。"
+    }
+
+
 def sentiment_pie_chart(blog_data: List[Dict[str, Any]],
                         output_dir: str = "report/images") -> Dict[str, Any]:
     """

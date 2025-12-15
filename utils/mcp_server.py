@@ -18,6 +18,10 @@ from utils.analysis_tools import (
     sentiment_anomaly_detection,
     sentiment_trend_chart,
     sentiment_pie_chart,
+    sentiment_bucket_trend_chart,
+    sentiment_attribute_trend_chart,
+    sentiment_focus_window_chart,
+    sentiment_focus_publisher_chart,
     # 主题工具
     topic_frequency_stats,
     topic_time_evolution,
@@ -25,12 +29,18 @@ from utils.analysis_tools import (
     topic_ranking_chart,
     topic_evolution_chart,
     topic_network_chart,
+    topic_focus_evolution_chart,
+    topic_keyword_trend_chart,
+    topic_focus_distribution_chart,
     # 地理工具
     geographic_distribution_stats,
     geographic_hotspot_detection,
     geographic_sentiment_analysis,
     geographic_heatmap,
     geographic_bar_chart,
+    geographic_sentiment_bar_chart,
+    geographic_topic_heatmap,
+    geographic_temporal_heatmap,
     # 交互工具
     publisher_distribution_stats,
     cross_dimension_matrix,
@@ -38,6 +48,10 @@ from utils.analysis_tools import (
     correlation_analysis,
     interaction_heatmap,
     publisher_bar_chart,
+    publisher_sentiment_bucket_chart,
+    publisher_topic_distribution_chart,
+    participant_trend_chart,
+    publisher_focus_distribution_chart,
 )
 from utils.data_loader import load_enhanced_blog_data
 
@@ -50,12 +64,29 @@ blog_data = None
 def get_blog_data():
     """获取博文数据，如果未加载则自动加载"""
     global blog_data
-    if blog_data is None:
+    if blog_data is not None:
+        return blog_data
+
+    candidates: List[str] = []
+    env_path = os.getenv("ENHANCED_DATA_PATH")
+    if env_path:
+        candidates.append(env_path)
+
+    
+    last_err = None
+    for path in candidates:
+        if not path or not os.path.exists(path):
+            continue
         try:
-            blog_data = load_enhanced_blog_data("data/test_enhanced_blogs.json")
+            blog_data = load_enhanced_blog_data(path)
+            print(f"[MCP] Loaded blog data from {path}, count={len(blog_data)}")
+            return blog_data
         except Exception as e:
-            # 尝试默认路径
-            blog_data = load_enhanced_blog_data("data/enhanced_blogs.json")
+            last_err = e
+            print(f"[MCP] Failed to load {path}: {e}")
+
+    print(f"[MCP] 无法加载博文数据，返回空列表。last_err={last_err}")
+    blog_data = []
     return blog_data
 
 # =============================================================================
@@ -109,6 +140,29 @@ def topic_cooccurrence() -> Dict[str, Any]:
     result = topic_cooccurrence_analysis(blog_data)
     return result
 
+@mcp.tool()
+def topic_focus_evolution() -> Dict[str, Any]:
+    """获取带焦点窗口高亮的主题演化数据"""
+    blog_data = get_blog_data()
+    result = topic_focus_evolution_chart(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def topic_keyword_trend() -> Dict[str, Any]:
+    """获取焦点关键词热度趋势数据"""
+    blog_data = get_blog_data()
+    result = topic_keyword_trend_chart(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def topic_focus_distribution(window_days: int = 14, top_n: int = 5) -> Dict[str, Any]:
+    """获取焦点窗口主题分布趋势（仅窗口数据）"""
+    blog_data = get_blog_data()
+    result = topic_focus_distribution_chart(
+        blog_data, output_dir="report/images", window_days=window_days, top_n=top_n
+    )
+    return result
+
 
 # =============================================================================
 # 地理分析工具
@@ -133,6 +187,31 @@ def geographic_sentiment() -> Dict[str, Any]:
     """获取地区情感分析数据"""
     blog_data = get_blog_data()
     result = geographic_sentiment_analysis(blog_data)
+    return result
+
+@mcp.tool()
+def geographic_sentiment_bar(top_n: int = 12) -> Dict[str, Any]:
+    """生成地区情感对比条形图"""
+    blog_data = get_blog_data()
+    result = geographic_sentiment_bar_chart(blog_data, output_dir="report/images", top_n=top_n)
+    return result
+
+@mcp.tool()
+def geographic_topic_heatmap_tool(top_regions: int = 10, top_topics: int = 8) -> Dict[str, Any]:
+    """生成地区×主题热力图"""
+    blog_data = get_blog_data()
+    result = geographic_topic_heatmap(
+        blog_data, output_dir="report/images", top_regions=top_regions, top_topics=top_topics
+    )
+    return result
+
+@mcp.tool()
+def geographic_temporal_heatmap_tool(granularity: str = "day", top_regions: int = 8) -> Dict[str, Any]:
+    """生成地区×时间热力图"""
+    blog_data = get_blog_data()
+    result = geographic_temporal_heatmap(
+        blog_data, output_dir="report/images", granularity=granularity, top_regions=top_regions
+    )
     return result
 
 
@@ -166,6 +245,75 @@ def correlation_analysis() -> Dict[str, Any]:
     """获取维度相关性分析数据"""
     blog_data = get_blog_data()
     result = correlation_analysis(blog_data)
+    return result
+
+@mcp.tool()
+def publisher_sentiment_bucket(top_n: int = 10) -> Dict[str, Any]:
+    """生成发布者维度正/中/负情绪桶堆叠图"""
+    blog_data = get_blog_data()
+    result = publisher_sentiment_bucket_chart(blog_data, output_dir="report/images", top_n=top_n)
+    return result
+
+@mcp.tool()
+def publisher_topic_distribution(top_publishers: int = 8, top_topics: int = 8) -> Dict[str, Any]:
+    """生成发布者×主题分布堆叠图"""
+    blog_data = get_blog_data()
+    result = publisher_topic_distribution_chart(
+        blog_data, output_dir="report/images", top_publishers=top_publishers, top_topics=top_topics
+    )
+    return result
+
+@mcp.tool()
+def participant_trend(granularity: str = "day") -> Dict[str, Any]:
+    """生成新增/累计参与用户趋势"""
+    blog_data = get_blog_data()
+    result = participant_trend_chart(blog_data, output_dir="report/images", granularity=granularity)
+    return result
+
+@mcp.tool()
+def publisher_focus_distribution(window_days: int = 14, top_n: int = 5) -> Dict[str, Any]:
+    """生成焦点窗口发布者类型发布趋势"""
+    blog_data = get_blog_data()
+    result = publisher_focus_distribution_chart(
+        blog_data, output_dir="report/images", window_days=window_days, top_n=top_n
+    )
+    return result
+
+
+# =============================================================================
+# 情感图表扩展
+# =============================================================================
+
+@mcp.tool()
+def generate_sentiment_bucket_trend_chart(granularity: str = "day") -> Dict[str, Any]:
+    """生成正中负情绪桶堆叠趋势图"""
+    blog_data = get_blog_data()
+    result = sentiment_bucket_trend_chart(blog_data, output_dir="report/images", granularity=granularity)
+    return result
+
+@mcp.tool()
+def generate_sentiment_attribute_trend_chart(granularity: str = "day", top_n: int = 6) -> Dict[str, Any]:
+    """生成情感属性热度趋势图"""
+    blog_data = get_blog_data()
+    result = sentiment_attribute_trend_chart(
+        blog_data, output_dir="report/images", granularity=granularity, top_n=top_n
+    )
+    return result
+
+@mcp.tool()
+def generate_sentiment_focus_window_chart(window_days: int = 14) -> Dict[str, Any]:
+    """生成焦点窗口情感趋势图（独立窗口数据）"""
+    blog_data = get_blog_data()
+    result = sentiment_focus_window_chart(blog_data, output_dir="report/images", window_days=window_days)
+    return result
+
+@mcp.tool()
+def generate_sentiment_focus_publisher_chart(window_days: int = 14, top_n: int = 5) -> Dict[str, Any]:
+    """生成焦点窗口 TopN 发布者情感趋势图"""
+    blog_data = get_blog_data()
+    result = sentiment_focus_publisher_chart(
+        blog_data, output_dir="report/images", window_days=window_days, top_n=top_n
+    )
     return result
 
 

@@ -401,7 +401,7 @@ def main():
     
     # ----- 数据路径配置 -----
     INPUT_DATA_PATH = "data/small.json"
-    OUTPUT_DATA_PATH = "data/small_enhanced_blogs.json"
+    OUTPUT_DATA_PATH = "data/enhanced_posts.json"
     TOPICS_PATH = "data/topics.json"
     SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
     PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
@@ -414,7 +414,7 @@ def main():
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
     # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [1]  # 执行阶段2和3（测试用）
+    RUN_STAGES = [2,3]  # 执行阶段2和3（测试用）
 
     # ----- 阶段1配置 -----
     ENHANCEMENT_MODE = "async"  # "async" | "batch_api"
@@ -422,7 +422,7 @@ def main():
     # ----- 阶段2配置 -----
     ANALYSIS_MODE = "agent"     # "workflow" | "agent"
     TOOL_SOURCE = "mcp"            # Agent模式下的唯一工具来源 (MCP协议)
-    AGENT_MAX_ITERATIONS = 30
+    AGENT_MAX_ITERATIONS = 40
 
     # ----- 阶段3配置 -----
     REPORT_MODE = "template"    # "template" | "iterative"

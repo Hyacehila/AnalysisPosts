@@ -151,6 +151,36 @@ def parse_publisher_analysis_result(result_line: str, publisher_objects: List[st
         return None
 
 
+def parse_belief_system_result(result_line: str) -> Optional[List[Dict[str, Any]]]:
+    """解析信念体系分类结果（列表，每项包含category/subcategories）"""
+    try:
+        data = json.loads(result_line)
+        if data.get("response", {}).get("status_code") != 200:
+            return None
+        content = data["response"]["body"]["choices"][0]["message"]["content"].strip()
+        parsed = json.loads(content)
+        if isinstance(parsed, list):
+            return parsed
+        return None
+    except Exception:
+        return None
+
+
+def parse_publisher_decision_result(result_line: str, candidates: List[str]) -> Optional[str]:
+    """解析事件关联身份分类结果（单选，需在候选内）"""
+    try:
+        data = json.loads(result_line)
+        if data.get("response", {}).get("status_code") != 200:
+            return None
+        content = data["response"]["body"]["choices"][0]["message"]["content"].strip().replace('"', '')
+        for cand in candidates:
+            if cand and cand in content:
+                return cand
+        return candidates[0] if candidates else None
+    except Exception:
+        return None
+
+
 def parse_single_result_file(result_file_path: str, analysis_type: str, **kwargs) -> Dict[int, Any]:
     """解析单个结果文件并生成索引映射"""
     result_mapping = {}
@@ -188,6 +218,11 @@ def parse_single_result_file(result_file_path: str, analysis_type: str, **kwargs
                     elif analysis_type == "publisher_analysis":
                         publisher_objects = kwargs.get("publisher_objects", [])
                         result = parse_publisher_analysis_result(line, publisher_objects)
+                    elif analysis_type == "belief_system":
+                        result = parse_belief_system_result(line)
+                    elif analysis_type == "publisher_decision":
+                        candidates = kwargs.get("publisher_decisions", [])
+                        result = parse_publisher_decision_result(line, candidates)
                     else:
                         print(f"第{line_num}行：未知的分析类型 {analysis_type}")
                         continue

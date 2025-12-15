@@ -112,7 +112,7 @@ def call_glm4v_plus(prompt: str, image_paths: Optional[List[str]] = None,
             "messages": messages,
             "temperature": temperature,
             "stream": False,
-            "timeout": timeout  # 添加超时设置
+            "timeout": 90  # 添加超时设置
         }
         
         if max_tokens:

@@ -18,6 +18,8 @@ from .sentiment_tools import (
     sentiment_pie_chart,
     sentiment_bucket_trend_chart,
     sentiment_attribute_trend_chart,
+    sentiment_focus_window_chart,
+    sentiment_focus_publisher_chart,
 )
 
 from .topic_tools import (
@@ -29,6 +31,7 @@ from .topic_tools import (
     topic_network_chart,
     topic_focus_evolution_chart,
     topic_keyword_trend_chart,
+    topic_focus_distribution_chart,
 )
 
 from .geographic_tools import (
@@ -52,6 +55,7 @@ from .interaction_tools import (
     publisher_sentiment_bucket_chart,
     publisher_topic_distribution_chart,
     participant_trend_chart,
+    publisher_focus_distribution_chart,
 )
 
 from .tool_registry import (
@@ -70,6 +74,8 @@ __all__ = [
     "sentiment_pie_chart",
     "sentiment_bucket_trend_chart",
     "sentiment_attribute_trend_chart",
+    "sentiment_focus_window_chart",
+    "sentiment_focus_publisher_chart",
     # 主题工具
     "topic_frequency_stats",
     "topic_time_evolution",
@@ -79,6 +85,7 @@ __all__ = [
     "topic_network_chart",
     "topic_focus_evolution_chart",
     "topic_keyword_trend_chart",
+    "topic_focus_distribution_chart",
     # 地理工具
     "geographic_distribution_stats",
     "geographic_hotspot_detection",
@@ -98,6 +105,7 @@ __all__ = [
     "publisher_sentiment_bucket_chart",
     "publisher_topic_distribution_chart",
     "participant_trend_chart",
+    "publisher_focus_distribution_chart",
     # 工具注册
     "TOOL_REGISTRY",
     "get_all_tools",

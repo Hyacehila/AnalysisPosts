@@ -16,12 +16,12 @@
     ],
     "topics": [
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众情绪"
-      },
-      {
         "parent_topic": "交通运输",
         "sub_topic": "交通拥堵"
+      },
+      {
+        "parent_topic": "民众反应",
+        "sub_topic": "民众情绪"
       }
     ],
     "publisher": "自媒体",
@@ -40,7 +40,8 @@
     "image_urls": [],
     "sentiment_polarity": 2,
     "sentiment_attribute": [
-      "不满"
+      "不满",
+      "无奈"
     ],
     "topics": [
       {
@@ -52,7 +53,7 @@
         "sub_topic": "网络热议"
       }
     ],
-    "publisher": "自媒体",
+    "publisher": "学生",
     "belief_signals": [],
     "publisher_decision": "事件旁观者"
   },
@@ -68,13 +69,17 @@
     "image_urls": [],
     "sentiment_polarity": 2,
     "sentiment_attribute": [
-      "担忧",
-      "惊讶"
+      "惊讶",
+      "担忧"
     ],
     "topics": [
       {
         "parent_topic": "民众反应",
         "sub_topic": "民众情绪"
+      },
+      {
+        "parent_topic": "应急管理",
+        "sub_topic": "安全保障"
       }
     ],
     "publisher": "个人用户",
@@ -104,7 +109,7 @@
       },
       {
         "parent_topic": "媒体传播",
-        "sub_topic": "网络传播"
+        "sub_topic": "社交媒体"
       }
     ],
     "publisher": "学生",
@@ -123,17 +128,12 @@
     "image_urls": [],
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "沮丧",
       "兴奋"
     ],
     "topics": [
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "网络热议"
+        "parent_topic": "媒体传播",
+        "sub_topic": "新闻报道"
       }
     ],
     "publisher": "学生",
@@ -152,13 +152,13 @@
     "image_urls": [],
     "sentiment_polarity": 2,
     "sentiment_attribute": [
-      "无奈",
-      "不满"
+      "不满",
+      "怀疑"
     ],
     "topics": [
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "网络热议"
+        "parent_topic": "媒体传播",
+        "sub_topic": "社交媒体"
       }
     ],
     "publisher": "自媒体",
@@ -178,20 +178,20 @@
     "sentiment_polarity": 2,
     "sentiment_attribute": [
       "不满",
-      "失望",
-      "担忧"
+      "困惑",
+      "失望"
     ],
     "topics": [
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "网络热议"
+        "parent_topic": "媒体传播",
+        "sub_topic": "社交媒体"
       },
       {
-        "parent_topic": "媒体传播",
-        "sub_topic": "舆论引导"
+        "parent_topic": "民众反应",
+        "sub_topic": "网络热议"
       }
     ],
-    "publisher": "学生",
+    "publisher": "自媒体",
     "belief_signals": [],
     "publisher_decision": "事件旁观者"
   },
@@ -213,11 +213,7 @@
     "topics": [
       {
         "parent_topic": "民众反应",
-        "sub_topic": "网络热议"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "社会反响"
+        "sub_topic": "民众情绪"
       }
     ],
     "publisher": "个人用户",

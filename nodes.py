@@ -1489,8 +1489,11 @@ class DataSummaryNode(Node):
         # 主题分布
         parent_topics = Counter()
         for p in blog_data:
-            for t in p.get("topics", []):
-                if t.get("parent_topic"):
+            topics = p.get("topics") or []
+            if not isinstance(topics, list):
+                continue
+            for t in topics:
+                if isinstance(t, dict) and t.get("parent_topic"):
                     parent_topics[t["parent_topic"]] += 1
         
         # 地理分布
@@ -1715,6 +1718,8 @@ class ExecuteAnalysisScriptNode(Node):
             sentiment_pie_chart,
             sentiment_bucket_trend_chart,
             sentiment_attribute_trend_chart,
+            sentiment_focus_window_chart,
+            sentiment_focus_publisher_chart,
             # 主题工具
             topic_frequency_stats,
             topic_time_evolution,
@@ -1724,6 +1729,7 @@ class ExecuteAnalysisScriptNode(Node):
             topic_network_chart,
             topic_focus_evolution_chart,
             topic_keyword_trend_chart,
+            topic_focus_distribution_chart,
             # 地理工具
             geographic_distribution_stats,
             geographic_hotspot_detection,
@@ -1743,6 +1749,7 @@ class ExecuteAnalysisScriptNode(Node):
             publisher_sentiment_bucket_chart,
             publisher_topic_distribution_chart,
             participant_trend_chart,
+            publisher_focus_distribution_chart,
         )
         import time
         
@@ -1817,6 +1824,30 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("sentiment_attribute_trend_chart")
+
+        # 焦点窗口情感趋势（窗口内极性均值 + 三分类）
+        result = sentiment_focus_window_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+            tables.append({
+                "id": "sentiment_focus_window_data",
+                "title": "焦点窗口情感数据",
+                "data": result.get("data", {}),
+                "source_tool": "sentiment_focus_window_chart"
+            })
+        tools_executed.append("sentiment_focus_window_chart")
+
+        # 焦点窗口发布者情感趋势
+        result = sentiment_focus_publisher_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+            tables.append({
+                "id": "sentiment_focus_publisher_data",
+                "title": "焦点窗口发布者情感均值",
+                "data": result.get("data", {}),
+                "source_tool": "sentiment_focus_publisher_chart"
+            })
+        tools_executed.append("sentiment_focus_publisher_chart")
         
         # 情感饼图
         result = sentiment_pie_chart(blog_data)
@@ -1874,6 +1905,18 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("topic_focus_evolution_chart")
+
+        # 焦点窗口主题发布趋势（独立窗口数据）
+        result = topic_focus_distribution_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+            tables.append({
+                "id": "topic_focus_distribution_data",
+                "title": "焦点窗口主题发布趋势数据",
+                "data": result.get("data", {}),
+                "source_tool": "topic_focus_distribution_chart"
+            })
+        tools_executed.append("topic_focus_distribution_chart")
 
         # 焦点关键词趋势
         result = topic_keyword_trend_chart(blog_data)
@@ -2022,6 +2065,18 @@ class ExecuteAnalysisScriptNode(Node):
         if result.get("charts"):
             charts.extend(result["charts"])
         tools_executed.append("participant_trend_chart")
+
+        # 焦点窗口发布者类型发布趋势（独立窗口数据）
+        result = publisher_focus_distribution_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+            tables.append({
+                "id": "publisher_focus_distribution_data",
+                "title": "焦点窗口发布者类型发布趋势数据",
+                "data": result.get("data", {}),
+                "source_tool": "publisher_focus_distribution_chart"
+            })
+        tools_executed.append("publisher_focus_distribution_chart")
         
         execution_time = time.time() - start_time
         
@@ -2646,14 +2701,42 @@ class ExecuteToolsNode(Node):
             # 对于MCP工具，传递正确的服务器路径，不需要传递blog_data，服务器会自动加载
             result = call_tool('utils/mcp_server', tool_name, {})
 
-            # 转换MCP结果为统一格式
-            if isinstance(result, dict) and "charts" in result:
-                # 已经是标准格式
-                final_result = result
-            else:
-                # 转换为标准格式
+            # 转换MCP结果为统一格式，保证charts存在且含id/title/path
+            charts = []
+            if isinstance(result, dict):
+                charts = result.get("charts") or []
+
+                # 兼容只有单个路径字段的返回
+                single_path = result.get("chart_path") or result.get("image_path")
+                if not charts and single_path:
+                    charts = [{
+                        "id": result.get("chart_id", tool_name),
+                        "title": result.get("title", tool_name),
+                        "path": single_path
+                    }]
+
+                # 规范化每个chart的字段
+                normalized_charts = []
+                for idx, ch in enumerate(charts):
+                    if not isinstance(ch, dict):
+                        continue
+                    normalized_charts.append({
+                        "id": ch.get("id") or f"{tool_name}_{idx}",
+                        "title": ch.get("title") or tool_name,
+                        "path": ch.get("path") or ch.get("chart_path") or ch.get("image_path", "")
+                    })
+                charts = normalized_charts
+
                 final_result = {
-                    "charts": result.get("charts", []),
+                    "charts": charts,
+                    "data": result if "data" not in result else result["data"],
+                    "category": result.get("category") or self._get_tool_category(tool_name),
+                    "summary": result.get("summary", f"MCP工具 {tool_name} 执行完成")
+                }
+            else:
+                # 非字典结果兜底
+                final_result = {
+                    "charts": [],
                     "data": result,
                     "category": self._get_tool_category(tool_name),
                     "summary": f"MCP工具 {tool_name} 执行完成"
@@ -3056,9 +3139,14 @@ class FillSectionNode(Node):
         available_charts = {}
         for chart in charts:
             chart_id = chart['id']
+            # 标准化图片路径，确保相对路径可用
+            file_path = normalize_path(chart.get('file_path', ''))
+            if not file_path.startswith('./images/') and 'images' in file_path:
+                filename = Path(file_path).name
+                file_path = f'./images/{filename}'
             available_charts[chart_id] = {
                 'title': chart['title'],
-                'file_path': chart['file_path'],
+                'file_path': file_path,
                 'description': chart['description'],
                 'type': chart['type']
             }
@@ -3164,6 +3252,16 @@ class FillSectionNode(Node):
 - 用表格展示传播数据统计与高峰时段
 """
 
+        elif section_name == "focus":
+            return f"""
+### 焦点窗口分析要点
+- 明确焦点窗口时间范围与选择依据（用表格或文字注明）
+- 必须引用焦点窗口情感趋势、三分类趋势、拐点/异常说明
+- 必须引用焦点窗口发布者类型趋势、主题/话题占比趋势图
+- 结合表格概述窗口内的关键数据（峰值、主要发布者、核心话题）
+- 给出窗口内的综合结论与预警
+"""
+
         elif section_name == "content":
             return f"""
 ### 内容分析要点
@@ -3257,6 +3355,7 @@ class AssembleReportNode(Node):
             ("summary", "报告摘要"),
             ("development", "舆情事件发展脉络"),
             ("trend", "舆情总体趋势分析"),
+            ("focus", "焦点窗口专项分析"),
             ("spread", "传播场景分析"),
             ("content", "舆论内容结构分析"),
             ("belief", "信念系统分析"),
@@ -3283,7 +3382,7 @@ class AssembleReportNode(Node):
 ### 智能体生成说明
 本报告由舆情分析智能体系统自动生成，包括：
 - 数据增强处理
-- 多维度分析（情感趋势、主题演化、地理分布、多维交互）
+- 多维度分析（情感趋势、主题演化、焦点窗口、地理分布、多维交互、信念体系）
 - 可视化图表生成与深度分析
 - 智能报告编排
 
@@ -3386,9 +3485,13 @@ class GenerateReportNode(Node):
         available_charts = {}
         for chart in charts:
             chart_id = chart['id']
+            file_path = normalize_path(chart.get('file_path', ''))
+            if not file_path.startswith('./images/') and 'images' in file_path:
+                filename = Path(file_path).name
+                file_path = f'./images/{filename}'
             available_charts[chart_id] = {
                 'title': chart['title'],
-                'file_path': chart['file_path'],
+                'file_path': file_path,
                 'description': chart['description'],
                 'type': chart['type']
             }
@@ -3440,6 +3543,11 @@ class GenerateReportNode(Node):
 ![主题演化时序图](report/images/topic_evolution_xxx.png)
 详细趋势分析...
 
+## 焦点窗口专项分析
+![焦点窗口情感趋势](report/images/sentiment_focus_window_xxx.png)
+![焦点窗口发布者趋势](report/images/publisher_focus_distribution_xxx.png)
+焦点窗口关键发现与预警...
+
 ## 传播场景分析
 ![发布者类型分布图](report/images/publisher_bar_xxx.png)
 ![地区分布图](report/images/geographic_bar_xxx.png)
@@ -3450,11 +3558,20 @@ class GenerateReportNode(Node):
 ![交叉分析热力图](report/images/interaction_heatmap_xxx.png)
 内容结构分析...
 
+## 信念系统分析
+信念节点激活与共现...
+
+## 区域与空间认知差异
+区域情感与归因差异...
+
 ## 舆情风险研判
 基于数据的综合风险评估...
 
 ## 应对建议
 基于分析结果的具体建议...
+
+## 附录
+数据范围与指标说明...
 ```
 
 现在请生成完整的图文并茂报告：
@@ -3878,6 +3995,7 @@ class GenerateFullReportNode(Node):
 2. **引用具体数据点**：在报告中引用具体的数据细节（如最高值、最低值、数据点数量）
 3. **结合趋势分析**：利用图表分析中的趋势发现和转折点分析
 4. **数据驱动结论**：每个结论都要有来自chart_analyses的具体支撑
+5. **覆盖模板章节**：按模板包含摘要、发展脉络、总体趋势、焦点窗口、传播、内容结构、信念、区域、风险、建议、附录
 
 ## 详细分析数据摘要
 
@@ -3901,13 +4019,17 @@ class GenerateFullReportNode(Node):
 - **关键发现引用**：图表分析发现：{'; '.join(detailed_analysis_summary[0]['key_findings'][:2]) if detailed_analysis_summary else 'N/A'}
 
 ### 报告章节和内容要求
-1. **报告摘要** - 基于insights和图表关键发现，突出最重要的数据指标
-2. **舆情事件发展脉络** - 利用时序图表的趋势分析和转折点
-3. **舆情总体趋势分析** - 基于情感分布的微观统计和宏观洞察
-4. **传播场景分析** - 结合地域和发布者数据的具体分布情况
-5. **舆论内容结构分析** - 利用主题图表的数据点细节和模式识别
-6. **舆情风险研判** - 基于情感和主题分布的具体数值和趋势
-7. **应对建议** - 针对数据分析中发现的具体问题提出建议
+1. **报告摘要** - 基于insights和关键图表，突出最重要的数据指标
+2. **舆情事件发展脉络** - 利用时序趋势与转折点
+3. **舆情总体趋势分析** - 情感/主题总体演化
+4. **焦点窗口专项分析** - 独立窗口内的情感、发布者、主题对比与预警
+5. **传播场景分析** - 地域与发布者分布、交互特征
+6. **舆论内容结构分析** - 主题网络、共现、排行
+7. **信念系统分析** - 信念节点激活与网络
+8. **区域与空间认知差异** - 区域情感、归因差异
+9. **舆情风险研判** - 结合情感/主题/传播指标
+10. **应对建议** - 针对发现的问题提出措施
+11. **附录** - 数据范围与指标说明
 
 ### 输出要求
 - 使用标准Markdown格式

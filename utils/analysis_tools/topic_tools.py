@@ -89,10 +89,14 @@ def topic_frequency_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     posts_with_topics = 0
     
     for post in blog_data:
-        topics = post.get("topics", [])
+        topics = post.get("topics") or []
+        if not isinstance(topics, list):
+            continue
         if topics:
             posts_with_topics += 1
             for topic in topics:
+                if not isinstance(topic, dict):
+                    continue
                 parent = topic.get("parent_topic", "")
                 sub = topic.get("sub_topic", "")
                 if parent:
@@ -170,8 +174,12 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
     # 首先获取最热门的父主题
     parent_topic_counts = Counter()
     for post in blog_data:
-        topics = post.get("topics", [])
+        topics = post.get("topics") or []
+        if not isinstance(topics, list):
+            continue
         for topic in topics:
+            if not isinstance(topic, dict):
+                continue
             parent = topic.get("parent_topic", "")
             if parent:
                 parent_topic_counts[parent] += 1
@@ -183,7 +191,7 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
     
     for post in blog_data:
         publish_time = post.get("publish_time", "")
-        topics = post.get("topics", [])
+        topics = post.get("topics") or []
         
         if not publish_time:
             continue
@@ -195,10 +203,13 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
             else:
                 time_key = dt.strftime("%Y-%m-%d")
             
-            for topic in topics:
-                parent = topic.get("parent_topic", "")
-                if parent in top_topics:
-                    time_topic_counts[time_key][parent] += 1
+            if isinstance(topics, list):
+                for topic in topics:
+                    if not isinstance(topic, dict):
+                        continue
+                    parent = topic.get("parent_topic", "")
+                    if parent in top_topics:
+                        time_topic_counts[time_key][parent] += 1
         except ValueError:
             continue
     
@@ -247,7 +258,12 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
             fseries = defaultdict(Counter)
             for _, row in fdf.iterrows():
                 key = row.get("focus_time_key")
-                for topic in row.get("topics", []):
+                topics_row = row.get("topics") or []
+                if not isinstance(topics_row, list):
+                    continue
+                for topic in topics_row:
+                    if not isinstance(topic, dict):
+                        continue
                     parent = topic.get("parent_topic", "")
                     if parent and key:
                         fseries[key][parent] += 1
@@ -326,8 +342,15 @@ def topic_cooccurrence_analysis(blog_data: List[Dict[str, Any]],
     # 收集每篇博文的父主题集合
     post_topics = []
     for post in blog_data:
-        topics = post.get("topics", [])
-        parent_topics = set(t.get("parent_topic", "") for t in topics if t.get("parent_topic"))
+        topics = post.get("topics") or []
+        if not isinstance(topics, list):
+            continue
+        parent_topics = set()
+        for t in topics:
+            if isinstance(t, dict):
+                parent = t.get("parent_topic", "")
+                if parent:
+                    parent_topics.add(parent)
         if len(parent_topics) >= 2:
             post_topics.append(parent_topics)
     
@@ -527,6 +550,110 @@ def topic_evolution_chart(blog_data: List[Dict[str, Any]],
     }
 
 
+def topic_focus_distribution_chart(blog_data: List[Dict[str, Any]],
+                                   output_dir: str = "report/images",
+                                   window_days: int = 14,
+                                   top_n: int = 5) -> Dict[str, Any]:
+    """
+    焦点窗口主题占比趋势（只绘制焦点窗口内的父主题趋势）
+    """
+    if not blog_data:
+        return {"charts": [], "summary": "没有可分析的博文数据"}
+
+    df_norm = _normalize_topic_df(blog_data)
+    focus = _detect_focus_window(df_norm[["publish_time"]], window_days=window_days)
+    if not focus:
+        return {"charts": [], "summary": "未找到焦点窗口，无法绘制"}
+
+    start = focus["start"]
+    end = focus["end"] + pd.Timedelta(days=1)
+    fdf = df_norm[(df_norm["publish_time"] >= start) & (df_norm["publish_time"] < end)].copy()
+    if fdf.empty:
+        return {"charts": [], "summary": "焦点窗口内无数据"}
+
+    fdf["date"] = fdf["publish_time"].dt.strftime("%Y-%m-%d")
+
+    # 统计父主题出现次数
+    parent_counts = Counter()
+    for _, row in fdf.iterrows():
+        topics_row = row.get("topics") or []
+        if not isinstance(topics_row, list):
+            continue
+        for topic in topics_row:
+            if not isinstance(topic, dict):
+                continue
+            parent = topic.get("parent_topic", "")
+            if parent:
+                parent_counts[parent] += 1
+
+    top_parents = [t for t, _ in parent_counts.most_common(top_n)]
+    if not top_parents:
+        return {"charts": [], "summary": "焦点窗口内无主题数据"}
+
+    series = {p: [] for p in top_parents}
+    dates = sorted(fdf["date"].unique())
+    for d in dates:
+        day_df = fdf[fdf["date"] == d]
+        counts = Counter()
+        for _, row in day_df.iterrows():
+            topics_row = row.get("topics") or []
+            if not isinstance(topics_row, list):
+                continue
+            for topic in topics_row:
+                if not isinstance(topic, dict):
+                    continue
+                parent = topic.get("parent_topic", "")
+                if parent in top_parents:
+                    counts[parent] += 1
+        for p in top_parents:
+            series[p].append(counts[p])
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = os.path.join(output_dir, f"topic_focus_distribution_{timestamp}.png")
+
+    import numpy as np
+    x_idx = np.arange(len(dates))
+    fig, ax = plt.subplots(figsize=(12, 6))
+    colors = plt.cm.tab20(np.linspace(0, 1, len(top_parents)))
+    for color, p in zip(colors, top_parents):
+        ax.plot(x_idx, series[p], marker='o', label=p, color=color)
+    ax.set_xticks(x_idx)
+    ax.set_xticklabels(dates, rotation=45, ha="right")
+    ax.set_title(f"焦点窗口主题发布趋势（{start.date()} - {focus['end'].date()}）")
+    ax.set_ylabel("发布量")
+    ax.set_xlabel("日期")
+    ax.grid(alpha=0.3)
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
+    plt.tight_layout()
+    plt.savefig(file_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    data_rows = []
+    for i, d in enumerate(dates):
+        row = {"time": d}
+        for p in top_parents:
+            row[p] = series[p][i]
+        data_rows.append(row)
+
+    return {
+        "charts": [{
+            "id": f"topic_focus_distribution_{timestamp}",
+            "type": "line_chart",
+            "title": "焦点窗口主题发布趋势",
+            "file_path": file_path,
+            "source_tool": "topic_focus_distribution_chart",
+            "description": f"焦点窗口内 Top{top_n} 父主题的发布趋势"
+        }],
+        "data": {
+            "focus_window": {"start": str(start.date()), "end": str(focus["end"].date())},
+            "series": data_rows,
+            "top_topics": top_parents
+        },
+        "summary": f"焦点窗口（{start.date()}~{focus['end'].date()}）内 Top{top_n} 主题的发布趋势。"
+    }
+
+
 def topic_network_chart(blog_data: List[Dict[str, Any]],
                         output_dir: str = "report/images",
                         min_support: int = 3) -> Dict[str, Any]:
@@ -551,11 +678,15 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
             "summary": f"没有满足阈值({min_support})的共现主题对"
         }
     
-    # 统计每个主题的总频次
+    # 统计每个主题的总频次（防御空值/类型异常）
     topic_counts = Counter()
     for post in blog_data:
-        topics = post.get("topics", [])
+        topics = post.get("topics") or []
+        if not isinstance(topics, list):
+            continue
         for topic in topics:
+            if not isinstance(topic, dict):
+                continue
             parent = topic.get("parent_topic", "")
             if parent:
                 topic_counts[parent] += 1
