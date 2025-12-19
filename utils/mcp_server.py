@@ -52,6 +52,7 @@ from utils.analysis_tools import (
     publisher_topic_distribution_chart,
     participant_trend_chart,
     publisher_focus_distribution_chart,
+    belief_network_chart as belief_network_chart_tool,
 )
 from utils.data_loader import load_enhanced_blog_data
 
@@ -382,6 +383,15 @@ def generate_publisher_bar_chart() -> Dict[str, Any]:
     """生成发布者分布柱状图"""
     blog_data = get_blog_data()
     result = publisher_bar_chart(blog_data, output_dir="report/images")
+    return result
+
+@mcp.tool()
+def belief_network_chart(event_name: str = "belief_network") -> Dict[str, Any]:
+    """生成信念系统共现网络图"""
+    blog_data = get_blog_data()
+    result = belief_network_chart_tool(
+        blog_data, output_dir="report/images", data_dir="report", event_name=event_name
+    )
     return result
 
 

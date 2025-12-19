@@ -58,6 +58,10 @@ from .interaction_tools import (
     publisher_focus_distribution_chart,
 )
 
+from .belief_tools import (
+    belief_network_chart,
+)
+
 
 # 工具注册表
 TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
@@ -538,6 +542,21 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
             "window_days": {"type": "int", "description": "焦点窗口天数", "required": False, "default": 14},
             "top_n": {"type": "int", "description": "发布者数量", "required": False, "default": 5}
+        },
+        "output_type": "chart",
+        "generates_chart": True
+    },
+    # ===== 信念系统分析工具 =====
+    "belief_network_chart": {
+        "name": "belief_network_chart",
+        "category": "信念系统分析",
+        "description": "生成信念系统共现网络图，并输出节点/边数据",
+        "function": belief_network_chart,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "data_dir": {"type": "string", "description": "节点/边数据输出目录", "required": False, "default": "report"},
+            "event_name": {"type": "string", "description": "事件名称", "required": False, "default": "belief_network"}
         },
         "output_type": "chart",
         "generates_chart": True

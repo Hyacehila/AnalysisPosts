@@ -1750,6 +1750,7 @@ class ExecuteAnalysisScriptNode(Node):
             publisher_topic_distribution_chart,
             participant_trend_chart,
             publisher_focus_distribution_chart,
+            belief_network_chart,
         )
         import time
         
@@ -2077,6 +2078,18 @@ class ExecuteAnalysisScriptNode(Node):
                 "source_tool": "publisher_focus_distribution_chart"
             })
         tools_executed.append("publisher_focus_distribution_chart")
+
+        # 信念系统网络
+        result = belief_network_chart(blog_data)
+        if result.get("charts"):
+            charts.extend(result["charts"])
+            tables.append({
+                "id": "belief_network_data",
+                "title": "信念系统共现网络数据",
+                "data": result.get("data", {}),
+                "source_tool": "belief_network_chart"
+            })
+        tools_executed.append("belief_network_chart")
         
         execution_time = time.time() - start_time
         
@@ -3269,6 +3282,13 @@ class FillSectionNode(Node):
 - 使用主题排行榜
 - 表格展示主题统计信息
 - 分析话题关联性
+"""
+        elif section_name == "belief":
+            return f"""
+### 信念系统分析要点
+- 使用信念系统网络图，展示子类共现关系
+- 结合节点/边数据表说明核心信念与关联强度
+- 指出主要信念类型之间的结构特征
 """
 
         else:

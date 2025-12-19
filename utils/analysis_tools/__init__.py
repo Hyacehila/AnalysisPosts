@@ -58,6 +58,10 @@ from .interaction_tools import (
     publisher_focus_distribution_chart,
 )
 
+from .belief_tools import (
+    belief_network_chart,
+)
+
 from .tool_registry import (
     TOOL_REGISTRY,
     get_all_tools,
@@ -106,6 +110,8 @@ __all__ = [
     "publisher_topic_distribution_chart",
     "participant_trend_chart",
     "publisher_focus_distribution_chart",
+    # 信念系统工具
+    "belief_network_chart",
     # 工具注册
     "TOOL_REGISTRY",
     "get_all_tools",
