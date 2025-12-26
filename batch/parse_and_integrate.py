@@ -33,11 +33,25 @@ def load_reference_data():
         with open(os.path.join(data_dir, "publisher_objects.json"), 'r', encoding='utf-8') as f:
             publisher_objects = json.load(f)
         
-        return topics_hierarchy, sentiment_attributes, publisher_objects
+        # 加载信念系统
+        belief_system = None
+        belief_system_path = os.path.join(data_dir, "believe_system_common.json")
+        if os.path.exists(belief_system_path):
+            with open(belief_system_path, 'r', encoding='utf-8') as f:
+                belief_system = json.load(f)
+        
+        # 加载发布者事件关联身份分类
+        publisher_decisions = None
+        publisher_decision_path = os.path.join(data_dir, "publisher_decision.json")
+        if os.path.exists(publisher_decision_path):
+            with open(publisher_decision_path, 'r', encoding='utf-8') as f:
+                publisher_decisions = json.load(f)
+        
+        return topics_hierarchy, sentiment_attributes, publisher_objects, belief_system, publisher_decisions
         
     except Exception as e:
         print(f"加载参考数据失败: {e}")
-        return [], [], []
+        return [], [], [], None, None
 
 
 def check_result_files(temp_dir: str):
@@ -47,7 +61,9 @@ def check_result_files(temp_dir: str):
         "sentiment_polarity*results*.jsonl",
         "sentiment_attribute*results*.jsonl", 
         "topic_analysis*results*.jsonl",
-        "publisher_analysis*results*.jsonl"
+        "publisher_analysis*results*.jsonl",
+        "belief_system*results*.jsonl",
+        "publisher_decision*results*.jsonl"
     ]
     
     import glob
@@ -88,7 +104,7 @@ def main():
         return
     
     # 加载参考数据
-    topics_hierarchy, sentiment_attributes, publisher_objects = load_reference_data()
+    topics_hierarchy, sentiment_attributes, publisher_objects, belief_system, publisher_decisions = load_reference_data()
     
     if not topics_hierarchy:
         print("参考数据加载失败，程序退出")
@@ -98,6 +114,10 @@ def main():
     print(f"  主题层次结构: {len(topics_hierarchy)} 个父主题")
     print(f"  情感属性: {len(sentiment_attributes)} 个")
     print(f"  发布者对象: {len(publisher_objects)} 个")
+    if belief_system:
+        print(f"  信念系统: {len(belief_system)} 个类别")
+    if publisher_decisions:
+        print(f"  关联身份分类: {len(publisher_decisions)} 个类别")
     
     # 整合结果
     print(f"\n开始整合结果...")
@@ -108,7 +128,9 @@ def main():
             temp_dir=temp_dir,
             topics_hierarchy=topics_hierarchy,
             sentiment_attributes=sentiment_attributes,
-            publisher_objects=publisher_objects
+            publisher_objects=publisher_objects,
+            belief_system=belief_system,
+            publisher_decisions=publisher_decisions
         )
         
         if "error" in integration_result:
@@ -133,7 +155,9 @@ def main():
             ("sentiment_polarity", "情感极性分析"),
             ("sentiment_attribute", "情感属性分析"),
             ("topic_analysis", "主题分析"),
-            ("publisher_analysis", "发布者对象分析")
+            ("publisher_analysis", "发布者对象分析"),
+            ("belief_system", "信念系统分析"),
+            ("publisher_decision", "关联身份识别分析")
         ]
         
         for analysis_key, analysis_name in analysis_types:
@@ -159,7 +183,7 @@ def main():
         print(f"验证结果:")
         print(f"  总博文数: {validation_result['total_posts']}")
         
-        for field in ["sentiment_polarity", "sentiment_attribute", "topics", "publisher"]:
+        for field in ["sentiment_polarity", "sentiment_attribute", "topics", "publisher", "belief_signals", "publisher_decision"]:
             field_stats = validation_result["field_completeness"].get(field, {})
             count = field_stats.get("count", 0)
             completeness = field_stats.get("completeness", 0)
@@ -195,7 +219,7 @@ def main():
         print("=" * 60)
         
         total_processed = 0
-        total_possible = len(enhanced_posts) * 4  # 4种分析类型
+        total_possible = len(enhanced_posts) * len(analysis_types)  # 所有分析类型
         
         for analysis_key, _ in analysis_types:
             stats = integration_stats.get(analysis_key, {})

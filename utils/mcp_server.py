@@ -44,8 +44,8 @@ from utils.analysis_tools import (
     # 交互工具
     publisher_distribution_stats,
     cross_dimension_matrix,
-    influence_analysis,
-    correlation_analysis,
+    influence_analysis as influence_analysis_tool,
+    correlation_analysis as correlation_analysis_tool,
     interaction_heatmap,
     publisher_bar_chart,
     publisher_sentiment_bucket_chart,
@@ -72,6 +72,17 @@ def get_blog_data():
     env_path = os.getenv("ENHANCED_DATA_PATH")
     if env_path:
         candidates.append(env_path)
+
+    # 兜底：常见默认路径（避免未设置 ENHANCED_DATA_PATH 时 MCP 工具全部“无数据”）
+    candidates.extend([
+        "data/enhanced_blogs.json",
+        "data/test_posts_enhenced.json",
+        "data/test_posts_enhanced.json",
+    ])
+
+    # 去重但保持顺序
+    seen = set()
+    candidates = [p for p in candidates if p and not (p in seen or seen.add(p))]
 
     
     last_err = None
@@ -238,14 +249,14 @@ def cross_matrix(dim1: str = "publisher", dim2: str = "sentiment_polarity") -> D
 def influence_analysis(top_n: int = 20) -> Dict[str, Any]:
     """获取影响力分析数据"""
     blog_data = get_blog_data()
-    result = influence_analysis(blog_data, top_n=top_n)
+    result = influence_analysis_tool(blog_data, top_n=top_n)
     return result
 
 @mcp.tool()
 def correlation_analysis() -> Dict[str, Any]:
     """获取维度相关性分析数据"""
     blog_data = get_blog_data()
-    result = correlation_analysis(blog_data)
+    result = correlation_analysis_tool(blog_data)
     return result
 
 @mcp.tool()

@@ -685,7 +685,11 @@ def publisher_focus_distribution_chart(blog_data: List[Dict[str, Any]],
     if daily.empty:
         return {"charts": [], "summary": "无有效时间数据"}
     rolling = daily.rolling(window_days, min_periods=1).sum()
-    end = rolling.idxmax()
+    if rolling.empty or rolling.isna().all():
+        return {"charts": [], "summary": "无有效滚动窗口数据"}
+    end = rolling.idxmax(skipna=True)
+    if pd.isna(end):
+        return {"charts": [], "summary": "无法确定焦点窗口"}
     start = end - pd.Timedelta(days=window_days - 1)
 
     fdf = df[(df["publish_time"] >= start) & (df["publish_time"] <= end)].copy()

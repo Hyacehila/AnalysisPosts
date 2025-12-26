@@ -400,8 +400,8 @@ def main():
     #
     
     # ----- 数据路径配置 -----
-    INPUT_DATA_PATH = "data/small.json"
-    OUTPUT_DATA_PATH = "data/enhanced_posts.json"
+    INPUT_DATA_PATH = "data/test_posts.json"
+    OUTPUT_DATA_PATH = "data/test_posts_enhenced.json"
     TOPICS_PATH = "data/topics.json"
     SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
     PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
@@ -437,6 +437,10 @@ def main():
     # =========================================================================
 
     import os
+
+    # Agent(MCP)模式下：MCP server 是独立子进程，需通过环境变量告知增强数据路径
+    if ANALYSIS_MODE == "agent" and TOOL_SOURCE == "mcp" and ENHANCED_DATA_PATH:
+        os.environ["ENHANCED_DATA_PATH"] = os.path.abspath(ENHANCED_DATA_PATH)
 
     # 检查不同阶段的文件前置条件
     if RUN_STAGES == [2]:

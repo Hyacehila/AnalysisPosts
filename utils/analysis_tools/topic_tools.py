@@ -46,7 +46,11 @@ def _detect_focus_window(df: pd.DataFrame, window_days: int = 14) -> Dict[str, A
     if daily.empty:
         return {}
     roll = daily.rolling(window_days, min_periods=1).sum()
-    end = roll.idxmax()
+    if roll.empty or roll.isna().all():
+        return {}
+    end = roll.idxmax(skipna=True)
+    if pd.isna(end):
+        return {}
     start = end - pd.Timedelta(days=window_days - 1)
     return {"start": start.normalize(), "end": end.normalize()}
 

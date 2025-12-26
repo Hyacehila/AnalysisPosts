@@ -2,15 +2,6 @@
   "charts": [],
   "tables": [
     {
-      "id": "sentiment_anomaly",
-      "title": "情感分析 - sentiment_anomaly",
-      "data": {
-        "anomalies": []
-      },
-      "source_tool": "sentiment_anomaly",
-      "source_type": "mcp"
-    },
-    {
       "id": "influence_analysis",
       "title": "其他 - influence_analysis",
       "data": {
@@ -20,22 +11,21 @@
       "source_type": "mcp"
     },
     {
-      "id": "generate_topic_network_chart",
-      "title": "主题分析 - generate_topic_network_chart",
+      "id": "correlation_analysis",
+      "title": "其他 - correlation_analysis",
       "data": {
-        "charts": [],
-        "summary": "没有满足阈值(3)的共现主题对"
+        "result": "Error calling tool 'correlation_analysis': 'FunctionTool' object is not callable"
       },
-      "source_tool": "generate_topic_network_chart",
+      "source_tool": "correlation_analysis",
       "source_type": "mcp"
     },
     {
-      "id": "geographic_hotspot",
-      "title": "地理分析 - geographic_hotspot",
+      "id": "sentiment_anomaly",
+      "title": "情感分析 - sentiment_anomaly",
       "data": {
-        "hotspots": []
+        "anomalies": []
       },
-      "source_tool": "geographic_hotspot",
+      "source_tool": "sentiment_anomaly",
       "source_type": "mcp"
     },
     {
@@ -49,43 +39,13 @@
       "source_type": "mcp"
     },
     {
-      "id": "generate_sentiment_pie_chart",
-      "title": "情感分析 - generate_sentiment_pie_chart",
+      "id": "publisher_topic_distribution",
+      "title": "主题分析 - publisher_topic_distribution",
       "data": {
         "charts": [],
-        "summary": "没有可绘制的数据"
+        "summary": "没有可用的发布者主题数据"
       },
-      "source_tool": "generate_sentiment_pie_chart",
-      "source_type": "mcp"
-    },
-    {
-      "id": "publisher_sentiment_bucket",
-      "title": "情感分析 - publisher_sentiment_bucket",
-      "data": {
-        "charts": [],
-        "summary": "没有可用的发布者情绪桶数据"
-      },
-      "source_tool": "publisher_sentiment_bucket",
-      "source_type": "mcp"
-    },
-    {
-      "id": "topic_focus_evolution",
-      "title": "主题分析 - topic_focus_evolution",
-      "data": {
-        "charts": [],
-        "summary": "没有可绘制的主题演化数据"
-      },
-      "source_tool": "topic_focus_evolution",
-      "source_type": "mcp"
-    },
-    {
-      "id": "geographic_sentiment_bar",
-      "title": "情感分析 - geographic_sentiment_bar",
-      "data": {
-        "charts": [],
-        "summary": "没有可用的地区情绪数据"
-      },
-      "source_tool": "geographic_sentiment_bar",
+      "source_tool": "publisher_topic_distribution",
       "source_type": "mcp"
     },
     {
@@ -99,82 +59,22 @@
       "source_type": "mcp"
     },
     {
-      "id": "publisher_topic_distribution",
-      "title": "主题分析 - publisher_topic_distribution",
+      "id": "geographic_hotspot",
+      "title": "地理分析 - geographic_hotspot",
       "data": {
-        "charts": [],
-        "summary": "没有可用的发布者主题数据"
+        "hotspots": []
       },
-      "source_tool": "publisher_topic_distribution",
+      "source_tool": "geographic_hotspot",
       "source_type": "mcp"
     },
     {
-      "id": "generate_geographic_heatmap",
-      "title": "地理分析 - generate_geographic_heatmap",
-      "data": {
-        "charts": [],
-        "summary": "地区数据不足，无法生成热力图"
-      },
-      "source_tool": "generate_geographic_heatmap",
-      "source_type": "mcp"
-    },
-    {
-      "id": "generate_topic_ranking_chart",
-      "title": "主题分析 - generate_topic_ranking_chart",
+      "id": "generate_sentiment_pie_chart",
+      "title": "情感分析 - generate_sentiment_pie_chart",
       "data": {
         "charts": [],
         "summary": "没有可绘制的数据"
       },
-      "source_tool": "generate_topic_ranking_chart",
-      "source_type": "mcp"
-    },
-    {
-      "id": "geographic_temporal_heatmap_tool",
-      "title": "地理分析 - geographic_temporal_heatmap_tool",
-      "data": {
-        "charts": [],
-        "summary": "缺少时间或地区字段"
-      },
-      "source_tool": "geographic_temporal_heatmap_tool",
-      "source_type": "mcp"
-    },
-    {
-      "id": "participant_trend",
-      "title": "其他 - participant_trend",
-      "data": {
-        "charts": [],
-        "summary": "缺少用户或时间字段"
-      },
-      "source_tool": "participant_trend",
-      "source_type": "mcp"
-    },
-    {
-      "id": "generate_sentiment_trend_chart",
-      "title": "情感分析 - generate_sentiment_trend_chart",
-      "data": {
-        "charts": [],
-        "summary": "没有可绘制的数据"
-      },
-      "source_tool": "generate_sentiment_trend_chart",
-      "source_type": "mcp"
-    },
-    {
-      "id": "correlation_analysis",
-      "title": "其他 - correlation_analysis",
-      "data": {
-        "result": "Error calling tool 'correlation_analysis': 'FunctionTool' object is not callable"
-      },
-      "source_tool": "correlation_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "topic_focus_distribution",
-      "title": "主题分析 - topic_focus_distribution",
-      "data": {
-        "charts": [],
-        "summary": "没有可分析的博文数据"
-      },
-      "source_tool": "topic_focus_distribution",
+      "source_tool": "generate_sentiment_pie_chart",
       "source_type": "mcp"
     },
     {
@@ -188,13 +88,113 @@
       "source_type": "mcp"
     },
     {
-      "id": "publisher_focus_distribution",
-      "title": "多维交互分析 - publisher_focus_distribution",
+      "id": "generate_sentiment_trend_chart",
+      "title": "情感分析 - generate_sentiment_trend_chart",
+      "data": {
+        "charts": [],
+        "summary": "没有可绘制的数据"
+      },
+      "source_tool": "generate_sentiment_trend_chart",
+      "source_type": "mcp"
+    },
+    {
+      "id": "generate_topic_network_chart",
+      "title": "主题分析 - generate_topic_network_chart",
+      "data": {
+        "charts": [],
+        "summary": "没有满足阈值(3)的共现主题对"
+      },
+      "source_tool": "generate_topic_network_chart",
+      "source_type": "mcp"
+    },
+    {
+      "id": "generate_geographic_heatmap",
+      "title": "地理分析 - generate_geographic_heatmap",
+      "data": {
+        "charts": [],
+        "summary": "地区数据不足，无法生成热力图"
+      },
+      "source_tool": "generate_geographic_heatmap",
+      "source_type": "mcp"
+    },
+    {
+      "id": "topic_focus_evolution",
+      "title": "主题分析 - topic_focus_evolution",
+      "data": {
+        "charts": [],
+        "summary": "没有可绘制的主题演化数据"
+      },
+      "source_tool": "topic_focus_evolution",
+      "source_type": "mcp"
+    },
+    {
+      "id": "publisher_sentiment_bucket",
+      "title": "情感分析 - publisher_sentiment_bucket",
+      "data": {
+        "charts": [],
+        "summary": "没有可用的发布者情绪桶数据"
+      },
+      "source_tool": "publisher_sentiment_bucket",
+      "source_type": "mcp"
+    },
+    {
+      "id": "geographic_temporal_heatmap_tool",
+      "title": "地理分析 - geographic_temporal_heatmap_tool",
+      "data": {
+        "charts": [],
+        "summary": "缺少时间或地区字段"
+      },
+      "source_tool": "geographic_temporal_heatmap_tool",
+      "source_type": "mcp"
+    },
+    {
+      "id": "generate_publisher_bar_chart",
+      "title": "多维交互分析 - generate_publisher_bar_chart",
+      "data": {
+        "charts": [],
+        "summary": "没有发布者数据"
+      },
+      "source_tool": "generate_publisher_bar_chart",
+      "source_type": "mcp"
+    },
+    {
+      "id": "participant_trend",
+      "title": "其他 - participant_trend",
+      "data": {
+        "charts": [],
+        "summary": "缺少用户或时间字段"
+      },
+      "source_tool": "participant_trend",
+      "source_type": "mcp"
+    },
+    {
+      "id": "generate_sentiment_attribute_trend_chart",
+      "title": "情感分析 - generate_sentiment_attribute_trend_chart",
+      "data": {
+        "charts": [],
+        "summary": "没有可绘制的情绪属性趋势数据"
+      },
+      "source_tool": "generate_sentiment_attribute_trend_chart",
+      "source_type": "mcp"
+    },
+    {
+      "id": "geographic_sentiment_bar",
+      "title": "情感分析 - geographic_sentiment_bar",
+      "data": {
+        "charts": [],
+        "summary": "没有可用的地区情绪数据"
+      },
+      "source_tool": "geographic_sentiment_bar",
+      "source_type": "mcp"
+    },
+    {
+      "id": "topic_focus_distribution",
+      "title": "主题分析 - topic_focus_distribution",
       "data": {
         "charts": [],
         "summary": "没有可分析的博文数据"
       },
-      "source_tool": "publisher_focus_distribution",
+      "source_tool": "topic_focus_distribution",
       "source_type": "mcp"
     },
     {
@@ -218,23 +218,33 @@
       "source_type": "mcp"
     },
     {
-      "id": "generate_sentiment_attribute_trend_chart",
-      "title": "情感分析 - generate_sentiment_attribute_trend_chart",
+      "id": "belief_network_chart",
+      "title": "其他 - belief_network_chart",
       "data": {
         "charts": [],
-        "summary": "没有可绘制的情绪属性趋势数据"
+        "summary": "没有可绘制的信念数据"
       },
-      "source_tool": "generate_sentiment_attribute_trend_chart",
+      "source_tool": "belief_network_chart",
       "source_type": "mcp"
     },
     {
-      "id": "generate_sentiment_focus_publisher_chart",
-      "title": "情感分析 - generate_sentiment_focus_publisher_chart",
+      "id": "publisher_focus_distribution",
+      "title": "多维交互分析 - publisher_focus_distribution",
       "data": {
         "charts": [],
         "summary": "没有可分析的博文数据"
       },
-      "source_tool": "generate_sentiment_focus_publisher_chart",
+      "source_tool": "publisher_focus_distribution",
+      "source_type": "mcp"
+    },
+    {
+      "id": "generate_topic_ranking_chart",
+      "title": "主题分析 - generate_topic_ranking_chart",
+      "data": {
+        "charts": [],
+        "summary": "没有可绘制的数据"
+      },
+      "source_tool": "generate_topic_ranking_chart",
       "source_type": "mcp"
     },
     {
@@ -248,16 +258,6 @@
       "source_type": "mcp"
     },
     {
-      "id": "generate_publisher_bar_chart",
-      "title": "多维交互分析 - generate_publisher_bar_chart",
-      "data": {
-        "charts": [],
-        "summary": "没有发布者数据"
-      },
-      "source_tool": "generate_publisher_bar_chart",
-      "source_type": "mcp"
-    },
-    {
       "id": "generate_sentiment_focus_window_chart",
       "title": "情感分析 - generate_sentiment_focus_window_chart",
       "data": {
@@ -268,13 +268,13 @@
       "source_type": "mcp"
     },
     {
-      "id": "generate_interaction_heatmap",
-      "title": "多维交互分析 - generate_interaction_heatmap",
+      "id": "generate_sentiment_focus_publisher_chart",
+      "title": "情感分析 - generate_sentiment_focus_publisher_chart",
       "data": {
         "charts": [],
-        "summary": "没有足够的数据生成热力图"
+        "summary": "没有可分析的博文数据"
       },
-      "source_tool": "generate_interaction_heatmap",
+      "source_tool": "generate_sentiment_focus_publisher_chart",
       "source_type": "mcp"
     }
   ],
@@ -285,38 +285,38 @@
       "geographic_distribution",
       "sentiment_timeseries",
       "publisher_distribution",
-      "sentiment_anomaly",
       "topic_evolution",
       "geographic_sentiment",
       "cross_matrix",
-      "topic_cooccurrence",
       "influence_analysis",
-      "generate_topic_network_chart",
-      "geographic_hotspot",
-      "geographic_topic_heatmap_tool",
-      "generate_sentiment_pie_chart",
-      "publisher_sentiment_bucket",
-      "topic_focus_evolution",
-      "geographic_sentiment_bar",
-      "topic_keyword_trend",
-      "publisher_topic_distribution",
-      "generate_geographic_heatmap",
-      "generate_topic_ranking_chart",
-      "geographic_temporal_heatmap_tool",
-      "participant_trend",
-      "generate_sentiment_trend_chart",
       "correlation_analysis",
-      "topic_focus_distribution",
+      "topic_cooccurrence",
+      "sentiment_anomaly",
+      "geographic_topic_heatmap_tool",
+      "publisher_topic_distribution",
+      "topic_keyword_trend",
+      "geographic_hotspot",
+      "generate_sentiment_pie_chart",
       "generate_geographic_bar_chart",
-      "publisher_focus_distribution",
+      "generate_sentiment_trend_chart",
+      "generate_topic_network_chart",
+      "generate_geographic_heatmap",
+      "topic_focus_evolution",
+      "publisher_sentiment_bucket",
+      "geographic_temporal_heatmap_tool",
+      "generate_publisher_bar_chart",
+      "participant_trend",
+      "generate_sentiment_attribute_trend_chart",
+      "geographic_sentiment_bar",
+      "topic_focus_distribution",
       "generate_interaction_heatmap",
       "generate_sentiment_bucket_trend_chart",
-      "generate_sentiment_attribute_trend_chart",
-      "generate_sentiment_focus_publisher_chart",
+      "belief_network_chart",
+      "publisher_focus_distribution",
+      "generate_topic_ranking_chart",
       "generate_topic_evolution_chart",
-      "generate_publisher_bar_chart",
       "generate_sentiment_focus_window_chart",
-      "generate_interaction_heatmap"
+      "generate_sentiment_focus_publisher_chart"
     ],
     "total_charts": 0,
     "total_tables": 0,

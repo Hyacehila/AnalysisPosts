@@ -32,11 +32,25 @@ def load_data_files():
         with open(os.path.join(data_dir, "publisher_objects.json"), 'r', encoding='utf-8') as f:
             publisher_objects = json.load(f)
         
-        return posts, topics_hierarchy, sentiment_attributes, publisher_objects
+        # 加载信念系统
+        belief_system = None
+        belief_system_path = os.path.join(data_dir, "believe_system_common.json")
+        if os.path.exists(belief_system_path):
+            with open(belief_system_path, 'r', encoding='utf-8') as f:
+                belief_system = json.load(f)
+        
+        # 加载发布者事件关联身份分类
+        publisher_decisions = None
+        publisher_decision_path = os.path.join(data_dir, "publisher_decision.json")
+        if os.path.exists(publisher_decision_path):
+            with open(publisher_decision_path, 'r', encoding='utf-8') as f:
+                publisher_decisions = json.load(f)
+        
+        return posts, topics_hierarchy, sentiment_attributes, publisher_objects, belief_system, publisher_decisions
         
     except Exception as e:
         print(f"加载数据文件失败: {e}")
-        return None, None, None, None
+        return None, None, None, None, None, None
 
 
 def save_batch_info(jsonl_files: dict, temp_dir: str):
@@ -91,7 +105,7 @@ def main():
     print("=" * 60)
     
     # 加载数据
-    posts, topics_hierarchy, sentiment_attributes, publisher_objects = load_data_files()
+    posts, topics_hierarchy, sentiment_attributes, publisher_objects, belief_system, publisher_decisions = load_data_files()
     
     if posts is None:
         print("数据加载失败，程序退出")
@@ -101,6 +115,10 @@ def main():
     print(f"加载主题层次结构: {len(topics_hierarchy)} 个父主题")
     print(f"加载情感属性: {len(sentiment_attributes)} 个")
     print(f"加载发布者对象: {len(publisher_objects)} 个")
+    if belief_system:
+        print(f"加载信念系统: {len(belief_system)} 个类别")
+    if publisher_decisions:
+        print(f"加载关联身份分类: {len(publisher_decisions)} 个类别")
     print()
     
     # 创建临时目录
@@ -115,7 +133,9 @@ def main():
             sentiment_attributes=sentiment_attributes,
             publishers=publisher_objects,
             data_dir="data",
-            temp_dir=temp_dir
+            temp_dir=temp_dir,
+            belief_system=belief_system,
+            publisher_decisions=publisher_decisions
         )
         
         print("\n" + "=" * 60)

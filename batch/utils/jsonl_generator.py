@@ -7,7 +7,7 @@ JSONL文件生成工具
 
 import os
 import json
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 
 # API限制常量
@@ -388,14 +388,119 @@ def generate_publisher_analysis_requests(posts: List[Dict[str, Any]], publishers
     return requests
 
 
+def generate_belief_system_requests(posts: List[Dict[str, Any]], belief_system: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """生成信念系统分析请求列表"""
+    requests = []
+    
+    for i, post in enumerate(posts):
+        # 构建信念体系层次字符串，与nodes.py保持一致
+        belief_lines = []
+        for bs in belief_system:
+            cat = bs.get("category", "")
+            subs = "、".join(bs.get("subcategories", []))
+            belief_lines.append(f"{cat} -> {subs}")
+        belief_str = "\n".join(belief_lines)
+        
+        # 构建提示词，与nodes.py保持一致
+        prompt = f"""请从下列信念体系主题列表中为博文的讨论内容选择1-3个最贴切的 category/subcategory 组合。
+必须以 [ 开头、以 ] 结尾，仅输出 JSON 数组，格式示例：
+[{{"category": "类别", "subcategories": ["子类1","子类2"]}}]
+若无匹配输出 []，不得添加任何说明、Markdown 代码块或多余文本。子类必须来自给定列表。
+信念体系：
+{belief_str}
+博文：
+{post.get('content', '')}"""
+        
+        # 选择模型和参数
+        model = select_model_for_analysis("belief_system")
+        temperature = get_temperature_for_analysis("belief_system")
+        
+        request = {
+            "custom_id": f"belief_system_{i:06d}",
+            "method": "POST",
+            "url": "/v4/chat/completions",
+            "body": {
+                "model": model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "你是一个专业的社交媒体内容分析师。"
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "temperature": temperature
+            }
+        }
+        
+        requests.append(request)
+    
+    return requests
+
+
+def generate_publisher_decision_requests(posts: List[Dict[str, Any]], publisher_decisions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """生成关联身份识别分析请求列表"""
+    requests = []
+    
+    for i, post in enumerate(posts):
+        # 清理数据，与nodes.py保持一致
+        def _clean(text: str) -> str:
+            if not isinstance(text, str):
+                return text
+            try:
+                return text.encode("latin1").decode("utf-8")
+            except Exception:
+                return text
+        
+        publisher_decisions_clean = [{"category": _clean(item.get("category", ""))} for item in (publisher_decisions or [])]
+        
+        # 构建提示词，与nodes.py保持一致
+        prompt = f"""请选择博文发布者与舆情事件"河南大学生夜骑事件"的"事件关联身份"，只能从下列候选中选1个：
+{json.dumps(publisher_decisions_clean, ensure_ascii=False, indent=2)}
+若无法判断，选择最接近的类型。只输出候选中的category文本，不要输出解释。
+博文内容：{post.get('content', '')}"""
+        
+        # 选择模型和参数
+        model = select_model_for_analysis("publisher_decision")
+        temperature = get_temperature_for_analysis("publisher_decision")
+        
+        request = {
+            "custom_id": f"publisher_decision_{i:06d}",
+            "method": "POST",
+            "url": "/v4/chat/completions",
+            "body": {
+                "model": model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "你是一个专业的社交媒体内容分析师。"
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "temperature": temperature
+            }
+        }
+        
+        requests.append(request)
+    
+    return requests
+
+
 def create_all_jsonl_files(posts: List[Dict[str, Any]], 
                          topics: List[Dict[str, Any]],
                          sentiment_attributes: List[str],
                          publishers: List[str],
                          data_dir: str,
-                         temp_dir: str) -> Dict[str, List[str]]:
+                         temp_dir: str,
+                         belief_system: Optional[List[Dict[str, Any]]] = None,
+                         publisher_decisions: Optional[List[Dict[str, Any]]] = None) -> Dict[str, List[str]]:
     """
-    创建所有四个JSONL文件，支持自动拆分
+    创建所有JSONL文件，支持自动拆分
     
     Args:
         posts: 博文数据列表
@@ -404,6 +509,8 @@ def create_all_jsonl_files(posts: List[Dict[str, Any]],
         publishers: 发布者对象列表
         data_dir: 数据目录路径
         temp_dir: 临时文件目录路径
+        belief_system: 信念系统分类列表
+        publisher_decisions: 发布者事件关联身份分类列表
         
     Returns:
         分析类型到文件路径列表的映射
@@ -451,6 +558,28 @@ def create_all_jsonl_files(posts: List[Dict[str, Any]],
     )
     jsonl_files["publisher_analysis"] = publisher_analysis_files
     print(f"创建发布者对象分析JSONL文件: {len(publisher_analysis_requests)} 条请求 -> {len(publisher_analysis_files)} 个文件")
+    
+    # 创建信念系统分析JSONL
+    if belief_system:
+        print("生成信念系统分析请求...")
+        belief_system_requests = generate_belief_system_requests(posts, belief_system)
+        belief_system_files = split_requests_by_limits(
+            belief_system_requests,
+            os.path.join(temp_dir, "belief_system_batch")
+        )
+        jsonl_files["belief_system"] = belief_system_files
+        print(f"创建信念系统分析JSONL文件: {len(belief_system_requests)} 条请求 -> {len(belief_system_files)} 个文件")
+    
+    # 创建关联身份识别分析JSONL
+    if publisher_decisions:
+        print("生成关联身份识别分析请求...")
+        publisher_decision_requests = generate_publisher_decision_requests(posts, publisher_decisions)
+        publisher_decision_files = split_requests_by_limits(
+            publisher_decision_requests,
+            os.path.join(temp_dir, "publisher_decision_batch")
+        )
+        jsonl_files["publisher_decision"] = publisher_decision_files
+        print(f"创建关联身份识别分析JSONL文件: {len(publisher_decision_requests)} 条请求 -> {len(publisher_decision_files)} 个文件")
     
     # 显示文件大小信息
     print("\n文件大小信息:")

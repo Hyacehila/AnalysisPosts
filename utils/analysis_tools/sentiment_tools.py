@@ -79,7 +79,11 @@ def _detect_focus_window(df: pd.DataFrame, window_days: int = 14) -> Dict[str, A
     if daily.empty:
         return {}
     rolling = daily.rolling(window_days, min_periods=1).sum()
-    end = rolling.idxmax()
+    if rolling.empty or rolling.isna().all():
+        return {}
+    end = rolling.idxmax(skipna=True)
+    if pd.isna(end):
+        return {}
     start = end - pd.Timedelta(days=window_days - 1)
     return {"start": start.normalize(), "end": end.normalize()}
 
@@ -326,7 +330,14 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
         for col in [c for c in attr_df.columns if c != "time"]:
             if col not in diff_df.columns:
                 continue
-            max_idx = diff_df[col].abs().idxmax()
+            # 检查列是否有有效数据（至少需要两行数据才能计算diff）
+            abs_values = diff_df[col].abs()
+            if abs_values.empty or abs_values.isna().all():
+                continue
+            # 使用 skipna=True 避免 FutureWarning，并检查结果是否为 NaN
+            max_idx = abs_values.idxmax(skipna=True)
+            if pd.isna(max_idx):
+                continue
             change = diff_df.loc[max_idx, col]
             if not pd.isna(change) and abs(change) >= 1:
                 attribute_turning_points.append({

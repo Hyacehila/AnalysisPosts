@@ -370,6 +370,7 @@ class DataLoadNode(Node):
             shared["data"]["belief_system"] = exec_res["belief_system"]
             shared["data"]["publisher_decisions"] = exec_res["publisher_decisions"]
             print(f"[DataLoad] belief_system loaded: {len(exec_res['belief_system'])} items")
+            print(f"[DataLoad] publisher_decisions loaded: {len(exec_res['publisher_decisions'])} items")
 
         if "stage1_results" not in shared:
             shared["stage1_results"] = {"statistics": {}}
@@ -1030,11 +1031,14 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
         publisher_objects = prep_res["publisher_objects"]
 
         publishers_str = "、".join(publisher_objects)
+        username = blog_post.get("username", "") or blog_post.get("user_name", "")
+
+        extra_user = f"\n发布者昵称/账号：{username}" if username else ""
 
         prompt = f"""候选发布者：{publishers_str}
 判断该博文最可能的发布者类型，直接输出候选列表中的一个条目，不得添加解释。
 博文：
-{blog_post.get('content', '')}"""
+{blog_post.get('content', '')}{extra_user}"""
 
         response = await asyncio.to_thread(call_glm_45_air, prompt, temperature=0.3)
 
@@ -1070,9 +1074,14 @@ class AsyncBeliefSystemAnalysisBatchNode(AsyncParallelBatchNode):
     """
     信念体系分类识别（多选）
     """
-    def prep(self, shared):
+    async def prep_async(self, shared):
+        """返回博文和信念系统的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         belief_system = shared.get("data", {}).get("belief_system", [])
+        if not belief_system:
+            print(f"[BeliefSystem] 警告: belief_system 数据为空，将跳过LLM调用")
+        else:
+            print(f"[BeliefSystem] 准备处理 {len(blog_data)} 条博文，信念系统包含 {len(belief_system)} 个类别")
         return [{
             "blog_data": blog_post,
             "belief_system": belief_system
@@ -1098,6 +1107,7 @@ class AsyncBeliefSystemAnalysisBatchNode(AsyncParallelBatchNode):
                 "subcategories": [_clean(sub) for sub in item.get("subcategories", [])]
             })
         if not belief_system:
+            print(f"[BeliefSystem] 警告: 处理博文时 belief_system 为空，返回空结果")
             return []
 
         # 构建信念体系层次字符串，类似两级主题提示
@@ -1119,7 +1129,7 @@ class AsyncBeliefSystemAnalysisBatchNode(AsyncParallelBatchNode):
 
         # 调用LLM
         response = await asyncio.to_thread(
-            call_glm_45_air, prompt, temperature=0.2, max_tokens=512
+            call_glm_45_air, prompt, temperature=0.2
         )
 
         # 解析与校验
@@ -1188,9 +1198,14 @@ class AsyncPublisherDecisionAnalysisBatchNode(AsyncParallelBatchNode):
     """
     发布者事件关联身份分类（四选一）
     """
-    def prep(self, shared):
+    async def prep_async(self, shared):
+        """返回博文和关联身份分类的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         publisher_decisions = shared.get("data", {}).get("publisher_decisions", [])
+        if not publisher_decisions:
+            print(f"[PublisherDecision] 警告: publisher_decisions 数据为空，将跳过LLM调用")
+        else:
+            print(f"[PublisherDecision] 准备处理 {len(blog_data)} 条博文，关联身份分类包含 {len(publisher_decisions)} 个类别")
         return [{
             "blog_data": blog_post,
             "publisher_decisions": publisher_decisions
@@ -1208,12 +1223,16 @@ class AsyncPublisherDecisionAnalysisBatchNode(AsyncParallelBatchNode):
                 return text
         publisher_decisions = [{"category": _clean(item.get("category", ""))} for item in (publisher_decisions_raw or [])]
         if not publisher_decisions:
+            print(f"[PublisherDecision] 警告: 处理博文时 publisher_decisions 为空，返回None")
             return None
+
+        username = blog_post.get("username", "") or blog_post.get("user_name", "")
+        extra_user = f"\n发布者昵称/账号：{username}" if username else ""
 
         prompt = f"""请选择博文发布者与舆情事件“河南大学生夜骑事件”的“事件关联身份”，只能从下列候选中选1个：
 {json.dumps(publisher_decisions, ensure_ascii=False, indent=2)}
 若无法判断，选择最接近的类型。只输出候选中的category文本，不要输出解释。
-博文内容：{blog_post.get('content', '')}"""
+博文内容：{blog_post.get('content', '')}{extra_user}"""
         try:
             response = await asyncio.to_thread(call_glm_45_air, prompt, temperature=0.2)
             chosen = response.strip().replace('"', '')
@@ -2165,7 +2184,13 @@ class ChartAnalysisNode(Node):
         for i, chart in enumerate(charts, 1):
             chart_id = chart.get("id", f"chart_{i}")
             chart_title = chart.get("title", "")
-            chart_path = chart.get("path", "")
+            chart_path = (
+                chart.get("path")
+                or chart.get("file_path")
+                or chart.get("chart_path")
+                or chart.get("image_path")
+                or ""
+            )
 
             print(f"[ChartAnalysis] [{i}/{len(charts)}] 分析图表: {chart_title}")
 
@@ -2693,7 +2718,8 @@ class ExecuteToolsNode(Node):
         return {
             "tool_name": agent.get("next_tool", ""),
             "blog_data": blog_data,
-            "tool_source": tool_source
+            "tool_source": tool_source,
+            "enhanced_data_path": shared.get("config", {}).get("data_source", {}).get("enhanced_data_path", "")
         }
 
     def exec(self, prep_res):
@@ -2701,6 +2727,7 @@ class ExecuteToolsNode(Node):
         tool_name = prep_res["tool_name"]
         blog_data = prep_res["blog_data"]
         tool_source = prep_res["tool_source"]
+        enhanced_data_path = prep_res.get("enhanced_data_path") or ""
 
         if not tool_name:
             return {"error": "未指定工具名称"}
@@ -2711,6 +2738,12 @@ class ExecuteToolsNode(Node):
         from utils.mcp_client.mcp_client import call_tool
 
         try:
+            # MCP server 是独立子进程：通过环境变量把增强数据路径传给它
+            # 否则 mcp_server.get_blog_data() 会返回空列表，导致“没有可绘制的数据/没有地区数据”等
+            if enhanced_data_path:
+                abs_path = os.path.abspath(enhanced_data_path)
+                os.environ["ENHANCED_DATA_PATH"] = abs_path
+
             # 对于MCP工具，传递正确的服务器路径，不需要传递blog_data，服务器会自动加载
             result = call_tool('utils/mcp_server', tool_name, {})
 
@@ -2720,12 +2753,16 @@ class ExecuteToolsNode(Node):
                 charts = result.get("charts") or []
 
                 # 兼容只有单个路径字段的返回
-                single_path = result.get("chart_path") or result.get("image_path")
+                single_path = result.get("chart_path") or result.get("image_path") or result.get("file_path")
                 if not charts and single_path:
                     charts = [{
                         "id": result.get("chart_id", tool_name),
                         "title": result.get("title", tool_name),
-                        "path": single_path
+                        "path": single_path,
+                        "file_path": single_path,
+                        "type": result.get("type", "unknown"),
+                        "description": result.get("description", ""),
+                        "source_tool": tool_name
                     }]
 
                 # 规范化每个chart的字段
@@ -2733,10 +2770,21 @@ class ExecuteToolsNode(Node):
                 for idx, ch in enumerate(charts):
                     if not isinstance(ch, dict):
                         continue
+                    path = (
+                        ch.get("path")
+                        or ch.get("file_path")
+                        or ch.get("chart_path")
+                        or ch.get("image_path")
+                        or ""
+                    )
                     normalized_charts.append({
                         "id": ch.get("id") or f"{tool_name}_{idx}",
                         "title": ch.get("title") or tool_name,
-                        "path": ch.get("path") or ch.get("chart_path") or ch.get("image_path", "")
+                        "path": path,
+                        "file_path": ch.get("file_path") or path,
+                        "type": ch.get("type") or ch.get("chart_type") or "unknown",
+                        "description": ch.get("description") or "",
+                        "source_tool": ch.get("source_tool") or tool_name
                     })
                 charts = normalized_charts
 
@@ -2925,19 +2973,25 @@ class LoadAnalysisResultsNode(Node):
 
     def prep(self, shared):
         """检查前置条件，准备文件路径"""
+        # 优先检查 shared 中是否有 stage2_results（同一流程中 stage2 刚完成的情况）
+        stage2_results = shared.get("stage2_results", {})
+        has_memory_data = bool(stage2_results.get("charts") or stage2_results.get("chart_analyses") or stage2_results.get("insights"))
+        
         # 检查阶段2输出文件是否存在
         analysis_data_path = "report/analysis_data.json"
         chart_analyses_path = "report/chart_analyses.json"
         insights_path = "report/insights.json"
         images_dir = "report/images/"
 
-        missing_files = []
-        for file_path in [analysis_data_path, chart_analyses_path, insights_path]:
-            if not os.path.exists(file_path):
-                missing_files.append(file_path)
+        # 如果内存中有数据，文件检查可以放宽（images_dir 仍然需要）
+        if not has_memory_data:
+            missing_files = []
+            for file_path in [analysis_data_path, chart_analyses_path, insights_path]:
+                if not os.path.exists(file_path):
+                    missing_files.append(file_path)
 
-        if missing_files:
-            raise FileNotFoundError(f"阶段2输出文件不存在: {missing_files}")
+            if missing_files:
+                raise FileNotFoundError(f"阶段2输出文件不存在: {missing_files}")
 
         if not os.path.exists(images_dir):
             raise FileNotFoundError(f"图表目录不存在: {images_dir}")
@@ -2947,20 +3001,44 @@ class LoadAnalysisResultsNode(Node):
             "chart_analyses_path": chart_analyses_path,
             "insights_path": insights_path,
             "images_dir": images_dir,
-            "enhanced_data_path": shared.get("config", {}).get("data_source", {}).get("enhanced_data_path", "")
+            "enhanced_data_path": shared.get("config", {}).get("data_source", {}).get("enhanced_data_path", ""),
+            "has_memory_data": has_memory_data,
+            "stage2_results": stage2_results
         }
 
     def exec(self, prep_res):
-        """加载分析结果文件"""
-        # 加载主要分析结果
-        with open(prep_res["analysis_data_path"], "r", encoding="utf-8") as f:
-            analysis_data = json.load(f)
+        """加载分析结果，优先从内存读取，否则从文件读取"""
+        # 优先从 shared["stage2_results"] 读取（如果存在）
+        if prep_res.get("has_memory_data"):
+            stage2_results = prep_res["stage2_results"]
+            print("[LoadAnalysisResults] 从内存中加载 stage2 结果")
+            
+            # 从内存数据构建 analysis_data
+            analysis_data = {
+                "charts": stage2_results.get("charts", []),
+                "tables": stage2_results.get("tables", []),
+                "execution_log": stage2_results.get("execution_log", {})
+            }
+            
+            # 从内存数据获取 chart_analyses（可能是字典或列表）
+            chart_analyses = stage2_results.get("chart_analyses", {})
+            if isinstance(chart_analyses, list):
+                # 如果是列表，转换为字典格式
+                chart_analyses = {f"chart_{i}": item for i, item in enumerate(chart_analyses)}
+            
+            # 从内存数据获取 insights
+            insights = stage2_results.get("insights", {})
+        else:
+            # 从文件读取
+            print("[LoadAnalysisResults] 从文件加载 stage2 结果")
+            with open(prep_res["analysis_data_path"], "r", encoding="utf-8") as f:
+                analysis_data = json.load(f)
 
-        with open(prep_res["chart_analyses_path"], "r", encoding="utf-8") as f:
-            chart_analyses = json.load(f)
+            with open(prep_res["chart_analyses_path"], "r", encoding="utf-8") as f:
+                chart_analyses = json.load(f)
 
-        with open(prep_res["insights_path"], "r", encoding="utf-8") as f:
-            insights = json.load(f)
+            with open(prep_res["insights_path"], "r", encoding="utf-8") as f:
+                insights = json.load(f)
 
         # 读取少量博文样本用于典型案例引用
         sample_blogs = []
@@ -3151,17 +3229,19 @@ class FillSectionNode(Node):
         # 构建可用的图片和表格引用字典
         available_charts = {}
         for chart in charts:
-            chart_id = chart['id']
+            chart_id = chart.get("id")
+            if not chart_id:
+                continue
             # 标准化图片路径，确保相对路径可用
             file_path = normalize_path(chart.get('file_path', ''))
             if not file_path.startswith('./images/') and 'images' in file_path:
                 filename = Path(file_path).name
                 file_path = f'./images/{filename}'
             available_charts[chart_id] = {
-                'title': chart['title'],
+                'title': chart.get('title', ''),
                 'file_path': file_path,
-                'description': chart['description'],
-                'type': chart['type']
+                'description': chart.get('description', ''),
+                'type': chart.get('type', 'unknown')
             }
 
         available_tables = {}
@@ -3504,16 +3584,18 @@ class GenerateReportNode(Node):
         # 构建可用的图片和表格引用
         available_charts = {}
         for chart in charts:
-            chart_id = chart['id']
+            chart_id = chart.get("id")
+            if not chart_id:
+                continue
             file_path = normalize_path(chart.get('file_path', ''))
             if not file_path.startswith('./images/') and 'images' in file_path:
                 filename = Path(file_path).name
                 file_path = f'./images/{filename}'
             available_charts[chart_id] = {
-                'title': chart['title'],
+                'title': chart.get('title', ''),
                 'file_path': file_path,
-                'description': chart['description'],
-                'type': chart['type']
+                'description': chart.get('description', ''),
+                'type': chart.get('type', 'unknown')
             }
 
         available_tables = {}
@@ -3948,9 +4030,11 @@ class GenerateFullReportNode(Node):
         # 构建可用的图片和表格引用字典
         available_charts = {}
         for chart in charts:
-            chart_id = chart['id']
+            chart_id = chart.get("id")
+            if not chart_id:
+                continue
             # 标准化图片路径为跨平台兼容的相对路径
-            file_path = normalize_path(chart['file_path'])
+            file_path = normalize_path(chart.get('file_path', ''))
             # 确保图片路径使用统一的相对路径格式
             if not file_path.startswith('./images/') and 'images' in file_path:
                 # 提取文件名并构造标准路径
@@ -3958,10 +4042,10 @@ class GenerateFullReportNode(Node):
                 file_path = f'./images/{filename}'
 
             available_charts[chart_id] = {
-                'title': chart['title'],
+                'title': chart.get('title', ''),
                 'file_path': file_path,
-                'description': chart['description'],
-                'type': chart['type']
+                'description': chart.get('description', ''),
+                'type': chart.get('type', 'unknown')
             }
 
         available_tables = {}

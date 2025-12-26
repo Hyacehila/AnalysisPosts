@@ -20,13 +20,32 @@
         "sub_topic": "交通拥堵"
       },
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众情绪"
+        "parent_topic": "社会民生",
+        "sub_topic": "公共秩序"
       }
     ],
-    "publisher": "自媒体",
-    "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "publisher": "个人用户",
+    "belief_signals": [
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "人为操作失误"
+        ]
+      },
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "担心公共安全"
+        ]
+      },
+      {
+        "category": "行动/政策类",
+        "subcategories": [
+          "呼吁社会关注"
+        ]
+      }
+    ],
+    "publisher_decision": "自媒体"
   },
   {
     "username": "湖内北大王",
@@ -41,12 +60,12 @@
     "sentiment_polarity": 2,
     "sentiment_attribute": [
       "不满",
-      "无奈"
+      "高兴"
     ],
     "topics": [
       {
         "parent_topic": "媒体传播",
-        "sub_topic": "社交媒体"
+        "sub_topic": "网络传播"
       },
       {
         "parent_topic": "民众反应",
@@ -54,8 +73,16 @@
       }
     ],
     "publisher": "学生",
-    "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "belief_signals": [
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "管理不到位",
+          "人为操作失误"
+        ]
+      }
+    ],
+    "publisher_decision": "自媒体"
   },
   {
     "username": "凶狠的平头哥",
@@ -67,7 +94,7 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
-    "sentiment_polarity": 2,
+    "sentiment_polarity": 4,
     "sentiment_attribute": [
       "惊讶",
       "担忧"
@@ -76,15 +103,19 @@
       {
         "parent_topic": "民众反应",
         "sub_topic": "民众情绪"
-      },
-      {
-        "parent_topic": "应急管理",
-        "sub_topic": "安全保障"
       }
     ],
     "publisher": "个人用户",
-    "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "belief_signals": [
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全",
+          "担心公共安全"
+        ]
+      }
+    ],
+    "publisher_decision": "自媒体"
   },
   {
     "username": "六祖终",
@@ -99,22 +130,31 @@
     "sentiment_polarity": 2,
     "sentiment_attribute": [
       "无奈",
-      "不满",
-      "困惑"
+      "不满"
     ],
     "topics": [
       {
         "parent_topic": "民众反应",
         "sub_topic": "民众情绪"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "社交媒体"
       }
     ],
-    "publisher": "学生",
-    "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "publisher": "个人用户",
+    "belief_signals": [
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "管理不到位",
+          "企业/机构责任缺位"
+        ]
+      },
+      {
+        "category": "行动/政策类",
+        "subcategories": [
+          "改善相关行业或系统"
+        ]
+      }
+    ],
+    "publisher_decision": "事件利益相关者"
   },
   {
     "username": "白白数码科技",
@@ -128,17 +168,22 @@
     "image_urls": [],
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "兴奋"
+      "兴奋",
+      "沮丧"
     ],
     "topics": [
       {
-        "parent_topic": "媒体传播",
-        "sub_topic": "新闻报道"
+        "parent_topic": "社会民生",
+        "sub_topic": "居民生活"
+      },
+      {
+        "parent_topic": "民众反应",
+        "sub_topic": "民众情绪"
       }
     ],
-    "publisher": "学生",
+    "publisher": "自媒体",
     "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "publisher_decision": "自媒体"
   },
   {
     "username": "氯豆他定",
@@ -152,8 +197,8 @@
     "image_urls": [],
     "sentiment_polarity": 2,
     "sentiment_attribute": [
-      "不满",
-      "怀疑"
+      "无奈",
+      "不满"
     ],
     "topics": [
       {
@@ -161,8 +206,15 @@
         "sub_topic": "社交媒体"
       }
     ],
-    "publisher": "自媒体",
-    "belief_signals": [],
+    "publisher": "学生",
+    "belief_signals": [
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "管理不到位"
+        ]
+      }
+    ],
     "publisher_decision": "事件旁观者"
   },
   {
@@ -178,22 +230,45 @@
     "sentiment_polarity": 2,
     "sentiment_attribute": [
       "不满",
-      "困惑",
-      "失望"
+      "生气",
+      "担忧"
     ],
     "topics": [
       {
-        "parent_topic": "媒体传播",
-        "sub_topic": "社交媒体"
+        "parent_topic": "民众反应",
+        "sub_topic": "公众关注"
       },
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "网络热议"
+        "parent_topic": "媒体传播",
+        "sub_topic": "舆论引导"
       }
     ],
     "publisher": "自媒体",
-    "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "belief_signals": [
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "事件很严重",
+          "担心自身安全",
+          "社会风险正在增加"
+        ]
+      },
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "管理不到位",
+          "政府监管不力"
+        ]
+      },
+      {
+        "category": "行动/政策类",
+        "subcategories": [
+          "政府应加强监管",
+          "加强公众教育和培训"
+        ]
+      }
+    ],
+    "publisher_decision": "自媒体"
   },
   {
     "username": "用户7878891419",
@@ -213,11 +288,22 @@
     "topics": [
       {
         "parent_topic": "民众反应",
-        "sub_topic": "民众情绪"
+        "sub_topic": "网络热议"
+      },
+      {
+        "parent_topic": "民众反应",
+        "sub_topic": "公众参与"
       }
     ],
     "publisher": "个人用户",
-    "belief_signals": [],
+    "belief_signals": [
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "人为操作失误"
+        ]
+      }
+    ],
     "publisher_decision": "事件旁观者"
   }
 ]
