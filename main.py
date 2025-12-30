@@ -109,6 +109,15 @@ def init_shared(
         "config": {
             # 阶段1: 增强处理方式（对应需求：四维度分析）
             "enhancement_mode": enhancement_mode,   # "async" | "batch_api"
+            # 阶段1: 断点续跑/防中断丢失（默认开启）
+            # - enabled: 是否开启
+            # - save_every: 每完成 N 条就保存一次（设为 1 即“每条都保存”）
+            # - min_interval_seconds: 最小保存间隔（秒），避免过于频繁写盘
+            "stage1_checkpoint": {
+                "enabled": True,
+                "save_every": 100,
+                "min_interval_seconds": 20
+            },
 
             # 阶段2: 分析执行方式（对应需求：分析工具集）
             "analysis_mode": analysis_mode,   # "workflow" | "agent"
@@ -133,6 +142,7 @@ def init_shared(
             # 数据源配置
             "data_source": {
                 "type": data_source_type,
+                "resume_if_exists": True,
                 "enhanced_data_path": output_data_path
             },
 
@@ -400,8 +410,8 @@ def main():
     #
     
     # ----- 数据路径配置 -----
-    INPUT_DATA_PATH = "data/test_posts.json"
-    OUTPUT_DATA_PATH = "data/test_posts_enhenced.json"
+    INPUT_DATA_PATH = "data/posts.json"
+    OUTPUT_DATA_PATH = "data/posts_enhenced.json"
     TOPICS_PATH = "data/topics.json"
     SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
     PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
@@ -414,7 +424,7 @@ def main():
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
     # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2,3]  # 执行阶段2和3（测试用）
+    RUN_STAGES = [1]  # 执行阶段2和3（测试用）
 
     # ----- 阶段1配置 -----
     ENHANCEMENT_MODE = "async"  # "async" | "batch_api"

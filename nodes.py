@@ -274,20 +274,146 @@ class AsyncParallelBatchNode(AsyncNode, BatchNode):
             asyncio.Semaphore(max_concurrent) 
             if max_concurrent else None
         )
+        # === stage1 checkpoint（防断连/防中断丢失）===
+        self._checkpoint_enabled: bool = False
+        self._checkpoint_output_path: str = ""
+        self._checkpoint_save_every: int = 0
+        self._checkpoint_min_interval_seconds: float = 0.0
+        self._checkpoint_last_save_time: float = 0.0
+        self._checkpoint_lock = asyncio.Lock()
+        self._checkpoint_data_ref: Optional[List[Dict[str, Any]]] = None
+
+    def _configure_checkpoint(self, shared: Dict[str, Any], blog_data_ref: List[Dict[str, Any]]) -> None:
+        """
+        从 shared["config"] 读取阶段1的 checkpoint 配置，并绑定需要保存的数据引用。
+
+        支持的配置入口（任选其一）：
+        - shared["config"]["stage1_checkpoint"]
+        - shared["config"]["checkpoint"]["stage1"]
+
+        字段：
+        - enabled: bool，默认 True
+        - save_every: int，每完成 N 条就保存一次，默认 200（想“每条都保存”可设为 1）
+        - min_interval_seconds: float，最小保存间隔（秒），默认 20
+        - output_path: str，覆盖输出路径；默认使用 config.data_source.enhanced_data_path
+        """
+        config = shared.get("config", {})
+        checkpoint_cfg = config.get("stage1_checkpoint")
+        if checkpoint_cfg is None:
+            checkpoint_cfg = (config.get("checkpoint", {}) or {}).get("stage1", {})
+
+        enabled = checkpoint_cfg.get("enabled", True)
+        save_every = checkpoint_cfg.get("save_every", 200)
+        min_interval_seconds = checkpoint_cfg.get("min_interval_seconds", 20)
+        output_path = checkpoint_cfg.get(
+            "output_path",
+            config.get("data_source", {}).get("enhanced_data_path", "data/enhanced_blogs.json"),
+        )
+
+        try:
+            save_every = int(save_every)
+        except Exception:
+            save_every = 200
+        try:
+            min_interval_seconds = float(min_interval_seconds)
+        except Exception:
+            min_interval_seconds = 20.0
+
+        self._checkpoint_enabled = bool(enabled) and bool(output_path) and save_every > 0
+        self._checkpoint_output_path = str(output_path)
+        self._checkpoint_save_every = max(1, save_every)
+        self._checkpoint_min_interval_seconds = max(0.0, min_interval_seconds)
+        self._checkpoint_data_ref = blog_data_ref
+
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        """
+        允许子类在每条 item 完成后，将 result 立刻写回 blog_post（用于 checkpoint 立刻落盘）。
+        默认不做任何事；子类按需 override。
+        """
+        return
+
+    async def _checkpoint_save_async(self, completed: int, total: int, *, force: bool) -> None:
+        if not self._checkpoint_enabled:
+            return
+        if not self._checkpoint_output_path:
+            return
+        if not isinstance(self._checkpoint_data_ref, list):
+            return
+
+        async with self._checkpoint_lock:
+            now = time.time()
+            if (
+                not force
+                and self._checkpoint_min_interval_seconds > 0
+                and (now - self._checkpoint_last_save_time) < self._checkpoint_min_interval_seconds
+            ):
+                return
+
+            ok = await asyncio.to_thread(
+                save_enhanced_blog_data, self._checkpoint_data_ref, self._checkpoint_output_path
+            )
+            if ok:
+                self._checkpoint_last_save_time = now
+                print(f"[Checkpoint] saved {completed}/{total} -> {self._checkpoint_output_path}")
     
     async def _exec(self, items):
-        """执行批量处理，支持并发控制"""
+        """
+        执行批量处理，支持并发控制 + 增量 checkpoint 保存。
+
+        checkpoint 的保存由 apply_item_result() 决定“每条结果如何写回原数据”，
+        写回后按 save_every / min_interval_seconds 规则落盘，避免中断导致丢失已增强结果。
+        """
         if not items:
             return []
-        
-        if self._semaphore:
-            async def sem_exec(item):
-                async with self._semaphore:
-                    return await AsyncNode._exec(self, item)
-            
-            return await asyncio.gather(*(sem_exec(i) for i in items))
-        else:
-            return await asyncio.gather(*(AsyncNode._exec(self, i) for i in items))
+
+        total = len(items)
+        results: List[Any] = [None] * total
+        max_workers = self.max_concurrent or min(200, total)
+        max_workers = max(1, int(max_workers))
+
+        index_queue: asyncio.Queue[Optional[int]] = asyncio.Queue()
+        done_queue: asyncio.Queue[tuple[int, Any, Any]] = asyncio.Queue()
+
+        for idx in range(total):
+            index_queue.put_nowait(idx)
+        for _ in range(max_workers):
+            index_queue.put_nowait(None)
+
+        async def worker():
+            while True:
+                idx = await index_queue.get()
+                if idx is None:
+                    return
+                item = items[idx]
+                # 并发由 worker 数量控制（避免一次性创建 total 个 task）
+                res = await AsyncNode._exec(self, item)
+                await done_queue.put((idx, item, res))
+
+        async def aggregator():
+            completed = 0
+            for _ in range(total):
+                idx, item, res = await done_queue.get()
+                results[idx] = res
+                try:
+                    self.apply_item_result(item, res)
+                except Exception as e:
+                    print(f"[Checkpoint] apply_item_result failed: {e}")
+
+                completed += 1
+                if self._checkpoint_enabled and (completed % self._checkpoint_save_every == 0):
+                    await self._checkpoint_save_async(completed, total, force=False)
+
+            if self._checkpoint_enabled:
+                await self._checkpoint_save_async(completed, total, force=True)
+
+        async with asyncio.TaskGroup() as tg:
+            agg_task = tg.create_task(aggregator())
+            for _ in range(max_workers):
+                tg.create_task(worker())
+
+        # TaskGroup exit indicates aggregator completed successfully (or raised).
+        _ = agg_task.result()
+        return results
 
 
 # =============================================================================
@@ -316,6 +442,7 @@ class DataLoadNode(Node):
         data_paths = shared.get("data", {}).get("data_paths", {})
 
         data_source_type = config.get("data_source", {}).get("type", "original")
+        enhanced_data_path = config.get("data_source", {}).get("enhanced_data_path", "data/enhanced_blogs.json")
 
         if data_source_type == "enhanced":
             enhanced_data_path = config.get("data_source", {}).get(
@@ -329,6 +456,8 @@ class DataLoadNode(Node):
             return {
                 "load_type": "original",
                 "blog_data_path": data_paths.get("blog_data_path", "data/beijing_rainstorm_posts.json"),
+                "enhanced_data_path": enhanced_data_path,
+                "resume_if_exists": config.get("data_source", {}).get("resume_if_exists", True),
                 "topics_path": data_paths.get("topics_path", "data/topics.json"),
                 "sentiment_attributes_path": data_paths.get("sentiment_attributes_path", "data/sentiment_attributes.json"),
                 "publisher_objects_path": data_paths.get("publisher_objects_path", "data/publisher_objects.json"),
@@ -345,8 +474,38 @@ class DataLoadNode(Node):
                 "load_type": "enhanced"
             }
         else:
+            blog_data = load_blog_data(prep_res["blog_data_path"])
+
+            # 如果存在上次运行的增强输出，则优先加载以便断点续跑（按内容/时间/用户抽样校验一致性）
+            enhanced_data_path = prep_res.get("enhanced_data_path")
+            if prep_res.get("resume_if_exists", True) and enhanced_data_path and os.path.exists(enhanced_data_path):
+                try:
+                    enhanced_data = load_enhanced_blog_data(enhanced_data_path)
+
+                    def _same_post(a: Dict[str, Any], b: Dict[str, Any]) -> bool:
+                        for k in ("content", "publish_time", "user_id", "username"):
+                            if a.get(k) != b.get(k):
+                                return False
+                        return True
+
+                    if len(enhanced_data) == len(blog_data) and len(blog_data) > 0:
+                        sample_indices = {0, len(blog_data) // 2, len(blog_data) - 1}
+                        matches = sum(
+                            1 for i in sample_indices
+                            if _same_post(blog_data[i], enhanced_data[i])
+                        )
+                        if matches >= max(1, len(sample_indices) - 1):
+                            blog_data = enhanced_data
+                            print(f"[DataLoad] Resume enabled: loaded existing enhanced data: {enhanced_data_path}")
+                        else:
+                            print(f"[DataLoad] Resume skipped: enhanced file does not match input dataset: {enhanced_data_path}")
+                    else:
+                        print(f"[DataLoad] Resume skipped: enhanced file length mismatch: {enhanced_data_path}")
+                except Exception as e:
+                    print(f"[DataLoad] Resume skipped: failed to load enhanced file: {enhanced_data_path}, err={e}")
+
             return {
-                "blog_data": load_blog_data(prep_res["blog_data_path"]),
+                "blog_data": blog_data,
                 "topics_hierarchy": load_topics(prep_res["topics_path"]),
                 "sentiment_attributes": load_sentiment_attributes(prep_res["sentiment_attributes_path"]),
                 "publisher_objects": load_publisher_objects(prep_res["publisher_objects_path"]),
@@ -769,13 +928,22 @@ class AsyncSentimentPolarityAnalysisBatchNode(AsyncParallelBatchNode):
     - 5: 极度乐观
     """
     
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        if isinstance(item, dict):
+            item["sentiment_polarity"] = result
+
     async def prep_async(self, shared):
         """返回博文数据列表"""
-        return shared.get("data", {}).get("blog_data", [])
+        blog_data = shared.get("data", {}).get("blog_data", [])
+        self._configure_checkpoint(shared, blog_data)
+        return blog_data
     
     async def exec_async(self, prep_res):
         """对单条博文调用多模态LLM进行情感极性分析"""
         blog_post = prep_res
+        existing = blog_post.get("sentiment_polarity")
+        if existing is not None:
+            return existing
 
         prompt = f"""你是社交媒体分析师，请依据下表判断博文整体情感极性：
 - 1=极度悲观，2=悲观，3=中性，4=乐观，5=极度乐观，0=无法判断
@@ -848,10 +1016,16 @@ class AsyncSentimentAttributeAnalysisBatchNode(AsyncParallelBatchNode):
     从预定义情感属性列表中选择1-3个最贴切的属性
     """
     
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        if isinstance(item, dict) and isinstance(item.get("blog_data"), dict):
+            item["blog_data"]["sentiment_attribute"] = result
+
     async def prep_async(self, shared):
         """返回博文和情感属性的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         sentiment_attributes = shared.get("data", {}).get("sentiment_attributes", [])
+
+        self._configure_checkpoint(shared, blog_data)
         
         return [{
             "blog_data": blog_post,
@@ -862,6 +1036,9 @@ class AsyncSentimentAttributeAnalysisBatchNode(AsyncParallelBatchNode):
         """对单条博文调用LLM进行情感属性分析"""
         blog_post = prep_res["blog_data"]
         sentiment_attributes = prep_res["sentiment_attributes"]
+        existing = blog_post.get("sentiment_attribute")
+        if existing is not None:
+            return existing
 
         attributes_str = "、".join(sentiment_attributes)
 
@@ -912,10 +1089,16 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
     从预定义的两层嵌套主题列表中选择1-2个父/子主题组合
     """
     
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        if isinstance(item, dict) and isinstance(item.get("blog_data"), dict):
+            item["blog_data"]["topics"] = result
+
     async def prep_async(self, shared):
         """返回博文和主题层次结构的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         topics_hierarchy = shared.get("data", {}).get("topics_hierarchy", [])
+
+        self._configure_checkpoint(shared, blog_data)
         
         return [{
             "blog_data": blog_post,
@@ -926,6 +1109,9 @@ class AsyncTwoLevelTopicAnalysisBatchNode(AsyncParallelBatchNode):
         """对单条博文调用多模态LLM进行主题匹配"""
         blog_post = prep_res["blog_data"]
         topics_hierarchy = prep_res["topics_hierarchy"]
+        existing = blog_post.get("topics")
+        if existing is not None:
+            return existing
 
         # 构建主题层次结构字符串
         topics_lines = []
@@ -1015,10 +1201,16 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
     政府机构、官方新闻媒体、自媒体、企业账号、个人用户等
     """
     
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        if isinstance(item, dict) and isinstance(item.get("blog_data"), dict):
+            item["blog_data"]["publisher"] = result
+
     async def prep_async(self, shared):
         """返回博文和发布者类型的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         publisher_objects = shared.get("data", {}).get("publisher_objects", [])
+
+        self._configure_checkpoint(shared, blog_data)
         
         return [{
             "blog_data": blog_post,
@@ -1029,6 +1221,9 @@ class AsyncPublisherObjectAnalysisBatchNode(AsyncParallelBatchNode):
         """对单条博文调用LLM进行发布者类型识别"""
         blog_post = prep_res["blog_data"]
         publisher_objects = prep_res["publisher_objects"]
+        existing = blog_post.get("publisher")
+        if existing is not None:
+            return existing
 
         publishers_str = "、".join(publisher_objects)
         username = blog_post.get("username", "") or blog_post.get("user_name", "")
@@ -1074,10 +1269,15 @@ class AsyncBeliefSystemAnalysisBatchNode(AsyncParallelBatchNode):
     """
     信念体系分类识别（多选）
     """
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        if isinstance(item, dict) and isinstance(item.get("blog_data"), dict):
+            item["blog_data"]["belief_signals"] = result if result is not None else []
+
     async def prep_async(self, shared):
         """返回博文和信念系统的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         belief_system = shared.get("data", {}).get("belief_system", [])
+        self._configure_checkpoint(shared, blog_data)
         if not belief_system:
             print(f"[BeliefSystem] 警告: belief_system 数据为空，将跳过LLM调用")
         else:
@@ -1089,6 +1289,9 @@ class AsyncBeliefSystemAnalysisBatchNode(AsyncParallelBatchNode):
 
     async def exec_async(self, prep_res):
         blog_post = prep_res["blog_data"]
+        existing = blog_post.get("belief_signals")
+        if existing is not None:
+            return existing
         belief_system_raw = prep_res["belief_system"]
         belief_system = []
 
@@ -1198,10 +1401,15 @@ class AsyncPublisherDecisionAnalysisBatchNode(AsyncParallelBatchNode):
     """
     发布者事件关联身份分类（四选一）
     """
+    def apply_item_result(self, item: Any, result: Any) -> None:
+        if isinstance(item, dict) and isinstance(item.get("blog_data"), dict):
+            item["blog_data"]["publisher_decision"] = result
+
     async def prep_async(self, shared):
         """返回博文和关联身份分类的组合列表"""
         blog_data = shared.get("data", {}).get("blog_data", [])
         publisher_decisions = shared.get("data", {}).get("publisher_decisions", [])
+        self._configure_checkpoint(shared, blog_data)
         if not publisher_decisions:
             print(f"[PublisherDecision] 警告: publisher_decisions 数据为空，将跳过LLM调用")
         else:
@@ -1213,6 +1421,9 @@ class AsyncPublisherDecisionAnalysisBatchNode(AsyncParallelBatchNode):
 
     async def exec_async(self, prep_res):
         blog_post = prep_res["blog_data"]
+        existing = blog_post.get("publisher_decision")
+        if existing is not None:
+            return existing
         publisher_decisions_raw = prep_res["publisher_decisions"]
         def _clean(text: str) -> str:
             if not isinstance(text, str):

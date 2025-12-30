@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 from typing import List, Dict, Any
 import logging
 
@@ -131,18 +132,31 @@ def save_enhanced_blog_data(enhanced_blog_data: List[Dict[str, Any]], output_pat
         bool: 保存是否成功
     """
     try:
-        # 确保输出目录存在
         output_dir = os.path.dirname(output_path)
         if output_dir and not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
-        
-        # 保存数据
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(enhanced_blog_data, f, ensure_ascii=False, indent=2)
-        
+
+        tmp_fd, tmp_path = tempfile.mkstemp(
+            prefix=".tmp_enhanced_",
+            suffix=".json",
+            dir=output_dir or None
+        )
+        try:
+            with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
+                json.dump(enhanced_blog_data, f, ensure_ascii=False, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+
+            os.replace(tmp_path, output_path)
+        finally:
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except Exception:
+                pass
+
         logger.info(f"成功保存增强博文数据到 {output_path}，共 {len(enhanced_blog_data)} 条记录")
         return True
-        
     except Exception as e:
         logger.error(f"保存增强博文数据失败: {e}")
         return False
