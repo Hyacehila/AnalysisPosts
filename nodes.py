@@ -2320,7 +2320,35 @@ class ExecuteAnalysisScriptNode(Node):
                 "source_tool": "belief_network_chart"
             })
         tools_executed.append("belief_network_chart")
-        
+
+        # 确保已注册工具都被调用（避免遗漏新工具）
+        try:
+            from utils.analysis_tools.tool_registry import TOOL_REGISTRY
+            executed_set = set(tools_executed)
+            for tool_name, tool_def in TOOL_REGISTRY.items():
+                if tool_name in executed_set:
+                    continue
+                params = {}
+                for param_name, spec in (tool_def.get("parameters") or {}).items():
+                    if param_name == "blog_data":
+                        params[param_name] = blog_data
+                    elif "default" in spec:
+                        params[param_name] = spec["default"]
+                result = tool_def["function"](**params)
+                tools_executed.append(tool_name)
+                executed_set.add(tool_name)
+                if isinstance(result, dict) and result.get("charts"):
+                    charts.extend(result["charts"])
+                elif isinstance(result, dict) and "data" in result:
+                    tables.append({
+                        "id": tool_name,
+                        "title": tool_def.get("description", tool_name),
+                        "data": result["data"],
+                        "source_tool": tool_name
+                    })
+        except Exception as e:
+            print(f"[ExecuteAnalysisScript] [!] 自动补齐工具失败: {e}")
+
         execution_time = time.time() - start_time
         
         print(f"\n[ExecuteAnalysisScript] [OK] 分析脚本执行完成")
@@ -2615,7 +2643,9 @@ class LLMInsightNode(Node):
 
 **重要**: 每个洞察都要有明确的数据支撑，不要添加推测性内容。"""
 
-        response = call_glm_45_air(prompt, temperature=0.7)
+        # 使用GLM-4.6推理模型进行综合分析，开启推理模式以获得更好的分析质量
+        # 此任务需要整合大量图表分析结果并生成结构化洞察，GLM-4.6更适合复杂分析任务
+        response = call_glm46(prompt, temperature=0.7, enable_reasoning=True)
 
         # 解析JSON响应
         try:
@@ -2925,12 +2955,18 @@ class ExecuteToolsNode(Node):
         agent = shared.get("agent", {})
         blog_data = shared.get("data", {}).get("blog_data", [])
         tool_source = agent.get("tool_source", "mcp")
+        enhanced_data_path = shared.get("config", {}).get("data_source", {}).get("enhanced_data_path", "")
+        
+        if not enhanced_data_path:
+            print(f"[ExecuteTools] 警告: enhanced_data_path 在 prep 中为空")
+        else:
+            print(f"[ExecuteTools] prep: enhanced_data_path={enhanced_data_path}")
 
         return {
             "tool_name": agent.get("next_tool", ""),
             "blog_data": blog_data,
             "tool_source": tool_source,
-            "enhanced_data_path": shared.get("config", {}).get("data_source", {}).get("enhanced_data_path", "")
+            "enhanced_data_path": enhanced_data_path
         }
 
     def exec(self, prep_res):
@@ -2950,10 +2986,19 @@ class ExecuteToolsNode(Node):
 
         try:
             # MCP server 是独立子进程：通过环境变量把增强数据路径传给它
-            # 否则 mcp_server.get_blog_data() 会返回空列表，导致“没有可绘制的数据/没有地区数据”等
+            # 否则 mcp_server.get_blog_data() 会返回空列表，导致"没有可绘制的数据/没有地区数据"等
+            # 优先使用 prep_res 中的路径，如果为空则使用环境变量中的路径
             if enhanced_data_path:
                 abs_path = os.path.abspath(enhanced_data_path)
                 os.environ["ENHANCED_DATA_PATH"] = abs_path
+                print(f"[ExecuteTools] 设置 ENHANCED_DATA_PATH={abs_path}")
+            else:
+                # 如果没有从 prep_res 获取到路径，尝试从环境变量获取
+                env_path = os.environ.get("ENHANCED_DATA_PATH")
+                if env_path:
+                    print(f"[ExecuteTools] 使用环境变量中的 ENHANCED_DATA_PATH={env_path}")
+                else:
+                    print(f"[ExecuteTools] 警告: enhanced_data_path 为空，环境变量中也未设置，可能导致数据加载失败")
 
             # 对于MCP工具，传递正确的服务器路径，不需要传递blog_data，服务器会自动加载
             result = call_tool('utils/mcp_server', tool_name, {})
@@ -3050,17 +3095,25 @@ class ExecuteToolsNode(Node):
         tool_name = exec_res["tool_name"]
         tool_source = exec_res["tool_source"]
         result = exec_res.get("result", {})
+        result_payload = result
+        if isinstance(result, dict):
+            if isinstance(result.get("result"), dict):
+                result_payload = result["result"]
+            elif isinstance(result.get("data"), dict) and (
+                "charts" in result["data"] or "summary" in result["data"]
+            ):
+                result_payload = result["data"]
 
         # 记录执行的工具
         shared["stage2_results"]["execution_log"]["tools_executed"].append(tool_name)
 
         # 处理错误情况
-        if "error" in result:
-            print(f"  [X] 工具执行失败: {result['error']}")
+        if "error" in result_payload:
+            print(f"  [X] 工具执行失败: {result_payload['error']}")
             # 存储失败结果
             shared["agent"]["last_tool_result"] = {
                 "tool_name": tool_name,
-                "summary": f"工具执行失败: {result['error']}",
+                "summary": f"工具执行失败: {result_payload['error']}",
                 "has_chart": False,
                 "has_data": False,
                 "error": True
@@ -3068,16 +3121,16 @@ class ExecuteToolsNode(Node):
             return "default"
 
         # 处理图表
-        if result.get("charts"):
-            shared["stage2_results"]["charts"].extend(result["charts"])
-            print(f"  [OK] 生成 {len(result['charts'])} 个图表")
+        if result_payload.get("charts"):
+            shared["stage2_results"]["charts"].extend(result_payload["charts"])
+            print(f"  [OK] 生成 {len(result_payload['charts'])} 个图表")
 
         # 处理数据表格
-        if result.get("data"):
+        if result_payload.get("data"):
             shared["stage2_results"]["tables"].append({
                 "id": tool_name,
-                "title": result.get("category", "") + " - " + tool_name,
-                "data": result["data"],
+                "title": result_payload.get("category", "") + " - " + tool_name,
+                "data": result_payload["data"],
                 "source_tool": tool_name,
                 "source_type": tool_source  # 记录数据来源
             })
@@ -3087,9 +3140,9 @@ class ExecuteToolsNode(Node):
         shared["agent"]["last_tool_result"] = {
             "tool_name": tool_name,
             "tool_source": tool_source,
-            "summary": result.get("summary", "执行完成"),
-            "has_chart": bool(result.get("charts")),
-            "has_data": bool(result.get("data")),
+            "summary": result_payload.get("summary", "执行完成"),
+            "has_chart": bool(result_payload.get("charts")),
+            "has_data": bool(result_payload.get("data")),
             "error": False
         }
 

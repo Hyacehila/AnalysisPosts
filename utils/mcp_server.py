@@ -73,13 +73,6 @@ def get_blog_data():
     if env_path:
         candidates.append(env_path)
 
-    # 兜底：常见默认路径（避免未设置 ENHANCED_DATA_PATH 时 MCP 工具全部“无数据”）
-    candidates.extend([
-        "data/enhanced_blogs.json",
-        "data/test_posts_enhenced.json",
-        "data/test_posts_enhanced.json",
-    ])
-
     # 去重但保持顺序
     seen = set()
     candidates = [p for p in candidates if p and not (p in seen or seen.add(p))]

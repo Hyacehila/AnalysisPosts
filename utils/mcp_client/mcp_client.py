@@ -7,11 +7,22 @@ import asyncio
 import os
 from typing import List, Dict, Any, Optional
 from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+from mcp.client.stdio import stdio_client, get_default_environment
 import json
 
 # 全局标志控制是否使用MCP
 USE_MCP = False
+
+def _build_mcp_env() -> dict:
+    """Extend MCP's default safe env with data path needed by mcp_server."""
+    env = get_default_environment()
+    enhanced_path = os.environ.get("ENHANCED_DATA_PATH")
+    if enhanced_path:
+        env["ENHANCED_DATA_PATH"] = enhanced_path
+        print(f"[MCP Client] _build_mcp_env: 设置 ENHANCED_DATA_PATH={enhanced_path}")
+    else:
+        print(f"[MCP Client] _build_mcp_env: 警告 - ENHANCED_DATA_PATH 环境变量未设置")
+    return env
 
 def set_mcp_mode(use_mcp: bool):
     """设置MCP模式"""
@@ -35,7 +46,8 @@ async def mcp_get_tools(server_script_path: str = "utils.mcp_server") -> List[Di
 
         server_params = StdioServerParameters(
             command="python",
-            args=[server_script_path]
+            args=[server_script_path],
+            env=_build_mcp_env()
         )
 
         async with stdio_client(server_params) as (read, write):
@@ -74,7 +86,8 @@ async def mcp_call_tool(server_script_path: str, tool_name: str, arguments: Dict
 
         server_params = StdioServerParameters(
             command="python",
-            args=[server_script_path]
+            args=[server_script_path],
+            env=_build_mcp_env()
         )
 
         async with stdio_client(server_params) as (read, write):
