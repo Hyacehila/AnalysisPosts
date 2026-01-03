@@ -2643,9 +2643,43 @@ class LLMInsightNode(Node):
 
 **重要**: 每个洞察都要有明确的数据支撑，不要添加推测性内容。"""
 
-        # 使用GLM-4.6推理模型进行综合分析，开启推理模式以获得更好的分析质量
-        # 此任务需要整合大量图表分析结果并生成结构化洞察，GLM-4.6更适合复杂分析任务
-        response = call_glm46(prompt, temperature=0.7, enable_reasoning=True)
+        # 优先使用GLM-4.6推理模型进行综合分析，开启推理模式以获得更好的分析质量
+        # 如果GLM-4.6失败（如并发限制），自动回退到GLM-4.5-air
+        response = None
+        use_fallback = False
+        
+        try:
+            response = call_glm46(prompt, temperature=0.7, enable_reasoning=True)
+        except Exception as e:
+            error_msg = str(e)
+            # 检测是否是并发限制或其他可恢复的错误，回退到glm-4.5-air
+            # 429: 并发限制；concurrency: 并发相关错误；调用glm4.6模型失败: 通用失败
+            is_recoverable_error = (
+                "429" in error_msg or 
+                "concurrency" in error_msg.lower() or 
+                "调用glm4.6模型失败" in error_msg or
+                "rate limit" in error_msg.lower() or
+                "API并发限制" in error_msg
+            )
+            
+            if is_recoverable_error:
+                print(f"[LLMInsight] GLM-4.6调用失败: {error_msg}")
+                print(f"[LLMInsight] 回退到GLM-4.5-air模型...")
+                try:
+                    # 使用glm-4.5-air，增加超时时间以适应长prompt
+                    response = call_glm_45_air(prompt, temperature=0.7, timeout=120)
+                    use_fallback = True
+                    print(f"[LLMInsight] ✓ 已成功使用GLM-4.5-air生成洞察")
+                except Exception as fallback_error:
+                    # 如果回退也失败，抛出详细的错误信息
+                    raise Exception(
+                        f"GLM-4.6和GLM-4.5-air都调用失败。\n"
+                        f"GLM-4.6错误: {error_msg}\n"
+                        f"GLM-4.5-air错误: {str(fallback_error)}"
+                    )
+            else:
+                # 其他类型的错误直接抛出，不进行回退
+                raise
 
         # 解析JSON响应
         try:

@@ -14,6 +14,7 @@ import os
 import json
 import base64
 import threading
+import time
 from typing import List, Dict, Any, Optional, Union
 from zai import ZaiClient
 
@@ -209,7 +210,8 @@ def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None,
 
 
 def call_glm46(prompt: str, temperature: float = 0.8, 
-               max_tokens: Optional[int] = None, enable_reasoning: bool = True) -> str:
+               max_tokens: Optional[int] = None, enable_reasoning: bool = True,
+               max_retries: int = 3, retry_delay: int = 5) -> str:
     """
     调用glm4.6智能体推理模型
     
@@ -218,33 +220,56 @@ def call_glm46(prompt: str, temperature: float = 0.8,
         temperature: 温度参数，控制随机性
         max_tokens: 最大生成token数
         enable_reasoning: 是否开启推理模式
+        max_retries: 最大重试次数（遇到429错误时），默认3次
+        retry_delay: 重试延迟时间（秒），默认5秒
         
     Returns:
         模型生成的文本响应
     """
-    try:
-        client = get_client()  # 创建新的客户端实例
-        
-        messages = [
-            {"role": "user", "content": prompt}
-        ]
-        
-        params = {
-            "model": "glm-4.6",
-            "messages": messages,
-            "temperature": temperature,
-            "stream": False
-        }
-        
-        if max_tokens:
-            params["max_tokens"] = max_tokens
-        
-        # glm4.6开启推理模式的参数设置
-        if enable_reasoning:
-            params["thinking"] = {"enabled": True}
-        
-        response = client.chat.completions.create(**params)
-        return response.choices[0].message.content
-        
-    except Exception as e:
-        raise Exception(f"调用glm4.6模型失败: {str(e)}")
+    last_error = None
+    
+    for attempt in range(max_retries):
+        try:
+            client = get_client()  # 创建新的客户端实例
+            
+            messages = [
+                {"role": "user", "content": prompt}
+            ]
+            
+            params = {
+                "model": "glm-4.6",
+                "messages": messages,
+                "temperature": temperature,
+                "stream": False
+            }
+            
+            if max_tokens:
+                params["max_tokens"] = max_tokens
+            
+            # glm4.6开启推理模式的参数设置
+            if enable_reasoning:
+                params["thinking"] = {"enabled": True}
+            
+            response = client.chat.completions.create(**params)
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            last_error = e
+            error_msg = str(e)
+            
+            # 检查是否是429并发限制错误
+            if "429" in error_msg or "concurrency" in error_msg.lower() or "rate" in error_msg.lower():
+                if attempt < max_retries - 1:
+                    # 指数退避：第1次等5秒，第2次等10秒，第3次等15秒
+                    delay = retry_delay * (attempt + 1)
+                    print(f"[call_glm46] API并发限制，等待 {delay} 秒后重试 (尝试 {attempt + 1}/{max_retries})...")
+                    time.sleep(delay)
+                    continue
+                else:
+                    raise Exception(f"API并发限制，已重试 {max_retries} 次仍失败: {error_msg}")
+            else:
+                # 其他错误直接抛出
+                raise Exception(f"调用glm4.6模型失败: {error_msg}")
+    
+    # 如果所有重试都失败
+    raise Exception(f"调用glm4.6模型失败（已重试{max_retries}次）: {str(last_error)}")
