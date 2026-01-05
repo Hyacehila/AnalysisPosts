@@ -84,10 +84,102 @@ from typing import List, Dict, Any, Optional
 from pocketflow import Node, BatchNode, AsyncNode, AsyncBatchNode
 from utils.call_llm import call_glm_45_air, call_glm4v_plus, call_glm45v_thinking, call_glm46
 from utils.data_loader import (
-    load_blog_data, load_topics, load_sentiment_attributes, 
+    load_blog_data, load_topics, load_sentiment_attributes,
     load_publisher_objects, save_enhanced_blog_data, load_enhanced_blog_data,
     load_belief_system, load_publisher_decisions
 )
+
+def _strip_timestamp_suffix(stem: str) -> str:
+    return re.sub(r"_\\d{8}_\\d{6}$", "", stem)
+
+def _build_chart_path_index(charts):
+    allowed_paths = set()
+    alias_to_path = {}
+
+    for chart in charts or []:
+        file_path = (
+            chart.get("file_path")
+            or chart.get("path")
+            or chart.get("chart_path")
+            or chart.get("image_path")
+            or ""
+        )
+        if not file_path:
+            continue
+        filename = Path(file_path).name
+        if not filename:
+            continue
+        rel_path = f"./images/{filename}"
+        allowed_paths.add(rel_path)
+
+        stem = Path(filename).stem
+        base = _strip_timestamp_suffix(stem)
+        if base:
+            alias_to_path.setdefault(base, rel_path)
+
+        source_tool = chart.get("source_tool") or ""
+        if source_tool:
+            tool_alias = source_tool.replace("_chart", "").replace("generate_", "")
+            alias_to_path.setdefault(tool_alias, rel_path)
+
+    return allowed_paths, alias_to_path
+
+_MANUAL_IMAGE_ALIAS = {
+    "sentiment_timeseries": "sentiment_trend",
+    "sentiment_distribution": "sentiment_pie",
+    "geographic_distribution": "geographic_bar",
+    "geographic_hotspot": "geographic_heatmap",
+    "publisher_distribution": "publisher_bar",
+    "topic_frequency": "topic_ranking",
+    "topic_cooccurrence": "topic_network",
+    "geographic_sentiment": "geographic_sentiment_bar",
+    "generate_sentiment_focus_window_chart": "sentiment_focus_window",
+    "belief_network_chart": "belief_network",
+    "influence_analysis": "publisher_bar",
+}
+
+def _remap_report_images(content, charts):
+    if not content or not charts:
+        return content
+
+    allowed_paths, alias_to_path = _build_chart_path_index(charts)
+    if not allowed_paths:
+        return content
+
+    def _replace(match):
+        alt_text = match.group(1)
+        raw_path = match.group(2).strip()
+        clean_path = raw_path.replace("\\\\", "/")
+        filename = Path(clean_path).name
+        rel_path = f"./images/{filename}" if filename else clean_path
+
+        if rel_path in allowed_paths:
+            return f"![{alt_text}]({rel_path})"
+
+        stem = Path(filename).stem if filename else Path(clean_path).stem
+        target_path = alias_to_path.get(stem)
+        if not target_path:
+            alias = _MANUAL_IMAGE_ALIAS.get(stem)
+            if alias:
+                target_path = alias_to_path.get(alias)
+        if not target_path:
+            for alias_key, alias_path in alias_to_path.items():
+                if alias_key and (alias_key in stem or stem in alias_key):
+                    target_path = alias_path
+                    break
+        if not target_path:
+            target_path = sorted(allowed_paths)[0]
+
+        return f"![{alt_text}]({target_path})"
+
+    return re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", _replace, content)
+
+def _load_analysis_charts():
+    try:
+        with open("report/analysis_data.json", "r", encoding="utf-8") as f:
+            return json.load(f).get("charts", [])
+    except Exception:
+        return []
 
 
 # =============================================================================
@@ -3273,7 +3365,21 @@ class LoadAnalysisResultsNode(Node):
         """检查前置条件，准备文件路径"""
         # 优先检查 shared 中是否有 stage2_results（同一流程中 stage2 刚完成的情况）
         stage2_results = shared.get("stage2_results", {})
-        has_memory_data = bool(stage2_results.get("charts") or stage2_results.get("chart_analyses") or stage2_results.get("insights"))
+        completed_stages = shared.get("dispatcher", {}).get("completed_stages", [])
+        insights = stage2_results.get("insights", {})
+        if isinstance(insights, dict):
+            has_insights = any(bool(value) for value in insights.values())
+        else:
+            has_insights = bool(insights)
+        has_memory_data = (
+            2 in completed_stages and
+            bool(
+                stage2_results.get("charts") or
+                stage2_results.get("chart_analyses") or
+                stage2_results.get("tables") or
+                has_insights
+            )
+        )
         
         # 检查阶段2输出文件是否存在
         analysis_data_path = "report/analysis_data.json"
@@ -3398,6 +3504,10 @@ class FormatReportNode(Node):
 
         for old_path, new_path in path_replacements:
             formatted_content = formatted_content.replace(old_path, new_path)
+
+        analysis_charts = _load_analysis_charts()
+        if analysis_charts:
+            formatted_content = _remap_report_images(formatted_content, analysis_charts)
 
         # 添加目录（如果还没有）
         if "# 目录" not in formatted_content and "## 目录" not in formatted_content:
@@ -4456,6 +4566,8 @@ class GenerateFullReportNode(Node):
 
         for old_path, new_path in path_replacements:
             response = response.replace(old_path, new_path)
+
+        response = _remap_report_images(response, charts)
 
         return response
 

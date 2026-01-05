@@ -181,7 +181,7 @@ def call_tool(server_script_path: str, tool_name: str, arguments: Optional[Dict[
 def _get_local_tools() -> List[Dict[str, Any]]:
     """获取本地工具列表"""
     try:
-        from .analysis_tools import get_all_tools
+        from utils.analysis_tools import get_all_tools
         return get_all_tools()
     except ImportError as e:
         print(f"[MCP Client] 无法导入本地工具: {str(e)}")
@@ -190,7 +190,7 @@ def _get_local_tools() -> List[Dict[str, Any]]:
 def _call_local_tool(tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
     """调用本地工具"""
     try:
-        from .analysis_tools import execute_tool
+        from utils.analysis_tools import execute_tool
         result = execute_tool(tool_name, [])
         return result
     except Exception as e:

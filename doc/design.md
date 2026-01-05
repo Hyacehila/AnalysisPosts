@@ -13,9 +13,9 @@
 
 ### 核心特性
 - **三阶段解耦**：增强处理、分析执行、报告生成三阶段独立运行
-- **多维度分析**：情感极性、情感属性、主题分类、发布者识别
+- **多维度分析**：情感极性、情感属性、主题分类、发布者识别、信念体系、发布者决策/身份分类
 - **多路径执行**：每阶段支持多种执行方式（异步/Batch API、Agent/Workflow、模板/迭代）
-- **大规模处理**：支持3万条博文数据的批量处理
+- **大规模处理**：支持万级博文数据的批量处理（规模取决于配置与资源）
 - **多模态支持**：文本与图像内容的综合分析
 - **全流程监测**：实时输出系统运行状态，提供详细的执行日志和进度提示
 - **思考过程记录**：记录LLM在工具调用决策和报告编排中的思考过程，支持终端实时提示和持久化存储
@@ -52,9 +52,9 @@
 ### 核心需求 - 三阶段解耦架构
 
 #### 阶段1: 原始博文增强处理
-**功能描述**：为每个博文添加四个维度的分析信息，支持独立运行
+**功能描述**：为每个博文添加多维度的分析信息，支持独立运行
 
-**四维度分析**：
+**多维度分析**：
 - **情感极性分析**：1-5档情感分级
   - 1-极度悲观，2-悲观，3-无明显极性，4-乐观，5-极度乐观
 - **情感属性分析**：具体情感状态识别
@@ -62,6 +62,8 @@
 - **两级主题分析**：从预定义的两层嵌套主题列表中选择合适主题
 - **发布者对象分析**：识别发布者类型
   - 政府机构、官方新闻媒体、自媒体、企业账号、个人用户等
+- **信念体系分析**：识别博文涉及的信念类别与子类
+- **发布者决策/身份分类**：对发布者的事件关联身份进行分类
 
 **执行路径**：
 - **异步批量并行**：本地代码并发调用API，适合中小规模数据
@@ -90,6 +92,10 @@
 - `sentiment_anomaly_detection`：情感异常点检测（突变、峰值识别）
 - `sentiment_trend_chart`：情感趋势折线图/面积图生成
 - `sentiment_pie_chart`：情感分布饼图生成
+- `sentiment_bucket_trend_chart`：正/负/中性情绪桶趋势图生成
+- `sentiment_attribute_trend_chart`：情感属性热度趋势图生成
+- `sentiment_focus_window_chart`：焦点窗口情绪趋势图生成
+- `sentiment_focus_publisher_chart`：焦点窗口发布者情绪趋势图生成
 
 ##### 2.2 主题演化分析工具集
 主题热度变化和关联分析，包含以下工具函数：
@@ -98,6 +104,9 @@
 - `topic_cooccurrence_analysis`：主题共现关联分析（主题间关系）
 - `topic_ranking_chart`：主题热度排行柱状图生成
 - `topic_evolution_chart`：主题演化时序图生成
+- `topic_focus_evolution_chart`：主题焦点演化趋势图生成
+- `topic_keyword_trend_chart`：主题关键词热度趋势图生成
+- `topic_focus_distribution_chart`：焦点窗口主题分布趋势图生成
 - `topic_network_chart`：主题关联网络图生成
 
 ##### 2.3 地理分布分析工具集
@@ -107,6 +116,9 @@
 - `geographic_sentiment_analysis`：地区情感差异分析
 - `geographic_heatmap`：地理热力图生成
 - `geographic_bar_chart`：地区分布柱状图生成
+- `geographic_sentiment_bar_chart`：地区情感对比柱状图生成
+- `geographic_topic_heatmap`：地区×主题热力图生成
+- `geographic_temporal_heatmap`：地区×时间热力图生成
 
 ##### 2.4 多维交互分析工具集
 情感、主题、地理、发布者多维度交叉分析，包含以下工具函数：
@@ -116,6 +128,11 @@
 - `correlation_analysis`：维度相关性分析
 - `interaction_heatmap`：交互热力图生成
 - `publisher_bar_chart`：发布者分布柱状图生成
+- `publisher_sentiment_bucket_chart`：发布者×情绪桶堆叠图生成
+- `publisher_topic_distribution_chart`：发布者×主题分布堆叠图生成
+- `participant_trend_chart`：新增/累计参与用户趋势图生成
+- `publisher_focus_distribution_chart`：焦点窗口发布者分布趋势图生成
+- `belief_network_chart`：信念体系关联网络图生成
 
 #### 阶段3: 报告生成
 **功能描述**：综合分析结果，生成结构化的Markdown报告，支持独立运行
@@ -137,7 +154,7 @@
 
 **独立执行前提**：
 - 每个阶段独立执行的前提是：**前序阶段已完成并将数据存储到指定位置**
-- 阶段2独立执行：需要阶段1输出的增强数据（`data/enhanced_posts.json`）
+- 阶段2独立执行：需要阶段1输出的增强数据（`data/enhanced_blogs.json`）
 - 阶段3独立执行：需要阶段2输出的分析结果（`report/` 目录下的图表和数据）
 
 **运行模式**：
@@ -147,7 +164,7 @@
 - **报告生成Flow**：仅运行阶段3（需要已有分析结果）
 
 #### 大规模处理能力
-**处理能力**：支持3万条博文数据的高效处理
+**处理能力**：支持万级博文数据的高效处理（规模取决于并发与批处理配置）
 
 **实现方式**：通过在原始数据字典中附加新字段实现信息增强
 
@@ -158,8 +175,8 @@
 - **多路径执行**：每个阶段支持多种执行方式，通过shared字典中的参数控制
 - **独立执行**：各阶段可独立运行，前提是前序阶段已完成并存储数据到指定位置
 - **前置检查**：阶段2/3独立执行前需检查前序阶段输出文件是否存在
-- **并行处理**：阶段1中四个分析维度完全并行，无先后顺序
-- **模型调用**：所有分析通过多模态语言模型API调用进行
+- **并行处理**：阶段1节点按顺序执行，节点内部通过 `AsyncParallelBatchNode` 并发处理
+- **模型调用**：阶段1增强与阶段3报告主要依赖LLM；阶段2以本地分析工具为主，LLM用于图表解读与洞察补充
 - **阶段数据隔离**：阶段3仅使用阶段2的分析结果和少量博文样本，不直接处理全量增强数据
 
 #### 多路径执行架构
@@ -290,9 +307,9 @@ flowchart TB
 - **灵活配置**：支持配置起始阶段和执行阶段列表
 
 #### 2. 三阶段顺序依赖（与需求分析完全对应）
-- **阶段1 - 原始博文增强处理**：为博文添加情感、主题、发布者等维度标注
-  - 对应需求："阶段1: 原始博文增强处理 - 四维度分析"
-  - 输出：`data/enhanced_posts.json`
+- **阶段1 - 原始博文增强处理**：为博文添加情感、主题、发布者、信念体系等多维度标注
+  - 对应需求："阶段1: 原始博文增强处理 - 多维度分析"
+  - 输出：`data/enhanced_blogs.json`
 - **阶段2 - 分析执行**：基于增强数据执行深度分析，生成图表、表格和洞察
   - 对应需求："阶段2: 分析执行 - 分析工具集"
   - 输出：`report/analysis_data.json`、`report/insights.json`、`report/images/`
@@ -334,7 +351,7 @@ flowchart TB
 
 > Notes for AI:
 > 1. 系统采用三阶段解耦架构，与需求分析中定义的三阶段完全对应
-> 2. 阶段1(增强处理)对应需求中的"四维度分析"
+> 2. 阶段1(增强处理)对应需求中的"多维度分析"
 > 3. 阶段2(分析执行)对应需求中的"分析工具集"  
 > 4. 阶段3(报告生成)对应需求中的"报告输出"
 > 5. 每个阶段支持多种执行路径，通过shared["config"]参数控制
@@ -424,7 +441,9 @@ flowchart TD
         async_sentiment_polarity --> async_sentiment_attribute[AsyncSentimentAttributeAnalysisBatchNode<br/>情感属性分析]
         async_sentiment_attribute --> async_topic[AsyncTwoLevelTopicAnalysisBatchNode<br/>两级主题分析]
         async_topic --> async_publisher[AsyncPublisherObjectAnalysisBatchNode<br/>发布者对象分析]
-        async_publisher --> async_save[SaveEnhancedDataNode<br/>保存增强数据]
+        async_publisher --> async_belief[AsyncBeliefSystemAnalysisBatchNode<br/>信念体系分析]
+        async_belief --> async_publisher_decision[AsyncPublisherDecisionAnalysisBatchNode<br/>发布者决策分析]
+        async_publisher_decision --> async_save[SaveEnhancedDataNode<br/>保存增强数据]
         async_save --> async_validate[DataValidationAndOverviewNode<br/>验证与统计]
         async_validate --> async_complete[Stage1CompletionNode<br/>阶段完成]
         async_complete --> async_end[结束]
@@ -434,9 +453,11 @@ flowchart TD
     style async_sentiment_attribute fill:#e3f2fd
     style async_topic fill:#e3f2fd
     style async_publisher fill:#e3f2fd
+    style async_belief fill:#e3f2fd
+    style async_publisher_decision fill:#e3f2fd
 ```
 
-> **说明**：四个异步分析节点顺序执行，每个节点内部使用 `AsyncParallelBatchNode` 实现批量并发处理。各节点的 `post_async` 方法直接将分析结果写入博文对象，无需单独的合并节点。
+> **说明**：六个异步分析节点顺序执行，每个节点内部使用 `AsyncParallelBatchNode` 实现批量并发处理。各节点的 `post_async` 方法直接将分析结果写入博文对象，无需单独的合并节点。
 
 ##### 1.2 Batch API并行处理路径 (enhancement_mode="batch_api")
 
@@ -559,9 +580,9 @@ flowchart TD
 |---------------|------|----------|------|------------|
 | AsyncEnhancementFlow | 阶段1 | Flow | 异步批量并行处理 | `stage1_async` |
 | BatchAPIFlow | 阶段1 | Flow | Batch API并行处理 | `stage1_batch_api` |
-| WorkflowAnalysisNode | 阶段2 | Node | 固定脚本分析 | `stage2_workflow` |
+| WorkflowAnalysisFlow | 阶段2 | Flow | 固定脚本分析 | `stage2_workflow` |
 | AgentAnalysisFlow | 阶段2 | Flow | LLM自主分析 | `stage2_agent` |
-| TemplateReportNode | 阶段3 | Node | 模板填充报告 | `stage3_template` |
+| TemplateReportFlow | 阶段3 | Flow | 模板填充报告 | `stage3_template` |
 | IterativeReportFlow | 阶段3 | Flow | 多轮迭代报告 | `stage3_iterative` |
 
 #### Flow编排优势
@@ -607,6 +628,8 @@ flowchart TD
 | LLM调用 | `utils/call_llm.py` | 封装多种模型调用（GLM4.5V+思考模式用于图文综合分析、纯文本分析等） |
 | 数据加载 | `utils/data_loader.py` | 博文数据、参考数据的加载与保存 |
 | 分析工具 | `utils/analysis_tools/` | 四类分析工具集的具体实现（通过MCP服务器暴露） |
+| MCP服务 | `utils/mcp_server.py` | 将分析工具注册为MCP接口 |
+| MCP客户端 | `utils/mcp_client/mcp_client.py` | 动态发现与调用MCP工具 |
 | MCP客户端 | `utils/mcp_client.py` | MCP协议客户端，用于工具发现和调用 |
 | 系统监测 | `utils/monitor.py` | 系统运行状态监测和日志输出 |
 | 思考记录 | `utils/thinking_logger.py` | LLM思考过程记录和终端提示 |
@@ -625,6 +648,16 @@ shared = {
         "topics_hierarchy": [],        # 主题层次结构（从data/topics.json加载）
         "sentiment_attributes": [],    # 情感属性列表（从data/sentiment_attributes.json加载）
         "publisher_objects": [],       # 发布者类型列表（从data/publisher_objects.json加载）
+        "belief_system": [],           # 信念体系分类（从data/believe_system_common.json加载）
+        "publisher_decisions": [],     # 事件关联身份分类（从data/publisher_decision.json加载）
+        "data_paths": {                # 数据路径配置
+            "blog_data_path": "data/posts.json",
+            "topics_path": "data/topics.json",
+            "sentiment_attributes_path": "data/sentiment_attributes.json",
+            "publisher_objects_path": "data/publisher_objects.json",
+            "belief_system_path": "data/believe_system_common.json",
+            "publisher_decision_path": "data/publisher_decision.json"
+        }
     },
     
     # === 调度控制（DispatcherNode使用） ===
@@ -633,13 +666,18 @@ shared = {
         "run_stages": [1, 2, 3],       # 需要执行的阶段列表
         "current_stage": 0,            # 当前执行到的阶段（0表示未开始）
         "completed_stages": [],        # 已完成的阶段列表
-        "next_action": "stage1"        # 下一步动作：stage1 | stage2 | stage3 | done
+        "next_action": "stage1_async"  # 下一步动作：stage1_async | stage1_batch_api | stage2_workflow | stage2_agent | stage3_template | stage3_iterative | done
     },
     
     # === 三阶段路径控制（对应需求分析中的三阶段架构） ===
     "config": {
-        # 阶段1: 增强处理方式（对应需求：四维度分析）
+        # 阶段1: 增强处理方式（对应需求：多维度分析）
         "enhancement_mode": "async",   # "async" | "batch_api"
+        "stage1_checkpoint": {         # 阶段1断点续跑配置
+            "enabled": True,
+            "save_every": 100,
+            "min_interval_seconds": 20
+        },
         
         # 阶段2: 分析执行方式（对应需求：分析工具集）
         "analysis_mode": "workflow",   # "workflow" | "agent"
@@ -656,6 +694,18 @@ shared = {
         # 阶段3 迭代报告配置
         "iterative_report_config": {
             "max_iterations": 10,
+        },
+        # 数据源与Batch API配置
+        "data_source": {
+            "type": "original",
+            "resume_if_exists": True,
+            "enhanced_data_path": "data/enhanced_blogs.json"
+        },
+        "batch_api_config": {
+            "script_path": "batch/batch_run.py",
+            "input_path": "data/posts.json",
+            "output_path": "data/enhanced_blogs.json",
+            "wait_for_completion": True
         }
     },
     
@@ -686,7 +736,9 @@ shared = {
                 "sentiment_polarity_empty": 0,
                 "sentiment_attribute_empty": 0,
                 "topics_empty": 0,
-                "publisher_empty": 0
+                "publisher_empty": 0,
+                "belief_system_empty": 0,
+                "publisher_decision_empty": 0
             },
             "engagement_statistics": {      # 参与度统计
                 "total_reposts": 0,
@@ -881,7 +933,7 @@ shared = {
 
 | 阶段 | shared字典存储 | 文件持久化 | 说明 |
 |------|---------------|-----------|------|
-| 阶段1 | `shared["stage1_results"]` | `data/enhanced_posts.json` | 增强博文数据 + 统计信息 |
+| 阶段1 | `shared["stage1_results"]` | `data/enhanced_blogs.json` | 增强博文数据 + 统计信息 |
 | 阶段2 | `shared["stage2_results"]` | `report/` 目录 | 图表、表格、洞察分析 |
 | 阶段3 | `shared["stage3_results"]` | `report/report.md` | 最终分析报告 |
 
@@ -891,7 +943,7 @@ shared = {
 - `report/insights.json` - LLM生成的洞察描述
 
 **独立执行说明**：
-- 阶段2独立执行：需先检查 `data/enhanced_posts.json` 是否存在
+- 阶段2独立执行：需先检查 `data/enhanced_blogs.json` 是否存在
 - 阶段3独立执行：需先检查 `report/analysis_data.json` 和 `report/images/` 是否存在
 - 阶段3从 `report/` 目录加载阶段2结果，仅从增强数据中读取少量博文样本用于典型案例引用
 
@@ -991,12 +1043,12 @@ shared = {
 
 ---
 
-## 阶段1节点: 原始博文增强处理（对应需求：四维度分析）
+## 阶段1节点: 原始博文增强处理（对应需求：多维度分析）
 
 ### 通用节点
 
 **1. DataLoadNode (数据加载节点)**
-- **功能**：加载原始博文数据
+- **功能**：加载原始博文数据与参考配置（主题、情感属性、发布者、信念体系、关联身份）
 - **类型**：Regular Node
 - **实现步骤**：
   - *prep*：读取数据文件路径配置
@@ -1018,7 +1070,7 @@ shared = {
 - **实现步骤**：
   - *prep*：读取增强后的博文数据
   - *exec*：验证必需字段、统计空字段数量、生成数据概况
-  - *post*：将统计信息存储到 `shared["results"]["statistics"]`
+  - *post*：将统计信息存储到 `shared["stage1_results"]["statistics"]`
 
 **4. Stage1CompletionNode (阶段1完成节点)**
 - **功能**：标记阶段1完成，返回调度器
@@ -1064,9 +1116,25 @@ shared = {
   - *exec_async*：对单条博文调用LLM进行发布者类型识别
   - *post_async*：将结果附加到 `publisher` 字段
 
+**9. AsyncBeliefSystemAnalysisBatchNode (异步信念体系分析节点)**
+- **功能**：异步批量识别博文涉及的信念体系类别
+- **类型**：AsyncParallelBatchNode
+- **实现步骤**：
+  - *prep_async*：返回博文数据列表与信念体系配置
+  - *exec_async*：对单条博文调用LLM进行信念体系多选分类
+  - *post_async*：将结果附加到 `belief_signals` 字段
+
+**10. AsyncPublisherDecisionAnalysisBatchNode (异步发布者决策分析节点)**
+- **功能**：异步批量识别发布者的事件关联身份
+- **类型**：AsyncParallelBatchNode
+- **实现步骤**：
+  - *prep_async*：返回博文数据列表与关联身份分类配置
+  - *exec_async*：对单条博文调用LLM进行发布者身份分类
+  - *post_async*：将结果附加到 `publisher_decision` 字段
+
 ### Batch API并行路径节点 (enhancement_mode="batch_api")
 
-**9. BatchAPIEnhancementNode (Batch API增强处理节点)**
+**11. BatchAPIEnhancementNode (Batch API增强处理节点)**
 - **功能**：调用 `batch/` 目录下的脚本进行批量处理
 - **类型**：Regular Node
 - **处理流程**：调用 `batch/batch_run.py` 脚本执行完整的 Batch API 流程
@@ -1089,7 +1157,7 @@ shared = {
 **10. LoadEnhancedDataNode (加载增强数据节点)**
 - **功能**：加载已完成增强处理的博文数据
 - **类型**：Regular Node
-- **前置检查**：验证阶段1输出文件是否存在（`data/enhanced_posts.json`）
+- **前置检查**：验证阶段1输出文件是否存在（`data/enhanced_blogs.json`）
 - **实现步骤**：
   - *prep*：读取增强数据文件路径，检查前置条件
   - *exec*：加载JSON数据，验证增强字段完整性
@@ -1348,11 +1416,14 @@ shared = {
 project_root/
 ├── data/                           # 数据文件
 │   ├── posts.json                  # [输入] 原始博文数据
-│   ├── enhanced_posts.json         # [阶段1输出] 增强后博文数据
+│   ├── enhanced_blogs.json         # [阶段1输出] 增强后博文数据（路径可配置）
 │   ├── topics.json                 # 主题层次结构
 │   ├── sentiment_attributes.json   # 情感属性列表
-│   └── publisher_objects.json      # 发布者类型列表
+│   ├── publisher_objects.json      # 发布者类型列表
+│   ├── believe_system_common.json  # 信念体系分类
+│   └── publisher_decision.json     # 事件关联身份分类
 ├── batch/                          # Batch API处理模块
+│   ├── batch_run.py                # Batch API主流程脚本
 │   ├── generate_jsonl.py           # 生成批量请求文件
 │   ├── upload_and_start.py         # 上传并启动任务
 │   ├── download_results.py         # 下载结果
@@ -1368,6 +1439,9 @@ project_root/
 │   ├── template.md                 # 报告模板
 │   └── report.md                   # [阶段3输出] 最终生成的报告
 ├── utils/                          # 工具函数
+│   ├── analysis_tools/             # 分析工具库
+│   ├── mcp_client/mcp_client.py    # MCP客户端
+│   ├── mcp_server.py               # MCP工具服务
 │   ├── call_llm.py                 # LLM调用封装
 │   └── data_loader.py              # 数据加载与保存
 ├── doc/                            # 文档
@@ -1375,7 +1449,6 @@ project_root/
 ├── tests/                          # 测试
 ├── nodes.py                        # 节点定义
 ├── flow.py                         # 流程编排
-├── EnhancementFlow.py              # 增强处理流程
 └── main.py                         # 入口文件
 ```
 
@@ -1383,13 +1456,15 @@ project_root/
 
 | 阶段 | 输入文件 | 输出文件 | 前置检查 |
 |------|----------|----------|----------|
-| 阶段1 | `data/posts.json` | `data/enhanced_posts.json` | 无 |
-| 阶段2 | `data/enhanced_posts.json` | `report/analysis_data.json`<br>`report/chart_analyses.json`<br>`report/insights.json`<br>`report/images/*` | 检查增强数据是否存在 |
-| 阶段3 | `report/analysis_data.json`<br>`report/chart_analyses.json`<br>`report/insights.json`<br>`report/images/*`<br>`data/enhanced_posts.json`(少量样本) | `report/report.md` | 检查分析结果是否存在 |
+| 阶段1 | `data/posts.json` | `data/enhanced_blogs.json` | 无 |
+| 阶段2 | `data/enhanced_blogs.json` | `report/analysis_data.json`<br>`report/chart_analyses.json`<br>`report/insights.json`<br>`report/images/*` | 检查增强数据是否存在 |
+| 阶段3 | `report/analysis_data.json`<br>`report/chart_analyses.json`<br>`report/insights.json`<br>`report/images/*`<br>`data/enhanced_blogs.json`(少量样本) | `report/report.md` | 检查分析结果是否存在 |
+
+> 说明：阶段1增强数据的输出路径可通过 `main.py` 或 `shared["config"]["data_source"]["enhanced_data_path"]` 调整。
 
 ### 输出约定
 
-- **阶段1输出**：增强博文数据存储到 `data/enhanced_posts.json`
+- **阶段1输出**：增强博文数据存储到 `data/enhanced_blogs.json`（路径可配置）
 - **阶段2输出**：分析结果存储在 `report/` 目录
   - 可视化图表：`report/images/`，命名格式 `{type}_{timestamp}.png`
   - 统计数据：`report/analysis_data.json`
@@ -1413,7 +1488,7 @@ project_root/
 
 | 阶段 | 对应需求 | 路径选项 | 权衡点 | 前置条件 |
 |------|----------|----------|--------|----------|
-| 阶段1: 增强处理 | 四维度分析 | 异步并行 / Batch API | 处理效率 vs API成本 | 无 |
+| 阶段1: 增强处理 | 多维度分析 | 异步并行 / Batch API | 处理效率 vs API成本 | 无 |
 | 阶段2: 分析执行 | 分析工具集 | Workflow(思路1) / Agent Loop(思路2) | 可预测性 vs 灵活性 | 阶段1输出存在 |
 | 阶段3: 报告生成 | 报告输出 | 模板填充 / 多轮迭代 | 效率 vs 质量 | 阶段2输出存在 |
 
@@ -1486,8 +1561,8 @@ project_root/
 
 ### 性能优化
 - **三阶段解耦**：各阶段独立运行，可针对性优化
-- **阶段1批量处理**：使用BatchFlow实现四个分析维度的批量处理
-- **阶段1并行执行**：四个BatchNode可以并行运行，提高处理效率
+- **阶段1批量处理**：使用 `AsyncParallelBatchNode` 对多维度分析进行批量处理
+- **阶段1并行执行**：节点内部并发处理，整体流程按节点顺序执行
 - **异步处理**：通过AsyncParallelBatchNode实现真正的并发处理，支持可配置的并发控制
 - **结果缓存**：避免重复分析相同内容
 - **分批加载**：大数据集分批处理避免内存溢出
