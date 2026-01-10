@@ -1,0 +1,8 @@
+{
+  "id": "interaction_heatmap_20260110_171920",
+  "type": "heatmap",
+  "title": "发布者类型 × 情感极性 热力图",
+  "file_path": "report/images\\interaction_heatmap_20260110_171920.png",
+  "source_tool": "interaction_heatmap",
+  "description": "展示发布者类型与情感极性的交叉分布"
+}

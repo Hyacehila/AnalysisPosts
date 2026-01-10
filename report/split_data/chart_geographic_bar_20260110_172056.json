@@ -1,0 +1,8 @@
+{
+  "id": "geographic_bar_20260110_172056",
+  "type": "bar_chart",
+  "title": "Top15 地区分布图",
+  "file_path": "report/images\\geographic_bar_20260110_172056.png",
+  "source_tool": "geographic_bar_chart",
+  "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
+}

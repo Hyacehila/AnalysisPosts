@@ -410,8 +410,8 @@ def main():
     #
     
     # ----- 数据路径配置 -----
-    INPUT_DATA_PATH = "data/posts.json"
-    OUTPUT_DATA_PATH = "data/posts_enhenced.json"
+    INPUT_DATA_PATH = "data/HongKongFireSEL.json"   # 设置为香港大火事件单关键词版本数据
+    OUTPUT_DATA_PATH = "data/HongKongFireSEL_enhenced.json"
     TOPICS_PATH = "data/topics.json"
     SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
     PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
@@ -424,7 +424,7 @@ def main():
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
     # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2,3]  # 执行阶段2和3（测试用）
+    RUN_STAGES = [2,3]    # 先进行阶段1的增强工作
 
     # ----- 阶段1配置 -----
     ENHANCEMENT_MODE = "async"  # "async" | "batch_api"

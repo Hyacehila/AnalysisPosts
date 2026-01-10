@@ -1,0 +1,8 @@
+{
+  "id": "publisher_topic_distribution_20260110_171614",
+  "type": "bar_chart",
+  "title": "发布者话题偏好分布",
+  "file_path": "report/images\\publisher_topic_distribution_20260110_171614.png",
+  "source_tool": "publisher_topic_distribution_chart",
+  "description": "堆叠展示不同发布者的主题偏好差异"
+}

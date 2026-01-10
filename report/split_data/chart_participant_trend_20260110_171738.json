@@ -1,0 +1,8 @@
+{
+  "id": "participant_trend_20260110_171738",
+  "type": "line_chart",
+  "title": "参与人数演化趋势",
+  "file_path": "report/images\\participant_trend_20260110_171738.png",
+  "source_tool": "participant_trend_chart",
+  "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
+}

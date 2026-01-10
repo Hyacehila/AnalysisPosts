@@ -1,0 +1,453 @@
+{
+  "id": "topic_frequency",
+  "title": "主题分析 - topic_frequency",
+  "data": {
+    "parent_topics": {
+      "应急管理": {
+        "count": 9930,
+        "percentage": 50.79
+      },
+      "民众反应": {
+        "count": 6844,
+        "percentage": 35.0
+      },
+      "媒体传播": {
+        "count": 3997,
+        "percentage": 20.44
+      },
+      "社会民生": {
+        "count": 3457,
+        "percentage": 17.68
+      },
+      "政府工作": {
+        "count": 1442,
+        "percentage": 7.38
+      },
+      "经济影响": {
+        "count": 346,
+        "percentage": 1.77
+      },
+      "交通运输": {
+        "count": 151,
+        "percentage": 0.77
+      },
+      "公共事业": {
+        "count": 105,
+        "percentage": 0.54
+      },
+      "自然灾害": {
+        "count": 96,
+        "percentage": 0.49
+      },
+      "地理区域": {
+        "count": 1,
+        "percentage": 0.01
+      }
+    },
+    "sub_topics": {
+      "救援行动": {
+        "count": 5474,
+        "percentage": 28.0
+      },
+      "民众情绪": {
+        "count": 4274,
+        "percentage": 21.86
+      },
+      "新闻报道": {
+        "count": 2147,
+        "percentage": 10.98
+      },
+      "抢险救灾": {
+        "count": 1658,
+        "percentage": 8.48
+      },
+      "应急响应": {
+        "count": 1614,
+        "percentage": 8.25
+      },
+      "住房安全": {
+        "count": 1171,
+        "percentage": 5.99
+      },
+      "社会救助": {
+        "count": 1025,
+        "percentage": 5.24
+      },
+      "社交媒体": {
+        "count": 989,
+        "percentage": 5.06
+      },
+      "居民生活": {
+        "count": 876,
+        "percentage": 4.48
+      },
+      "网络热议": {
+        "count": 609,
+        "percentage": 3.11
+      },
+      "互助行为": {
+        "count": 561,
+        "percentage": 2.87
+      },
+      "公众关注": {
+        "count": 518,
+        "percentage": 2.65
+      },
+      "政策发布": {
+        "count": 444,
+        "percentage": 2.27
+      },
+      "部门协调": {
+        "count": 425,
+        "percentage": 2.17
+      },
+      "安全保障": {
+        "count": 364,
+        "percentage": 1.86
+      },
+      "疏散转移": {
+        "count": 329,
+        "percentage": 1.68
+      },
+      "社会反响": {
+        "count": 310,
+        "percentage": 1.59
+      },
+      "监督检查": {
+        "count": 277,
+        "percentage": 1.42
+      },
+      "网络传播": {
+        "count": 265,
+        "percentage": 1.36
+      },
+      "灾后重建": {
+        "count": 232,
+        "percentage": 1.19
+      },
+      "民生保障": {
+        "count": 198,
+        "percentage": 1.01
+      },
+      "经济损失": {
+        "count": 167,
+        "percentage": 0.85
+      },
+      "舆论引导": {
+        "count": 165,
+        "percentage": 0.84
+      },
+      "信息发布": {
+        "count": 160,
+        "percentage": 0.82
+      },
+      "公众参与": {
+        "count": 149,
+        "percentage": 0.76
+      },
+      "志愿服务": {
+        "count": 143,
+        "percentage": 0.73
+      },
+      "物资调配": {
+        "count": 140,
+        "percentage": 0.72
+      },
+      "求助信息": {
+        "count": 138,
+        "percentage": 0.71
+      },
+      "社区管理": {
+        "count": 132,
+        "percentage": 0.68
+      },
+      "现场直播": {
+        "count": 113,
+        "percentage": 0.58
+      },
+      "民众建议": {
+        "count": 105,
+        "percentage": 0.54
+      },
+      "交通事故": {
+        "count": 103,
+        "percentage": 0.53
+      },
+      "信息公开": {
+        "count": 92,
+        "percentage": 0.47
+      },
+      "应急预案": {
+        "count": 64,
+        "percentage": 0.33
+      },
+      "领导指示": {
+        "count": 62,
+        "percentage": 0.32
+      },
+      "保险理赔": {
+        "count": 62,
+        "percentage": 0.32
+      },
+      "舆情回应": {
+        "count": 59,
+        "percentage": 0.3
+      },
+      "采访报道": {
+        "count": 52,
+        "percentage": 0.27
+      },
+      "商业损失": {
+        "count": 49,
+        "percentage": 0.25
+      },
+      "评论分析": {
+        "count": 47,
+        "percentage": 0.24
+      },
+      "市场影响": {
+        "count": 44,
+        "percentage": 0.23
+      },
+      "谣言澄清": {
+        "count": 44,
+        "percentage": 0.23
+      },
+      "预警发布": {
+        "count": 40,
+        "percentage": 0.2
+      },
+      "工作部署": {
+        "count": 40,
+        "percentage": 0.2
+      },
+      "投诉举报": {
+        "count": 37,
+        "percentage": 0.19
+      },
+      "部门联动": {
+        "count": 36,
+        "percentage": 0.18
+      },
+      "大风": {
+        "count": 33,
+        "percentage": 0.17
+      },
+      "医疗服务": {
+        "count": 29,
+        "percentage": 0.15
+      },
+      "公共秩序": {
+        "count": 28,
+        "percentage": 0.14
+      },
+      "教育服务": {
+        "count": 24,
+        "percentage": 0.12
+      },
+      "就业影响": {
+        "count": 19,
+        "percentage": 0.1
+      },
+      "暴雨": {
+        "count": 19,
+        "percentage": 0.1
+      },
+      "电力供应": {
+        "count": 16,
+        "percentage": 0.08
+      },
+      "洪水": {
+        "count": 16,
+        "percentage": 0.08
+      },
+      "指挥调度": {
+        "count": 15,
+        "percentage": 0.08
+      },
+      "恢复重建": {
+        "count": 15,
+        "percentage": 0.08
+      },
+      "媒体监督": {
+        "count": 15,
+        "percentage": 0.08
+      },
+      "干旱": {
+        "count": 12,
+        "percentage": 0.06
+      },
+      "燃气供应": {
+        "count": 12,
+        "percentage": 0.06
+      },
+      "供水保障": {
+        "count": 10,
+        "percentage": 0.05
+      },
+      "通信网络": {
+        "count": 9,
+        "percentage": 0.05
+      },
+      "道路管制": {
+        "count": 8,
+        "percentage": 0.04
+      },
+      "地震": {
+        "count": 7,
+        "percentage": 0.04
+      },
+      "地铁运营": {
+        "count": 6,
+        "percentage": 0.03
+      },
+      "公交调整": {
+        "count": 6,
+        "percentage": 0.03
+      },
+      "交通拥堵": {
+        "count": 6,
+        "percentage": 0.03
+      },
+      "运输保障": {
+        "count": 6,
+        "percentage": 0.03
+      },
+      "出行安全": {
+        "count": 6,
+        "percentage": 0.03
+      },
+      "会议通报": {
+        "count": 6,
+        "percentage": 0.03
+      },
+      "旅游业": {
+        "count": 5,
+        "percentage": 0.03
+      },
+      "航班延误": {
+        "count": 5,
+        "percentage": 0.03
+      },
+      "铁路停运": {
+        "count": 5,
+        "percentage": 0.03
+      },
+      "大雪": {
+        "count": 4,
+        "percentage": 0.02
+      },
+      "物价稳定": {
+        "count": 4,
+        "percentage": 0.02
+      },
+      "台风": {
+        "count": 3,
+        "percentage": 0.02
+      },
+      "环境卫生": {
+        "count": 3,
+        "percentage": 0.02
+      },
+      "环卫服务": {
+        "count": 3,
+        "percentage": 0.02
+      },
+      "工业影响": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "金融服务": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "零售业": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "餐饮业": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "冰雹": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "食品安全": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "通州区": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "山体滑坡": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "工作总结": {
+        "count": 1,
+        "percentage": 0.01
+      }
+    },
+    "top_topic_pairs": [
+      {
+        "topic": "应急管理 > 救援行动",
+        "count": 5474,
+        "percentage": 28.0
+      },
+      {
+        "topic": "民众反应 > 民众情绪",
+        "count": 4274,
+        "percentage": 21.86
+      },
+      {
+        "topic": "媒体传播 > 新闻报道",
+        "count": 2147,
+        "percentage": 10.98
+      },
+      {
+        "topic": "应急管理 > 抢险救灾",
+        "count": 1658,
+        "percentage": 8.48
+      },
+      {
+        "topic": "应急管理 > 应急响应",
+        "count": 1614,
+        "percentage": 8.25
+      },
+      {
+        "topic": "社会民生 > 住房安全",
+        "count": 1171,
+        "percentage": 5.99
+      },
+      {
+        "topic": "社会民生 > 社会救助",
+        "count": 1025,
+        "percentage": 5.24
+      },
+      {
+        "topic": "媒体传播 > 社交媒体",
+        "count": 989,
+        "percentage": 5.06
+      },
+      {
+        "topic": "社会民生 > 居民生活",
+        "count": 876,
+        "percentage": 4.48
+      },
+      {
+        "topic": "民众反应 > 网络热议",
+        "count": 609,
+        "percentage": 3.11
+      }
+    ],
+    "coverage": {
+      "posts_with_topics": 13745,
+      "total_posts": 19552,
+      "percentage": 70.3
+    }
+  },
+  "source_tool": "topic_frequency",
+  "source_type": "mcp"
+}

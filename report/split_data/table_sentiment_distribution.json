@@ -1,0 +1,39 @@
+{
+  "id": "sentiment_distribution",
+  "title": "情感分析 - sentiment_distribution",
+  "data": {
+    "distribution": {
+      "极度悲观": {
+        "count": 2193,
+        "percentage": 11.22,
+        "polarity_value": 1
+      },
+      "悲观": {
+        "count": 9378,
+        "percentage": 47.96,
+        "polarity_value": 2
+      },
+      "中性": {
+        "count": 2652,
+        "percentage": 13.56,
+        "polarity_value": 3
+      },
+      "乐观": {
+        "count": 5129,
+        "percentage": 26.23,
+        "polarity_value": 4
+      },
+      "极度乐观": {
+        "count": 200,
+        "percentage": 1.02,
+        "polarity_value": 5
+      }
+    },
+    "total_count": 19552,
+    "valid_count": 19552,
+    "avg_polarity": 2.58,
+    "dominant_polarity": "悲观"
+  },
+  "source_tool": "sentiment_distribution",
+  "source_type": "mcp"
+}

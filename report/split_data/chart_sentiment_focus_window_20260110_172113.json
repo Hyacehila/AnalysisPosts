@@ -1,0 +1,9 @@
+{
+  "id": "sentiment_focus_window_20260110_172113",
+  "title": "焦点窗口情感分析",
+  "path": "report/images\\sentiment_focus_window_20260110_172113.png",
+  "file_path": "report/images\\sentiment_focus_window_20260110_172113.png",
+  "type": "line_chart",
+  "description": "焦点窗口（2025-11-26~2025-12-09）内的极性均值与三分类趋势",
+  "source_tool": "sentiment_focus_window_chart"
+}

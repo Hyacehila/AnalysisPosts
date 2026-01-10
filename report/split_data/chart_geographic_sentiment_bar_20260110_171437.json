@@ -1,0 +1,8 @@
+{
+  "id": "geographic_sentiment_bar_20260110_171437",
+  "type": "bar_chart",
+  "title": "地区正负面差异",
+  "file_path": "report/images\\geographic_sentiment_bar_20260110_171437.png",
+  "source_tool": "geographic_sentiment_bar_chart",
+  "description": "正负面占比与平均极性对比，体现地区情绪差异"
+}

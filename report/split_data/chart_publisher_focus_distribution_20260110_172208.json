@@ -1,0 +1,9 @@
+{
+  "id": "publisher_focus_distribution_20260110_172208",
+  "title": "焦点窗口发布者类型发布趋势",
+  "path": "report/images\\publisher_focus_distribution_20260110_172208.png",
+  "file_path": "report/images\\publisher_focus_distribution_20260110_172208.png",
+  "type": "line_chart",
+  "description": "焦点窗口内 Top5 发布者类型的日发布量趋势",
+  "source_tool": "publisher_focus_distribution_chart"
+}

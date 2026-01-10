@@ -1,0 +1,8 @@
+{
+  "id": "topic_keyword_trend_20260110_171648",
+  "type": "line_chart",
+  "title": "焦点关键词热度趋势",
+  "file_path": "report/images\\topic_keyword_trend_20260110_171648.png",
+  "source_tool": "topic_keyword_trend_chart",
+  "description": "按时间粒度展示焦点关键词热度，支持地理与主题差异解读"
+}

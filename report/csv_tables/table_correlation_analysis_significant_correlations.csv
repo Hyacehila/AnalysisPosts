@@ -1,0 +1,4 @@
+﻿feature1,feature2,correlation,strength
+comment_count,like_count,0.78,强
+like_count,repost_count,0.752,强
+comment_count,repost_count,0.494,弱

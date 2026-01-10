@@ -1,0 +1,8 @@
+{
+  "id": "geographic_temporal_heatmap_20260110_171600",
+  "type": "heatmap",
+  "title": "地区时间差异热力图",
+  "file_path": "report/images\\geographic_temporal_heatmap_20260110_171600.png",
+  "source_tool": "geographic_temporal_heatmap",
+  "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
+}

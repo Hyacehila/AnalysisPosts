@@ -1,0 +1,103 @@
+{
+  "id": "correlation_analysis",
+  "title": "其他 - correlation_analysis",
+  "data": {
+    "correlation_matrix": {
+      "sentiment_polarity": {
+        "sentiment_polarity": 1.0,
+        "repost_count": 0.007,
+        "comment_count": 0.022,
+        "like_count": 0.006,
+        "content_length": 0.063,
+        "image_count": 0.084,
+        "topic_count": -0.143
+      },
+      "repost_count": {
+        "sentiment_polarity": 0.007,
+        "repost_count": 1.0,
+        "comment_count": 0.494,
+        "like_count": 0.752,
+        "content_length": 0.019,
+        "image_count": 0.02,
+        "topic_count": -0.001
+      },
+      "comment_count": {
+        "sentiment_polarity": 0.022,
+        "repost_count": 0.494,
+        "comment_count": 1.0,
+        "like_count": 0.78,
+        "content_length": 0.024,
+        "image_count": 0.02,
+        "topic_count": 0.008
+      },
+      "like_count": {
+        "sentiment_polarity": 0.006,
+        "repost_count": 0.752,
+        "comment_count": 0.78,
+        "like_count": 1.0,
+        "content_length": 0.012,
+        "image_count": 0.019,
+        "topic_count": 0.005
+      },
+      "content_length": {
+        "sentiment_polarity": 0.063,
+        "repost_count": 0.019,
+        "comment_count": 0.024,
+        "like_count": 0.012,
+        "content_length": 1.0,
+        "image_count": 0.158,
+        "topic_count": -0.105
+      },
+      "image_count": {
+        "sentiment_polarity": 0.084,
+        "repost_count": 0.02,
+        "comment_count": 0.02,
+        "like_count": 0.019,
+        "content_length": 0.158,
+        "image_count": 1.0,
+        "topic_count": -0.084
+      },
+      "topic_count": {
+        "sentiment_polarity": -0.143,
+        "repost_count": -0.001,
+        "comment_count": 0.008,
+        "like_count": 0.005,
+        "content_length": -0.105,
+        "image_count": -0.084,
+        "topic_count": 1.0
+      }
+    },
+    "feature_names": [
+      "sentiment_polarity",
+      "repost_count",
+      "comment_count",
+      "like_count",
+      "content_length",
+      "image_count",
+      "topic_count"
+    ],
+    "significant_correlations": [
+      {
+        "feature1": "comment_count",
+        "feature2": "like_count",
+        "correlation": 0.78,
+        "strength": "强"
+      },
+      {
+        "feature1": "like_count",
+        "feature2": "repost_count",
+        "correlation": 0.752,
+        "strength": "强"
+      },
+      {
+        "feature1": "comment_count",
+        "feature2": "repost_count",
+        "correlation": 0.494,
+        "strength": "弱"
+      }
+    ],
+    "sample_size": 19552
+  },
+  "source_tool": "correlation_analysis",
+  "source_type": "mcp"
+}

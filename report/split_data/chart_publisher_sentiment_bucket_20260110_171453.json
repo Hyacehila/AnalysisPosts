@@ -1,0 +1,8 @@
+{
+  "id": "publisher_sentiment_bucket_20260110_171453",
+  "type": "bar_chart",
+  "title": "发布者情绪桶分布",
+  "file_path": "report/images\\publisher_sentiment_bucket_20260110_171453.png",
+  "source_tool": "publisher_sentiment_bucket_chart",
+  "description": "按发布者对比正/中/负面占比，突出情绪差异"
+}

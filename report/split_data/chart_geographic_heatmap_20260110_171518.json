@@ -1,0 +1,8 @@
+{
+  "id": "geographic_heatmap_20260110_171518",
+  "type": "heatmap",
+  "title": "地区舆情热力图",
+  "file_path": "report/images\\geographic_heatmap_20260110_171518.png",
+  "source_tool": "geographic_heatmap",
+  "description": "展示各地区在不同舆情指标上的表现差异"
+}

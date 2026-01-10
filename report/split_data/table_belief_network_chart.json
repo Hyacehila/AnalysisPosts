@@ -1,0 +1,2443 @@
+{
+  "id": "belief_network_chart",
+  "title": "其他 - belief_network_chart",
+  "data": {
+    "nodes": [
+      {
+        "ID": "事件很严重",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 4555.661287904742
+      },
+      {
+        "ID": "担心自身安全",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 1183.854066116848
+      },
+      {
+        "ID": "加强公众教育和培训",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 720.3789469834835
+      },
+      {
+        "ID": "管理不到位",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 2976.3625583578096
+      },
+      {
+        "ID": "企业/机构责任缺位",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 995.5403020922171
+      },
+      {
+        "ID": "政府监管不力",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 1271.2293071500847
+      },
+      {
+        "ID": "人为操作失误",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 868.2284364196282
+      },
+      {
+        "ID": "长期积累的问题爆发",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 1093.471707419511
+      },
+      {
+        "ID": "担心公共安全",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 4076.406991747232
+      },
+      {
+        "ID": "社会风险正在增加",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 1379.470661813227
+      },
+      {
+        "ID": "需要追责问责",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1433.593189987362
+      },
+      {
+        "ID": "改善相关行业或系统",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1928.1200712031539
+      },
+      {
+        "ID": "政府应加强监管",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1647.8312262720433
+      },
+      {
+        "ID": "加强信息发布和科普",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 583.8365418438351
+      },
+      {
+        "ID": "提升应急能力",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1451.4937152093737
+      },
+      {
+        "ID": "经济风险正在增加",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 132.41179535831944
+      },
+      {
+        "ID": "呼吁社会关注",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1513.5814267179817
+      },
+      {
+        "ID": "对未来感到不安",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 1054.804500968945
+      },
+      {
+        "ID": "需要公开透明",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1521.4804192682716
+      },
+      {
+        "ID": "信息披露不及时",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 1130.8008084329354
+      },
+      {
+        "ID": "支持政策改进",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 1821.6544278745407
+      },
+      {
+        "ID": "制度问题",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 1289.072902893904
+      },
+      {
+        "ID": "环境风险正在增加",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 128.86229110726046
+      },
+      {
+        "ID": "技术手段不足",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 603.4362053977725
+      },
+      {
+        "ID": "对信息不透明感到焦虑",
+        "Category": "风险感知类",
+        "Co-Occurrence-Weight": 650.6131084866423
+      },
+      {
+        "ID": "推动法律法规完善",
+        "Category": "行动/政策类",
+        "Co-Occurrence-Weight": 526.2556855105694
+      },
+      {
+        "ID": "法律法规不完善",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 476.2493584767731
+      },
+      {
+        "ID": "外部因素影响",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 163.7948939874704
+      },
+      {
+        "ID": "归因信念类",
+        "Category": "归因信念类",
+        "Co-Occurrence-Weight": 4.795790545596741
+      }
+    ],
+    "edges": [
+      {
+        "Source": "事件很严重",
+        "Target": "担心自身安全",
+        "Weight": 234.33687835739573,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "加强公众教育和培训",
+        "Weight": 116.9599332092169,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "管理不到位",
+        "Weight": 348.78037647873145,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "企业/机构责任缺位",
+        "Weight": 88.03498190576997,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "政府监管不力",
+        "Weight": 107.92187633759086,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "人为操作失误",
+        "Weight": 114.59029726626207,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "长期积累的问题爆发",
+        "Weight": 124.22966740051766,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "担心公共安全",
+        "Weight": 982.3313138988744,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "社会风险正在增加",
+        "Weight": 207.25520020967159,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "需要追责问责",
+        "Weight": 115.48228902411046,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "改善相关行业或系统",
+        "Weight": 238.66340041384134,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "政府应加强监管",
+        "Weight": 129.2933874787326,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "加强信息发布和科普",
+        "Weight": 55.46697618455137,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "提升应急能力",
+        "Weight": 211.13587665417498,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "经济风险正在增加",
+        "Weight": 16.978150197726492,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "呼吁社会关注",
+        "Weight": 325.4194099250944,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "对未来感到不安",
+        "Weight": 212.80118929203323,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "制度问题",
+        "Weight": 126.86805582185865,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "需要公开透明",
+        "Weight": 138.44006734184757,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "支持政策改进",
+        "Weight": 242.83909130251968,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "事件很严重",
+        "Weight": 55.306237119993135,
+        "Type": "Loop"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "信息披露不及时",
+        "Weight": 106.11740030951162,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 88.73075697719622,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "环境风险正在增加",
+        "Weight": 28.150825598425392,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "法律法规不完善",
+        "Weight": 43.73047238619075,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "推动法律法规完善",
+        "Weight": 45.03915614460571,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "技术手段不足",
+        "Weight": 79.75927710208978,
+        "Type": "Regular"
+      },
+      {
+        "Source": "事件很严重",
+        "Target": "外部因素影响",
+        "Weight": 26.304980686186706,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "加强公众教育和培训",
+        "Weight": 55.205438649698735,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "担心公共安全",
+        "Weight": 141.0007921517461,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "担心自身安全",
+        "Weight": 1.9459101490553132,
+        "Type": "Loop"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "制度问题",
+        "Weight": 26.514768291234077,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "呼吁社会关注",
+        "Weight": 42.314500339622896,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "对未来感到不安",
+        "Weight": 91.41911707880612,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "支持政策改进",
+        "Weight": 35.973615438227775,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "提升应急能力",
+        "Weight": 75.35955837873155,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "改善相关行业或系统",
+        "Weight": 60.13590449714989,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "管理不到位",
+        "Weight": 81.05972851853082,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "企业/机构责任缺位",
+        "Weight": 17.194903950941935,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "信息披露不及时",
+        "Weight": 38.05759219436684,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 41.315688732388324,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "需要公开透明",
+        "Weight": 13.926121267204229,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "人为操作失误",
+        "Weight": 32.52107528207137,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "技术手段不足",
+        "Weight": 33.24576835092527,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "加强信息发布和科普",
+        "Weight": 29.479186348893172,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "社会风险正在增加",
+        "Weight": 22.86470529515933,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "经济风险正在增加",
+        "Weight": 5.634789603169249,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "政府监管不力",
+        "Weight": 16.20384756849509,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "法律法规不完善",
+        "Weight": 10.02251425895777,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "政府应加强监管",
+        "Weight": 16.182528166477496,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "长期积累的问题爆发",
+        "Weight": 25.89396026075196,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "需要追责问责",
+        "Weight": 22.534449969240704,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "环境风险正在增加",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "推动法律法规完善",
+        "Weight": 6.238324625039508,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心自身安全",
+        "Target": "外部因素影响",
+        "Weight": 9.21830854162536,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 10.234229114448356,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "管理不到位",
+        "Weight": 43.963578129403665,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "技术手段不足",
+        "Weight": 9.041685005946043,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "信息披露不及时",
+        "Weight": 14.979161242811607,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "加强信息发布和科普",
+        "Weight": 14.952727985743449,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "提升应急能力",
+        "Weight": 81.22235453376305,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "支持政策改进",
+        "Weight": 16.631419152428634,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "改善相关行业或系统",
+        "Weight": 40.49074007472409,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "呼吁社会关注",
+        "Weight": 42.454717520732125,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "担心公共安全",
+        "Weight": 114.8642896929608,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "社会风险正在增加",
+        "Weight": 43.148009828262644,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "企业/机构责任缺位",
+        "Weight": 4.276666119016055,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "人为操作失误",
+        "Weight": 35.6961864178725,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "长期积累的问题爆发",
+        "Weight": 16.293846165665702,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "制度问题",
+        "Weight": 8.737452587550585,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "政府监管不力",
+        "Weight": 4.330733340286331,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "法律法规不完善",
+        "Weight": 5.438079308923196,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "对未来感到不安",
+        "Weight": 21.288314010718548,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "需要公开透明",
+        "Weight": 12.125079486320642,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "政府应加强监管",
+        "Weight": 8.044305406990638,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "推动法律法规完善",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "加强公众教育和培训",
+        "Weight": 12.92269218227526,
+        "Type": "Loop"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "需要追责问责",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强公众教育和培训",
+        "Target": "经济风险正在增加",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "企业/机构责任缺位",
+        "Weight": 142.2437257782893,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "政府监管不力",
+        "Weight": 162.72031608341547,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "人为操作失误",
+        "Weight": 80.12082891921409,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "长期积累的问题爆发",
+        "Weight": 105.55656548670105,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "担心公共安全",
+        "Weight": 291.6966557443924,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "社会风险正在增加",
+        "Weight": 113.73277888228434,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "需要追责问责",
+        "Weight": 197.59996115800183,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "改善相关行业或系统",
+        "Weight": 133.77293098711885,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "政府应加强监管",
+        "Weight": 212.84358968700963,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "需要公开透明",
+        "Weight": 159.55279465182582,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "对未来感到不安",
+        "Weight": 63.62124327611962,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "信息披露不及时",
+        "Weight": 139.8613310709531,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "制度问题",
+        "Weight": 178.1035314303283,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "支持政策改进",
+        "Weight": 105.89941187091738,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "呼吁社会关注",
+        "Weight": 64.28534254544604,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 66.69885575024027,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "推动法律法规完善",
+        "Weight": 46.30700849146218,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "提升应急能力",
+        "Weight": 75.24958423484004,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "法律法规不完善",
+        "Weight": 45.65292309220069,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "技术手段不足",
+        "Weight": 63.01360341555819,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "加强信息发布和科普",
+        "Weight": 26.89514291982669,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "经济风险正在增加",
+        "Weight": 15.032240048671182,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "外部因素影响",
+        "Weight": 10.999897417649038,
+        "Type": "Regular"
+      },
+      {
+        "Source": "管理不到位",
+        "Target": "环境风险正在增加",
+        "Weight": 1.0986122886681098,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "政府监管不力",
+        "Weight": 46.315185090343434,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "人为操作失误",
+        "Weight": 35.04455764546603,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "长期积累的问题爆发",
+        "Weight": 30.856742483736298,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "担心公共安全",
+        "Weight": 62.76658261234136,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "社会风险正在增加",
+        "Weight": 37.21834030755409,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "需要追责问责",
+        "Weight": 96.97571790203745,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "改善相关行业或系统",
+        "Weight": 42.30987415049173,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "政府应加强监管",
+        "Weight": 77.92647376141662,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "需要公开透明",
+        "Weight": 84.78867641326887,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "对未来感到不安",
+        "Weight": 17.094241956065662,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "技术手段不足",
+        "Weight": 6.222576268071369,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "信息披露不及时",
+        "Weight": 64.54212039185268,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 14.76097166713821,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "支持政策改进",
+        "Weight": 22.046777216666708,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "制度问题",
+        "Weight": 32.2681295374679,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "推动法律法规完善",
+        "Weight": 8.019612794400267,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "法律法规不完善",
+        "Weight": 5.717027701406222,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "呼吁社会关注",
+        "Weight": 26.63124094321473,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "经济风险正在增加",
+        "Weight": 4.718498871295094,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "提升应急能力",
+        "Weight": 18.867161875755905,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "环境风险正在增加",
+        "Weight": 0.6931471805599453,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "加强信息发布和科普",
+        "Weight": 8.006367567650246,
+        "Type": "Regular"
+      },
+      {
+        "Source": "企业/机构责任缺位",
+        "Target": "企业/机构责任缺位",
+        "Weight": 2.3978952727983707,
+        "Type": "Loop"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "人为操作失误",
+        "Weight": 18.2776931246708,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "长期积累的问题爆发",
+        "Weight": 47.03141504774972,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "担心公共安全",
+        "Weight": 103.07746430455614,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "社会风险正在增加",
+        "Weight": 46.84305406905113,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "需要追责问责",
+        "Weight": 94.42137547833107,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "改善相关行业或系统",
+        "Weight": 71.2657818600076,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "政府应加强监管",
+        "Weight": 143.48484342207692,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "需要公开透明",
+        "Weight": 81.05100970304179,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "信息披露不及时",
+        "Weight": 45.714710735546426,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "制度问题",
+        "Weight": 55.965113748118746,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "支持政策改进",
+        "Weight": 42.933959233629054,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "推动法律法规完善",
+        "Weight": 35.764618773218494,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "提升应急能力",
+        "Weight": 32.132075121512486,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "法律法规不完善",
+        "Weight": 26.268986534837115,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "对未来感到不安",
+        "Weight": 14.951084599999719,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "经济风险正在增加",
+        "Weight": 5.2574953720277815,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 21.25714526777962,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "呼吁社会关注",
+        "Weight": 17.743469902690773,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "加强信息发布和科普",
+        "Weight": 16.20830191884447,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "技术手段不足",
+        "Weight": 14.087750512266307,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "外部因素影响",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府监管不力",
+        "Target": "政府监管不力",
+        "Weight": 0.6931471805599453,
+        "Type": "Loop"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "长期积累的问题爆发",
+        "Weight": 49.26030297808471,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "担心公共安全",
+        "Weight": 105.67182489673918,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "社会风险正在增加",
+        "Weight": 35.7912959623637,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "需要追责问责",
+        "Weight": 63.595158842698446,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "改善相关行业或系统",
+        "Weight": 34.02197383825458,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "政府应加强监管",
+        "Weight": 37.540363585712065,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "需要公开透明",
+        "Weight": 29.303130632855314,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "技术手段不足",
+        "Weight": 8.03268487596762,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "呼吁社会关注",
+        "Weight": 33.595140821943446,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "支持政策改进",
+        "Weight": 33.88381476544706,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "推动法律法规完善",
+        "Weight": 6.815639990074331,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "制度问题",
+        "Weight": 8.419800845407588,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 8.714403360703942,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "信息披露不及时",
+        "Weight": 25.52705919346559,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "外部因素影响",
+        "Weight": 6.234410725718371,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "人为操作失误",
+        "Weight": 13.420866688487694,
+        "Type": "Loop"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "提升应急能力",
+        "Weight": 26.82040440704366,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "加强信息发布和科普",
+        "Weight": 7.662937850461535,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "法律法规不完善",
+        "Weight": 8.479698986988657,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "对未来感到不安",
+        "Weight": 11.35837470512163,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "环境风险正在增加",
+        "Weight": 5.971261839790462,
+        "Type": "Regular"
+      },
+      {
+        "Source": "人为操作失误",
+        "Target": "经济风险正在增加",
+        "Weight": 5.278114659230517,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "担心公共安全",
+        "Weight": 109.07199421185177,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "社会风险正在增加",
+        "Weight": 66.31355627779404,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "需要追责问责",
+        "Weight": 49.71120431890178,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "改善相关行业或系统",
+        "Weight": 73.75118321357277,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "政府应加强监管",
+        "Weight": 65.5389737197878,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "需要公开透明",
+        "Weight": 28.528400149647588,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "对未来感到不安",
+        "Weight": 37.79409755292424,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "制度问题",
+        "Weight": 62.961236646737895,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "推动法律法规完善",
+        "Weight": 20.603285909890303,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "支持政策改进",
+        "Weight": 26.468420845620184,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "提升应急能力",
+        "Weight": 39.53115482521458,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "经济风险正在增加",
+        "Weight": 14.359712155313973,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "技术手段不足",
+        "Weight": 17.96357046903049,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "呼吁社会关注",
+        "Weight": 10.260987156349415,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 3.8501476017100584,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "信息披露不及时",
+        "Weight": 32.18897181266061,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "法律法规不完善",
+        "Weight": 6.385194398997726,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "长期积累的问题爆发",
+        "Weight": 0.0,
+        "Type": "Loop"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "环境风险正在增加",
+        "Weight": 11.318369370507929,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "外部因素影响",
+        "Weight": 5.634789603169249,
+        "Type": "Regular"
+      },
+      {
+        "Source": "长期积累的问题爆发",
+        "Target": "加强信息发布和科普",
+        "Weight": 12.113957356622368,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "社会风险正在增加",
+        "Weight": 222.70519470347088,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "需要追责问责",
+        "Weight": 94.90243903159156,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "改善相关行业或系统",
+        "Weight": 191.6162731912491,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "政府应加强监管",
+        "Weight": 130.87874607956815,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "提升应急能力",
+        "Weight": 197.3169404388048,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "呼吁社会关注",
+        "Weight": 265.50440515494677,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "对未来感到不安",
+        "Weight": 210.86979743561625,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "制度问题",
+        "Weight": 111.38265828912824,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "需要公开透明",
+        "Weight": 124.45801136238376,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "支持政策改进",
+        "Weight": 208.7678463151848,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "信息披露不及时",
+        "Weight": 78.80749250247386,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "环境风险正在增加",
+        "Weight": 23.820092258139063,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "加强信息发布和科普",
+        "Weight": 60.438926152194654,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 71.08680443392826,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "技术手段不足",
+        "Weight": 64.97492890396614,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "经济风险正在增加",
+        "Weight": 11.788372999753665,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "外部因素影响",
+        "Weight": 27.676349397089922,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "法律法规不完善",
+        "Weight": 33.16141442086491,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "推动法律法规完善",
+        "Weight": 33.371485890611766,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "归因信念类",
+        "Weight": 2.3978952727983707,
+        "Type": "Regular"
+      },
+      {
+        "Source": "担心公共安全",
+        "Target": "担心公共安全",
+        "Weight": 8.36053938137086,
+        "Type": "Loop"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "需要追责问责",
+        "Weight": 46.531143837836574,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "改善相关行业或系统",
+        "Weight": 72.50319304328919,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "政府应加强监管",
+        "Weight": 57.141766833392815,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "制度问题",
+        "Weight": 53.115865570815224,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "需要公开透明",
+        "Weight": 45.49834528661109,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "支持政策改进",
+        "Weight": 48.8761162884945,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "环境风险正在增加",
+        "Weight": 9.584108393341092,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "法律法规不完善",
+        "Weight": 22.108988002393577,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "推动法律法规完善",
+        "Weight": 18.39379123996227,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "对未来感到不安",
+        "Weight": 26.935262913616114,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "经济风险正在增加",
+        "Weight": 8.877381954654766,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "提升应急能力",
+        "Weight": 56.33751747369195,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "技术手段不足",
+        "Weight": 18.6301800180265,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "呼吁社会关注",
+        "Weight": 34.56392084172454,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 7.433666540166168,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "信息披露不及时",
+        "Weight": 23.471773082014526,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "加强信息发布和科普",
+        "Weight": 19.864141518880203,
+        "Type": "Regular"
+      },
+      {
+        "Source": "社会风险正在增加",
+        "Target": "外部因素影响",
+        "Weight": 13.731363438705644,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "改善相关行业或系统",
+        "Weight": 51.13945051047723,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "政府应加强监管",
+        "Weight": 129.42157905142892,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "需要公开透明",
+        "Weight": 93.27712960070654,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "呼吁社会关注",
+        "Weight": 52.809681995972326,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "支持政策改进",
+        "Weight": 56.1084726417658,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "制度问题",
+        "Weight": 68.62045775652649,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "推动法律法规完善",
+        "Weight": 32.03423006080417,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "法律法规不完善",
+        "Weight": 33.69224951487732,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "外部因素影响",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "技术手段不足",
+        "Weight": 11.203542965539109,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "提升应急能力",
+        "Weight": 13.9597840471207,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "加强信息发布和科普",
+        "Weight": 10.545341438708522,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 23.872613046842744,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "信息披露不及时",
+        "Weight": 66.09075993204817,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "对未来感到不安",
+        "Weight": 7.272398392570047,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "需要追责问责",
+        "Weight": 0.6931471805599453,
+        "Type": "Loop"
+      },
+      {
+        "Source": "需要追责问责",
+        "Target": "经济风险正在增加",
+        "Weight": 1.791759469228055,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "政府应加强监管",
+        "Weight": 99.15887589280298,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "提升应急能力",
+        "Weight": 187.3160479041083,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "经济风险正在增加",
+        "Weight": 2.6390573296152584,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "需要公开透明",
+        "Weight": 52.5584774163868,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "对未来感到不安",
+        "Weight": 46.950446129751455,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "支持政策改进",
+        "Weight": 222.3888663885944,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "信息披露不及时",
+        "Weight": 18.42369380013614,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 13.517596314946244,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "推动法律法规完善",
+        "Weight": 34.59412398915706,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "呼吁社会关注",
+        "Weight": 76.56130438685175,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "环境风险正在增加",
+        "Weight": 4.430816798843313,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "制度问题",
+        "Weight": 73.40926223193316,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "改善相关行业或系统",
+        "Weight": 13.229271494908408,
+        "Type": "Loop"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "加强信息发布和科普",
+        "Weight": 25.934116294111142,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "技术手段不足",
+        "Weight": 38.32290269126927,
+        "Type": "Regular"
+      },
+      {
+        "Source": "改善相关行业或系统",
+        "Target": "法律法规不完善",
+        "Weight": 22.24377785447046,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "需要公开透明",
+        "Weight": 121.561473048599,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "提升应急能力",
+        "Weight": 48.22973946759827,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "制度问题",
+        "Weight": 82.83130206960456,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "支持政策改进",
+        "Weight": 64.22565855218865,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "信息披露不及时",
+        "Weight": 55.88374429861018,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "推动法律法规完善",
+        "Weight": 33.97285930399044,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "法律法规不完善",
+        "Weight": 34.96072109572835,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "对未来感到不安",
+        "Weight": 21.306215221047783,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "加强信息发布和科普",
+        "Weight": 13.435713196604688,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "技术手段不足",
+        "Weight": 29.81520069971474,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "呼吁社会关注",
+        "Weight": 12.331823850835734,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 21.821342382129604,
+        "Type": "Regular"
+      },
+      {
+        "Source": "政府应加强监管",
+        "Target": "经济风险正在增加",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "呼吁社会关注",
+        "Weight": 36.523432413863674,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "提升应急能力",
+        "Weight": 59.01443819304834,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "需要公开透明",
+        "Weight": 56.291826801725854,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "支持政策改进",
+        "Weight": 34.93092467016602,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 17.680291001069243,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "技术手段不足",
+        "Weight": 12.938132799588718,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "信息披露不及时",
+        "Weight": 24.652149924034887,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "对未来感到不安",
+        "Weight": 10.89228497519703,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "外部因素影响",
+        "Weight": 9.213535262872702,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "加强信息发布和科普",
+        "Weight": 1.0986122886681098,
+        "Type": "Loop"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "制度问题",
+        "Weight": 6.214608098422191,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "推动法律法规完善",
+        "Weight": 8.019612794400267,
+        "Type": "Regular"
+      },
+      {
+        "Source": "加强信息发布和科普",
+        "Target": "环境风险正在增加",
+        "Weight": 6.461468176353717,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "呼吁社会关注",
+        "Weight": 42.73497023580478,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "对未来感到不安",
+        "Weight": 31.1441380369177,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "需要公开透明",
+        "Weight": 31.653071149707948,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "支持政策改进",
+        "Weight": 88.72110661567116,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "提升应急能力",
+        "Weight": 37.33865617904136,
+        "Type": "Loop"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 6.356107660695891,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "技术手段不足",
+        "Weight": 37.168579795587156,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "信息披露不及时",
+        "Weight": 20.77014698009419,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "环境风险正在增加",
+        "Weight": 8.712759974960212,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "制度问题",
+        "Weight": 35.808532055627865,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "推动法律法规完善",
+        "Weight": 18.447858461232542,
+        "Type": "Regular"
+      },
+      {
+        "Source": "提升应急能力",
+        "Target": "法律法规不完善",
+        "Weight": 7.483806687665836,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "对未来感到不安",
+        "Weight": 9.908276069267924,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "制度问题",
+        "Weight": 7.135687347028144,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "法律法规不完善",
+        "Weight": 1.3862943611198906,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "支持政策改进",
+        "Weight": 5.2574953720277815,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "环境风险正在增加",
+        "Weight": 5.278114659230517,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "需要公开透明",
+        "Weight": 2.0794415416798357,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "信息披露不及时",
+        "Weight": 3.465735902799726,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "外部因素影响",
+        "Weight": 3.465735902799726,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "技术手段不足",
+        "Weight": 0.6931471805599453,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "呼吁社会关注",
+        "Weight": 1.3862943611198906,
+        "Type": "Regular"
+      },
+      {
+        "Source": "经济风险正在增加",
+        "Target": "经济风险正在增加",
+        "Weight": 0.0,
+        "Type": "Loop"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "制度问题",
+        "Weight": 43.37149075042721,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "对未来感到不安",
+        "Weight": 61.849476033536064,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "支持政策改进",
+        "Weight": 174.15476631842049,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "呼吁社会关注",
+        "Weight": 131.3970599301388,
+        "Type": "Loop"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "环境风险正在增加",
+        "Weight": 3.465735902799726,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "信息披露不及时",
+        "Weight": 40.10038043237854,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 14.293482356859187,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "法律法规不完善",
+        "Weight": 12.444774535760235,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "推动法律法规完善",
+        "Weight": 8.616133139271142,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "需要公开透明",
+        "Weight": 57.76785184717904,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "技术手段不足",
+        "Weight": 2.3978952727983707,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "外部因素影响",
+        "Weight": 7.600902459542082,
+        "Type": "Regular"
+      },
+      {
+        "Source": "呼吁社会关注",
+        "Target": "归因信念类",
+        "Weight": 2.3978952727983707,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "支持政策改进",
+        "Weight": 32.64581766769114,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "制度问题",
+        "Weight": 35.28671804728418,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "环境风险正在增加",
+        "Weight": 4.605170185988091,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "法律法规不完善",
+        "Weight": 1.3862943611198906,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 18.848657747150547,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "技术手段不足",
+        "Weight": 18.71145662563706,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "需要公开透明",
+        "Weight": 23.113975031622278,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "对未来感到不安",
+        "Weight": 5.347107530717469,
+        "Type": "Loop"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "信息披露不及时",
+        "Weight": 13.121402916309204,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "推动法律法规完善",
+        "Weight": 5.940171252720431,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对未来感到不安",
+        "Target": "外部因素影响",
+        "Weight": 3.6888794541139367,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "信息披露不及时",
+        "Weight": 94.42416133144066,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "支持政策改进",
+        "Weight": 117.87309161498966,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "制度问题",
+        "Weight": 52.762983183037,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 45.644599601962504,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "法律法规不完善",
+        "Weight": 17.470148506072878,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "推动法律法规完善",
+        "Weight": 22.541865698438798,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "外部因素影响",
+        "Weight": 5.863631175598097,
+        "Type": "Regular"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "需要公开透明",
+        "Weight": 0.0,
+        "Type": "Loop"
+      },
+      {
+        "Source": "需要公开透明",
+        "Target": "技术手段不足",
+        "Weight": 8.925055424124123,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "支持政策改进",
+        "Weight": 44.55462784137509,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 88.10666399812888,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "技术手段不足",
+        "Weight": 37.13300391168041,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "制度问题",
+        "Weight": 24.166536474774354,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "外部因素影响",
+        "Weight": 14.672896787767408,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "法律法规不完善",
+        "Weight": 5.438079308923196,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "推动法律法规完善",
+        "Weight": 9.430599768110529,
+        "Type": "Regular"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "信息披露不及时",
+        "Weight": 0.6931471805599453,
+        "Type": "Loop"
+      },
+      {
+        "Source": "信息披露不及时",
+        "Target": "环境风险正在增加",
+        "Weight": 1.0986122886681098,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "制度问题",
+        "Weight": 79.34511097707906,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "支持政策改进",
+        "Weight": 21.965208011822945,
+        "Type": "Loop"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "环境风险正在增加",
+        "Weight": 6.51025834052315,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "推动法律法规完善",
+        "Weight": 31.92185486814696,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "技术手段不足",
+        "Weight": 18.51410059275176,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "法律法规不完善",
+        "Weight": 34.10457778385953,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 16.95900011708644,
+        "Type": "Regular"
+      },
+      {
+        "Source": "支持政策改进",
+        "Target": "外部因素影响",
+        "Weight": 9.118225083068378,
+        "Type": "Regular"
+      },
+      {
+        "Source": "制度问题",
+        "Target": "推动法律法规完善",
+        "Weight": 40.98035651980302,
+        "Type": "Regular"
+      },
+      {
+        "Source": "制度问题",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 15.42286630419405,
+        "Type": "Regular"
+      },
+      {
+        "Source": "制度问题",
+        "Target": "技术手段不足",
+        "Weight": 13.893981569632002,
+        "Type": "Regular"
+      },
+      {
+        "Source": "制度问题",
+        "Target": "法律法规不完善",
+        "Weight": 42.49066446632994,
+        "Type": "Regular"
+      },
+      {
+        "Source": "制度问题",
+        "Target": "外部因素影响",
+        "Weight": 2.9957322735539913,
+        "Type": "Regular"
+      },
+      {
+        "Source": "制度问题",
+        "Target": "制度问题",
+        "Weight": 0.0,
+        "Type": "Loop"
+      },
+      {
+        "Source": "环境风险正在增加",
+        "Target": "技术手段不足",
+        "Weight": 5.0238805208462765,
+        "Type": "Regular"
+      },
+      {
+        "Source": "环境风险正在增加",
+        "Target": "外部因素影响",
+        "Weight": 2.6390573296152584,
+        "Type": "Regular"
+      },
+      {
+        "Source": "技术手段不足",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 28.919622174645845,
+        "Type": "Regular"
+      },
+      {
+        "Source": "技术手段不足",
+        "Target": "技术手段不足",
+        "Weight": 1.6094379124341003,
+        "Type": "Loop"
+      },
+      {
+        "Source": "技术手段不足",
+        "Target": "法律法规不完善",
+        "Weight": 8.17695386822578,
+        "Type": "Regular"
+      },
+      {
+        "Source": "技术手段不足",
+        "Target": "推动法律法规完善",
+        "Weight": 11.89052593493009,
+        "Type": "Regular"
+      },
+      {
+        "Source": "技术手段不足",
+        "Target": "外部因素影响",
+        "Weight": 4.736198448394496,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对信息不透明感到焦虑",
+        "Target": "法律法规不完善",
+        "Weight": 2.890371757896165,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对信息不透明感到焦虑",
+        "Target": "推动法律法规完善",
+        "Weight": 2.1972245773362196,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对信息不透明感到焦虑",
+        "Target": "外部因素影响",
+        "Weight": 0.0,
+        "Type": "Regular"
+      },
+      {
+        "Source": "对信息不透明感到焦虑",
+        "Target": "对信息不透明感到焦虑",
+        "Weight": 0.0,
+        "Type": "Loop"
+      },
+      {
+        "Source": "推动法律法规完善",
+        "Target": "法律法规不完善",
+        "Weight": 45.11534528296326,
+        "Type": "Regular"
+      },
+      {
+        "Source": "外部因素影响",
+        "Target": "外部因素影响",
+        "Weight": 8.754002933494261,
+        "Type": "Loop"
+      }
+    ]
+  },
+  "source_tool": "belief_network_chart",
+  "source_type": "mcp"
+}

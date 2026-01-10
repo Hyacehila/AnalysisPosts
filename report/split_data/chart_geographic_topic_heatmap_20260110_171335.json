@@ -1,0 +1,8 @@
+{
+  "id": "geographic_topic_heatmap_20260110_171335",
+  "type": "heatmap",
+  "title": "地区话题差异热力图",
+  "file_path": "report/images\\geographic_topic_heatmap_20260110_171335.png",
+  "source_tool": "geographic_topic_heatmap",
+  "description": "地区 × 主题的热度差异，支持地理可视化叙事"
+}

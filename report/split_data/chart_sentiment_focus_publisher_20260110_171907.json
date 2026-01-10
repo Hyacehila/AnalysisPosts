@@ -1,0 +1,9 @@
+{
+  "id": "sentiment_focus_publisher_20260110_171907",
+  "title": "焦点窗口发布者情感均值",
+  "path": "report/images\\sentiment_focus_publisher_20260110_171907.png",
+  "file_path": "report/images\\sentiment_focus_publisher_20260110_171907.png",
+  "type": "line_chart",
+  "description": "焦点窗口内 Top5 发布者的情感均值趋势",
+  "source_tool": "sentiment_focus_publisher_chart"
+}

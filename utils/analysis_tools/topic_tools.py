@@ -18,6 +18,9 @@ from collections import Counter, defaultdict
 from itertools import combinations
 
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib import patheffects
+import networkx as nx
 import numpy as np
 import pandas as pd
 
@@ -662,7 +665,7 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
                         output_dir: str = "report/images",
                         min_support: int = 3) -> Dict[str, Any]:
     """
-    生成主题关联网络图
+    生成主题关联网络图 (Style Enhanced)
     
     Args:
         blog_data: 增强后的博文数据列表
@@ -682,7 +685,10 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
             "summary": f"没有满足阈值({min_support})的共现主题对"
         }
     
-    # 统计每个主题的总频次（防御空值/类型异常）
+    # 构建 NetworkX 图
+    G = nx.Graph()
+    
+    # 统计每个主题的总频次
     topic_counts = Counter()
     for post in blog_data:
         topics = post.get("topics") or []
@@ -695,59 +701,110 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
             if parent:
                 topic_counts[parent] += 1
     
-    # 收集所有涉及的主题
+    # 添加边与各节点
+    for pair in pairs:
+        t1, t2 = pair["topic_pair"]
+        w = pair["count"]
+        # Defensive check
+        if t1 == t2:
+            continue
+        if G.has_edge(t1, t2):
+            G[t1][t2]['weight'] += w
+        else:
+            G.add_edge(t1, t2, weight=w)
+
+    # 确保所有涉及主题都入图
     all_topics = set()
     for pair in pairs:
         all_topics.update(pair["topic_pair"])
     
-    # 创建图表
-    fig, ax = plt.subplots(figsize=(12, 12))
+    for node in all_topics:
+        if not G.has_node(node):
+            G.add_node(node)
+        G.nodes[node]['count'] = topic_counts.get(node, 0)
+        
+    num_nodes = G.number_of_nodes()
+    if num_nodes == 0:
+        return {"charts": [], "summary": "图节点为空"}
     
-    # 计算节点位置（圆形布局）
-    n_topics = len(all_topics)
-    topics_list = list(all_topics)
-    angles = np.linspace(0, 2 * np.pi, n_topics, endpoint=False)
-    radius = 5
+    # 绘图设置
+    # a. 布局
+    fig_side = max(15, int(np.sqrt(num_nodes) * 3.5))
+    fig, ax = plt.subplots(figsize=(fig_side, fig_side * 0.9), facecolor='white')
     
-    positions = {
-        topic: (radius * np.cos(angle), radius * np.sin(angle))
-        for topic, angle in zip(topics_list, angles)
-    }
+    dynamic_k = 5.0 / np.sqrt(num_nodes)
+    pos = nx.spring_layout(G, k=dynamic_k, iterations=100, seed=42)
     
+    # b. 节点大小
+    counts = [G.nodes[n].get('count', 1) for n in G.nodes()]
+    max_count = max(counts) if counts else 1
+    # 基础大小 + 比例大小
+    node_sizes = [300 + (c / max_count) * 2000 for c in counts]
+    
+    # c. 边宽度分档
+    weights = [d['weight'] for u, v, d in G.edges(data=True)]
+    w_levels = [1.0, 3.0, 5.0, 8.0, 12.0]
+    edge_widths = []
+    edge_range_labels = []
+
+    if weights:
+        p_points = [0, 25, 50, 75, 90, 100]
+        thresholds = [np.percentile(weights, p) for p in p_points]
+        edge_range_labels = [f"{int(thresholds[i])} - {int(thresholds[i+1])}" for i in range(5)]
+        
+        for u, v, d in G.edges(data=True):
+            w = d['weight']
+            idx = next((i for i, t in enumerate(thresholds[1:]) if w <= t), 4)
+            edge_widths.append(w_levels[idx])
+    else:
+        edge_widths = [1.0] * len(G.edges())
+
+    # 4. 绘制
     # 绘制边
-    max_count = max(p["count"] for p in pairs)
-    for pair in pairs:
-        t1, t2 = pair["topic_pair"]
-        if t1 in positions and t2 in positions:
-            x1, y1 = positions[t1]
-            x2, y2 = positions[t2]
-            # 线宽与共现次数成正比
-            linewidth = 1 + (pair["count"] / max_count) * 4
-            alpha = 0.3 + (pair["count"] / max_count) * 0.5
-            ax.plot([x1, x2], [y1, y2], 'gray', linewidth=linewidth, alpha=alpha, zorder=1)
+    nx.draw_networkx_edges(G, pos, width=edge_widths, alpha=0.4, edge_color="#7f8c8d")
     
-    # 绘制节点
-    max_topic_count = max(topic_counts.values()) if topic_counts else 1
-    for topic in topics_list:
-        x, y = positions[topic]
-        size = 200 + (topic_counts.get(topic, 0) / max_topic_count) * 800
-        ax.scatter(x, y, s=size, c='steelblue', alpha=0.7, edgecolors='white', linewidth=2, zorder=2)
-        ax.annotate(topic, (x, y), fontsize=10, ha='center', va='center', 
-                   fontweight='bold', zorder=3)
+    # 绘制节点 (双层效果)
+    # 外圈 - 浅色
+    nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="#3498db", alpha=0.3, linewidths=0)
+    # 内圈 - 深色 (实心)
+    inner_sizes = [s * 0.6 for s in node_sizes]
+    nx.draw_networkx_nodes(G, pos, node_size=inner_sizes, node_color="#2980b9", alpha=0.9, linewidths=1.5, edgecolors='white')
     
-    ax.set_xlim(-radius * 1.5, radius * 1.5)
-    ax.set_ylim(-radius * 1.5, radius * 1.5)
-    ax.set_aspect('equal')
-    ax.axis('off')
-    ax.set_title('主题关联网络图', fontsize=16, fontweight='bold', pad=20)
+    # 标签
+    for node, (x, y) in pos.items():
+        base_size = G.nodes[node]['count']
+        font_size = np.clip(10 + (base_size / max_count) * 10, 10, 18)
+        
+        txt = plt.text(x, y, s=node, fontsize=font_size, fontfamily='SimHei', 
+                 fontweight='bold', ha='center', va='center', zorder=10, color='white')
+        txt.set_path_effects([patheffects.withStroke(linewidth=3, foreground="#2c3e50")])
+        
+    # 图例
+    legend_elements = [
+        Line2D([0], [0], marker='o', color='w', label='Top Topic', 
+               markerfacecolor='#2980b9', markersize=15, alpha=0.9),
+        Line2D([0], [0], marker='o', color='w', label='Normal Topic', 
+               markerfacecolor='#2980b9', markersize=10, alpha=0.9)
+    ]
     
-    plt.tight_layout()
+    if weights and edge_range_labels:
+        display_indices = [0, 2, 4]
+        for idx in display_indices:
+             legend_elements.append(
+                 Line2D([0], [0], color='#7f8c8d', lw=w_levels[idx], label=f"Weight: {edge_range_labels[idx]}")
+             )
+
+    ax.legend(handles=legend_elements, loc='upper right', title="Legend", 
+              fontsize=10, frameon=True, framealpha=0.8)
+    
+    plt.axis('off')
+    plt.margins(0.1)
     
     # 保存图表
     os.makedirs(output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_network_{timestamp}.png")
-    plt.savefig(file_path, dpi=150, bbox_inches='tight')
+    plt.savefig(file_path, dpi=300, bbox_inches='tight')
     plt.close()
     
     return {
@@ -757,9 +814,9 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
             "title": "主题关联网络图",
             "file_path": file_path,
             "source_tool": "topic_network_chart",
-            "description": "展示主题之间的共现关联关系，线条粗细表示关联强度"
+            "description": "展示主题之间的共现关联关系，节点大小代表热度，线条粗细表示关联强度"
         }],
-        "summary": f"已生成主题关联网络图，保存至 {file_path}"
+        "summary": f"已生成优化后的主题关联网络图，保存至 {file_path}"
     }
 
 

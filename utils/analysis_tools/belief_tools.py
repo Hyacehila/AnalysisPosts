@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime
 from itertools import combinations
 from typing import Any, Dict, List, Tuple
@@ -14,41 +15,6 @@ plt.rcParams["font.sans-serif"] = ["SimHei"]
 plt.rcParams["axes.unicode_minus"] = False
 
 
-def _extract_belief_signals(belief_signals: Any) -> Tuple[List[str], Dict[str, str]]:
-    """提取信念信号列表与子类->类别映射."""
-    if not belief_signals:
-        return [], {}
-
-    signals: List[str] = []
-    mapping: Dict[str, str] = {}
-
-    for item in belief_signals:
-        if isinstance(item, dict):
-            category = item.get("category") or item.get("Category") or ""
-            subcategory = item.get("subcategory") or item.get("Subcategory") or ""
-            subcategories = item.get("subcategories") or item.get("Subcategories") or []
-
-            if subcategory:
-                signals.append(subcategory)
-                mapping[subcategory] = category or subcategory
-
-            if subcategories:
-                for sub in subcategories:
-                    if not sub:
-                        continue
-                    signals.append(sub)
-                    mapping[sub] = category or sub
-            elif not subcategory and category:
-                signals.append(category)
-                mapping[category] = category
-        elif isinstance(item, str):
-            signals.append(item)
-            mapping[item] = mapping.get(item, item)
-
-    unique_signals = list(dict.fromkeys(signals))
-    return unique_signals, mapping
-
-
 def build_belief_network_data(
     blogs_data: List[Dict[str, Any]],
     event_name: str = "belief_network",
@@ -56,171 +22,203 @@ def build_belief_network_data(
 ) -> Tuple[nx.Graph, pd.DataFrame, pd.DataFrame]:
     """
     输入：打好标签的博文列表
-    输出：NetworkX 图对象 + 节点/边数据表
+    输出：NetworkX 图对象 (包含节点、普通边、环边及其权重)
     """
     G = nx.Graph()
-    W_REPOST, W_COMMENT, W_LIKE = 5, 3, 1
+    # 转发、评论、点赞的权重
+    # W_REPOST, W_COMMENT, W_LIKE = 5, 3, 1
 
     for blog in blogs_data:
-        signals, sig_to_cat = _extract_belief_signals(blog.get("belief_signals", []))
+        # 1. 提取信号并处理嵌套的 subcategories 列表
+        raw_signals_list = blog.get('belief_signals', [])
+        if not raw_signals_list:
+            continue
+
+        signals = []
+        sig_to_cat = {}
+        
+        for item in raw_signals_list:
+            if isinstance(item, dict):
+                cat = item.get('category', '其他')
+                # 关键修复：遍历 subcategories 列表
+                subs = item.get('subcategories', [])
+                if isinstance(subs, list):
+                    for s in subs:
+                        if s:
+                            signals.append(s)
+                            sig_to_cat[s] = cat
+                elif isinstance(subs, str): # 防御性编程：万一以后出现了字符串
+                    if subs:
+                        signals.append(subs)
+                        sig_to_cat[subs] = cat
+            elif isinstance(item, str):
+                if item:
+                    signals.append(item)
+                    sig_to_cat[item] = '其他'
+
+        # 对单篇博文内的信号去重
+        signals = list(set(signals))
         if not signals:
             continue
 
-        raw_score = (
-            blog.get("repost_count", 0) * W_REPOST
-            + blog.get("comment_count", 0) * W_COMMENT
-            + blog.get("like_count", 0) * W_LIKE
-        )
-        blog_weight = np.log1p(raw_score)
+        # 互动总分
+        interaction_sum = (blog.get('repost_count', 0) * 5 + 
+                           blog.get('comment_count', 0) * 3 + 
+                           blog.get('like_count', 0) * 1)
+        blog_weight = np.log(np.e + interaction_sum)    # 自然对数平滑
 
+        # 3. 构建网络结构
         if len(signals) == 1:
+            # 单个信号：构造“自环”边，表示独立出现的强度
             node = signals[0]
             if not G.has_node(node):
-                G.add_node(node, category=sig_to_cat.get(node, ""), co_occurrence_weight=0)
-
+                G.add_node(node, category=sig_to_cat.get(node, "其他"), co_occurrence_weight=0)
+            
             if G.has_edge(node, node):
-                G[node][node]["weight"] += blog_weight
+                G[node][node]['weight'] += blog_weight
             else:
                 G.add_edge(node, node, weight=blog_weight)
+        
         else:
+            # 多个信号：构造两两之间的普通边，并增加节点的“共现”权重
             for u, v in combinations(signals, 2):
-                for n in (u, v):
+                for n in [u, v]:
                     if not G.has_node(n):
-                        G.add_node(n, category=sig_to_cat.get(n, ""), co_occurrence_weight=0)
-                    G.nodes[n]["co_occurrence_weight"] += blog_weight
-
+                        G.add_node(n, category=sig_to_cat.get(n, "其他"), co_occurrence_weight=0)
+                    # 记录节点参与“共现”的总强度
+                    G.nodes[n]['co_occurrence_weight'] += blog_weight
+                
                 if G.has_edge(u, v):
-                    G[u][v]["weight"] += blog_weight
+                    G[u][v]['weight'] += blog_weight
                 else:
                     G.add_edge(u, v, weight=blog_weight)
-
-    nodes_df = pd.DataFrame(
-        [
-            {
-                "ID": n,
-                "Category": d.get("category", ""),
-                "Co-Occurrence-Weight": d.get("co_occurrence_weight", 0),
-            }
-            for n, d in G.nodes(data=True)
-        ]
-    )
-
-    edges_list = []
-    for u, v, d in G.edges(data=True):
-        edges_list.append(
-            {
-                "Source": u,
-                "Target": v,
-                "Weight": d.get("weight", 0),
-                "Type": "Loop" if u == v else "Regular",
-            }
-        )
-    edges_df = pd.DataFrame(edges_list)
-
+    
+    nodes_df = pd.DataFrame([
+        {
+            "ID": n, 
+            "Category": d.get('category', '未知'), 
+            "Co-Occurrence-Weight": d.get('co_occurrence_weight', 0)
+        }
+        for n, d in G.nodes(data=True)
+    ])
+    
     os.makedirs(data_dir, exist_ok=True)
     nodes_path = os.path.join(data_dir, f"nodes_{event_name}.csv")
     edges_path = os.path.join(data_dir, f"edges_{event_name}.csv")
-    nodes_df.to_csv(nodes_path, index=False, encoding="utf_8")
-    edges_df.to_csv(edges_path, index=False, encoding="utf_8")
+    nodes_df.to_csv(nodes_path, index=False, encoding='utf_8_sig')
 
+    edges_list = []
+    for u, v, d in G.edges(data=True):
+        edges_list.append({
+            "Source": u, 
+            "Target": v, 
+            "Weight": d['weight'], 
+            "Type": "Loop" if u == v else "Regular"
+        })
+    edges_df = pd.DataFrame(edges_list)
+    edges_df.to_csv(edges_path, index=False, encoding='utf_8_sig')
+    
     return G, nodes_df, edges_df
 
 
 def _draw_belief_network_graph(G: nx.Graph, file_path: str, event_name: str) -> None:
-    if G.number_of_nodes() == 0:
-        return
+    if G.number_of_nodes() == 0: return
 
     num_nodes = G.number_of_nodes()
-    dynamic_k = 2.5 / np.sqrt(num_nodes)
-    pos = nx.spring_layout(G, k=dynamic_k, iterations=10, seed=114514)
+    fig_side = max(15, int(np.sqrt(num_nodes) * 3.5))
+    fig, ax = plt.subplots(figsize=(fig_side, fig_side * 1), facecolor='white')
 
-    plt.figure(figsize=(15, 12), facecolor="white")
+    dynamic_k = 7.0 / np.sqrt(num_nodes) 
+    pos = nx.spring_layout(G, k=dynamic_k, iterations=500, seed=114514, weight=None)
 
     nodes = list(G.nodes())
-    color_map = {"风险感知类": "#FF6B6B", "归因信念类": "#4D96FF", "行动/政策类": "#6BCB77"}
-    border_color_map = {"风险感知类": "#C0392B", "归因信念类": "#2980B9", "行动/政策类": "#27AE60"}
+    self_loop_weights = {u: d['weight'] for u, v, d in G.edges(data=True) if u == v}
+    co_occurrence_weights = {n: G.nodes[n].get('co_occurrence_weight', 0) for n in nodes}
 
-    self_loop_weights = {u: d["weight"] for u, v, d in G.edges(data=True) if u == v}
+    total_weights = [co_occurrence_weights[n] + self_loop_weights.get(n, 0) for n in nodes]
+    avg_total_w = np.mean(total_weights) if total_weights else 1
+    
+    base_node_size = (fig_side * 1000) / np.sqrt(num_nodes) 
+    outer_sizes = [base_node_size * np.clip(np.sqrt(w / avg_total_w), 0.8, 3.5) for w in total_weights]
+
+    # 3. 边宽五档化 (针对外部边)
     regular_edges = [(u, v) for u, v in G.edges() if u != v]
+    w_levels = [1.0, 2.5, 4.5, 7.0, 10.0]
+    
+    edge_widths = []
+    edge_range_labels = []
 
-    total_sizes = []
-    core_sizes = []
-    for n in nodes:
-        cw = G.nodes[n].get("co_occurrence_weight", 0)
-        sw = self_loop_weights.get(n, 0)
-        total_w = cw + sw
+    if regular_edges:
+        weights = np.array([G[u][v]['weight'] for u, v in regular_edges])
+        p_points = [0, 20, 40, 60, 80, 100]
+        thresholds = [np.percentile(weights, p) for p in p_points]
+        edge_range_labels = [f"{int(thresholds[i])} - {int(thresholds[i+1])}" for i in range(5)]
+        
+        for u, v in regular_edges:
+            w = G[u][v]['weight']
+            idx = next((i for i, t in enumerate(thresholds[1:]) if w <= t), 4)
+            edge_widths.append(w_levels[idx])
+    else:
+        edge_range_labels = ["0-0"] * 5
 
-        t_size = np.power(total_w, 0.5) * 400 + 1500
-        total_sizes.append(t_size)
+    color_map = {"风险感知类": "#FF6B6B", "归因信念类": "#4D96FF", "行动/政策类": "#6BCB77"}
+    dark_color_map = {"风险感知类": "#C0392B", "归因信念类": "#2980B9", "行动/政策类": "#27AE60"}
 
-        ratio = (cw / total_w) if total_w > 0 else 0
-        core_sizes.append(t_size * (ratio * 0.8 + 0.2))
+    nx.draw_networkx_edges(G, pos, edgelist=regular_edges, width=edge_widths, alpha=0.25, edge_color="#5D5C5C")
 
-    edge_widths = [np.power((G[u][v]["weight"] / 5), 0.7) * 10 for u, v in regular_edges]
+    for i, node in enumerate(nodes):
+        cat = G.nodes[node].get('category', '其他')
+        base_color = color_map.get(cat, "#cccccc")
+        dark_color = dark_color_map.get(cat, "#747474")
+        
+        nx.draw_networkx_nodes(G, pos, nodelist=[node], node_size=outer_sizes[i], 
+                               node_color=base_color, edgecolors=dark_color, linewidths=1.0, alpha=0.8)
+        
+        self_w = self_loop_weights.get(node, 0)
+        total_w = total_weights[i]
+        inner_ratio = np.sqrt(self_w / total_w) if total_w > 0 else 0
+        inner_size = outer_sizes[i] * inner_ratio
+        
+        if inner_size > 0:
+            nx.draw_networkx_nodes(G, pos, nodelist=[node], node_size=inner_size, 
+                                   node_color=dark_color, edgecolors=dark_color, linewidths=0.5, alpha=1)
 
-    nx.draw_networkx_edges(
-        G, pos, edgelist=regular_edges, width=edge_widths, alpha=0.5, edge_color="#5F5F5F"
-    )
+    for i, (node, (x, y)) in enumerate(pos.items()):
+        d_fontsize = np.clip(np.sqrt(outer_sizes[i]) / 3.5, 10, 16)
+        txt = plt.text(x, y - 0.03, s=node, fontsize=d_fontsize, fontfamily='SimHei', 
+                        fontweight='bold', ha='center', va='center', zorder=150)
+        txt.set_path_effects([patheffects.withStroke(linewidth=2.5, foreground="white")])
 
-    nx.draw_networkx_nodes(
-        G,
-        pos,
-        node_size=total_sizes,
-        node_color=[border_color_map.get(G.nodes[n].get("category"), "#747474") for n in nodes],
-        alpha=1.0,
-    )
+    cat_legends = [Line2D([0], [0], marker='o', color='w', label=cat, markerfacecolor=color, 
+                          markersize=14) 
+                   for cat, color in color_map.items()]
+    
+    if regular_edges:
+        edge_legends = [Line2D([0], [0], color='#767676', lw=w_levels[i], label=edge_range_labels[i])
+                        for i in range(4, -1, -1)]
+    else:
+        edge_legends = []
 
-    nx.draw_networkx_nodes(
-        G,
-        pos,
-        node_size=core_sizes,
-        node_color=[color_map.get(G.nodes[n].get("category"), "#cccccc") for n in nodes],
-        edgecolors="none",
-        alpha=1.0,
-    )
-
-    for node, (x, y) in pos.items():
-        txt = plt.text(
-            x,
-            y,
-            s=node,
-            fontsize=12,
-            fontfamily="SimHei",
-            fontweight="bold",
-            ha="center",
-            va="center",
-            zorder=30,
-        )
-        txt.set_path_effects([patheffects.withStroke(linewidth=3, foreground="white")])
-
-    legend_elements = [
-        Line2D(
-            [0],
-            [0],
-            marker="o",
-            color="w",
-            label=cat,
-            markerfacecolor=color,
-            markersize=12,
-            markeredgecolor=border_color_map[cat],
-            markeredgewidth=1.5,
-        )
-        for cat, color in color_map.items()
+    node_composition_legends = [
+        Line2D([0], [0], marker='o', color='w', label='共现部分', 
+               markerfacecolor='#DDDDDD', markersize=14),
+        Line2D([0], [0], marker='o', color='w', label='自现部分', 
+               markerfacecolor='#747474', markersize=10)
     ]
 
-    plt.legend(
-        handles=legend_elements,
-        loc="upper right",
-        title="信念类别",
-        fontsize=11,
-        title_fontsize=13,
-        frameon=True,
-        edgecolor="#D3D3D3",
-    )
-    plt.title(f"信念网络图（{event_name}）", fontsize=18, fontfamily="SimHei")
+    leg1 = ax.legend(handles=cat_legends, loc='upper right', title="信念类别", shadow=True)
+    ax.add_artist(leg1) 
+    leg2 = ax.legend(handles=node_composition_legends, loc='upper right', 
+                     title="节点构成", bbox_to_anchor=(1, 0.85), shadow=True)
+    ax.add_artist(leg2)
+    
+    if edge_legends:
+        ax.legend(handles=edge_legends, loc='lower right', title="关联强度", shadow=True)
+
+    # plt.title(f"信念网络图（{event_name}）", fontsize=22, pad=30)
+    plt.axis('off')
     plt.margins(0.05)
-    plt.axis("off")
-    plt.savefig(file_path, bbox_inches="tight", dpi=300)
+    plt.savefig(file_path, dpi=600, bbox_inches='tight', transparent=True)
     plt.close()
 
 

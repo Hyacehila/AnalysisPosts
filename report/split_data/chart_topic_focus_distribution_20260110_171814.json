@@ -1,0 +1,9 @@
+{
+  "id": "topic_focus_distribution_20260110_171814",
+  "title": "焦点窗口主题发布趋势",
+  "path": "report/images\\topic_focus_distribution_20260110_171814.png",
+  "file_path": "report/images\\topic_focus_distribution_20260110_171814.png",
+  "type": "line_chart",
+  "description": "焦点窗口内 Top5 父主题的发布趋势",
+  "source_tool": "topic_focus_distribution_chart"
+}

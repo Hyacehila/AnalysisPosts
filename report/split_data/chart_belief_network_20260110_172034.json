@@ -1,0 +1,9 @@
+{
+  "id": "belief_network_20260110_172034",
+  "title": "信念网络图（belief_network）",
+  "path": "report/images\\belief_network_20260110_172034.png",
+  "file_path": "report/images\\belief_network_20260110_172034.png",
+  "type": "network",
+  "description": "信念子类的共现关系与强度",
+  "source_tool": "belief_network_chart"
+}

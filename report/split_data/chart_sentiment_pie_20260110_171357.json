@@ -1,0 +1,8 @@
+{
+  "id": "sentiment_pie_20260110_171357",
+  "type": "pie_chart",
+  "title": "情感分布饼图",
+  "file_path": "report/images\\sentiment_pie_20260110_171357.png",
+  "source_tool": "sentiment_pie_chart",
+  "description": "展示博文情感极性的整体分布情况"
+}

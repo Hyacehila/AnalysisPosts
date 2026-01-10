@@ -1,0 +1,8 @@
+﻿Key,sentiment_polarity,repost_count,comment_count,like_count,content_length,image_count,topic_count
+sentiment_polarity,1.0,0.007,0.022,0.006,0.063,0.084,-0.143
+repost_count,0.007,1.0,0.494,0.752,0.019,0.02,-0.001
+comment_count,0.022,0.494,1.0,0.78,0.024,0.02,0.008
+like_count,0.006,0.752,0.78,1.0,0.012,0.019,0.005
+content_length,0.063,0.019,0.024,0.012,1.0,0.158,-0.105
+image_count,0.084,0.02,0.02,0.019,0.158,1.0,-0.084
+topic_count,-0.143,-0.001,0.008,0.005,-0.105,-0.084,1.0

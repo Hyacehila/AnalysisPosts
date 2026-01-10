@@ -1,0 +1,8 @@
+{
+  "id": "sentiment_bucket_trend_20260110_171940",
+  "type": "area_chart",
+  "title": "正负中性占比时序趋势",
+  "file_path": "report/images\\sentiment_bucket_trend_20260110_171940.png",
+  "source_tool": "sentiment_bucket_trend_chart",
+  "description": "正/负/中性情绪占比的阶段差异和峰值"
+}

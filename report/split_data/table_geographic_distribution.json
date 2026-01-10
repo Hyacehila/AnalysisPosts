@@ -1,0 +1,370 @@
+{
+  "id": "geographic_distribution",
+  "title": "地理分析 - geographic_distribution",
+  "data": {
+    "distribution": {
+      "无位置信息": {
+        "count": 3176,
+        "percentage": 16.24
+      },
+      "广东": {
+        "count": 2853,
+        "percentage": 14.59
+      },
+      "北京": {
+        "count": 1492,
+        "percentage": 7.63
+      },
+      "浙江": {
+        "count": 950,
+        "percentage": 4.86
+      },
+      "江苏": {
+        "count": 934,
+        "percentage": 4.78
+      },
+      "河南": {
+        "count": 857,
+        "percentage": 4.38
+      },
+      "山东": {
+        "count": 822,
+        "percentage": 4.2
+      },
+      "上海": {
+        "count": 778,
+        "percentage": 3.98
+      },
+      "四川": {
+        "count": 667,
+        "percentage": 3.41
+      },
+      "福建": {
+        "count": 561,
+        "percentage": 2.87
+      },
+      "湖北": {
+        "count": 557,
+        "percentage": 2.85
+      },
+      "湖南": {
+        "count": 552,
+        "percentage": 2.82
+      },
+      "河北": {
+        "count": 510,
+        "percentage": 2.61
+      },
+      "中国香港": {
+        "count": 497,
+        "percentage": 2.54
+      },
+      "陕西": {
+        "count": 427,
+        "percentage": 2.18
+      },
+      "安徽": {
+        "count": 379,
+        "percentage": 1.94
+      },
+      "广西": {
+        "count": 366,
+        "percentage": 1.87
+      },
+      "辽宁": {
+        "count": 354,
+        "percentage": 1.81
+      },
+      "江西": {
+        "count": 336,
+        "percentage": 1.72
+      },
+      "重庆": {
+        "count": 303,
+        "percentage": 1.55
+      },
+      "天津": {
+        "count": 287,
+        "percentage": 1.47
+      },
+      "山西": {
+        "count": 219,
+        "percentage": 1.12
+      },
+      "云南": {
+        "count": 175,
+        "percentage": 0.9
+      },
+      "吉林": {
+        "count": 158,
+        "percentage": 0.81
+      },
+      "贵州": {
+        "count": 154,
+        "percentage": 0.79
+      },
+      "黑龙江": {
+        "count": 139,
+        "percentage": 0.71
+      },
+      "海南": {
+        "count": 131,
+        "percentage": 0.67
+      },
+      "内蒙古": {
+        "count": 120,
+        "percentage": 0.61
+      },
+      "甘肃": {
+        "count": 108,
+        "percentage": 0.55
+      },
+      "美国": {
+        "count": 81,
+        "percentage": 0.41
+      },
+      "新疆": {
+        "count": 80,
+        "percentage": 0.41
+      },
+      "中国台湾": {
+        "count": 60,
+        "percentage": 0.31
+      },
+      "日本": {
+        "count": 58,
+        "percentage": 0.3
+      },
+      "宁夏": {
+        "count": 47,
+        "percentage": 0.24
+      },
+      "英国": {
+        "count": 44,
+        "percentage": 0.23
+      },
+      "澳大利亚": {
+        "count": 39,
+        "percentage": 0.2
+      },
+      "加拿大": {
+        "count": 39,
+        "percentage": 0.2
+      },
+      "新加坡": {
+        "count": 28,
+        "percentage": 0.14
+      },
+      "马来西亚": {
+        "count": 28,
+        "percentage": 0.14
+      },
+      "中国": {
+        "count": 24,
+        "percentage": 0.12
+      },
+      "荷兰": {
+        "count": 23,
+        "percentage": 0.12
+      },
+      "中国澳门": {
+        "count": 20,
+        "percentage": 0.1
+      },
+      "德国": {
+        "count": 19,
+        "percentage": 0.1
+      },
+      "青海": {
+        "count": 17,
+        "percentage": 0.09
+      },
+      "韩国": {
+        "count": 11,
+        "percentage": 0.06
+      },
+      "意大利": {
+        "count": 9,
+        "percentage": 0.05
+      },
+      "法国": {
+        "count": 8,
+        "percentage": 0.04
+      },
+      "泰国": {
+        "count": 8,
+        "percentage": 0.04
+      },
+      "西班牙": {
+        "count": 7,
+        "percentage": 0.04
+      },
+      "西藏": {
+        "count": 3,
+        "percentage": 0.02
+      },
+      "比利时": {
+        "count": 3,
+        "percentage": 0.02
+      },
+      "俄罗斯": {
+        "count": 3,
+        "percentage": 0.02
+      },
+      "葡萄牙": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "匈牙利": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "柬埔寨": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "菲律宾": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "阿根廷": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "新西兰": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "印度尼西亚": {
+        "count": 2,
+        "percentage": 0.01
+      },
+      "埃塞俄比亚": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "巴西": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "安哥拉": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "智利": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "芬兰": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "阿联酋": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "哈萨克斯坦": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "哥斯达黎加": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "关岛": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "瑞士": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "南非": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "莫桑比克": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "格鲁吉亚": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "越南": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "尼日利亚": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "挪威": {
+        "count": 1,
+        "percentage": 0.01
+      },
+      "奥地利": {
+        "count": 1,
+        "percentage": 0.01
+      }
+    },
+    "total_posts": 19552,
+    "posts_with_location": 19552,
+    "coverage_percentage": 100.0,
+    "unique_locations": 76,
+    "top_locations": [
+      {
+        "location": "无位置信息",
+        "count": 3176,
+        "percentage": 16.24
+      },
+      {
+        "location": "广东",
+        "count": 2853,
+        "percentage": 14.59
+      },
+      {
+        "location": "北京",
+        "count": 1492,
+        "percentage": 7.63
+      },
+      {
+        "location": "浙江",
+        "count": 950,
+        "percentage": 4.86
+      },
+      {
+        "location": "江苏",
+        "count": 934,
+        "percentage": 4.78
+      },
+      {
+        "location": "河南",
+        "count": 857,
+        "percentage": 4.38
+      },
+      {
+        "location": "山东",
+        "count": 822,
+        "percentage": 4.2
+      },
+      {
+        "location": "上海",
+        "count": 778,
+        "percentage": 3.98
+      },
+      {
+        "location": "四川",
+        "count": 667,
+        "percentage": 3.41
+      },
+      {
+        "location": "福建",
+        "count": 561,
+        "percentage": 2.87
+      }
+    ]
+  },
+  "source_tool": "geographic_distribution",
+  "source_type": "mcp"
+}

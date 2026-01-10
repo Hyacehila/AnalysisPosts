@@ -1,0 +1,8 @@
+{
+  "id": "sentiment_attribute_trend_20260110_172015",
+  "type": "line_chart",
+  "title": "情绪属性热点趋势",
+  "file_path": "report/images\\sentiment_attribute_trend_20260110_172015.png",
+  "source_tool": "sentiment_attribute_trend_chart",
+  "description": "Top情绪属性时间热度变化与焦点窗口标注"
+}

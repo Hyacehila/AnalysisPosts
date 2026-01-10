@@ -1,0 +1,61 @@
+{
+  "id": "cross_matrix",
+  "title": "其他 - cross_matrix",
+  "data": {
+    "matrix": {
+      "个人用户": {
+        "悲观": {
+          "count": 9378,
+          "row_percentage": 47.96,
+          "col_percentage": 100.0
+        },
+        "乐观": {
+          "count": 5129,
+          "row_percentage": 26.23,
+          "col_percentage": 100.0
+        },
+        "中性": {
+          "count": 2652,
+          "row_percentage": 13.56,
+          "col_percentage": 100.0
+        },
+        "极度悲观": {
+          "count": 2193,
+          "row_percentage": 11.22,
+          "col_percentage": 100.0
+        },
+        "极度乐观": {
+          "count": 200,
+          "row_percentage": 1.02,
+          "col_percentage": 100.0
+        }
+      }
+    },
+    "dimensions": {
+      "dim1": "publisher",
+      "dim2": "sentiment_polarity"
+    },
+    "dim1_values": [
+      "个人用户"
+    ],
+    "dim2_values": [
+      "悲观",
+      "乐观",
+      "中性",
+      "极度悲观",
+      "极度乐观"
+    ],
+    "dim1_totals": {
+      "个人用户": 19552
+    },
+    "dim2_totals": {
+      "悲观": 9378,
+      "乐观": 5129,
+      "中性": 2652,
+      "极度悲观": 2193,
+      "极度乐观": 200
+    }
+  },
+  "source_tool": "cross_matrix",
+  "source_type": "mcp"
+}

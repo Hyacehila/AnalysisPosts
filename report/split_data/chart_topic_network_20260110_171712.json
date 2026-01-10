@@ -1,0 +1,8 @@
+{
+  "id": "topic_network_20260110_171712",
+  "type": "network_chart",
+  "title": "主题关联网络图",
+  "file_path": "report/images\\topic_network_20260110_171712.png",
+  "source_tool": "topic_network_chart",
+  "description": "展示主题之间的共现关联关系，线条粗细表示关联强度"
+}

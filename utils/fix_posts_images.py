@@ -96,7 +96,7 @@ def print_statistics(stats: Dict[str, Any]):
 def main():
     """主函数"""
     # 数据文件路径
-    posts_file = 'data/posts.json'
+    posts_file = 'data/HongKongFireSEL.json'
     test_posts_file = 'data/test_posts.json'
     
     print("开始修复posts数据中的图片数量...")

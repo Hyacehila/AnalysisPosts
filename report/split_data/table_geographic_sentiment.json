@@ -1,0 +1,355 @@
+{
+  "id": "geographic_sentiment",
+  "title": "情感分析 - geographic_sentiment",
+  "data": {
+    "regional_analysis": {
+      "山东": {
+        "post_count": 822,
+        "avg_polarity": 2.51,
+        "positive_ratio": 26.28,
+        "negative_ratio": 62.53,
+        "sentiment_label": "中性"
+      },
+      "无位置信息": {
+        "post_count": 3176,
+        "avg_polarity": 2.73,
+        "positive_ratio": 29.79,
+        "negative_ratio": 47.04,
+        "sentiment_label": "中性"
+      },
+      "中国香港": {
+        "post_count": 497,
+        "avg_polarity": 2.83,
+        "positive_ratio": 37.42,
+        "negative_ratio": 48.09,
+        "sentiment_label": "中性"
+      },
+      "广东": {
+        "post_count": 2853,
+        "avg_polarity": 2.57,
+        "positive_ratio": 28.08,
+        "negative_ratio": 61.69,
+        "sentiment_label": "中性"
+      },
+      "天津": {
+        "post_count": 287,
+        "avg_polarity": 2.48,
+        "positive_ratio": 22.65,
+        "negative_ratio": 60.98,
+        "sentiment_label": "负面主导"
+      },
+      "北京": {
+        "post_count": 1492,
+        "avg_polarity": 2.48,
+        "positive_ratio": 22.05,
+        "negative_ratio": 63.4,
+        "sentiment_label": "负面主导"
+      },
+      "浙江": {
+        "post_count": 950,
+        "avg_polarity": 2.59,
+        "positive_ratio": 28.42,
+        "negative_ratio": 59.47,
+        "sentiment_label": "中性"
+      },
+      "安徽": {
+        "post_count": 379,
+        "avg_polarity": 2.49,
+        "positive_ratio": 25.59,
+        "negative_ratio": 63.85,
+        "sentiment_label": "负面主导"
+      },
+      "四川": {
+        "post_count": 667,
+        "avg_polarity": 2.52,
+        "positive_ratio": 24.89,
+        "negative_ratio": 62.97,
+        "sentiment_label": "中性"
+      },
+      "江西": {
+        "post_count": 336,
+        "avg_polarity": 2.53,
+        "positive_ratio": 26.49,
+        "negative_ratio": 63.1,
+        "sentiment_label": "中性"
+      },
+      "上海": {
+        "post_count": 778,
+        "avg_polarity": 2.56,
+        "positive_ratio": 27.63,
+        "negative_ratio": 62.21,
+        "sentiment_label": "中性"
+      },
+      "山西": {
+        "post_count": 219,
+        "avg_polarity": 2.63,
+        "positive_ratio": 32.42,
+        "negative_ratio": 58.9,
+        "sentiment_label": "中性"
+      },
+      "中国": {
+        "post_count": 24,
+        "avg_polarity": 2.29,
+        "positive_ratio": 12.5,
+        "negative_ratio": 79.17,
+        "sentiment_label": "负面主导"
+      },
+      "河南": {
+        "post_count": 857,
+        "avg_polarity": 2.47,
+        "positive_ratio": 23.1,
+        "negative_ratio": 66.16,
+        "sentiment_label": "负面主导"
+      },
+      "吉林": {
+        "post_count": 158,
+        "avg_polarity": 2.37,
+        "positive_ratio": 22.15,
+        "negative_ratio": 70.89,
+        "sentiment_label": "负面主导"
+      },
+      "广西": {
+        "post_count": 366,
+        "avg_polarity": 2.66,
+        "positive_ratio": 28.69,
+        "negative_ratio": 56.83,
+        "sentiment_label": "中性"
+      },
+      "湖南": {
+        "post_count": 552,
+        "avg_polarity": 2.57,
+        "positive_ratio": 27.17,
+        "negative_ratio": 60.14,
+        "sentiment_label": "中性"
+      },
+      "河北": {
+        "post_count": 510,
+        "avg_polarity": 2.56,
+        "positive_ratio": 28.04,
+        "negative_ratio": 60.98,
+        "sentiment_label": "中性"
+      },
+      "湖北": {
+        "post_count": 557,
+        "avg_polarity": 2.56,
+        "positive_ratio": 29.26,
+        "negative_ratio": 61.4,
+        "sentiment_label": "中性"
+      },
+      "中国台湾": {
+        "post_count": 60,
+        "avg_polarity": 3.17,
+        "positive_ratio": 55.0,
+        "negative_ratio": 35.0,
+        "sentiment_label": "中性"
+      },
+      "辽宁": {
+        "post_count": 354,
+        "avg_polarity": 2.52,
+        "positive_ratio": 24.58,
+        "negative_ratio": 62.15,
+        "sentiment_label": "中性"
+      },
+      "重庆": {
+        "post_count": 303,
+        "avg_polarity": 2.62,
+        "positive_ratio": 28.71,
+        "negative_ratio": 57.76,
+        "sentiment_label": "中性"
+      },
+      "江苏": {
+        "post_count": 934,
+        "avg_polarity": 2.53,
+        "positive_ratio": 26.77,
+        "negative_ratio": 62.63,
+        "sentiment_label": "中性"
+      },
+      "贵州": {
+        "post_count": 154,
+        "avg_polarity": 2.49,
+        "positive_ratio": 22.73,
+        "negative_ratio": 66.88,
+        "sentiment_label": "负面主导"
+      },
+      "福建": {
+        "post_count": 561,
+        "avg_polarity": 2.53,
+        "positive_ratio": 24.6,
+        "negative_ratio": 59.89,
+        "sentiment_label": "中性"
+      },
+      "云南": {
+        "post_count": 175,
+        "avg_polarity": 2.54,
+        "positive_ratio": 32.0,
+        "negative_ratio": 64.0,
+        "sentiment_label": "中性"
+      },
+      "陕西": {
+        "post_count": 427,
+        "avg_polarity": 2.46,
+        "positive_ratio": 22.72,
+        "negative_ratio": 63.7,
+        "sentiment_label": "负面主导"
+      },
+      "甘肃": {
+        "post_count": 108,
+        "avg_polarity": 2.64,
+        "positive_ratio": 27.78,
+        "negative_ratio": 57.41,
+        "sentiment_label": "中性"
+      },
+      "法国": {
+        "post_count": 8,
+        "avg_polarity": 2.62,
+        "positive_ratio": 37.5,
+        "negative_ratio": 62.5,
+        "sentiment_label": "中性"
+      },
+      "黑龙江": {
+        "post_count": 139,
+        "avg_polarity": 2.63,
+        "positive_ratio": 30.22,
+        "negative_ratio": 56.83,
+        "sentiment_label": "中性"
+      },
+      "新疆": {
+        "post_count": 80,
+        "avg_polarity": 2.49,
+        "positive_ratio": 22.5,
+        "negative_ratio": 62.5,
+        "sentiment_label": "负面主导"
+      },
+      "海南": {
+        "post_count": 131,
+        "avg_polarity": 2.54,
+        "positive_ratio": 26.72,
+        "negative_ratio": 64.89,
+        "sentiment_label": "中性"
+      },
+      "内蒙古": {
+        "post_count": 120,
+        "avg_polarity": 2.69,
+        "positive_ratio": 33.33,
+        "negative_ratio": 55.83,
+        "sentiment_label": "中性"
+      },
+      "韩国": {
+        "post_count": 11,
+        "avg_polarity": 2.09,
+        "positive_ratio": 9.09,
+        "negative_ratio": 90.91,
+        "sentiment_label": "负面主导"
+      },
+      "新加坡": {
+        "post_count": 28,
+        "avg_polarity": 2.39,
+        "positive_ratio": 21.43,
+        "negative_ratio": 71.43,
+        "sentiment_label": "负面主导"
+      },
+      "英国": {
+        "post_count": 44,
+        "avg_polarity": 2.39,
+        "positive_ratio": 20.45,
+        "negative_ratio": 68.18,
+        "sentiment_label": "负面主导"
+      },
+      "马来西亚": {
+        "post_count": 28,
+        "avg_polarity": 2.32,
+        "positive_ratio": 21.43,
+        "negative_ratio": 67.86,
+        "sentiment_label": "负面主导"
+      },
+      "荷兰": {
+        "post_count": 23,
+        "avg_polarity": 2.09,
+        "positive_ratio": 13.04,
+        "negative_ratio": 73.91,
+        "sentiment_label": "负面主导"
+      },
+      "德国": {
+        "post_count": 19,
+        "avg_polarity": 2.74,
+        "positive_ratio": 21.05,
+        "negative_ratio": 52.63,
+        "sentiment_label": "中性"
+      },
+      "青海": {
+        "post_count": 17,
+        "avg_polarity": 2.06,
+        "positive_ratio": 11.76,
+        "negative_ratio": 82.35,
+        "sentiment_label": "负面主导"
+      },
+      "宁夏": {
+        "post_count": 47,
+        "avg_polarity": 2.49,
+        "positive_ratio": 21.28,
+        "negative_ratio": 68.09,
+        "sentiment_label": "负面主导"
+      },
+      "中国澳门": {
+        "post_count": 20,
+        "avg_polarity": 2.8,
+        "positive_ratio": 35.0,
+        "negative_ratio": 45.0,
+        "sentiment_label": "中性"
+      },
+      "日本": {
+        "post_count": 58,
+        "avg_polarity": 2.78,
+        "positive_ratio": 36.21,
+        "negative_ratio": 51.72,
+        "sentiment_label": "中性"
+      },
+      "澳大利亚": {
+        "post_count": 39,
+        "avg_polarity": 2.51,
+        "positive_ratio": 23.08,
+        "negative_ratio": 61.54,
+        "sentiment_label": "中性"
+      },
+      "加拿大": {
+        "post_count": 39,
+        "avg_polarity": 2.64,
+        "positive_ratio": 33.33,
+        "negative_ratio": 53.85,
+        "sentiment_label": "中性"
+      },
+      "泰国": {
+        "post_count": 8,
+        "avg_polarity": 3.0,
+        "positive_ratio": 50.0,
+        "negative_ratio": 50.0,
+        "sentiment_label": "中性"
+      },
+      "美国": {
+        "post_count": 81,
+        "avg_polarity": 2.63,
+        "positive_ratio": 27.16,
+        "negative_ratio": 60.49,
+        "sentiment_label": "中性"
+      },
+      "西班牙": {
+        "post_count": 7,
+        "avg_polarity": 2.57,
+        "positive_ratio": 14.29,
+        "negative_ratio": 57.14,
+        "sentiment_label": "中性"
+      },
+      "意大利": {
+        "post_count": 9,
+        "avg_polarity": 2.56,
+        "positive_ratio": 33.33,
+        "negative_ratio": 55.56,
+        "sentiment_label": "中性"
+      }
+    },
+    "min_posts_threshold": 5,
+    "regions_analyzed": 49
+  },
+  "source_tool": "geographic_sentiment",
+  "source_type": "mcp"
+}

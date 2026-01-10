@@ -1,0 +1,61 @@
+{
+  "id": "geographic_hotspot",
+  "title": "地理分析 - geographic_hotspot",
+  "data": {
+    "hotspots": [
+      {
+        "location": "无位置信息",
+        "count": 3176,
+        "percentage": 16.24,
+        "is_hotspot": true
+      },
+      {
+        "location": "广东",
+        "count": 2853,
+        "percentage": 14.59,
+        "is_hotspot": true
+      },
+      {
+        "location": "北京",
+        "count": 1492,
+        "percentage": 7.63,
+        "is_hotspot": true
+      },
+      {
+        "location": "浙江",
+        "count": 950,
+        "percentage": 4.86,
+        "is_hotspot": true
+      },
+      {
+        "location": "江苏",
+        "count": 934,
+        "percentage": 4.78,
+        "is_hotspot": true
+      },
+      {
+        "location": "河南",
+        "count": 857,
+        "percentage": 4.38,
+        "is_hotspot": true
+      },
+      {
+        "location": "山东",
+        "count": 822,
+        "percentage": 4.2,
+        "is_hotspot": true
+      },
+      {
+        "location": "上海",
+        "count": 778,
+        "percentage": 3.98,
+        "is_hotspot": true
+      }
+    ],
+    "threshold": 722.5,
+    "threshold_percentile": 90,
+    "hotspot_concentration": 60.67
+  },
+  "source_tool": "geographic_hotspot",
+  "source_type": "mcp"
+}

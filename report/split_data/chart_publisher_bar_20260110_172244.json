@@ -1,0 +1,8 @@
+{
+  "id": "publisher_bar_20260110_172244",
+  "type": "bar_chart",
+  "title": "发布者类型分布图",
+  "file_path": "report/images\\publisher_bar_20260110_172244.png",
+  "source_tool": "publisher_bar_chart",
+  "description": "展示不同发布者类型的博文数量及情感倾向"
+}

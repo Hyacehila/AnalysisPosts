@@ -1,0 +1,8 @@
+{
+  "id": "sentiment_trend_20260110_171424",
+  "type": "line_chart",
+  "title": "情感趋势变化图",
+  "file_path": "report/images\\sentiment_trend_20260110_171424.png",
+  "source_tool": "sentiment_trend_chart",
+  "description": "展示情感极性随时间的变化趋势及正负面占比"
+}

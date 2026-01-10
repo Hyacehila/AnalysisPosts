@@ -1,0 +1,8 @@
+{
+  "id": "topic_ranking_20260110_171237",
+  "type": "bar_chart",
+  "title": "Top10 主题热度排行",
+  "file_path": "report/images\\topic_ranking_20260110_171237.png",
+  "source_tool": "topic_ranking_chart",
+  "description": "展示热度最高的10个主题及其博文数量"
+}
