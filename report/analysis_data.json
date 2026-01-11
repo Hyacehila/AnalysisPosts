@@ -1,192 +1,209 @@
 {
   "charts": [
     {
-      "id": "topic_keyword_trend_20260103_212301",
-      "type": "line_chart",
-      "title": "焦点关键词热度趋势",
-      "file_path": "report/images\\topic_keyword_trend_20260103_212301.png",
-      "source_tool": "topic_keyword_trend_chart",
-      "description": "按时间粒度展示焦点关键词热度，支持地理与主题差异解读"
-    },
-    {
-      "id": "geographic_topic_heatmap_20260103_212400",
-      "type": "heatmap",
-      "title": "地区话题差异热力图",
-      "file_path": "report/images\\geographic_topic_heatmap_20260103_212400.png",
-      "source_tool": "geographic_topic_heatmap",
-      "description": "地区 × 主题的热度差异，支持地理可视化叙事"
-    },
-    {
-      "id": "participant_trend_20260103_212430",
-      "type": "line_chart",
-      "title": "参与人数演化趋势",
-      "file_path": "report/images\\participant_trend_20260103_212430.png",
-      "source_tool": "participant_trend_chart",
-      "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
-    },
-    {
-      "id": "topic_ranking_20260103_212449",
-      "type": "bar_chart",
-      "title": "Top10 主题热度排行",
-      "file_path": "report/images\\topic_ranking_20260103_212449.png",
-      "source_tool": "topic_ranking_chart",
-      "description": "展示热度最高的10个主题及其博文数量"
-    },
-    {
-      "id": "publisher_topic_distribution_20260103_212510",
-      "type": "bar_chart",
-      "title": "发布者话题偏好分布",
-      "file_path": "report/images\\publisher_topic_distribution_20260103_212510.png",
-      "source_tool": "publisher_topic_distribution_chart",
-      "description": "堆叠展示不同发布者的主题偏好差异"
-    },
-    {
-      "id": "publisher_sentiment_bucket_20260103_212631",
-      "type": "bar_chart",
-      "title": "发布者情绪桶分布",
-      "file_path": "report/images\\publisher_sentiment_bucket_20260103_212631.png",
-      "source_tool": "publisher_sentiment_bucket_chart",
-      "description": "按发布者对比正/中/负面占比，突出情绪差异"
-    },
-    {
-      "id": "geographic_heatmap_20260103_212654",
+      "id": "geographic_heatmap_20260111_144636",
       "type": "heatmap",
       "title": "地区舆情热力图",
-      "file_path": "report/images\\geographic_heatmap_20260103_212654.png",
+      "file_path": "report/images\\geographic_heatmap_20260111_144636.png",
       "source_tool": "geographic_heatmap",
       "description": "展示各地区在不同舆情指标上的表现差异"
     },
     {
-      "id": "topic_network_20260103_212713",
+      "id": "geographic_topic_heatmap_20260111_144656",
+      "type": "heatmap",
+      "title": "地区话题差异热力图",
+      "file_path": "report/images\\geographic_topic_heatmap_20260111_144656.png",
+      "source_tool": "geographic_topic_heatmap",
+      "description": "地区 × 主题的热度差异，支持地理可视化叙事"
+    },
+    {
+      "id": "topic_keyword_trend_20260111_144722",
+      "type": "line_chart",
+      "title": "焦点关键词热度趋势",
+      "file_path": "report/images\\topic_keyword_trend_20260111_144722.png",
+      "source_tool": "topic_keyword_trend_chart",
+      "description": "按时间粒度展示焦点关键词热度，支持地理与主题差异解读"
+    },
+    {
+      "id": "publisher_sentiment_bucket_20260111_144802",
+      "type": "bar_chart",
+      "title": "发布者情绪桶分布",
+      "file_path": "report/images\\publisher_sentiment_bucket_20260111_144802.png",
+      "source_tool": "publisher_sentiment_bucket_chart",
+      "description": "按发布者对比正/中/负面占比，突出情绪差异"
+    },
+    {
+      "id": "topic_network_20260111_144852",
       "type": "network_chart",
       "title": "主题关联网络图",
-      "file_path": "report/images\\topic_network_20260103_212713.png",
+      "file_path": "report/images\\topic_network_20260111_144852.png",
       "source_tool": "topic_network_chart",
       "description": "展示主题之间的共现关联关系，线条粗细表示关联强度"
     },
     {
-      "id": "sentiment_pie_20260103_212818",
-      "type": "pie_chart",
-      "title": "情感分布饼图",
-      "file_path": "report/images\\sentiment_pie_20260103_212818.png",
-      "source_tool": "sentiment_pie_chart",
-      "description": "展示博文情感极性的整体分布情况"
-    },
-    {
-      "id": "sentiment_trend_20260103_212840",
+      "id": "sentiment_trend_20260111_144951",
       "type": "line_chart",
       "title": "情感趋势变化图",
-      "file_path": "report/images\\sentiment_trend_20260103_212840.png",
+      "file_path": "report/images\\sentiment_trend_20260111_144951.png",
       "source_tool": "sentiment_trend_chart",
       "description": "展示情感极性随时间的变化趋势及正负面占比"
     },
     {
-      "id": "geographic_temporal_heatmap_20260103_212903",
-      "type": "heatmap",
-      "title": "地区时间差异热力图",
-      "file_path": "report/images\\geographic_temporal_heatmap_20260103_212903.png",
-      "source_tool": "geographic_temporal_heatmap",
-      "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
+      "id": "publisher_topic_distribution_20260111_145030",
+      "type": "bar_chart",
+      "title": "发布者话题偏好分布",
+      "file_path": "report/images\\publisher_topic_distribution_20260111_145030.png",
+      "source_tool": "publisher_topic_distribution_chart",
+      "description": "堆叠展示不同发布者的主题偏好差异"
     },
     {
-      "id": "topic_focus_evolution_20260103_212942",
+      "id": "geographic_sentiment_bar_20260111_145045",
+      "type": "bar_chart",
+      "title": "地区正负面差异",
+      "file_path": "report/images\\geographic_sentiment_bar_20260111_145045.png",
+      "source_tool": "geographic_sentiment_bar_chart",
+      "description": "正负面占比与平均极性对比，体现地区情绪差异"
+    },
+    {
+      "id": "participant_trend_20260111_145101",
+      "type": "line_chart",
+      "title": "参与人数演化趋势",
+      "file_path": "report/images\\participant_trend_20260111_145101.png",
+      "source_tool": "participant_trend_chart",
+      "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
+    },
+    {
+      "id": "topic_focus_evolution_20260111_145124",
       "type": "line_chart",
       "title": "主题演化趋势（焦点窗口）",
-      "file_path": "report/images\\topic_focus_evolution_20260103_212942.png",
+      "file_path": "report/images\\topic_focus_evolution_20260111_145124.png",
       "source_tool": "topic_focus_evolution_chart",
       "description": "Top主题的时序变化，突出焦点窗口与峰值阶段"
     },
     {
-      "id": "geographic_bar_20260103_212958",
-      "type": "bar_chart",
-      "title": "Top15 地区分布图",
-      "file_path": "report/images\\geographic_bar_20260103_212958.png",
-      "source_tool": "geographic_bar_chart",
-      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
-    },
-    {
-      "id": "interaction_heatmap_20260103_213023",
+      "id": "geographic_temporal_heatmap_20260111_145142",
       "type": "heatmap",
-      "title": "发布者类型 × 情感极性 热力图",
-      "file_path": "report/images\\interaction_heatmap_20260103_213023.png",
-      "source_tool": "interaction_heatmap",
-      "description": "展示发布者类型与情感极性的交叉分布"
+      "title": "地区时间差异热力图",
+      "file_path": "report/images\\geographic_temporal_heatmap_20260111_145142.png",
+      "source_tool": "geographic_temporal_heatmap",
+      "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
     },
     {
-      "id": "sentiment_focus_window_20260103_213040",
-      "title": "焦点窗口情感分析",
-      "path": "report/images\\sentiment_focus_window_20260103_213040.png",
-      "file_path": "report/images\\sentiment_focus_window_20260103_213040.png",
-      "type": "line_chart",
-      "description": "焦点窗口（2024-11-02~2024-11-15）内的极性均值与三分类趋势",
-      "source_tool": "sentiment_focus_window_chart"
+      "id": "sentiment_bucket_trend_20260111_145230",
+      "type": "area_chart",
+      "title": "正负中性占比时序趋势",
+      "file_path": "report/images\\sentiment_bucket_trend_20260111_145230.png",
+      "source_tool": "sentiment_bucket_trend_chart",
+      "description": "正/负/中性情绪占比的阶段差异和峰值"
     },
     {
-      "id": "topic_focus_distribution_20260103_213222",
+      "id": "topic_focus_distribution_20260111_145255",
       "title": "焦点窗口主题发布趋势",
-      "path": "report/images\\topic_focus_distribution_20260103_213222.png",
-      "file_path": "report/images\\topic_focus_distribution_20260103_213222.png",
+      "path": "report/images\\topic_focus_distribution_20260111_145255.png",
+      "file_path": "report/images\\topic_focus_distribution_20260111_145255.png",
       "type": "line_chart",
       "description": "焦点窗口内 Top5 父主题的发布趋势",
       "source_tool": "topic_focus_distribution_chart"
     },
     {
-      "id": "publisher_bar_20260103_213750",
-      "type": "bar_chart",
-      "title": "发布者类型分布图",
-      "file_path": "report/images\\publisher_bar_20260103_213750.png",
-      "source_tool": "publisher_bar_chart",
-      "description": "展示不同发布者类型的博文数量及情感倾向"
-    },
-    {
-      "id": "sentiment_attribute_trend_20260103_213843",
+      "id": "sentiment_attribute_trend_20260111_145402",
       "type": "line_chart",
       "title": "情绪属性热点趋势",
-      "file_path": "report/images\\sentiment_attribute_trend_20260103_213843.png",
+      "file_path": "report/images\\sentiment_attribute_trend_20260111_145402.png",
       "source_tool": "sentiment_attribute_trend_chart",
       "description": "Top情绪属性时间热度变化与焦点窗口标注"
     },
     {
-      "id": "geographic_sentiment_bar_20260103_213857",
-      "type": "bar_chart",
-      "title": "地区正负面差异",
-      "file_path": "report/images\\geographic_sentiment_bar_20260103_213857.png",
-      "source_tool": "geographic_sentiment_bar_chart",
-      "description": "正负面占比与平均极性对比，体现地区情绪差异"
+      "id": "sentiment_pie_20260111_145416",
+      "type": "pie_chart",
+      "title": "情感分布饼图",
+      "file_path": "report/images\\sentiment_pie_20260111_145416.png",
+      "source_tool": "sentiment_pie_chart",
+      "description": "展示博文情感极性的整体分布情况"
     },
     {
-      "id": "sentiment_bucket_trend_20260103_213943",
-      "type": "area_chart",
-      "title": "正负中性占比时序趋势",
-      "file_path": "report/images\\sentiment_bucket_trend_20260103_213943.png",
-      "source_tool": "sentiment_bucket_trend_chart",
-      "description": "正/负/中性情绪占比的阶段差异和峰值"
+      "id": "publisher_focus_distribution_20260111_145440",
+      "title": "焦点窗口发布者类型发布趋势",
+      "path": "report/images\\publisher_focus_distribution_20260111_145440.png",
+      "file_path": "report/images\\publisher_focus_distribution_20260111_145440.png",
+      "type": "line_chart",
+      "description": "焦点窗口内 Top5 发布者类型的日发布量趋势",
+      "source_tool": "publisher_focus_distribution_chart"
     },
     {
-      "id": "belief_network_20260103_213958",
-      "title": "信念网络图（belief_network）",
-      "path": "report/images\\belief_network_20260103_213958.png",
-      "file_path": "report/images\\belief_network_20260103_213958.png",
-      "type": "network",
-      "description": "信念子类的共现关系与强度",
-      "source_tool": "belief_network_chart"
-    },
-    {
-      "id": "sentiment_focus_publisher_20260103_214018",
+      "id": "sentiment_focus_publisher_20260111_145512",
       "title": "焦点窗口发布者情感均值",
-      "path": "report/images\\sentiment_focus_publisher_20260103_214018.png",
-      "file_path": "report/images\\sentiment_focus_publisher_20260103_214018.png",
+      "path": "report/images\\sentiment_focus_publisher_20260111_145512.png",
+      "file_path": "report/images\\sentiment_focus_publisher_20260111_145512.png",
       "type": "line_chart",
       "description": "焦点窗口内 Top5 发布者的情感均值趋势",
       "source_tool": "sentiment_focus_publisher_chart"
     },
     {
-      "id": "topic_evolution_20260103_214045",
+      "id": "belief_network_20260111_145529",
+      "title": "信念网络图（belief_network）",
+      "path": "report/images\\belief_network_20260111_145529.png",
+      "file_path": "report/images\\belief_network_20260111_145529.png",
+      "type": "network",
+      "description": "信念子类的共现关系与强度",
+      "source_tool": "belief_network_chart"
+    },
+    {
+      "id": "topic_ranking_20260111_145545",
+      "type": "bar_chart",
+      "title": "Top10 主题热度排行",
+      "file_path": "report/images\\topic_ranking_20260111_145545.png",
+      "source_tool": "topic_ranking_chart",
+      "description": "展示热度最高的10个主题及其博文数量"
+    },
+    {
+      "id": "interaction_heatmap_20260111_145603",
+      "type": "heatmap",
+      "title": "发布者类型 × 情感极性 热力图",
+      "file_path": "report/images\\interaction_heatmap_20260111_145603.png",
+      "source_tool": "interaction_heatmap",
+      "description": "展示发布者类型与情感极性的交叉分布"
+    },
+    {
+      "id": "topic_evolution_20260111_145641",
       "type": "line_chart",
       "title": "主题热度时序演化",
-      "file_path": "report/images\\topic_evolution_20260103_214045.png",
+      "file_path": "report/images\\topic_evolution_20260111_145641.png",
       "source_tool": "topic_evolution_chart",
       "description": "展示Top5主题随时间的热度变化趋势"
+    },
+    {
+      "id": "geographic_bar_20260111_145744",
+      "type": "bar_chart",
+      "title": "Top15 地区分布图",
+      "file_path": "report/images\\geographic_bar_20260111_145744.png",
+      "source_tool": "geographic_bar_chart",
+      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
+    },
+    {
+      "id": "sentiment_focus_window_20260111_145806",
+      "title": "焦点窗口情感分析",
+      "path": "report/images\\sentiment_focus_window_20260111_145806.png",
+      "file_path": "report/images\\sentiment_focus_window_20260111_145806.png",
+      "type": "line_chart",
+      "description": "焦点窗口（2024-11-02~2024-11-15）内的极性均值与三分类趋势",
+      "source_tool": "sentiment_focus_window_chart"
+    },
+    {
+      "id": "publisher_bar_20260111_145826",
+      "type": "bar_chart",
+      "title": "发布者类型分布图",
+      "file_path": "report/images\\publisher_bar_20260111_145826.png",
+      "source_tool": "publisher_bar_chart",
+      "description": "展示不同发布者类型的博文数量及情感倾向"
+    },
+    {
+      "id": "interaction_heatmap_20260111_145912",
+      "type": "heatmap",
+      "title": "发布者类型 × 情感极性 热力图",
+      "file_path": "report/images\\interaction_heatmap_20260111_145912.png",
+      "source_tool": "interaction_heatmap",
+      "description": "展示发布者类型与情感极性的交叉分布"
     }
   ],
   "tables": [
@@ -29021,290 +29038,6 @@
       "source_type": "mcp"
     },
     {
-      "id": "topic_cooccurrence",
-      "title": "主题分析 - topic_cooccurrence",
-      "data": {
-        "cooccurrence_pairs": [
-          {
-            "topic_pair": [
-              "媒体传播",
-              "民众反应"
-            ],
-            "count": 4052,
-            "support": 23.46
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "民众反应"
-            ],
-            "count": 2167,
-            "support": 12.54
-          },
-          {
-            "topic_pair": [
-              "民众反应",
-              "社会民生"
-            ],
-            "count": 1419,
-            "support": 8.21
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "政府工作"
-            ],
-            "count": 634,
-            "support": 3.67
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "媒体传播"
-            ],
-            "count": 555,
-            "support": 3.21
-          },
-          {
-            "topic_pair": [
-              "媒体传播",
-              "社会民生"
-            ],
-            "count": 419,
-            "support": 2.43
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "社会民生"
-            ],
-            "count": 414,
-            "support": 2.4
-          },
-          {
-            "topic_pair": [
-              "政府工作",
-              "民众反应"
-            ],
-            "count": 363,
-            "support": 2.1
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "应急管理"
-            ],
-            "count": 289,
-            "support": 1.67
-          },
-          {
-            "topic_pair": [
-              "媒体传播",
-              "政府工作"
-            ],
-            "count": 207,
-            "support": 1.2
-          },
-          {
-            "topic_pair": [
-              "民众反应",
-              "经济影响"
-            ],
-            "count": 164,
-            "support": 0.95
-          },
-          {
-            "topic_pair": [
-              "媒体传播",
-              "经济影响"
-            ],
-            "count": 144,
-            "support": 0.83
-          },
-          {
-            "topic_pair": [
-              "政府工作",
-              "社会民生"
-            ],
-            "count": 128,
-            "support": 0.74
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "经济影响"
-            ],
-            "count": 117,
-            "support": 0.68
-          },
-          {
-            "topic_pair": [
-              "应急管理",
-              "民众反应"
-            ],
-            "count": 101,
-            "support": 0.58
-          },
-          {
-            "topic_pair": [
-              "公共事业",
-              "民众反应"
-            ],
-            "count": 85,
-            "support": 0.49
-          },
-          {
-            "topic_pair": [
-              "社会民生",
-              "经济影响"
-            ],
-            "count": 78,
-            "support": 0.45
-          },
-          {
-            "topic_pair": [
-              "应急管理",
-              "政府工作"
-            ],
-            "count": 69,
-            "support": 0.4
-          },
-          {
-            "topic_pair": [
-              "政府工作",
-              "经济影响"
-            ],
-            "count": 57,
-            "support": 0.33
-          },
-          {
-            "topic_pair": [
-              "交通运输",
-              "公共事业"
-            ],
-            "count": 52,
-            "support": 0.3
-          }
-        ],
-        "association_matrix": {
-          "经济影响": {
-            "媒体传播": 144,
-            "公共事业": 5,
-            "民众反应": 164,
-            "应急管理": 3,
-            "自然灾害": 1,
-            "地理区域": 0,
-            "政府工作": 57,
-            "社会民生": 78,
-            "交通运输": 117
-          },
-          "媒体传播": {
-            "经济影响": 144,
-            "公共事业": 49,
-            "民众反应": 4052,
-            "应急管理": 20,
-            "自然灾害": 7,
-            "地理区域": 4,
-            "政府工作": 207,
-            "社会民生": 419,
-            "交通运输": 555
-          },
-          "公共事业": {
-            "经济影响": 5,
-            "媒体传播": 49,
-            "民众反应": 85,
-            "应急管理": 8,
-            "自然灾害": 0,
-            "地理区域": 1,
-            "政府工作": 15,
-            "社会民生": 52,
-            "交通运输": 52
-          },
-          "民众反应": {
-            "经济影响": 164,
-            "媒体传播": 4052,
-            "公共事业": 85,
-            "应急管理": 101,
-            "自然灾害": 39,
-            "地理区域": 5,
-            "政府工作": 363,
-            "社会民生": 1419,
-            "交通运输": 2167
-          },
-          "应急管理": {
-            "经济影响": 3,
-            "媒体传播": 20,
-            "公共事业": 8,
-            "民众反应": 101,
-            "自然灾害": 11,
-            "地理区域": 0,
-            "政府工作": 69,
-            "社会民生": 28,
-            "交通运输": 289
-          },
-          "自然灾害": {
-            "经济影响": 1,
-            "媒体传播": 7,
-            "公共事业": 0,
-            "民众反应": 39,
-            "应急管理": 11,
-            "地理区域": 0,
-            "政府工作": 1,
-            "社会民生": 6,
-            "交通运输": 9
-          },
-          "地理区域": {
-            "经济影响": 0,
-            "媒体传播": 4,
-            "公共事业": 1,
-            "民众反应": 5,
-            "应急管理": 0,
-            "自然灾害": 0,
-            "政府工作": 0,
-            "社会民生": 2,
-            "交通运输": 7
-          },
-          "政府工作": {
-            "经济影响": 57,
-            "媒体传播": 207,
-            "公共事业": 15,
-            "民众反应": 363,
-            "应急管理": 69,
-            "自然灾害": 1,
-            "地理区域": 0,
-            "社会民生": 128,
-            "交通运输": 634
-          },
-          "社会民生": {
-            "经济影响": 78,
-            "媒体传播": 419,
-            "公共事业": 52,
-            "民众反应": 1419,
-            "应急管理": 28,
-            "自然灾害": 6,
-            "地理区域": 2,
-            "政府工作": 128,
-            "交通运输": 414
-          },
-          "交通运输": {
-            "经济影响": 117,
-            "媒体传播": 555,
-            "公共事业": 52,
-            "民众反应": 2167,
-            "应急管理": 289,
-            "自然灾害": 9,
-            "地理区域": 7,
-            "政府工作": 634,
-            "社会民生": 414
-          }
-        },
-        "min_support": 2,
-        "total_pairs_analyzed": 40
-      },
-      "source_tool": "topic_cooccurrence",
-      "source_type": "mcp"
-    },
-    {
       "id": "sentiment_distribution",
       "title": "情感分析 - sentiment_distribution",
       "data": {
@@ -29341,298 +29074,6 @@
         "dominant_polarity": "乐观"
       },
       "source_tool": "sentiment_distribution",
-      "source_type": "mcp"
-    },
-    {
-      "id": "geographic_sentiment",
-      "title": "情感分析 - geographic_sentiment",
-      "data": {
-        "regional_analysis": {
-          "湖北": {
-            "post_count": 378,
-            "avg_polarity": 3.11,
-            "positive_ratio": 45.24,
-            "negative_ratio": 36.77,
-            "sentiment_label": "中性"
-          },
-          "云南": {
-            "post_count": 83,
-            "avg_polarity": 2.95,
-            "positive_ratio": 38.55,
-            "negative_ratio": 45.78,
-            "sentiment_label": "中性"
-          },
-          "辽宁": {
-            "post_count": 265,
-            "avg_polarity": 3.2,
-            "positive_ratio": 51.7,
-            "negative_ratio": 37.36,
-            "sentiment_label": "中性"
-          },
-          "重庆": {
-            "post_count": 151,
-            "avg_polarity": 3.11,
-            "positive_ratio": 47.68,
-            "negative_ratio": 41.06,
-            "sentiment_label": "中性"
-          },
-          "无位置信息": {
-            "post_count": 2649,
-            "avg_polarity": 3.53,
-            "positive_ratio": 62.06,
-            "negative_ratio": 13.89,
-            "sentiment_label": "正面主导"
-          },
-          "上海": {
-            "post_count": 483,
-            "avg_polarity": 3.0,
-            "positive_ratio": 40.37,
-            "negative_ratio": 43.27,
-            "sentiment_label": "中性"
-          },
-          "浙江": {
-            "post_count": 596,
-            "avg_polarity": 3.02,
-            "positive_ratio": 43.29,
-            "negative_ratio": 43.79,
-            "sentiment_label": "中性"
-          },
-          "北京": {
-            "post_count": 1050,
-            "avg_polarity": 3.18,
-            "positive_ratio": 48.19,
-            "negative_ratio": 34.0,
-            "sentiment_label": "中性"
-          },
-          "吉林": {
-            "post_count": 94,
-            "avg_polarity": 3.24,
-            "positive_ratio": 48.94,
-            "negative_ratio": 31.91,
-            "sentiment_label": "中性"
-          },
-          "四川": {
-            "post_count": 369,
-            "avg_polarity": 3.02,
-            "positive_ratio": 41.73,
-            "negative_ratio": 42.82,
-            "sentiment_label": "中性"
-          },
-          "山东": {
-            "post_count": 618,
-            "avg_polarity": 3.07,
-            "positive_ratio": 46.12,
-            "negative_ratio": 42.07,
-            "sentiment_label": "中性"
-          },
-          "江苏": {
-            "post_count": 685,
-            "avg_polarity": 2.92,
-            "positive_ratio": 37.96,
-            "negative_ratio": 48.03,
-            "sentiment_label": "中性"
-          },
-          "河南": {
-            "post_count": 5593,
-            "avg_polarity": 3.03,
-            "positive_ratio": 43.48,
-            "negative_ratio": 42.79,
-            "sentiment_label": "中性"
-          },
-          "河北": {
-            "post_count": 356,
-            "avg_polarity": 2.94,
-            "positive_ratio": 38.48,
-            "negative_ratio": 46.07,
-            "sentiment_label": "中性"
-          },
-          "湖南": {
-            "post_count": 255,
-            "avg_polarity": 3.02,
-            "positive_ratio": 38.43,
-            "negative_ratio": 36.86,
-            "sentiment_label": "中性"
-          },
-          "陕西": {
-            "post_count": 367,
-            "avg_polarity": 2.99,
-            "positive_ratio": 40.05,
-            "negative_ratio": 43.6,
-            "sentiment_label": "中性"
-          },
-          "内蒙古": {
-            "post_count": 54,
-            "avg_polarity": 3.06,
-            "positive_ratio": 46.3,
-            "negative_ratio": 44.44,
-            "sentiment_label": "中性"
-          },
-          "广东": {
-            "post_count": 1121,
-            "avg_polarity": 3.02,
-            "positive_ratio": 42.11,
-            "negative_ratio": 41.39,
-            "sentiment_label": "中性"
-          },
-          "安徽": {
-            "post_count": 305,
-            "avg_polarity": 3.08,
-            "positive_ratio": 45.25,
-            "negative_ratio": 40.33,
-            "sentiment_label": "中性"
-          },
-          "江西": {
-            "post_count": 162,
-            "avg_polarity": 2.97,
-            "positive_ratio": 40.74,
-            "negative_ratio": 45.68,
-            "sentiment_label": "中性"
-          },
-          "黑龙江": {
-            "post_count": 88,
-            "avg_polarity": 2.86,
-            "positive_ratio": 38.64,
-            "negative_ratio": 53.41,
-            "sentiment_label": "中性"
-          },
-          "山西": {
-            "post_count": 182,
-            "avg_polarity": 3.12,
-            "positive_ratio": 46.7,
-            "negative_ratio": 40.66,
-            "sentiment_label": "中性"
-          },
-          "福建": {
-            "post_count": 412,
-            "avg_polarity": 2.97,
-            "positive_ratio": 43.45,
-            "negative_ratio": 45.15,
-            "sentiment_label": "中性"
-          },
-          "中国香港": {
-            "post_count": 17,
-            "avg_polarity": 2.94,
-            "positive_ratio": 35.29,
-            "negative_ratio": 41.18,
-            "sentiment_label": "中性"
-          },
-          "天津": {
-            "post_count": 188,
-            "avg_polarity": 3.13,
-            "positive_ratio": 49.47,
-            "negative_ratio": 40.43,
-            "sentiment_label": "中性"
-          },
-          "广西": {
-            "post_count": 141,
-            "avg_polarity": 2.84,
-            "positive_ratio": 34.75,
-            "negative_ratio": 52.48,
-            "sentiment_label": "中性"
-          },
-          "贵州": {
-            "post_count": 51,
-            "avg_polarity": 2.78,
-            "positive_ratio": 35.29,
-            "negative_ratio": 56.86,
-            "sentiment_label": "中性"
-          },
-          "海南": {
-            "post_count": 159,
-            "avg_polarity": 3.01,
-            "positive_ratio": 34.59,
-            "negative_ratio": 33.33,
-            "sentiment_label": "中性"
-          },
-          "甘肃": {
-            "post_count": 178,
-            "avg_polarity": 2.91,
-            "positive_ratio": 30.9,
-            "negative_ratio": 42.7,
-            "sentiment_label": "中性"
-          },
-          "新疆": {
-            "post_count": 60,
-            "avg_polarity": 3.3,
-            "positive_ratio": 51.67,
-            "negative_ratio": 28.33,
-            "sentiment_label": "中性"
-          },
-          "青海": {
-            "post_count": 12,
-            "avg_polarity": 3.25,
-            "positive_ratio": 58.33,
-            "negative_ratio": 41.67,
-            "sentiment_label": "中性"
-          },
-          "美国": {
-            "post_count": 21,
-            "avg_polarity": 2.81,
-            "positive_ratio": 28.57,
-            "negative_ratio": 47.62,
-            "sentiment_label": "中性"
-          },
-          "日本": {
-            "post_count": 16,
-            "avg_polarity": 2.81,
-            "positive_ratio": 37.5,
-            "negative_ratio": 56.25,
-            "sentiment_label": "中性"
-          },
-          "德国": {
-            "post_count": 9,
-            "avg_polarity": 2.11,
-            "positive_ratio": 11.11,
-            "negative_ratio": 88.89,
-            "sentiment_label": "负面主导"
-          },
-          "澳大利亚": {
-            "post_count": 9,
-            "avg_polarity": 3.0,
-            "positive_ratio": 33.33,
-            "negative_ratio": 33.33,
-            "sentiment_label": "中性"
-          },
-          "中国台湾": {
-            "post_count": 9,
-            "avg_polarity": 3.11,
-            "positive_ratio": 44.44,
-            "negative_ratio": 33.33,
-            "sentiment_label": "中性"
-          },
-          "宁夏": {
-            "post_count": 24,
-            "avg_polarity": 2.96,
-            "positive_ratio": 50.0,
-            "negative_ratio": 45.83,
-            "sentiment_label": "中性"
-          },
-          "加拿大": {
-            "post_count": 8,
-            "avg_polarity": 3.0,
-            "positive_ratio": 50.0,
-            "negative_ratio": 50.0,
-            "sentiment_label": "中性"
-          },
-          "英国": {
-            "post_count": 12,
-            "avg_polarity": 3.17,
-            "positive_ratio": 50.0,
-            "negative_ratio": 33.33,
-            "sentiment_label": "中性"
-          },
-          "意大利": {
-            "post_count": 6,
-            "avg_polarity": 3.83,
-            "positive_ratio": 83.33,
-            "negative_ratio": 16.67,
-            "sentiment_label": "正面主导"
-          }
-        },
-        "min_posts_threshold": 5,
-        "regions_analyzed": 40
-      },
-      "source_tool": "geographic_sentiment",
       "source_type": "mcp"
     },
     {
@@ -30727,6 +30168,55 @@
       "source_type": "mcp"
     },
     {
+      "id": "geographic_hotspot",
+      "title": "地理分析 - geographic_hotspot",
+      "data": {
+        "hotspots": [
+          {
+            "location": "河南",
+            "count": 5593,
+            "percentage": 32.38,
+            "is_hotspot": true
+          },
+          {
+            "location": "无位置信息",
+            "count": 2649,
+            "percentage": 15.33,
+            "is_hotspot": true
+          },
+          {
+            "location": "广东",
+            "count": 1121,
+            "percentage": 6.49,
+            "is_hotspot": true
+          },
+          {
+            "location": "北京",
+            "count": 1050,
+            "percentage": 6.08,
+            "is_hotspot": true
+          },
+          {
+            "location": "江苏",
+            "count": 685,
+            "percentage": 3.97,
+            "is_hotspot": true
+          },
+          {
+            "location": "山东",
+            "count": 618,
+            "percentage": 3.58,
+            "is_hotspot": true
+          }
+        ],
+        "threshold": 598.2,
+        "threshold_percentile": 90,
+        "hotspot_concentration": 67.82
+      },
+      "source_tool": "geographic_hotspot",
+      "source_type": "mcp"
+    },
+    {
       "id": "cross_matrix",
       "title": "其他 - cross_matrix",
       "data": {
@@ -31342,6 +30832,582 @@
         ]
       },
       "source_tool": "influence_analysis",
+      "source_type": "mcp"
+    },
+    {
+      "id": "topic_cooccurrence",
+      "title": "主题分析 - topic_cooccurrence",
+      "data": {
+        "cooccurrence_pairs": [
+          {
+            "topic_pair": [
+              "媒体传播",
+              "民众反应"
+            ],
+            "count": 4052,
+            "support": 23.46
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "民众反应"
+            ],
+            "count": 2167,
+            "support": 12.54
+          },
+          {
+            "topic_pair": [
+              "民众反应",
+              "社会民生"
+            ],
+            "count": 1419,
+            "support": 8.21
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "政府工作"
+            ],
+            "count": 634,
+            "support": 3.67
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "媒体传播"
+            ],
+            "count": 555,
+            "support": 3.21
+          },
+          {
+            "topic_pair": [
+              "媒体传播",
+              "社会民生"
+            ],
+            "count": 419,
+            "support": 2.43
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "社会民生"
+            ],
+            "count": 414,
+            "support": 2.4
+          },
+          {
+            "topic_pair": [
+              "政府工作",
+              "民众反应"
+            ],
+            "count": 363,
+            "support": 2.1
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "应急管理"
+            ],
+            "count": 289,
+            "support": 1.67
+          },
+          {
+            "topic_pair": [
+              "媒体传播",
+              "政府工作"
+            ],
+            "count": 207,
+            "support": 1.2
+          },
+          {
+            "topic_pair": [
+              "民众反应",
+              "经济影响"
+            ],
+            "count": 164,
+            "support": 0.95
+          },
+          {
+            "topic_pair": [
+              "媒体传播",
+              "经济影响"
+            ],
+            "count": 144,
+            "support": 0.83
+          },
+          {
+            "topic_pair": [
+              "政府工作",
+              "社会民生"
+            ],
+            "count": 128,
+            "support": 0.74
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "经济影响"
+            ],
+            "count": 117,
+            "support": 0.68
+          },
+          {
+            "topic_pair": [
+              "应急管理",
+              "民众反应"
+            ],
+            "count": 101,
+            "support": 0.58
+          },
+          {
+            "topic_pair": [
+              "公共事业",
+              "民众反应"
+            ],
+            "count": 85,
+            "support": 0.49
+          },
+          {
+            "topic_pair": [
+              "社会民生",
+              "经济影响"
+            ],
+            "count": 78,
+            "support": 0.45
+          },
+          {
+            "topic_pair": [
+              "应急管理",
+              "政府工作"
+            ],
+            "count": 69,
+            "support": 0.4
+          },
+          {
+            "topic_pair": [
+              "政府工作",
+              "经济影响"
+            ],
+            "count": 57,
+            "support": 0.33
+          },
+          {
+            "topic_pair": [
+              "交通运输",
+              "公共事业"
+            ],
+            "count": 52,
+            "support": 0.3
+          }
+        ],
+        "association_matrix": {
+          "民众反应": {
+            "自然灾害": 39,
+            "政府工作": 363,
+            "应急管理": 101,
+            "地理区域": 5,
+            "媒体传播": 4052,
+            "公共事业": 85,
+            "社会民生": 1419,
+            "经济影响": 164,
+            "交通运输": 2167
+          },
+          "自然灾害": {
+            "民众反应": 39,
+            "政府工作": 1,
+            "应急管理": 11,
+            "地理区域": 0,
+            "媒体传播": 7,
+            "公共事业": 0,
+            "社会民生": 6,
+            "经济影响": 1,
+            "交通运输": 9
+          },
+          "政府工作": {
+            "民众反应": 363,
+            "自然灾害": 1,
+            "应急管理": 69,
+            "地理区域": 0,
+            "媒体传播": 207,
+            "公共事业": 15,
+            "社会民生": 128,
+            "经济影响": 57,
+            "交通运输": 634
+          },
+          "应急管理": {
+            "民众反应": 101,
+            "自然灾害": 11,
+            "政府工作": 69,
+            "地理区域": 0,
+            "媒体传播": 20,
+            "公共事业": 8,
+            "社会民生": 28,
+            "经济影响": 3,
+            "交通运输": 289
+          },
+          "地理区域": {
+            "民众反应": 5,
+            "自然灾害": 0,
+            "政府工作": 0,
+            "应急管理": 0,
+            "媒体传播": 4,
+            "公共事业": 1,
+            "社会民生": 2,
+            "经济影响": 0,
+            "交通运输": 7
+          },
+          "媒体传播": {
+            "民众反应": 4052,
+            "自然灾害": 7,
+            "政府工作": 207,
+            "应急管理": 20,
+            "地理区域": 4,
+            "公共事业": 49,
+            "社会民生": 419,
+            "经济影响": 144,
+            "交通运输": 555
+          },
+          "公共事业": {
+            "民众反应": 85,
+            "自然灾害": 0,
+            "政府工作": 15,
+            "应急管理": 8,
+            "地理区域": 1,
+            "媒体传播": 49,
+            "社会民生": 52,
+            "经济影响": 5,
+            "交通运输": 52
+          },
+          "社会民生": {
+            "民众反应": 1419,
+            "自然灾害": 6,
+            "政府工作": 128,
+            "应急管理": 28,
+            "地理区域": 2,
+            "媒体传播": 419,
+            "公共事业": 52,
+            "经济影响": 78,
+            "交通运输": 414
+          },
+          "经济影响": {
+            "民众反应": 164,
+            "自然灾害": 1,
+            "政府工作": 57,
+            "应急管理": 3,
+            "地理区域": 0,
+            "媒体传播": 144,
+            "公共事业": 5,
+            "社会民生": 78,
+            "交通运输": 117
+          },
+          "交通运输": {
+            "民众反应": 2167,
+            "自然灾害": 9,
+            "政府工作": 634,
+            "应急管理": 289,
+            "地理区域": 7,
+            "媒体传播": 555,
+            "公共事业": 52,
+            "社会民生": 414,
+            "经济影响": 117
+          }
+        },
+        "min_support": 2,
+        "total_pairs_analyzed": 40
+      },
+      "source_tool": "topic_cooccurrence",
+      "source_type": "mcp"
+    },
+    {
+      "id": "geographic_sentiment",
+      "title": "情感分析 - geographic_sentiment",
+      "data": {
+        "regional_analysis": {
+          "湖北": {
+            "post_count": 378,
+            "avg_polarity": 3.11,
+            "positive_ratio": 45.24,
+            "negative_ratio": 36.77,
+            "sentiment_label": "中性"
+          },
+          "云南": {
+            "post_count": 83,
+            "avg_polarity": 2.95,
+            "positive_ratio": 38.55,
+            "negative_ratio": 45.78,
+            "sentiment_label": "中性"
+          },
+          "辽宁": {
+            "post_count": 265,
+            "avg_polarity": 3.2,
+            "positive_ratio": 51.7,
+            "negative_ratio": 37.36,
+            "sentiment_label": "中性"
+          },
+          "重庆": {
+            "post_count": 151,
+            "avg_polarity": 3.11,
+            "positive_ratio": 47.68,
+            "negative_ratio": 41.06,
+            "sentiment_label": "中性"
+          },
+          "无位置信息": {
+            "post_count": 2649,
+            "avg_polarity": 3.53,
+            "positive_ratio": 62.06,
+            "negative_ratio": 13.89,
+            "sentiment_label": "正面主导"
+          },
+          "上海": {
+            "post_count": 483,
+            "avg_polarity": 3.0,
+            "positive_ratio": 40.37,
+            "negative_ratio": 43.27,
+            "sentiment_label": "中性"
+          },
+          "浙江": {
+            "post_count": 596,
+            "avg_polarity": 3.02,
+            "positive_ratio": 43.29,
+            "negative_ratio": 43.79,
+            "sentiment_label": "中性"
+          },
+          "北京": {
+            "post_count": 1050,
+            "avg_polarity": 3.18,
+            "positive_ratio": 48.19,
+            "negative_ratio": 34.0,
+            "sentiment_label": "中性"
+          },
+          "吉林": {
+            "post_count": 94,
+            "avg_polarity": 3.24,
+            "positive_ratio": 48.94,
+            "negative_ratio": 31.91,
+            "sentiment_label": "中性"
+          },
+          "四川": {
+            "post_count": 369,
+            "avg_polarity": 3.02,
+            "positive_ratio": 41.73,
+            "negative_ratio": 42.82,
+            "sentiment_label": "中性"
+          },
+          "山东": {
+            "post_count": 618,
+            "avg_polarity": 3.07,
+            "positive_ratio": 46.12,
+            "negative_ratio": 42.07,
+            "sentiment_label": "中性"
+          },
+          "江苏": {
+            "post_count": 685,
+            "avg_polarity": 2.92,
+            "positive_ratio": 37.96,
+            "negative_ratio": 48.03,
+            "sentiment_label": "中性"
+          },
+          "河南": {
+            "post_count": 5593,
+            "avg_polarity": 3.03,
+            "positive_ratio": 43.48,
+            "negative_ratio": 42.79,
+            "sentiment_label": "中性"
+          },
+          "河北": {
+            "post_count": 356,
+            "avg_polarity": 2.94,
+            "positive_ratio": 38.48,
+            "negative_ratio": 46.07,
+            "sentiment_label": "中性"
+          },
+          "湖南": {
+            "post_count": 255,
+            "avg_polarity": 3.02,
+            "positive_ratio": 38.43,
+            "negative_ratio": 36.86,
+            "sentiment_label": "中性"
+          },
+          "陕西": {
+            "post_count": 367,
+            "avg_polarity": 2.99,
+            "positive_ratio": 40.05,
+            "negative_ratio": 43.6,
+            "sentiment_label": "中性"
+          },
+          "内蒙古": {
+            "post_count": 54,
+            "avg_polarity": 3.06,
+            "positive_ratio": 46.3,
+            "negative_ratio": 44.44,
+            "sentiment_label": "中性"
+          },
+          "广东": {
+            "post_count": 1121,
+            "avg_polarity": 3.02,
+            "positive_ratio": 42.11,
+            "negative_ratio": 41.39,
+            "sentiment_label": "中性"
+          },
+          "安徽": {
+            "post_count": 305,
+            "avg_polarity": 3.08,
+            "positive_ratio": 45.25,
+            "negative_ratio": 40.33,
+            "sentiment_label": "中性"
+          },
+          "江西": {
+            "post_count": 162,
+            "avg_polarity": 2.97,
+            "positive_ratio": 40.74,
+            "negative_ratio": 45.68,
+            "sentiment_label": "中性"
+          },
+          "黑龙江": {
+            "post_count": 88,
+            "avg_polarity": 2.86,
+            "positive_ratio": 38.64,
+            "negative_ratio": 53.41,
+            "sentiment_label": "中性"
+          },
+          "山西": {
+            "post_count": 182,
+            "avg_polarity": 3.12,
+            "positive_ratio": 46.7,
+            "negative_ratio": 40.66,
+            "sentiment_label": "中性"
+          },
+          "福建": {
+            "post_count": 412,
+            "avg_polarity": 2.97,
+            "positive_ratio": 43.45,
+            "negative_ratio": 45.15,
+            "sentiment_label": "中性"
+          },
+          "中国香港": {
+            "post_count": 17,
+            "avg_polarity": 2.94,
+            "positive_ratio": 35.29,
+            "negative_ratio": 41.18,
+            "sentiment_label": "中性"
+          },
+          "天津": {
+            "post_count": 188,
+            "avg_polarity": 3.13,
+            "positive_ratio": 49.47,
+            "negative_ratio": 40.43,
+            "sentiment_label": "中性"
+          },
+          "广西": {
+            "post_count": 141,
+            "avg_polarity": 2.84,
+            "positive_ratio": 34.75,
+            "negative_ratio": 52.48,
+            "sentiment_label": "中性"
+          },
+          "贵州": {
+            "post_count": 51,
+            "avg_polarity": 2.78,
+            "positive_ratio": 35.29,
+            "negative_ratio": 56.86,
+            "sentiment_label": "中性"
+          },
+          "海南": {
+            "post_count": 159,
+            "avg_polarity": 3.01,
+            "positive_ratio": 34.59,
+            "negative_ratio": 33.33,
+            "sentiment_label": "中性"
+          },
+          "甘肃": {
+            "post_count": 178,
+            "avg_polarity": 2.91,
+            "positive_ratio": 30.9,
+            "negative_ratio": 42.7,
+            "sentiment_label": "中性"
+          },
+          "新疆": {
+            "post_count": 60,
+            "avg_polarity": 3.3,
+            "positive_ratio": 51.67,
+            "negative_ratio": 28.33,
+            "sentiment_label": "中性"
+          },
+          "青海": {
+            "post_count": 12,
+            "avg_polarity": 3.25,
+            "positive_ratio": 58.33,
+            "negative_ratio": 41.67,
+            "sentiment_label": "中性"
+          },
+          "美国": {
+            "post_count": 21,
+            "avg_polarity": 2.81,
+            "positive_ratio": 28.57,
+            "negative_ratio": 47.62,
+            "sentiment_label": "中性"
+          },
+          "日本": {
+            "post_count": 16,
+            "avg_polarity": 2.81,
+            "positive_ratio": 37.5,
+            "negative_ratio": 56.25,
+            "sentiment_label": "中性"
+          },
+          "德国": {
+            "post_count": 9,
+            "avg_polarity": 2.11,
+            "positive_ratio": 11.11,
+            "negative_ratio": 88.89,
+            "sentiment_label": "负面主导"
+          },
+          "澳大利亚": {
+            "post_count": 9,
+            "avg_polarity": 3.0,
+            "positive_ratio": 33.33,
+            "negative_ratio": 33.33,
+            "sentiment_label": "中性"
+          },
+          "中国台湾": {
+            "post_count": 9,
+            "avg_polarity": 3.11,
+            "positive_ratio": 44.44,
+            "negative_ratio": 33.33,
+            "sentiment_label": "中性"
+          },
+          "宁夏": {
+            "post_count": 24,
+            "avg_polarity": 2.96,
+            "positive_ratio": 50.0,
+            "negative_ratio": 45.83,
+            "sentiment_label": "中性"
+          },
+          "加拿大": {
+            "post_count": 8,
+            "avg_polarity": 3.0,
+            "positive_ratio": 50.0,
+            "negative_ratio": 50.0,
+            "sentiment_label": "中性"
+          },
+          "英国": {
+            "post_count": 12,
+            "avg_polarity": 3.17,
+            "positive_ratio": 50.0,
+            "negative_ratio": 33.33,
+            "sentiment_label": "中性"
+          },
+          "意大利": {
+            "post_count": 6,
+            "avg_polarity": 3.83,
+            "positive_ratio": 83.33,
+            "negative_ratio": 16.67,
+            "sentiment_label": "正面主导"
+          }
+        },
+        "min_posts_threshold": 5,
+        "regions_analyzed": 40
+      },
+      "source_tool": "geographic_sentiment",
       "source_type": "mcp"
     },
     {
@@ -32002,55 +32068,6 @@
       "source_type": "mcp"
     },
     {
-      "id": "geographic_hotspot",
-      "title": "地理分析 - geographic_hotspot",
-      "data": {
-        "hotspots": [
-          {
-            "location": "河南",
-            "count": 5593,
-            "percentage": 32.38,
-            "is_hotspot": true
-          },
-          {
-            "location": "无位置信息",
-            "count": 2649,
-            "percentage": 15.33,
-            "is_hotspot": true
-          },
-          {
-            "location": "广东",
-            "count": 1121,
-            "percentage": 6.49,
-            "is_hotspot": true
-          },
-          {
-            "location": "北京",
-            "count": 1050,
-            "percentage": 6.08,
-            "is_hotspot": true
-          },
-          {
-            "location": "江苏",
-            "count": 685,
-            "percentage": 3.97,
-            "is_hotspot": true
-          },
-          {
-            "location": "山东",
-            "count": 618,
-            "percentage": 3.58,
-            "is_hotspot": true
-          }
-        ],
-        "threshold": 598.2,
-        "threshold_percentile": 90,
-        "hotspot_concentration": 67.82
-      },
-      "source_tool": "geographic_hotspot",
-      "source_type": "mcp"
-    },
-    {
       "id": "correlation_analysis",
       "title": "其他 - correlation_analysis",
       "data": {
@@ -32151,129 +32168,6 @@
         "sample_size": 17275
       },
       "source_tool": "correlation_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "generate_sentiment_focus_window_chart",
-      "title": "情感分析 - generate_sentiment_focus_window_chart",
-      "data": {
-        "focus_window": {
-          "start": "2024-11-02",
-          "end": "2024-11-15"
-        },
-        "daily_avg": {
-          "2024-11-02": 3.514851485148515,
-          "2024-11-03": 3.640888208269525,
-          "2024-11-04": 3.7199281867145424,
-          "2024-11-05": 3.629272567922875,
-          "2024-11-06": 3.684596577017115,
-          "2024-11-07": 3.4638069705093835,
-          "2024-11-08": 3.0252864480442514,
-          "2024-11-09": 2.8948494029584744,
-          "2024-11-10": 2.6194575979337062,
-          "2024-11-11": 2.870262390670554,
-          "2024-11-12": 2.901639344262295,
-          "2024-11-13": 3.087719298245614,
-          "2024-11-14": 3.378640776699029,
-          "2024-11-15": 2.6544117647058822
-        },
-        "bucket_trend": [
-          {
-            "date": "2024-11-02",
-            "正面": 68,
-            "中性": 12,
-            "负面": 21
-          },
-          {
-            "date": "2024-11-03",
-            "正面": 952,
-            "中性": 109,
-            "负面": 245
-          },
-          {
-            "date": "2024-11-04",
-            "正面": 1255,
-            "中性": 244,
-            "负面": 172
-          },
-          {
-            "date": "2024-11-05",
-            "正面": 780,
-            "中性": 216,
-            "负面": 145
-          },
-          {
-            "date": "2024-11-06",
-            "正面": 317,
-            "中性": 40,
-            "负面": 52
-          },
-          {
-            "date": "2024-11-07",
-            "正面": 225,
-            "中性": 72,
-            "负面": 76
-          },
-          {
-            "date": "2024-11-08",
-            "正面": 1101,
-            "中性": 358,
-            "负面": 1072
-          },
-          {
-            "date": "2024-11-09",
-            "正面": 1955,
-            "中性": 1038,
-            "负面": 2618
-          },
-          {
-            "date": "2024-11-10",
-            "正面": 543,
-            "中性": 381,
-            "负面": 1399
-          },
-          {
-            "date": "2024-11-11",
-            "正面": 229,
-            "中性": 134,
-            "负面": 323
-          },
-          {
-            "date": "2024-11-12",
-            "正面": 67,
-            "中性": 30,
-            "负面": 86
-          },
-          {
-            "date": "2024-11-13",
-            "正面": 48,
-            "中性": 25,
-            "负面": 41
-          },
-          {
-            "date": "2024-11-14",
-            "正面": 65,
-            "中性": 11,
-            "负面": 27
-          },
-          {
-            "date": "2024-11-15",
-            "正面": 36,
-            "中性": 27,
-            "负面": 73
-          }
-        ]
-      },
-      "source_tool": "generate_sentiment_focus_window_chart",
-      "source_type": "mcp"
-    },
-    {
-      "id": "generate_publisher_focus_distribution",
-      "title": "多维交互分析 - generate_publisher_focus_distribution",
-      "data": {
-        "result": "Unknown tool: generate_publisher_focus_distribution"
-      },
-      "source_tool": "generate_publisher_focus_distribution",
       "source_type": "mcp"
     },
     {
@@ -32407,6 +32301,257 @@
         ]
       },
       "source_tool": "topic_focus_distribution",
+      "source_type": "mcp"
+    },
+    {
+      "id": "publisher_focus_distribution",
+      "title": "多维交互分析 - publisher_focus_distribution",
+      "data": {
+        "focus_window": {
+          "start": "2024-11-02",
+          "end": "2024-11-15"
+        },
+        "series": [
+          {
+            "date": "2024-11-02",
+            "个人用户": 41.0,
+            "公安部门": 0.0,
+            "学生": 22.0,
+            "官方新闻媒体": 5.0,
+            "自媒体": 24.0
+          },
+          {
+            "date": "2024-11-03",
+            "个人用户": 573.0,
+            "公安部门": 12.0,
+            "学生": 246.0,
+            "官方新闻媒体": 111.0,
+            "自媒体": 253.0
+          },
+          {
+            "date": "2024-11-04",
+            "个人用户": 451.0,
+            "公安部门": 67.0,
+            "学生": 168.0,
+            "官方新闻媒体": 329.0,
+            "自媒体": 353.0
+          },
+          {
+            "date": "2024-11-05",
+            "个人用户": 285.0,
+            "公安部门": 93.0,
+            "学生": 94.0,
+            "官方新闻媒体": 218.0,
+            "自媒体": 241.0
+          },
+          {
+            "date": "2024-11-06",
+            "个人用户": 77.0,
+            "公安部门": 15.0,
+            "学生": 42.0,
+            "官方新闻媒体": 82.0,
+            "自媒体": 108.0
+          },
+          {
+            "date": "2024-11-07",
+            "个人用户": 95.0,
+            "公安部门": 4.0,
+            "学生": 40.0,
+            "官方新闻媒体": 95.0,
+            "自媒体": 79.0
+          },
+          {
+            "date": "2024-11-08",
+            "个人用户": 1243.0,
+            "公安部门": 5.0,
+            "学生": 408.0,
+            "官方新闻媒体": 131.0,
+            "自媒体": 463.0
+          },
+          {
+            "date": "2024-11-09",
+            "个人用户": 2278.0,
+            "公安部门": 28.0,
+            "学生": 863.0,
+            "官方新闻媒体": 405.0,
+            "自媒体": 1589.0
+          },
+          {
+            "date": "2024-11-10",
+            "个人用户": 1039.0,
+            "公安部门": 13.0,
+            "学生": 201.0,
+            "官方新闻媒体": 101.0,
+            "自媒体": 754.0
+          },
+          {
+            "date": "2024-11-11",
+            "个人用户": 206.0,
+            "公安部门": 16.0,
+            "学生": 77.0,
+            "官方新闻媒体": 47.0,
+            "自媒体": 252.0
+          },
+          {
+            "date": "2024-11-12",
+            "个人用户": 51.0,
+            "公安部门": 1.0,
+            "学生": 22.0,
+            "官方新闻媒体": 8.0,
+            "自媒体": 74.0
+          },
+          {
+            "date": "2024-11-13",
+            "个人用户": 42.0,
+            "公安部门": 0.0,
+            "学生": 12.0,
+            "官方新闻媒体": 5.0,
+            "自媒体": 37.0
+          },
+          {
+            "date": "2024-11-14",
+            "个人用户": 35.0,
+            "公安部门": 0.0,
+            "学生": 7.0,
+            "官方新闻媒体": 15.0,
+            "自媒体": 25.0
+          }
+        ],
+        "top_publishers": [
+          "个人用户",
+          "自媒体",
+          "学生",
+          "官方新闻媒体",
+          "公安部门"
+        ]
+      },
+      "source_tool": "publisher_focus_distribution",
+      "source_type": "mcp"
+    },
+    {
+      "id": "generate_sentiment_focus_publisher_chart",
+      "title": "情感分析 - generate_sentiment_focus_publisher_chart",
+      "data": {
+        "focus_window": {
+          "start": "2024-11-02",
+          "end": "2024-11-15"
+        },
+        "publisher_mean": [
+          {
+            "date": "2024-11-02",
+            "个人用户": 3.2439024390243905,
+            "公安部门": NaN,
+            "学生": 3.5454545454545454,
+            "官方新闻媒体": 4.0,
+            "自媒体": 3.8333333333333335
+          },
+          {
+            "date": "2024-11-03",
+            "个人用户": 3.481675392670157,
+            "公安部门": 4.25,
+            "学生": 3.459349593495935,
+            "官方新闻媒体": 4.081081081081081,
+            "自媒体": 3.877470355731225
+          },
+          {
+            "date": "2024-11-04",
+            "个人用户": 3.516629711751663,
+            "公安部门": 3.8955223880597014,
+            "学生": 3.5476190476190474,
+            "官方新闻媒体": 3.930091185410334,
+            "自媒体": 3.7677053824362607
+          },
+          {
+            "date": "2024-11-05",
+            "个人用户": 3.4105263157894736,
+            "公安部门": 4.096774193548387,
+            "学生": 3.5106382978723403,
+            "官方新闻媒体": 3.7339449541284404,
+            "自媒体": 3.5643153526970957
+          },
+          {
+            "date": "2024-11-06",
+            "个人用户": 3.168831168831169,
+            "公安部门": 4.0,
+            "学生": 3.2142857142857144,
+            "官方新闻媒体": 4.024390243902439,
+            "自媒体": 3.7037037037037037
+          },
+          {
+            "date": "2024-11-07",
+            "个人用户": 3.3684210526315788,
+            "公安部门": 3.75,
+            "学生": 2.975,
+            "官方新闻媒体": 3.431578947368421,
+            "自媒体": 3.481012658227848
+          },
+          {
+            "date": "2024-11-08",
+            "个人用户": 3.0313757039420755,
+            "公安部门": 3.6,
+            "学生": 2.8823529411764706,
+            "官方新闻媒体": 3.3740458015267176,
+            "自媒体": 3.0043196544276456
+          },
+          {
+            "date": "2024-11-09",
+            "个人用户": 2.798507462686567,
+            "公安部门": 3.5,
+            "学生": 2.8030127462340673,
+            "官方新闻媒体": 3.0469135802469136,
+            "自媒体": 2.935808684707363
+          },
+          {
+            "date": "2024-11-10",
+            "个人用户": 2.4398460057747835,
+            "公安部门": 3.3846153846153846,
+            "学生": 2.656716417910448,
+            "官方新闻媒体": 3.089108910891089,
+            "自媒体": 2.6538461538461537
+          },
+          {
+            "date": "2024-11-11",
+            "个人用户": 2.8155339805825244,
+            "公安部门": 3.75,
+            "学生": 2.831168831168831,
+            "官方新闻媒体": 2.872340425531915,
+            "自媒体": 2.734126984126984
+          },
+          {
+            "date": "2024-11-12",
+            "个人用户": 2.843137254901961,
+            "公安部门": 2.0,
+            "学生": 3.0454545454545454,
+            "官方新闻媒体": 3.0,
+            "自媒体": 2.824324324324324
+          },
+          {
+            "date": "2024-11-13",
+            "个人用户": 2.9523809523809526,
+            "公安部门": NaN,
+            "学生": 2.9166666666666665,
+            "官方新闻媒体": 3.6,
+            "自媒体": 2.945945945945946
+          },
+          {
+            "date": "2024-11-14",
+            "个人用户": 2.8285714285714287,
+            "公安部门": NaN,
+            "学生": 3.0,
+            "官方新闻媒体": 4.0,
+            "自媒体": 3.6
+          },
+          {
+            "date": "2024-11-15",
+            "个人用户": 2.6666666666666665,
+            "公安部门": NaN,
+            "学生": 2.0,
+            "官方新闻媒体": 3.4285714285714284,
+            "自媒体": 3.0
+          }
+        ]
+      },
+      "source_tool": "generate_sentiment_focus_publisher_chart",
       "source_type": "mcp"
     },
     {
@@ -34983,129 +35128,117 @@
       "source_type": "mcp"
     },
     {
-      "id": "generate_sentiment_focus_publisher_chart",
-      "title": "情感分析 - generate_sentiment_focus_publisher_chart",
+      "id": "generate_sentiment_focus_window_chart",
+      "title": "情感分析 - generate_sentiment_focus_window_chart",
       "data": {
         "focus_window": {
           "start": "2024-11-02",
           "end": "2024-11-15"
         },
-        "publisher_mean": [
+        "daily_avg": {
+          "2024-11-02": 3.514851485148515,
+          "2024-11-03": 3.640888208269525,
+          "2024-11-04": 3.7199281867145424,
+          "2024-11-05": 3.629272567922875,
+          "2024-11-06": 3.684596577017115,
+          "2024-11-07": 3.4638069705093835,
+          "2024-11-08": 3.0252864480442514,
+          "2024-11-09": 2.8948494029584744,
+          "2024-11-10": 2.6194575979337062,
+          "2024-11-11": 2.870262390670554,
+          "2024-11-12": 2.901639344262295,
+          "2024-11-13": 3.087719298245614,
+          "2024-11-14": 3.378640776699029,
+          "2024-11-15": 2.6544117647058822
+        },
+        "bucket_trend": [
           {
             "date": "2024-11-02",
-            "个人用户": 3.2439024390243905,
-            "公安部门": NaN,
-            "学生": 3.5454545454545454,
-            "官方新闻媒体": 4.0,
-            "自媒体": 3.8333333333333335
+            "正面": 68,
+            "中性": 12,
+            "负面": 21
           },
           {
             "date": "2024-11-03",
-            "个人用户": 3.481675392670157,
-            "公安部门": 4.25,
-            "学生": 3.459349593495935,
-            "官方新闻媒体": 4.081081081081081,
-            "自媒体": 3.877470355731225
+            "正面": 952,
+            "中性": 109,
+            "负面": 245
           },
           {
             "date": "2024-11-04",
-            "个人用户": 3.516629711751663,
-            "公安部门": 3.8955223880597014,
-            "学生": 3.5476190476190474,
-            "官方新闻媒体": 3.930091185410334,
-            "自媒体": 3.7677053824362607
+            "正面": 1255,
+            "中性": 244,
+            "负面": 172
           },
           {
             "date": "2024-11-05",
-            "个人用户": 3.4105263157894736,
-            "公安部门": 4.096774193548387,
-            "学生": 3.5106382978723403,
-            "官方新闻媒体": 3.7339449541284404,
-            "自媒体": 3.5643153526970957
+            "正面": 780,
+            "中性": 216,
+            "负面": 145
           },
           {
             "date": "2024-11-06",
-            "个人用户": 3.168831168831169,
-            "公安部门": 4.0,
-            "学生": 3.2142857142857144,
-            "官方新闻媒体": 4.024390243902439,
-            "自媒体": 3.7037037037037037
+            "正面": 317,
+            "中性": 40,
+            "负面": 52
           },
           {
             "date": "2024-11-07",
-            "个人用户": 3.3684210526315788,
-            "公安部门": 3.75,
-            "学生": 2.975,
-            "官方新闻媒体": 3.431578947368421,
-            "自媒体": 3.481012658227848
+            "正面": 225,
+            "中性": 72,
+            "负面": 76
           },
           {
             "date": "2024-11-08",
-            "个人用户": 3.0313757039420755,
-            "公安部门": 3.6,
-            "学生": 2.8823529411764706,
-            "官方新闻媒体": 3.3740458015267176,
-            "自媒体": 3.0043196544276456
+            "正面": 1101,
+            "中性": 358,
+            "负面": 1072
           },
           {
             "date": "2024-11-09",
-            "个人用户": 2.798507462686567,
-            "公安部门": 3.5,
-            "学生": 2.8030127462340673,
-            "官方新闻媒体": 3.0469135802469136,
-            "自媒体": 2.935808684707363
+            "正面": 1955,
+            "中性": 1038,
+            "负面": 2618
           },
           {
             "date": "2024-11-10",
-            "个人用户": 2.4398460057747835,
-            "公安部门": 3.3846153846153846,
-            "学生": 2.656716417910448,
-            "官方新闻媒体": 3.089108910891089,
-            "自媒体": 2.6538461538461537
+            "正面": 543,
+            "中性": 381,
+            "负面": 1399
           },
           {
             "date": "2024-11-11",
-            "个人用户": 2.8155339805825244,
-            "公安部门": 3.75,
-            "学生": 2.831168831168831,
-            "官方新闻媒体": 2.872340425531915,
-            "自媒体": 2.734126984126984
+            "正面": 229,
+            "中性": 134,
+            "负面": 323
           },
           {
             "date": "2024-11-12",
-            "个人用户": 2.843137254901961,
-            "公安部门": 2.0,
-            "学生": 3.0454545454545454,
-            "官方新闻媒体": 3.0,
-            "自媒体": 2.824324324324324
+            "正面": 67,
+            "中性": 30,
+            "负面": 86
           },
           {
             "date": "2024-11-13",
-            "个人用户": 2.9523809523809526,
-            "公安部门": NaN,
-            "学生": 2.9166666666666665,
-            "官方新闻媒体": 3.6,
-            "自媒体": 2.945945945945946
+            "正面": 48,
+            "中性": 25,
+            "负面": 41
           },
           {
             "date": "2024-11-14",
-            "个人用户": 2.8285714285714287,
-            "公安部门": NaN,
-            "学生": 3.0,
-            "官方新闻媒体": 4.0,
-            "自媒体": 3.6
+            "正面": 65,
+            "中性": 11,
+            "负面": 27
           },
           {
             "date": "2024-11-15",
-            "个人用户": 2.6666666666666665,
-            "公安部门": NaN,
-            "学生": 2.0,
-            "官方新闻媒体": 3.4285714285714284,
-            "自媒体": 3.0
+            "正面": 36,
+            "中性": 27,
+            "负面": 73
           }
         ]
       },
-      "source_tool": "generate_sentiment_focus_publisher_chart",
+      "source_tool": "generate_sentiment_focus_window_chart",
       "source_type": "mcp"
     }
   ],
@@ -35115,48 +35248,49 @@
       "topic_frequency",
       "geographic_distribution",
       "publisher_distribution",
-      "topic_cooccurrence",
       "sentiment_distribution",
-      "geographic_sentiment",
       "topic_evolution",
+      "geographic_hotspot",
       "cross_matrix",
       "influence_analysis",
-      "topic_keyword_trend",
+      "topic_cooccurrence",
+      "geographic_sentiment",
       "sentiment_anomaly",
-      "geographic_topic_heatmap_tool",
-      "participant_trend",
-      "generate_topic_ranking_chart",
-      "publisher_topic_distribution",
-      "geographic_hotspot",
-      "publisher_sentiment_bucket",
       "generate_geographic_heatmap",
+      "geographic_topic_heatmap_tool",
+      "topic_keyword_trend",
+      "publisher_sentiment_bucket",
       "generate_topic_network_chart",
-      "correlation_analysis",
-      "generate_sentiment_pie_chart",
       "generate_sentiment_trend_chart",
-      "geographic_temporal_heatmap_tool",
-      "topic_focus_evolution",
-      "generate_geographic_bar_chart",
-      "generate_interaction_heatmap",
-      "generate_sentiment_focus_window_chart",
-      "generate_publisher_focus_distribution",
-      "topic_focus_distribution",
-      "generate_publisher_bar_chart",
-      "generate_sentiment_attribute_trend_chart",
+      "publisher_topic_distribution",
       "geographic_sentiment_bar",
+      "participant_trend",
+      "topic_focus_evolution",
+      "geographic_temporal_heatmap_tool",
+      "correlation_analysis",
       "generate_sentiment_bucket_trend_chart",
-      "belief_network_chart",
+      "topic_focus_distribution",
+      "generate_sentiment_attribute_trend_chart",
+      "generate_sentiment_pie_chart",
+      "publisher_focus_distribution",
       "generate_sentiment_focus_publisher_chart",
-      "generate_topic_evolution_chart"
+      "belief_network_chart",
+      "generate_topic_ranking_chart",
+      "generate_interaction_heatmap",
+      "generate_topic_evolution_chart",
+      "generate_geographic_bar_chart",
+      "generate_sentiment_focus_window_chart",
+      "generate_publisher_bar_chart",
+      "generate_interaction_heatmap"
     ],
     "total_charts": 0,
     "total_tables": 0,
     "execution_time": 0.0,
     "chart_analysis": {
-      "total_charts": 23,
-      "success_count": 23,
+      "total_charts": 25,
+      "success_count": 25,
       "success_rate": 1.0,
-      "analysis_timestamp": 511.17613410949707
+      "analysis_timestamp": 1974.392660856247
     }
   }
 }

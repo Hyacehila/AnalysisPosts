@@ -120,8 +120,8 @@ def build_belief_network_data(
     os.makedirs(data_dir, exist_ok=True)
     nodes_path = os.path.join(data_dir, f"nodes_{event_name}.csv")
     edges_path = os.path.join(data_dir, f"edges_{event_name}.csv")
-    nodes_df.to_csv(nodes_path, index=False, encoding="utf_8")
-    edges_df.to_csv(edges_path, index=False, encoding="utf_8")
+    nodes_df.to_csv(nodes_path, index=False, encoding="utf_8_sig")
+    edges_df.to_csv(edges_path, index=False, encoding="utf_8_sig")
 
     return G, nodes_df, edges_df
 
@@ -131,69 +131,105 @@ def _draw_belief_network_graph(G: nx.Graph, file_path: str, event_name: str) -> 
         return
 
     num_nodes = G.number_of_nodes()
-    dynamic_k = 2.5 / np.sqrt(num_nodes)
-    pos = nx.spring_layout(G, k=dynamic_k, iterations=10, seed=114514)
+    fig_side = max(15, int(np.sqrt(num_nodes) * 3.5))
+    fig, ax = plt.subplots(figsize=(fig_side, fig_side * 0.618), facecolor="white")
 
-    plt.figure(figsize=(15, 12), facecolor="white")
+    dynamic_k = 7.0 / np.sqrt(num_nodes)
+    pos = nx.spring_layout(G, k=dynamic_k, iterations=500, seed=114514, weight=None)
 
     nodes = list(G.nodes())
     color_map = {"风险感知类": "#FF6B6B", "归因信念类": "#4D96FF", "行动/政策类": "#6BCB77"}
     border_color_map = {"风险感知类": "#C0392B", "归因信念类": "#2980B9", "行动/政策类": "#27AE60"}
 
     self_loop_weights = {u: d["weight"] for u, v, d in G.edges(data=True) if u == v}
+    co_occurrence_weights = {n: G.nodes[n].get("co_occurrence_weight", 0) for n in nodes}
+    total_weights = [co_occurrence_weights[n] + self_loop_weights.get(n, 0) for n in nodes]
+    avg_total_w = np.mean(total_weights) if total_weights else 1
+    if avg_total_w <= 0:
+        avg_total_w = 1
+
+    base_node_size = (fig_side * 1000) / np.sqrt(num_nodes)
+    outer_sizes = [
+        base_node_size * np.clip(np.sqrt(w / avg_total_w), 0.8, 3.5)
+        for w in total_weights
+    ]
+
     regular_edges = [(u, v) for u, v in G.edges() if u != v]
+    edge_widths = []
+    edge_range_labels = []
+    if regular_edges:
+        weights = np.array([G[u][v]["weight"] for u, v in regular_edges])
+        p_points = [0, 20, 40, 60, 80, 100]
+        thresholds = [np.percentile(weights, p) for p in p_points]
+        edge_range_labels = [
+            f"{int(thresholds[i])} - {int(thresholds[i + 1])}" for i in range(5)
+        ]
+        w_levels = [1.0, 2.5, 4.5, 7.0, 10.0]
+        for u, v in regular_edges:
+            w = G[u][v]["weight"]
+            idx = next((i for i, t in enumerate(thresholds[1:]) if w <= t), 4)
+            edge_widths.append(w_levels[idx])
 
-    total_sizes = []
-    core_sizes = []
-    for n in nodes:
-        cw = G.nodes[n].get("co_occurrence_weight", 0)
-        sw = self_loop_weights.get(n, 0)
-        total_w = cw + sw
+        nx.draw_networkx_edges(
+            G,
+            pos,
+            edgelist=regular_edges,
+            width=edge_widths,
+            alpha=0.25,
+            edge_color="#5D5C5C",
+            ax=ax,
+        )
 
-        t_size = np.power(total_w, 0.5) * 400 + 1500
-        total_sizes.append(t_size)
+    for i, node in enumerate(nodes):
+        cat = G.nodes[node].get("category", "")
+        base_color = color_map.get(cat, "#cccccc")
+        dark_color = border_color_map.get(cat, "#747474")
 
-        ratio = (cw / total_w) if total_w > 0 else 0
-        core_sizes.append(t_size * (ratio * 0.8 + 0.2))
+        nx.draw_networkx_nodes(
+            G,
+            pos,
+            nodelist=[node],
+            node_size=outer_sizes[i],
+            node_color=base_color,
+            edgecolors=dark_color,
+            linewidths=1.0,
+            alpha=0.8,
+            ax=ax,
+        )
 
-    edge_widths = [np.power((G[u][v]["weight"] / 5), 0.7) * 10 for u, v in regular_edges]
+        self_w = self_loop_weights.get(node, 0)
+        total_w = total_weights[i]
+        inner_ratio = np.sqrt(self_w / total_w) if total_w > 0 else 0
+        inner_size = outer_sizes[i] * inner_ratio
+        if inner_size > 0:
+            nx.draw_networkx_nodes(
+                G,
+                pos,
+                nodelist=[node],
+                node_size=inner_size,
+                node_color=dark_color,
+                edgecolors=dark_color,
+                linewidths=0.5,
+                alpha=1.0,
+                ax=ax,
+            )
 
-    nx.draw_networkx_edges(
-        G, pos, edgelist=regular_edges, width=edge_widths, alpha=0.5, edge_color="#5F5F5F"
-    )
-
-    nx.draw_networkx_nodes(
-        G,
-        pos,
-        node_size=total_sizes,
-        node_color=[border_color_map.get(G.nodes[n].get("category"), "#747474") for n in nodes],
-        alpha=1.0,
-    )
-
-    nx.draw_networkx_nodes(
-        G,
-        pos,
-        node_size=core_sizes,
-        node_color=[color_map.get(G.nodes[n].get("category"), "#cccccc") for n in nodes],
-        edgecolors="none",
-        alpha=1.0,
-    )
-
-    for node, (x, y) in pos.items():
-        txt = plt.text(
+    for i, (node, (x, y)) in enumerate(pos.items()):
+        d_fontsize = np.clip(np.sqrt(outer_sizes[i]) / 3.5, 10, 16)
+        txt = ax.text(
             x,
-            y,
+            y - 0.03,
             s=node,
-            fontsize=12,
+            fontsize=d_fontsize,
             fontfamily="SimHei",
             fontweight="bold",
             ha="center",
             va="center",
-            zorder=30,
+            zorder=150,
         )
-        txt.set_path_effects([patheffects.withStroke(linewidth=3, foreground="white")])
+        txt.set_path_effects([patheffects.withStroke(linewidth=2.5, foreground="white")])
 
-    legend_elements = [
+    cat_legends = [
         Line2D(
             [0],
             [0],
@@ -201,27 +237,58 @@ def _draw_belief_network_graph(G: nx.Graph, file_path: str, event_name: str) -> 
             color="w",
             label=cat,
             markerfacecolor=color,
-            markersize=12,
-            markeredgecolor=border_color_map[cat],
+            markersize=14,
+            markeredgecolor=border_color_map.get(cat, "#747474"),
             markeredgewidth=1.5,
         )
         for cat, color in color_map.items()
     ]
 
-    plt.legend(
-        handles=legend_elements,
+    node_composition_legends = [
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            label="共现部分",
+            markerfacecolor="#DDDDDD",
+            markersize=14,
+        ),
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            color="w",
+            label="自现部分",
+            markerfacecolor="#747474",
+            markersize=10,
+        ),
+    ]
+
+    leg1 = ax.legend(handles=cat_legends, loc="upper right", title="信念类别", shadow=True)
+    ax.add_artist(leg1)
+    leg2 = ax.legend(
+        handles=node_composition_legends,
         loc="upper right",
-        title="信念类别",
-        fontsize=11,
-        title_fontsize=13,
-        frameon=True,
-        edgecolor="#D3D3D3",
+        title="节点构成",
+        bbox_to_anchor=(1, 0.85),
+        shadow=True,
     )
-    plt.title(f"信念网络图（{event_name}）", fontsize=18, fontfamily="SimHei")
-    plt.margins(0.05)
+    ax.add_artist(leg2)
+
+    if edge_range_labels:
+        w_levels = [1.0, 2.5, 4.5, 7.0, 10.0]
+        edge_legends = [
+            Line2D([0], [0], color="#767676", lw=w_levels[i], label=edge_range_labels[i])
+            for i in range(4, -1, -1)
+        ]
+        ax.legend(handles=edge_legends, loc="lower right", title="关联强度", shadow=True)
+
+    ax.set_title(f"信念网络图（{event_name}）", fontsize=22, pad=30)
     plt.axis("off")
+    plt.margins(0.05)
     plt.savefig(file_path, bbox_inches="tight", dpi=300)
-    plt.close()
+    plt.close(fig)
 
 
 def belief_network_chart(
