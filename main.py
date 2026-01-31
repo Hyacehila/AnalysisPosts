@@ -337,7 +337,7 @@ def print_results(shared: Dict[str, Any], elapsed_time: float):
 
 async def run(
     shared: Dict[str, Any],
-    concurrent_num: int = 60,
+    concurrent_num: int = 3,
     max_retries: int = 3,
     wait_time: int = 8
 ):
@@ -424,7 +424,7 @@ def main():
     # ----- 执行阶段配置 -----
     # 设置需要执行的阶段列表
     # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2,3]    # 先进行阶段1的增强工作
+    RUN_STAGES = [1]    # 先进行阶段1的增强工作
 
     # ----- 阶段1配置 -----
     ENHANCEMENT_MODE = "async"  # "async" | "batch_api"

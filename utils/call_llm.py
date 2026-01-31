@@ -19,8 +19,8 @@ from typing import List, Dict, Any, Optional, Union
 from zai import ZaiClient
 
 # API密钥配置
-#GLM_API_KEY = "c020d461aacc492aba4ce1e9b5071962.uFJuF63k31GRGs2l"  # API密钥
-GLM_API_KEY = "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH"   # 武大团队API密钥
+qinziGLM_API_KEY = "c020d461aacc492aba4ce1e9b5071962.uFJuF63k31GRGs2l"  # API密钥
+#GLM_API_KEY = "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH"   # 武大团队API密钥
 
 # 使用 ThreadLocal 存储客户端实例
 # 这样每个线程会有自己独立的 Client，既避免了锁竞争，又实现了连接复用

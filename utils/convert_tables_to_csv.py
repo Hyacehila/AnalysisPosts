@@ -79,4 +79,4 @@ def process_node(data, output_prefix):
     pass
 
 if __name__ == "__main__":
-    convert_to_csv('report/split_data', 'report/csv_tables')
+    convert_to_csv('report/split_data_kaifeng', 'report/csv_tables_kaifeng')

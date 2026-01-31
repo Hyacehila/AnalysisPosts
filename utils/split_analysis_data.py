@@ -56,4 +56,4 @@ def split_analysis_data(input_file, output_dir):
         print(f"Error splitting file: {e}")
 
 if __name__ == "__main__":
-    split_analysis_data('report/analysis_data.json', 'report/split_data')
+    split_analysis_data('report/analysis_data_kaifeng.json', 'report/split_data_kaifeng')
