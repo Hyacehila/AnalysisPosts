@@ -29,8 +29,12 @@
 _thread_local = threading.local()
 
 def get_client():
-    if not hasattr(_thread_local, "client"):
-        _thread_local.client = ZaiClient(api_key=GLM_API_KEY)
+    api_key = os.getenv("GLM_API_KEY")
+    if not api_key:
+        raise RuntimeError("GLM_API_KEY environment variable is not set.")
+    if not hasattr(_thread_local, "client") or getattr(_thread_local, "api_key", None) != api_key:
+        _thread_local.client = ZaiClient(api_key=api_key)
+        _thread_local.api_key = api_key
     return _thread_local.client
 ```
 

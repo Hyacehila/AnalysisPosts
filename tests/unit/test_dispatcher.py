@@ -52,12 +52,11 @@ class TestDispatcherNodePrep:
 
     def test_reads_mode_from_config(self, minimal_shared):
         """从 config 中读取各阶段模式"""
-        minimal_shared["config"]["enhancement_mode"] = "batch_api"
         minimal_shared["config"]["analysis_mode"] = "agent"
         minimal_shared["config"]["report_mode"] = "iterative"
         node = DispatcherNode()
         result = node.prep(minimal_shared)
-        assert result["enhancement_mode"] == "batch_api"
+        assert result["enhancement_mode"] == "async"
         assert result["analysis_mode"] == "agent"
         assert result["report_mode"] == "iterative"
 
@@ -86,12 +85,6 @@ class TestDispatcherNodeExec:
         result = node.exec(self._make_prep_res())
         assert result["action"] == "stage1_async"
         assert result["next_stage"] == 1
-
-    def test_first_entry_batch_api_mode(self):
-        """enhancement_mode=batch_api → stage1_batch_api"""
-        node = DispatcherNode()
-        result = node.exec(self._make_prep_res(enhancement_mode="batch_api"))
-        assert result["action"] == "stage1_batch_api"
 
     def test_stage1_done_routes_to_stage2(self):
         """Stage 1 完成后 → stage2_workflow"""

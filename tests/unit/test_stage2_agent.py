@@ -102,7 +102,7 @@ class TestDecisionToolsNode:
         assert len(result["available_tools"]) == 2
         assert result["current_iteration"] == 0
 
-    @patch("nodes.call_glm46")
+    @patch("nodes.stage2.call_glm46")
     def test_exec_parses_execute_decision(self, mock_llm):
         """LLM 返回 execute 决策"""
         mock_llm.return_value = json.dumps({
@@ -125,7 +125,7 @@ class TestDecisionToolsNode:
         assert result["action"] == "execute"
         assert result["tool_name"] == "sentiment_distribution_stats"
 
-    @patch("nodes.call_glm46")
+    @patch("nodes.stage2.call_glm46")
     def test_exec_parses_finish_decision(self, mock_llm):
         """LLM 返回 finish 决策"""
         mock_llm.return_value = json.dumps({
@@ -145,7 +145,7 @@ class TestDecisionToolsNode:
         result = node.exec(prep_res)
         assert result["action"] == "finish"
 
-    @patch("nodes.call_glm46", return_value="invalid json response")
+    @patch("nodes.stage2.call_glm46", return_value="invalid json response")
     def test_exec_fallback_on_parse_error(self, mock_llm):
         """JSON 解析失败 → 默认从 sentiment_distribution_stats 开始"""
         node = DecisionToolsNode()
@@ -160,7 +160,7 @@ class TestDecisionToolsNode:
         assert result["action"] == "execute"
         assert result["tool_name"] == "sentiment_distribution_stats"
 
-    @patch("nodes.call_glm46")
+    @patch("nodes.stage2.call_glm46")
     def test_exec_json_in_code_block(self, mock_llm):
         """LLM 返回被 ```json 包裹的 JSON"""
         mock_llm.return_value = '```json\n{"action": "execute", "tool_name": "topic_frequency_stats", "reason": "test"}\n```'

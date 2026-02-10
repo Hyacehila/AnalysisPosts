@@ -18,6 +18,7 @@ tests/
 │   ├── sample_sentiment_attrs.json
 │   └── sample_publishers.json
 ├── unit/                          # 单元测试
+│   ├── test_config.py             # P0 — YAML 配置加载/校验
 │   ├── test_utils.py              # P0 — 纯工具函数
 │   ├── test_dispatcher.py         # P0 — 调度器状态机
 │   ├── test_stage1_nodes.py       # P1 — Stage 1 通用节点
@@ -29,7 +30,7 @@ tests/
 ├── test_data_format.py            # 数据格式验证（独立）
 ├── test_data_loader.py            # 数据加载器测试（独立）
 ├── test_json_files.py             # JSON 配置文件验证（独立）
-└── test_llm_models.py             # LLM 在线测试（需 API Key）
+└── test_llm_models.py             # LLM 在线测试（需 RUN_LLM_TESTS=1）
 ```
 
 ## 2. 运行测试
@@ -41,7 +42,7 @@ tests/
 .venv/Scripts/python.exe -m pytest tests/unit/ -v --tb=short
 ```
 
-当前基线: **150 passed, 0 failed** (< 1s)
+当前基线: **153 passed, 0 failed** (< 1s)
 
 ### 2.2 运行特定模块
 
@@ -74,8 +75,8 @@ tests/
 # 数据加载器（需要真实 JSON 文件）
 .venv/Scripts/python.exe -m pytest tests/test_data_loader.py -v
 
-# LLM 在线测试（需要配置 API Key，会产生 API 调用费用）
-.venv/Scripts/python.exe -m pytest tests/test_llm_models.py -v
+# LLM 在线测试（需要 RUN_LLM_TESTS=1，会产生 API 调用费用）
+RUN_LLM_TESTS=1 .venv/Scripts/python.exe -m pytest tests/test_llm_models.py -v
 ```
 
 ## 3. 源码 ↔ 测试映射
@@ -84,13 +85,13 @@ tests/
 
 | 源文件 / 模块 | 测试文件 | 优先级 |
 |---|---|---|
-| `nodes.py` — `normalize_path`, `_strip_timestamp_suffix`, `_build_chart_path_index`, `_remap_report_images`, `ensure_dir_exists`, `get_project_relative_path` | `test_utils.py` | P0 |
-| `nodes.py` — `DispatcherNode`, `TerminalNode`, `Stage{1,2,3}CompletionNode` | `test_dispatcher.py` | P0 |
-| `nodes.py` — `DataLoadNode`, `SaveEnhancedDataNode`, `DataValidationAndOverviewNode` | `test_stage1_nodes.py` | P1 |
-| `nodes.py` — `AsyncSentimentPolarityAnalysisBatchNode`, `AsyncSentimentAttributeAnalysisBatchNode`, `AsyncTwoLevelTopicAnalysisBatchNode`, `AsyncPublisherObjectAnalysisBatchNode`, `AsyncBeliefSystemAnalysisBatchNode`, `AsyncPublisherDecisionAnalysisBatchNode` | `test_stage1_analysis.py` | P1 |
-| `nodes.py` — `LoadEnhancedDataNode`, `DataSummaryNode`, `ExecuteAnalysisScriptNode`, `ChartAnalysisNode`, `SaveAnalysisResultsNode`, `LLMInsightNode` | `test_stage2_workflow.py` | P2 |
-| `nodes.py` — `CollectToolsNode`, `DecisionToolsNode` | `test_stage2_agent.py` | P2 |
-| `nodes.py` — `LoadAnalysisResultsNode`, `FormatReportNode`, `SaveReportNode`, `GenerateFullReportNode`, `InitReportStateNode`, `ReviewReportNode` | `test_stage3_report.py` | P3 |
+| `nodes/_utils.py` — `normalize_path`, `_strip_timestamp_suffix`, `_build_chart_path_index`, `_remap_report_images`, `ensure_dir_exists`, `get_project_relative_path` | `test_utils.py` | P0 |
+| `nodes/dispatcher.py` — `DispatcherNode`, `TerminalNode`, `Stage{1,2,3}CompletionNode` | `test_dispatcher.py` | P0 |
+| `nodes/stage1.py` — `DataLoadNode`, `SaveEnhancedDataNode`, `DataValidationAndOverviewNode` | `test_stage1_nodes.py` | P1 |
+| `nodes/stage1.py` — `AsyncSentimentPolarityAnalysisBatchNode`, `AsyncSentimentAttributeAnalysisBatchNode`, `AsyncTwoLevelTopicAnalysisBatchNode`, `AsyncPublisherObjectAnalysisBatchNode`, `AsyncBeliefSystemAnalysisBatchNode`, `AsyncPublisherDecisionAnalysisBatchNode` | `test_stage1_analysis.py` | P1 |
+| `nodes/stage2.py` — `LoadEnhancedDataNode`, `DataSummaryNode`, `ExecuteAnalysisScriptNode`, `ChartAnalysisNode`, `SaveAnalysisResultsNode`, `LLMInsightNode` | `test_stage2_workflow.py` | P2 |
+| `nodes/stage2.py` — `CollectToolsNode`, `DecisionToolsNode` | `test_stage2_agent.py` | P2 |
+| `nodes/stage3.py` — `LoadAnalysisResultsNode`, `FormatReportNode`, `SaveReportNode`, `GenerateFullReportNode`, `InitReportStateNode`, `ReviewReportNode` | `test_stage3_report.py` | P3 |
 | 多节点串联行为、`shared` 字典流转、Dispatcher 多阶段调度 | `test_flow_integration.py` | P4 |
 | `utils/data_loader.py` | `test_data_loader.py` | — |
 | `utils/call_llm.py` | `test_llm_models.py` | — |
@@ -209,9 +210,9 @@ tests/
 
 | Mock 目标 | 方式 | 说明 |
 |---|---|---|
-| LLM 调用 (`call_glm_45_air`, `call_glm4v_plus`, `call_glm45v_thinking`, `call_glm46`) | `@patch("nodes.xxx")` | 返回可控字符串/JSON |
-| 文件 I/O (`load_blog_data`, `save_enhanced_blog_data` 等) | `@patch("nodes.xxx")` | 返回 fixture 数据 |
+| LLM 调用 (`call_glm_45_air`, `call_glm4v_plus`, `call_glm45v_thinking`, `call_glm46`) | `@patch("nodes.stageX.xxx")` | 返回可控字符串/JSON |
+| 文件 I/O (`load_blog_data`, `save_enhanced_blog_data` 等) | `@patch("nodes.stageX.xxx")` | 返回 fixture 数据 |
 | MCP 工具 (`get_tools`, `set_mcp_mode`) | 通过 Mock `CollectToolsNode.exec` | 避免启动真实 MCP 服务 |
 | 文件系统 (`os.path.exists`, `os.makedirs`) | `@patch` | 避免真实文件操作 |
 
-**重构时**: 如果将 `nodes.py` 拆分为多个文件，需要更新 `@patch` 路径。例如 `@patch("nodes.call_glm_45_air")` 可能需要改为 `@patch("stage1_nodes.call_glm_45_air")`。
+**重构时**: `@patch("nodes.xxx")` 需指向具体模块，例如 `@patch("nodes.stage1.call_glm_45_air")`、`@patch("nodes.stage2.call_glm46")`。

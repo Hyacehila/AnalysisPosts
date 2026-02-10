@@ -1,0 +1,34 @@
+data:
+  input_path: "data/posts.json"
+  output_path: "data/enhanced_posts.json"
+  topics_path: "data/topics.json"
+  sentiment_attributes_path: "data/sentiment_attributes.json"
+  publisher_objects_path: "data/publisher_objects.json"
+  belief_system_path: "data/believe_system_common.json"
+  publisher_decision_path: "data/publisher_decision.json"
+
+pipeline:
+  start_stage: 1
+  run_stages: [1, 2, 3]
+
+stage1:
+  mode: "async"
+  checkpoint:
+    enabled: true
+    save_every: 100
+    min_interval_seconds: 20
+
+stage2:
+  mode: "workflow"
+  tool_source: "local"
+  agent_max_iterations: 10
+
+stage3:
+  mode: "template"
+  max_iterations: 5
+  min_score: 80
+
+runtime:
+  concurrent_num: 60
+  max_retries: 3
+  wait_time: 8

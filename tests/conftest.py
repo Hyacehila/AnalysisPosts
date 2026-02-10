@@ -4,15 +4,10 @@ conftest.py — pytest 共享 Fixtures
 为所有测试提供统一的测试数据和 Mock 对象。
 """
 import json
-import sys
 import os
 import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
-
-# 将项目根目录加入 sys.path
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
 
@@ -149,10 +144,10 @@ def mock_llm_calls():
             mock_llm_calls["air"].return_value = "3"
             # ... 执行节点 ...
     """
-    with patch("nodes.call_glm_45_air") as m_air, \
-         patch("nodes.call_glm4v_plus") as m_4v, \
-         patch("nodes.call_glm45v_thinking") as m_thinking, \
-         patch("nodes.call_glm46") as m_46:
+    with patch("nodes.stage1.call_glm_45_air") as m_air, \
+         patch("nodes.stage1.call_glm4v_plus") as m_4v, \
+         patch("nodes.stage2.call_glm45v_thinking") as m_thinking, \
+         patch("nodes.stage2.call_glm46") as m_46:
         m_air.return_value = "mocked_air_response"
         m_4v.return_value = "mocked_4v_response"
         m_thinking.return_value = "mocked_thinking_response"

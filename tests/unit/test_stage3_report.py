@@ -122,7 +122,7 @@ class TestFormatReportNode:
         result = node.exec("")
         assert result == ""
 
-    @patch("nodes._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3._load_analysis_charts", return_value=[])
     def test_exec_fixes_image_paths(self, mock_charts):
         """Windows 路径 → 标准化为 ./images/"""
         node = FormatReportNode()
@@ -130,7 +130,7 @@ class TestFormatReportNode:
         result = node.exec(content)
         assert "./images/chart.png" in result
 
-    @patch("nodes._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3._load_analysis_charts", return_value=[])
     def test_exec_adds_toc(self, mock_charts):
         """无目录时自动添加"""
         node = FormatReportNode()
@@ -138,7 +138,7 @@ class TestFormatReportNode:
         result = node.exec(content)
         assert "## 目录" in result
 
-    @patch("nodes._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3._load_analysis_charts", return_value=[])
     def test_exec_no_duplicate_toc(self, mock_charts):
         """已有目录时不重复添加"""
         node = FormatReportNode()
@@ -146,7 +146,7 @@ class TestFormatReportNode:
         result = node.exec(content)
         assert result.count("## 目录") == 1
 
-    @patch("nodes._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3._load_analysis_charts", return_value=[])
     def test_exec_ensures_trailing_newline(self, mock_charts):
         """确保结尾有换行"""
         node = FormatReportNode()
@@ -271,7 +271,7 @@ class TestReviewReportNode:
         assert result["satisfaction_threshold"] == 80
         assert result["max_iterations"] == 5
 
-    @patch("nodes.call_glm46")
+    @patch("nodes.stage3.call_glm46")
     def test_exec_parses_review_result(self, mock_llm):
         mock_llm.return_value = json.dumps({
             "structure_score": 18,
@@ -298,7 +298,7 @@ class TestReviewReportNode:
         assert result["total_score"] == 84
         assert result["needs_revision"] is False
 
-    @patch("nodes.call_glm46", return_value="invalid json!!!")
+    @patch("nodes.stage3.call_glm46", return_value="invalid json!!!")
     def test_exec_fallback_on_json_error(self, mock_llm):
         """JSON 解析失败 → 使用默认评分"""
         node = ReviewReportNode()

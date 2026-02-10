@@ -10,7 +10,6 @@
 
 DispatcherNode（中央调度入口）
     ├─ stage1_async → AsyncEnhancementFlow → dispatch（返回）
-    ├─ stage1_batch_api → BatchAPIEnhancementFlow → dispatch（返回）
     ├─ stage2_workflow → WorkflowAnalysisFlow → dispatch（返回）
     ├─ stage2_agent → AgentAnalysisFlow → dispatch（返回）
     ├─ stage3_template → TemplateReportFlow → dispatch（返回）（待实现）
@@ -39,8 +38,7 @@ from nodes import (
     AsyncPublisherObjectAnalysisBatchNode,
     AsyncBeliefSystemAnalysisBatchNode,
     AsyncPublisherDecisionAnalysisBatchNode,
-    # 阶段1 Batch API节点
-    BatchAPIEnhancementNode,
+
     # 阶段2通用节点
     LoadEnhancedDataNode,
     DataSummaryNode,
@@ -134,23 +132,6 @@ def _create_async_enhancement_flow(
     
     return AsyncFlow(start=data_load_node)
 
-
-def _create_batch_api_enhancement_flow() -> Flow:
-    """
-    创建Batch API处理Flow (enhancement_mode="batch_api")
-    
-    内部函数，由create_main_flow调用。
-    """
-    data_load_node = DataLoadNode()
-    batch_api_node = BatchAPIEnhancementNode()
-    validation_node = DataValidationAndOverviewNode()
-    completion_node = Stage1CompletionNode()
-    
-    data_load_node >> batch_api_node
-    batch_api_node >> validation_node
-    validation_node >> completion_node
-    
-    return Flow(start=data_load_node)
 
 
 def _create_workflow_analysis_flow() -> Flow:
@@ -269,7 +250,6 @@ def create_main_flow(
         max_retries=max_retries,
         wait_time=wait_time
     )
-    batch_api_enhancement_flow = _create_batch_api_enhancement_flow()
     
     # 阶段2 Flow
     workflow_analysis_flow = _create_workflow_analysis_flow()
@@ -281,9 +261,7 @@ def create_main_flow(
 
     # === 阶段1路径 ===
     dispatcher - "stage1_async" >> async_enhancement_flow
-    dispatcher - "stage1_batch_api" >> batch_api_enhancement_flow
     async_enhancement_flow - "dispatch" >> dispatcher
-    batch_api_enhancement_flow - "dispatch" >> dispatcher
 
     # === 阶段2路径 ===
     dispatcher - "stage2_workflow" >> workflow_analysis_flow

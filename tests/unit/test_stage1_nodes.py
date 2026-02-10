@@ -60,7 +60,7 @@ class TestDataLoadNodePrep:
 class TestDataLoadNodeExec:
     """测试 DataLoadNode.exec"""
 
-    @patch("nodes.load_enhanced_blog_data")
+    @patch("nodes.stage1.load_enhanced_blog_data")
     def test_enhanced_load(self, mock_load, sample_enhanced_data):
         mock_load.return_value = sample_enhanced_data
         node = DataLoadNode()
@@ -69,12 +69,12 @@ class TestDataLoadNodeExec:
         assert result["blog_data"] == sample_enhanced_data
         mock_load.assert_called_once_with("data/enh.json")
 
-    @patch("nodes.load_publisher_decisions")
-    @patch("nodes.load_belief_system")
-    @patch("nodes.load_publisher_objects")
-    @patch("nodes.load_sentiment_attributes")
-    @patch("nodes.load_topics")
-    @patch("nodes.load_blog_data")
+    @patch("nodes.stage1.load_publisher_decisions")
+    @patch("nodes.stage1.load_belief_system")
+    @patch("nodes.stage1.load_publisher_objects")
+    @patch("nodes.stage1.load_sentiment_attributes")
+    @patch("nodes.stage1.load_topics")
+    @patch("nodes.stage1.load_blog_data")
     def test_original_load(self, mock_blog, mock_topics, mock_sa, mock_po,
                            mock_bs, mock_pd,
                            sample_blog_data, sample_topics,
@@ -104,13 +104,13 @@ class TestDataLoadNodeExec:
         assert len(result["topics_hierarchy"]) == 3
         assert len(result["sentiment_attributes"]) == len(sample_sentiment_attrs)
 
-    @patch("nodes.load_enhanced_blog_data")
-    @patch("nodes.load_publisher_decisions")
-    @patch("nodes.load_belief_system")
-    @patch("nodes.load_publisher_objects")
-    @patch("nodes.load_sentiment_attributes")
-    @patch("nodes.load_topics")
-    @patch("nodes.load_blog_data")
+    @patch("nodes.stage1.load_enhanced_blog_data")
+    @patch("nodes.stage1.load_publisher_decisions")
+    @patch("nodes.stage1.load_belief_system")
+    @patch("nodes.stage1.load_publisher_objects")
+    @patch("nodes.stage1.load_sentiment_attributes")
+    @patch("nodes.stage1.load_topics")
+    @patch("nodes.stage1.load_blog_data")
     @patch("os.path.exists", return_value=True)
     def test_resume_loads_enhanced_data(
         self, mock_exists, mock_blog, mock_topics, mock_sa, mock_po,
@@ -189,7 +189,7 @@ class TestSaveEnhancedDataNode:
         assert result["blog_data"] == sample_enhanced_data
         assert "enhanced" in result["output_path"]
 
-    @patch("nodes.save_enhanced_blog_data", return_value=True)
+    @patch("nodes.stage1.save_enhanced_blog_data", return_value=True)
     def test_exec_calls_save(self, mock_save, sample_enhanced_data):
         node = SaveEnhancedDataNode()
         result = node.exec({

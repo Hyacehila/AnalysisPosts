@@ -18,3 +18,8 @@ report/images/
 
 # Claude 
 .claude/
+
+# Agent artifacts
+.agent/
+.pytest_tmp/
+.pytest_tmp_local/

@@ -19,7 +19,7 @@ from typing import List, Dict, Any, Optional, Union
 from zai import ZaiClient
 
 # API密钥配置
-GLM_API_KEY = "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH"  # API密钥
+GLM_API_KEY_ENV = "GLM_API_KEY"
 
 # 使用 ThreadLocal 存储客户端实例
 # 这样每个线程会有自己独立的 Client，既避免了锁竞争，又实现了连接复用
@@ -30,8 +30,12 @@ def get_client():
     获取当前线程的 ZaiClient 实例
     如果在当前线程是第一次调用，则创建一个新实例并缓存
     """
-    if not hasattr(_thread_local, "client"):
-        _thread_local.client = ZaiClient(api_key=GLM_API_KEY)
+    api_key = os.getenv(GLM_API_KEY_ENV)
+    if not api_key:
+        raise RuntimeError(f"{GLM_API_KEY_ENV} environment variable is not set.")
+    if not hasattr(_thread_local, "client") or getattr(_thread_local, "api_key", None) != api_key:
+        _thread_local.client = ZaiClient(api_key=api_key)
+        _thread_local.api_key = api_key
     return _thread_local.client
 
 
@@ -113,7 +117,7 @@ def call_glm4v_plus(prompt: str, image_paths: Optional[List[str]] = None,
             "messages": messages,
             "temperature": temperature,
             "stream": False,
-            "timeout": 90  # 添加超时设置
+            "timeout": timeout  # 添加超时设置
         }
         
         if max_tokens:

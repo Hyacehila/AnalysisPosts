@@ -27,7 +27,7 @@
 ### 1.3 设计理念
 
 1. **中央调度 + 阶段解耦**：`DispatcherNode` 统一管理三阶段的执行顺序，各阶段封装为独立 Flow，互不依赖。
-2. **多模式可切换**：每个阶段提供 2 种执行模式（如 async/batch_api），在 `main.py` 中通过配置参数切换。
+2. **多模式可切换**：每个阶段提供不同的执行模式（如 workflow/agent），在 `config.yaml` 中通过配置项切换（`main.py` 读取 YAML）。
 3. **单一数据源 (`shared`)**：所有节点通过共享字典 `shared` 通信，无隐式状态。
 4. **容错与断点续传**：阶段 1 的长时间批处理支持 Checkpoint 机制，中断后可恢复。
 
@@ -42,7 +42,6 @@ graph TD
     User["用户入口<br>(main.py)"] -->|"初始化 shared"| Dispatcher["DispatcherNode<br>(中央调度)"]
     
     Dispatcher -->|"stage1_async"| S1A["AsyncEnhancementFlow<br>(异步并行增强)"]
-    Dispatcher -->|"stage1_batch_api"| S1B["BatchAPIEnhancementFlow<br>(Batch API 增强)"]
     
     Dispatcher -->|"stage2_workflow"| S2A["WorkflowAnalysisFlow<br>(预定义分析)"]
     Dispatcher -->|"stage2_agent"| S2B["AgentAnalysisFlow<br>(自主探索分析)"]
@@ -138,7 +137,6 @@ stateDiagram-v2
 | Action 字符串 | 目标 Flow | 触发条件 |
 |:---|:---|:---|
 | `stage1_async` | `AsyncEnhancementFlow` | `next_stage == 1` 且 `enhancement_mode == "async"` |
-| `stage1_batch_api` | `BatchAPIEnhancementFlow` | `next_stage == 1` 且 `enhancement_mode == "batch_api"` |
 | `stage2_workflow` | `WorkflowAnalysisFlow` | `next_stage == 2` 且 `analysis_mode == "workflow"` |
 | `stage2_agent` | `AgentAnalysisFlow` | `next_stage == 2` 且 `analysis_mode == "agent"` |
 | `stage3_template` | `TemplateReportFlow` | `next_stage == 3` 且 `report_mode == "template"` |
@@ -157,14 +155,13 @@ stateDiagram-v2
 
 ## 4. Flow 编排 (`flow.py`)
 
-`flow.py` 定义了 **6 个子 Flow** 和 **1 个主 Flow**。所有 Flow 由 `create_main_flow()` 统一注册到 DispatcherNode 的 Action 路由中。
+`flow.py` 定义了 **5 个子 Flow** 和 **1 个主 Flow**。所有 Flow 由 `create_main_flow()` 统一注册到 DispatcherNode 的 Action 路由中。
 
 ### 4.1 Flow 清单
 
 | 函数 | 类型 | 节点链路 |
 |:---|:---|:---|
 | `_create_async_enhancement_flow` | `AsyncFlow` | DataLoad → SentimentPolarity → SentimentAttribute → Topic → Publisher → Belief → PublisherDecision → Save → Validate → Complete |
-| `_create_batch_api_enhancement_flow` | `Flow` | DataLoad → BatchAPI → Validate → Complete |
 | `_create_workflow_analysis_flow` | `Flow` | LoadEnhanced → Summary → ExecuteScript → ChartAnalysis → LLMInsight → SaveResults → Complete |
 | `_create_agent_analysis_flow` | `AsyncFlow` | LoadEnhanced → Summary → CollectTools → Decision ⇄ Execute ⇄ Process → ChartAnalysis → LLMInsight → SaveResults → Complete |
 | `_create_template_report_flow` | `Flow` | LoadResults → GenerateFullReport → Format → Save → Complete |
@@ -201,7 +198,7 @@ dispatcher - "done" >> terminal
 
 ## 5. 核心数据结构 `shared`
 
-`shared` 字典是所有节点间通信的**唯一数据总线**，由 `main.py` 的 `init_shared()` 函数初始化。
+`shared` 字典是所有节点间通信的**唯一数据总线**，由 `config.py` 的 `config_to_shared()` 初始化。
 
 ### 5.1 顶级结构
 
@@ -224,7 +221,7 @@ dispatcher - "done" >> terminal
 
 ```
 config
-├── enhancement_mode         "async" | "batch_api"
+├── enhancement_mode         "async"
 ├── analysis_mode            "workflow" | "agent"
 ├── report_mode              "template" | "iterative"
 ├── tool_source              "local" | "mcp"
@@ -243,11 +240,6 @@ config
 │   ├── type                 "original" | "enhanced"
 │   ├── resume_if_exists     bool (默认 True)
 │   └── enhanced_data_path   str
-└── batch_api_config
-    ├── script_path           str
-    ├── input_path            str
-    ├── output_path           str
-    └── wait_for_completion   bool
 ```
 
 ### 5.3 `data` 子结构详情
@@ -302,66 +294,82 @@ stage2_results
 
 ---
 
-## 6. 入口配置 (`main.py`)
+## 6. 入口配置（`config.yaml` + `config.py`）
 
-### 6.1 `init_shared()` 参数
+### 6.1 `config.yaml` 结构
 
-| 参数 | 类型 | 默认值 | 说明 |
-|:---|:---|:---|:---|
-| `input_data_path` | str | `"data/beijing_rainstorm_posts.json"` | 输入博文文件 |
-| `output_data_path` | str | `"data/enhanced_blogs.json"` | 增强数据输出路径 |
-| `topics_path` | str | `"data/topics.json"` | 主题层次结构 |
-| `sentiment_attributes_path` | str | `"data/sentiment_attributes.json"` | 情感属性列表 |
-| `publisher_objects_path` | str | `"data/publisher_objects.json"` | 发布者类型列表 |
-| `belief_system_path` | str | `"data/believe_system_common.json"` | 信念体系分类 |
-| `publisher_decision_path` | str | `"data/publisher_decision.json"` | 事件关联身份 |
-| `start_stage` | int | `1` | 起始阶段 |
-| `run_stages` | List[int] | `[1]` | 执行哪些阶段 |
-| `enhancement_mode` | str | `"async"` | 阶段 1 模式 |
-| `analysis_mode` | str | `"workflow"` | 阶段 2 模式 |
-| `tool_source` | str | `"local"` | Agent 工具来源 |
-| `agent_max_iterations` | int | `10` | Agent 最大迭代 |
-| `report_mode` | str | `"template"` | 阶段 3 模式 |
-| `report_max_iterations` | int | `5` | 报告最大迭代 |
-| `report_min_score` | int | `80` | 报告满意度阈值 |
-| `data_source_type` | str | `"original"` | 数据源类型 |
+```yaml
+data:
+  input_path: "data/posts.json"
+  output_path: "data/enhanced_posts.json"
+  topics_path: "data/topics.json"
+  sentiment_attributes_path: "data/sentiment_attributes.json"
+  publisher_objects_path: "data/publisher_objects.json"
+  belief_system_path: "data/believe_system_common.json"
+  publisher_decision_path: "data/publisher_decision.json"
 
-### 6.2 `run()` 运行时参数
+pipeline:
+  start_stage: 1
+  run_stages: [1, 2, 3]
 
-| 参数 | 默认值 | 说明 |
-|:---|:---|:---|
-| `concurrent_num` | `60` | 异步处理最大并发数 |
-| `max_retries` | `3` | 节点级重试次数 |
-| `wait_time` | `8` | 重试间隔（秒） |
+stage1:
+  mode: "async"
+  checkpoint:
+    enabled: true
+    save_every: 100
+    min_interval_seconds: 20
 
-运行时会创建 `concurrent_num + 20` 个线程的线程池，用于异步调用同步 LLM 函数。
+stage2:
+  mode: "workflow"   # workflow | agent
+  tool_source: "local"  # local | mcp
+  agent_max_iterations: 10
 
-### 6.3 典型运行配置示例
+stage3:
+  mode: "template"   # template | iterative
+  max_iterations: 5
+  min_score: 80
 
-```python
-# 完整流程：阶段 1 → 2 → 3
-RUN_STAGES = [1, 2, 3]
-ENHANCEMENT_MODE = "async"
-ANALYSIS_MODE = "workflow"
-REPORT_MODE = "template"
+runtime:
+  concurrent_num: 60
+  max_retries: 3
+  wait_time: 8
+```
 
-# 仅运行阶段 2 + 3（阶段 1 已完成）
-RUN_STAGES = [2, 3]
-start_stage = 2
-data_source_type = "enhanced"
+### 6.2 `config.py` 入口流程
 
-# Agent 模式分析
-ANALYSIS_MODE = "agent"
-TOOL_SOURCE = "mcp"
-AGENT_MAX_ITERATIONS = 40
+`main.py` 中的启动流程如下：
+
+1. `load_config("config.yaml")` 读取配置  
+2. `validate_config(config)` 执行前置条件校验  
+3. `config_to_shared(config)` 构建 `shared`  
+4. `asyncio.run(run(shared, **runtime))` 启动主 Flow
+
+### 6.3 典型运行示例
+
+```yaml
+# 仅运行阶段2 + 3（阶段1已完成）
+pipeline:
+  start_stage: 2
+  run_stages: [2, 3]
+
+stage2:
+  mode: "workflow"
+```
+
+```yaml
+# Agent 模式分析 + MCP
+stage2:
+  mode: "agent"
+  tool_source: "mcp"
+  agent_max_iterations: 40
 ```
 
 ### 6.4 前置条件检查
 
-`main()` 函数根据 `RUN_STAGES` 自动检查：
-- `[2]` 或 `[2,3]`：检查增强数据文件是否存在
-- `[3]`：检查 `report/analysis_data.json`、`report/chart_analyses.json`、`report/insights.json` 是否存在
-- Agent + MCP 模式：通过环境变量 `ENHANCED_DATA_PATH` 告知 MCP Server 增强数据路径
+`validate_config()` 自动检查：
+- 仅运行阶段2/3时，增强数据文件必须存在  
+- 仅运行阶段3时，`report/analysis_data.json` / `report/chart_analyses.json` / `report/insights.json` 必须存在  
+- Agent + MCP 模式下需要 `ENHANCED_DATA_PATH`（`main.py` 会自动设置）
 
 ---
 
@@ -376,7 +384,6 @@ AGENT_MAX_ITERATIONS = 40
 | 模式 | Flow | 特点 |
 |:---|:---|:---|
 | `async` | `AsyncEnhancementFlow` | 异步并行调用 LLM，支持并发控制与 Checkpoint |
-| `batch_api` | `BatchAPIEnhancementFlow` | 调用智谱 Batch API，低成本大规模处理 |
 
 **六个增强维度**：情感极性 · 情感属性 · 二级主题 · 发布者类型 · 信念体系 · 事件关联身份
 
@@ -417,7 +424,6 @@ AGENT_MAX_ITERATIONS = 40
 | [分析工具库](analysis_tools.md) | 5 类工具模块、算法实现、注册表 |
 | [工具函数文档](utils.md) | LLM 调用层、数据加载、路径处理 |
 | [MCP 协议集成](mcp_integration.md) | MCP Server/Client、双模式工具分发 |
-| [Batch API 批处理](batch_processing.md) | JSONL 格式、批量工作流、错误恢复 |
 | [测试工作流](testing_workflow.md) | 测试架构、Mock 策略、运行指南 |
 
 ---
@@ -447,3 +453,4 @@ uv sync           # 同步依赖
 | `fastmcp` | ≥ 2.13.0 | MCP 服务端框架 |
 | `pydantic` | ≥ 2.0.0 | 数据验证 |
 | `requests` | ≥ 2.32.5 | HTTP 客户端 |
+| `pyyaml` | ≥ 6.0.2 | YAML 配置解析 |

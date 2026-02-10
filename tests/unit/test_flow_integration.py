@@ -53,13 +53,13 @@ def _complete_stage(shared, CompletionNodeClass):
 class TestStage1PipelineFlow:
     """DataLoad → Validation → Save 串联流程"""
 
-    @patch("nodes.save_enhanced_blog_data", return_value=True)
-    @patch("nodes.load_publisher_decisions", return_value=["type1"])
-    @patch("nodes.load_belief_system", return_value=[])
-    @patch("nodes.load_publisher_objects")
-    @patch("nodes.load_sentiment_attributes")
-    @patch("nodes.load_topics")
-    @patch("nodes.load_blog_data")
+    @patch("nodes.stage1.save_enhanced_blog_data", return_value=True)
+    @patch("nodes.stage1.load_publisher_decisions", return_value=["type1"])
+    @patch("nodes.stage1.load_belief_system", return_value=[])
+    @patch("nodes.stage1.load_publisher_objects")
+    @patch("nodes.stage1.load_sentiment_attributes")
+    @patch("nodes.stage1.load_topics")
+    @patch("nodes.stage1.load_blog_data")
     def test_full_stage1_pipeline(
         self, mock_blog, mock_topics, mock_sa, mock_po,
         mock_bs, mock_pd, mock_save,
@@ -98,13 +98,13 @@ class TestStage1PipelineFlow:
 
         assert minimal_shared["stage1_results"]["data_save"]["saved"] is True
 
-    @patch("nodes.save_enhanced_blog_data", return_value=True)
-    @patch("nodes.load_publisher_decisions", return_value=[])
-    @patch("nodes.load_belief_system", return_value=[])
-    @patch("nodes.load_publisher_objects")
-    @patch("nodes.load_sentiment_attributes")
-    @patch("nodes.load_topics")
-    @patch("nodes.load_blog_data")
+    @patch("nodes.stage1.save_enhanced_blog_data", return_value=True)
+    @patch("nodes.stage1.load_publisher_decisions", return_value=[])
+    @patch("nodes.stage1.load_belief_system", return_value=[])
+    @patch("nodes.stage1.load_publisher_objects")
+    @patch("nodes.stage1.load_sentiment_attributes")
+    @patch("nodes.stage1.load_topics")
+    @patch("nodes.stage1.load_blog_data")
     def test_stage1_with_enhanced_data(
         self, mock_blog, mock_topics, mock_sa, mock_po,
         mock_bs, mock_pd, mock_save,
@@ -137,8 +137,8 @@ class TestStage1PipelineFlow:
 class TestStage2AnalysisFlow:
     """DataSummary → ChartAnalysis → SaveResults → Insight 串联"""
 
-    @patch("nodes.call_glm46", return_value='{"sentiment_summary":"s","topic_distribution":"t","geographic_distribution":"g","publisher_behavior":"p","overall_summary":"o"}')
-    @patch("nodes.call_glm45v_thinking", return_value="分析结果")
+    @patch("nodes.stage2.call_glm46", return_value='{"sentiment_summary":"s","topic_distribution":"t","geographic_distribution":"g","publisher_behavior":"p","overall_summary":"o"}')
+    @patch("nodes.stage2.call_glm45v_thinking", return_value="分析结果")
     def test_summary_to_insight_pipeline(self, mock_chart_llm, mock_insight_llm, enhanced_shared, sample_enhanced_data):
         # Ensure stage2_results exists
         enhanced_shared["stage2_results"] = {}
@@ -186,7 +186,7 @@ class TestStage2AnalysisFlow:
 class TestStage3ReportFlow:
     """LoadAnalysisResults → FormatReport → SaveReport"""
 
-    @patch("nodes._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3._load_analysis_charts", return_value=[])
     def test_format_and_save_pipeline(self, mock_charts, minimal_shared):
         # 准备数据
         report_content = "# 舆情分析报告\n\n## 引言\n内容\n\n## 分析\n![图](report/images/c1.png)"

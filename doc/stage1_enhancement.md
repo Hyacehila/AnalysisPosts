@@ -1,7 +1,7 @@
 # 阶段 1：数据增强子系统
 
 > **文档状态**: 2026-02-10 创建  
-> **关联源码**: `nodes.py` L347-1709, `flow.py` L77-153  
+> **关联源码**: `nodes/stage1.py`, `nodes/base.py`, `flow.py`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -20,12 +20,9 @@
 | **输出** | `data/enhanced_blogs.json` — 增强后的博文 JSON 数组 |
 | **参考数据** | `data/topics.json`、`data/sentiment_attributes.json`、`data/publisher_objects.json`、`data/believe_system_common.json`、`data/publisher_decision.json` |
 
-### 1.3 两种执行模式
+### 1.3 执行模式
 
-| 模式 | 配置值 | Flow 类型 | 特点 |
-|:---|:---|:---|:---|
-| 异步并行 | `enhancement_mode = "async"` | `AsyncFlow` | 直接调用 LLM API，支持并发控制与 Checkpoint |
-| Batch API | `enhancement_mode = "batch_api"` | `Flow` | 通过智谱 Batch API 批量处理，适合大规模低成本场景 |
+阶段 1 采用异步并行模式（`enhancement_mode = "async"`）：通过 `AsyncFlow` 直接调用 LLM API，支持并发控制与 Checkpoint。
 
 ---
 
@@ -262,42 +259,9 @@ post_async(shared, prep_res, exec_res) → 将结果批量写回 shared
 
 ---
 
-## 4. Batch API 模式
+## 4. 数据加载与保存
 
-### 4.1 Flow 节点链路
-
-```mermaid
-flowchart LR
-    DL[DataLoadNode] --> BA[BatchAPIEnhancementNode]
-    BA --> DV[DataValidation]
-    DV --> SC[Stage1Completion]
-```
-
-仅 4 个节点，核心处理由外部脚本完成。
-
-### 4.2 `BatchAPIEnhancementNode`
-
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node`（同步节点） |
-| **脚本路径** | `config.batch_api_config.script_path`（默认 `batch/batch_run.py`） |
-
-**执行流程**：
-1. **prep**：读取 `batch_api_config` 配置
-2. **exec**：通过 `subprocess.run()` 调用 `batch_run.py` 脚本
-   - 使用 `capture_output=True` 捕获输出
-   - 检查 `returncode == 0` 判断成功
-3. **post**：
-   - 成功：加载 `output_path` 的增强数据到 `shared["data"]["blog_data"]`
-   - 失败：记录错误信息到 `shared["stage1_results"]["batch_api"]`
-
-→ Batch API 的完整工作流详见 [Batch API 批处理文档](batch_processing.md)
-
----
-
-## 5. 数据加载与保存
-
-### 5.1 `DataLoadNode`
+### 4.1 `DataLoadNode`
 
 | 属性 | 值 |
 |:---|:---|
@@ -331,7 +295,7 @@ flowchart LR
 - `shared["data"]["publisher_decisions"]` ← 事件身份列表
 - 初始化 `shared["stage1_results"]["statistics"]` 结构（详细的空值统计、参与度统计等）
 
-### 5.2 `SaveEnhancedDataNode`
+### 4.2 `SaveEnhancedDataNode`
 
 | 属性 | 值 |
 |:---|:---|
@@ -345,13 +309,13 @@ flowchart LR
 
 ---
 
-## 6. 数据验证 `DataValidationAndOverviewNode`
+## 5. 数据验证 `DataValidationAndOverviewNode`
 
-### 6.1 概述
+### 5.1 概述
 
 在增强处理完成后执行质量检查，生成详细的统计报告。
 
-### 6.2 验证内容
+### 5.2 验证内容
 
 | 统计类别 | 统计项 |
 |:---|:---|
@@ -361,14 +325,14 @@ flowchart LR
 | **内容统计** | 总图片数、含图博文数、平均内容长度、按小时的发布时间分布 |
 | **地理分布** | IP 归属地分布（按 `ip_location` 字段） |
 
-### 6.3 输出
+### 5.3 输出
 
 - 将完整统计写入 `shared["stage1_results"]["statistics"]`
 - 在控制台打印详细的验证报告（包含所有统计项的格式化输出）
 
 ---
 
-## 7. 阶段完成 `Stage1CompletionNode`
+## 6. 阶段完成 `Stage1CompletionNode`
 
 | 行为 | 说明 |
 |:---|:---|

@@ -14,4 +14,19 @@ dependencies = [
     "requests>=2.32.5",
     "zai-sdk>=0.0.4.2",
     "pydantic>=2.0.0",
+    "pyyaml>=6.0.2",
+    "networkx>=3.3",
 ]
+
+[project.scripts]
+analysis = "main:main"
+
+[tool.pytest.ini_options]
+addopts = "--basetemp=.pytest_tmp"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["."]
+markers = ["integration: live LLM API connectivity"]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]

@@ -18,9 +18,12 @@ DispatcherNode会根据配置自动在各节点间流转。
 import asyncio
 import concurrent.futures
 import time
+import os
+from dataclasses import asdict
 from typing import Dict, Any, List
 
 from flow import create_main_flow
+from config import load_config, validate_config, config_to_shared
 
 
 def init_shared(
@@ -45,8 +48,6 @@ def init_shared(
     report_mode: str = "template",
     report_max_iterations: int = 5,
     report_min_score: int = 80,
-    # Batch API配置
-    batch_script_path: str = "batch/batch_run.py",
     # 数据源配置
     data_source_type: str = "original",
 ) -> Dict[str, Any]:
@@ -64,14 +65,14 @@ def init_shared(
         publisher_objects_path: 发布者类型列表文件路径
         start_stage: 起始阶段 (1/2/3)
         run_stages: 需要执行的阶段列表，默认[1, 2]
-        enhancement_mode: 阶段1处理模式 ("async" | "batch_api")
+        enhancement_mode: 阶段1处理模式 ("async")
         analysis_mode: 阶段2分析模式 ("workflow" | "agent")
         tool_source: Agent工具来源 ("local" | "mcp")
         agent_max_iterations: Agent最大迭代次数
         report_mode: 阶段3报告模式 ("template" | "iterative")
         report_max_iterations: 报告最大迭代次数
         report_min_score: 报告满意度阈值
-        batch_script_path: Batch API脚本路径
+
     
     Returns:
         Dict: 初始化完成的shared字典
@@ -108,7 +109,7 @@ def init_shared(
         # === 三阶段路径控制（对应需求分析中的三阶段架构） ===
         "config": {
             # 阶段1: 增强处理方式（对应需求：四维度分析）
-            "enhancement_mode": enhancement_mode,   # "async" | "batch_api"
+            "enhancement_mode": enhancement_mode,   # "async"
             # 阶段1: 断点续跑/防中断丢失（默认开启）
             # - enabled: 是否开启
             # - save_every: 每完成 N 条就保存一次（设为 1 即“每条都保存”）
@@ -144,14 +145,6 @@ def init_shared(
                 "type": data_source_type,
                 "resume_if_exists": True,
                 "enhanced_data_path": output_data_path
-            },
-
-            # Batch API配置
-            "batch_api_config": {
-                "script_path": batch_script_path,
-                "input_path": input_data_path,
-                "output_path": output_data_path,
-                "wait_for_completion": True
             }
         },
 
@@ -210,12 +203,6 @@ def init_shared(
                 "saved": False,
                 "output_path": "",
                 "data_count": 0
-            },
-            # Batch API处理状态（BatchAPIEnhancementNode填充）
-            "batch_api": {
-                "success": False,
-                "data_count": 0,
-                "error": ""
             }
         },
 
@@ -392,147 +379,17 @@ def main():
     所有配置参数直接在此函数中修改。
     系统会根据run_stages配置自动执行对应阶段。
     """
-    # =========================================================================
-    # 配置区域 - 修改以下参数调整运行配置
-    # =========================================================================
-    #
-    # 快速切换运行模式：
-    # 1. 仅运行阶段2 (当前配置): RUN_STAGES = [2]
-    # 2. 运行完整流程: RUN_STAGES = [1, 2]
-    # 3. 仅运行阶段1: RUN_STAGES = [1]
-    #
-    # 阶段2模式切换：
-    # - workflow: 预定义分析脚本 (推荐，稳定)
-    # - agent: LLM自主决策分析 (通过MCP协议动态调用工具)
-    #
-    # Agent工具源：
-    # - mcp: 使用MCP协议动态发现和调用工具 (唯一实现方式)
-    #
-    
-    # ----- 数据路径配置 -----
-    INPUT_DATA_PATH = "data/posts.json"
-    OUTPUT_DATA_PATH = "data/posts_enhenced.json"
-    TOPICS_PATH = "data/topics.json"
-    SENTIMENT_ATTRS_PATH = "data/sentiment_attributes.json"
-    PUBLISHER_OBJS_PATH = "data/publisher_objects.json"
-    BELIEF_SYSTEM_PATH = "data/believe_system_common.json"
-    PUBLISHER_DECISION_PATH = "data/publisher_decision.json"
-
-    # 阶段2需要读取的增强数据文件路径（确保阶段1已生成）
-    ENHANCED_DATA_PATH = OUTPUT_DATA_PATH
-    
-    # ----- 执行阶段配置 -----
-    # 设置需要执行的阶段列表
-    # [1] = 仅阶段1, [2] = 仅阶段2, [3] = 仅阶段3, [1,2] = 阶段1和2, [1,2,3] = 全部阶段
-    RUN_STAGES = [2,3]  # 执行阶段2和3（测试用）
-
-    # ----- 阶段1配置 -----
-    ENHANCEMENT_MODE = "async"  # "async" | "batch_api"
-
-    # ----- 阶段2配置 -----
-    ANALYSIS_MODE = "agent"     # "workflow" | "agent"
-    TOOL_SOURCE = "mcp"            # Agent模式下的唯一工具来源 (MCP协议)
-    AGENT_MAX_ITERATIONS = 40
-
-    # ----- 阶段3配置 -----
-    REPORT_MODE = "template"    # "template" | "iterative"
-    REPORT_MAX_ITERATIONS = 10
-    REPORT_MIN_SCORE = 80
-    
-    # ----- Batch API配置 -----
-    BATCH_SCRIPT_PATH = "batch/batch_run.py"
-    
-    # =========================================================================
-    # 检查前置条件并初始化shared字典
-    # =========================================================================
-
-    import os
+    config = load_config("config.yaml")
 
     # Agent(MCP)模式下：MCP server 是独立子进程，需通过环境变量告知增强数据路径
-    if ANALYSIS_MODE == "agent" and TOOL_SOURCE == "mcp" and ENHANCED_DATA_PATH:
-        os.environ["ENHANCED_DATA_PATH"] = os.path.abspath(ENHANCED_DATA_PATH)
+    if config.stage2.mode == "agent" and config.stage2.tool_source == "mcp":
+        if config.data.output_path:
+            os.environ["ENHANCED_DATA_PATH"] = os.path.abspath(config.data.output_path)
 
-    # 检查不同阶段的文件前置条件
-    if RUN_STAGES == [2]:
-        # 只运行阶段2：检查增强数据文件是否存在
-        if not os.path.exists(OUTPUT_DATA_PATH):
-            print(f"[X] 错误: 增强数据文件不存在: {OUTPUT_DATA_PATH}")
-            print(f"请先运行阶段1生成增强数据，或设置 RUN_STAGES = [1, 2] 运行完整流程")
-            return
-    elif RUN_STAGES == [3]:
-        # 只运行阶段3：检查阶段2输出文件是否存在
-        required_files = [
-            "report/analysis_data.json",
-            "report/chart_analyses.json",
-            "report/insights.json"
-        ]
-        missing_files = [f for f in required_files if not os.path.exists(f)]
-        if missing_files:
-            print(f"[X] 错误: 阶段2输出文件不存在: {missing_files}")
-            print(f"请先运行阶段2生成分析结果，或设置 RUN_STAGES = [1, 2, 3] 运行完整流程")
-            return
-    elif RUN_STAGES == [2, 3]:
-        # 运行阶段2和3：检查增强数据文件是否存在
-        if not os.path.exists(OUTPUT_DATA_PATH):
-            print(f"[X] 错误: 增强数据文件不存在: {OUTPUT_DATA_PATH}")
-            print(f"请先运行阶段1生成增强数据，或设置 RUN_STAGES = [1, 2, 3] 运行完整流程")
-            return
-    elif RUN_STAGES == [1, 2, 3]:
-        # 运行完整流程：无需额外检查
-        pass
+    validate_config(config)
+    shared = config_to_shared(config)
 
-    # 根据运行阶段设置数据源类型
-    if RUN_STAGES == [2]:
-        # 只运行阶段2：需要加载已增强的数据
-        data_source_type = "enhanced"
-    elif RUN_STAGES == [3]:
-        # 只运行阶段3：需要加载已增强的数据
-        data_source_type = "enhanced"
-    elif RUN_STAGES == [2, 3]:
-        # 运行阶段2和3：需要加载已增强的数据
-        data_source_type = "enhanced"
-    elif RUN_STAGES == [1, 2, 3] or RUN_STAGES == [1]:
-        # 运行阶段1或完整流程：从原始数据开始
-        data_source_type = "original"
-    else:
-        data_source_type = "original"
-
-    # 确定起始阶段
-    if RUN_STAGES == [2]:
-        start_stage = 2
-    elif RUN_STAGES == [3]:
-        start_stage = 3
-    elif RUN_STAGES == [2, 3]:
-        start_stage = 2  # 从阶段2开始
-    else:
-        start_stage = 1
-
-    shared = init_shared(
-        input_data_path=INPUT_DATA_PATH,
-        output_data_path=OUTPUT_DATA_PATH,
-        topics_path=TOPICS_PATH,
-        sentiment_attributes_path=SENTIMENT_ATTRS_PATH,
-        publisher_objects_path=PUBLISHER_OBJS_PATH,
-        belief_system_path=BELIEF_SYSTEM_PATH,
-        publisher_decision_path=PUBLISHER_DECISION_PATH,
-        run_stages=RUN_STAGES,
-        start_stage=start_stage,
-        enhancement_mode=ENHANCEMENT_MODE,
-        analysis_mode=ANALYSIS_MODE,
-        tool_source=TOOL_SOURCE,
-        agent_max_iterations=AGENT_MAX_ITERATIONS,
-        report_mode=REPORT_MODE,
-        report_max_iterations=REPORT_MAX_ITERATIONS,
-        report_min_score=REPORT_MIN_SCORE,
-        batch_script_path=BATCH_SCRIPT_PATH,
-        data_source_type=data_source_type,  # 添加数据源类型参数
-    )
-
-        
-    # 运行系统 - DispatcherNode会根据配置自动调度执行相应阶段
-    # 当前配置：仅执行阶段3的模板模式
-    # 性能参数使用run函数的默认值：concurrent_num=60, max_retries=3, wait_time=8
-    asyncio.run(run(shared=shared))
+    asyncio.run(run(shared=shared, **asdict(config.runtime)))
 
 
 if __name__ == "__main__":

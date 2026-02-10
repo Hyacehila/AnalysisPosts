@@ -48,7 +48,7 @@ class TestLoadEnhancedDataNode:
         result = node.prep(minimal_shared)
         assert "data_path" in result
 
-    @patch("nodes.load_enhanced_blog_data")
+    @patch("nodes.stage2.load_enhanced_blog_data")
     def test_exec_counts_valid_posts(self, mock_load, sample_enhanced_data):
         mock_load.return_value = sample_enhanced_data
         node = LoadEnhancedDataNode()
@@ -57,7 +57,7 @@ class TestLoadEnhancedDataNode:
         assert result["valid_count"] == 3
         assert result["enhancement_rate"] == 100.0
 
-    @patch("nodes.load_enhanced_blog_data")
+    @patch("nodes.stage2.load_enhanced_blog_data")
     def test_exec_partial_enhancement(self, mock_load, sample_blog_data):
         """部分增强 → valid_count < total_count"""
         mock_load.return_value = sample_blog_data  # 无增强字段
@@ -159,7 +159,7 @@ class TestChartAnalysisNode:
         result = node.prep(enhanced_shared)
         assert len(result) == 2
 
-    @patch("nodes.call_glm45v_thinking", return_value="分析结果文本")
+    @patch("nodes.stage2.call_glm45v_thinking", return_value="分析结果文本")
     def test_exec_analyzes_charts(self, mock_llm):
         node = ChartAnalysisNode()
         charts = [
@@ -171,7 +171,7 @@ class TestChartAnalysisNode:
         assert "chart_1" in result["chart_analyses"]
         assert result["chart_analyses"]["chart_1"]["analysis_status"] == "success"
 
-    @patch("nodes.call_glm45v_thinking", side_effect=Exception("LLM Error"))
+    @patch("nodes.stage2.call_glm45v_thinking", side_effect=Exception("LLM Error"))
     def test_exec_handles_failure(self, mock_llm):
         node = ChartAnalysisNode()
         charts = [{"id": "chart_1", "title": "X"}]
@@ -231,7 +231,7 @@ class TestSaveAnalysisResultsNode:
         # Mock os.makedirs and open to use tmp_path
         report_dir = tmp_path / "report"
         report_dir.mkdir()
-        with patch("nodes.os.makedirs"), \
+        with patch("nodes.stage2.os.makedirs"), \
              patch("builtins.open", create=True) as mock_open:
             mock_open.return_value.__enter__ = lambda s: s
             mock_open.return_value.__exit__ = MagicMock(return_value=False)
@@ -273,7 +273,7 @@ class TestLLMInsightNode:
         assert "tables" in result
         assert result["data_summary"] == "summary text"
 
-    @patch("nodes.call_glm46", return_value='{"sentiment_summary":"ok","topic_distribution":"ok","geographic_distribution":"ok","publisher_behavior":"ok","overall_summary":"ok"}')
+    @patch("nodes.stage2.call_glm46", return_value='{"sentiment_summary":"ok","topic_distribution":"ok","geographic_distribution":"ok","publisher_behavior":"ok","overall_summary":"ok"}')
     def test_exec_generates_insights(self, mock_llm):
         node = LLMInsightNode()
         prep_res = {
