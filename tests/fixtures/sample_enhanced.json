@@ -1,0 +1,94 @@
+[
+    {
+        "username": "测试用户A",
+        "user_id": "1001",
+        "content": "今天天气真好，出去散步了一圈",
+        "publish_time": "2024-11-09 10:00:00",
+        "location": "北京",
+        "repost_count": 5,
+        "comment_count": 3,
+        "like_count": 10,
+        "image_urls": [
+            "https://example.com/img1.jpg"
+        ],
+        "sentiment_polarity": 5,
+        "sentiment_attribute": [
+            "高兴",
+            "满足"
+        ],
+        "topics": [
+            {
+                "parent_topic": "社会民生",
+                "sub_topic": "居民生活"
+            }
+        ],
+        "publisher": "个人用户",
+        "belief_signals": [
+            {
+                "category": "风险感知类",
+                "subcategories": [
+                    "担心公共安全"
+                ]
+            }
+        ],
+        "publisher_decision": "事件旁观者"
+    },
+    {
+        "username": "测试用户B",
+        "user_id": "1002",
+        "content": "发生了一些令人担忧的事情",
+        "publish_time": "2024-11-09 12:30:00",
+        "location": "上海",
+        "repost_count": 0,
+        "comment_count": 1,
+        "like_count": 0,
+        "image_urls": [],
+        "sentiment_polarity": 2,
+        "sentiment_attribute": [
+            "担忧"
+        ],
+        "topics": [
+            {
+                "parent_topic": "民众反应",
+                "sub_topic": "民众情绪"
+            }
+        ],
+        "publisher": "个人用户",
+        "belief_signals": [],
+        "publisher_decision": "事件旁观者"
+    },
+    {
+        "username": "测试用户C",
+        "user_id": "1003",
+        "content": "官方发布了最新的通知公告",
+        "publish_time": "2024-11-10 08:00:00",
+        "location": "北京",
+        "repost_count": 100,
+        "comment_count": 50,
+        "like_count": 200,
+        "image_urls": [
+            "https://example.com/img2.jpg",
+            "https://example.com/img3.jpg"
+        ],
+        "sentiment_polarity": 3,
+        "sentiment_attribute": [
+            "中立"
+        ],
+        "topics": [
+            {
+                "parent_topic": "政府应对",
+                "sub_topic": "政策发布"
+            }
+        ],
+        "publisher": "官方媒体",
+        "belief_signals": [
+            {
+                "category": "行动/政策类",
+                "subcategories": [
+                    "政府应加强监管"
+                ]
+            }
+        ],
+        "publisher_decision": "官方机构"
+    }
+]

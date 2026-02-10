@@ -1,0 +1,35 @@
+[
+  {
+    "username": "测试用户A",
+    "user_id": "1001",
+    "content": "今天天气真好，出去散步了一圈",
+    "publish_time": "2024-11-09 10:00:00",
+    "location": "北京",
+    "repost_count": 5,
+    "comment_count": 3,
+    "like_count": 10,
+    "image_urls": ["https://example.com/img1.jpg"]
+  },
+  {
+    "username": "测试用户B",
+    "user_id": "1002",
+    "content": "发生了一些令人担忧的事情",
+    "publish_time": "2024-11-09 12:30:00",
+    "location": "上海",
+    "repost_count": 0,
+    "comment_count": 1,
+    "like_count": 0,
+    "image_urls": []
+  },
+  {
+    "username": "测试用户C",
+    "user_id": "1003",
+    "content": "官方发布了最新的通知公告",
+    "publish_time": "2024-11-10 08:00:00",
+    "location": "北京",
+    "repost_count": 100,
+    "comment_count": 50,
+    "like_count": 200,
+    "image_urls": ["https://example.com/img2.jpg", "https://example.com/img3.jpg"]
+  }
+]
