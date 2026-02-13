@@ -9,13 +9,49 @@
     "comment_count": 0,
     "like_count": 1,
     "image_urls": [],
+    "keywords": [
+      "骑单车",
+      "夜骑",
+      "盲骑",
+      "单车",
+      "路灯",
+      "烦躁",
+      "共享",
+      "公园"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 2,
     "sentiment_attribute": [
-      "生气"
+      "生气",
+      "沮丧",
+      "无奈"
     ],
-    "topics": [],
+    "topics": [
+      {
+        "parent_topic": "交通运输",
+        "sub_topic": "出行安全"
+      },
+      {
+        "parent_topic": "民众反应",
+        "sub_topic": "民众情绪"
+      }
+    ],
     "publisher": "个人用户",
-    "belief_signals": [],
+    "belief_signals": [
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全"
+        ]
+      }
+    ],
     "publisher_decision": "自媒体"
   },
   {
@@ -32,10 +68,29 @@
       "media/7683014843_OuJwG6ofw/img_10.jpg",
       "media/7683014843_OuJwG6ofw/img_2.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "半毫",
+      "艳阳天",
+      "中未差",
+      "电单车",
+      "四辆",
+      "恰如其分",
+      "八里",
+      "高唱"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "negative",
+      "score": -1,
+      "positive": 0,
+      "negative": 1
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
       "高兴",
-      "满意"
+      "满意",
+      "欣慰"
     ],
     "topics": [],
     "publisher": "个人用户",
@@ -54,13 +109,32 @@
     "image_urls": [
       "media/7285130616_OuImV8to0/img_1.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "骑行",
+      "变酸",
+      "很爱夜",
+      "单车",
+      "第一张",
+      "脚蹬",
+      "闷热",
+      "叛逆"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
       "高兴",
-      "激动"
+      "兴奋",
+      "满意"
     ],
     "topics": [],
-    "publisher": "个人用户",
+    "publisher": "学生",
     "belief_signals": [],
     "publisher_decision": "事件利益相关者"
   },
@@ -76,11 +150,29 @@
     "image_urls": [
       "media/5227847701_OuFdsEwJa/img_1.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "解放北路",
+      "天津",
+      "夜骑",
+      "余虹",
+      "相册",
+      "私生活",
+      "单车",
+      "收看"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "positive",
+      "score": 1,
+      "positive": 1,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
       "高兴",
-      "平静",
-      "自豪"
+      "兴奋",
+      "欣慰"
     ],
     "topics": [],
     "publisher": "个人用户",
@@ -99,29 +191,34 @@
     "image_urls": [
       "media/6508016609_OuvPRbAlh/img_1.jpg"
     ],
+    "keywords": [
+      "骑行",
+      "儿童",
+      "孩子",
+      "低龄",
+      "上路",
+      "12",
+      "家长",
+      "骑车"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "negative",
+      "score": -1,
+      "positive": 3,
+      "negative": 4
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "担忧",
-      "不满",
-      "失望"
+      "失望",
+      "希望"
     ],
-    "topics": [
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "政策发布"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "新闻报道"
-      }
-    ],
+    "topics": [],
     "publisher": "官方新闻媒体",
     "belief_signals": [],
-    "publisher_decision": "官方媒体或政府机构"
+    "publisher_decision": "自媒体"
   },
   {
     "username": "滴di滴叭ba叭呜皮啊",
@@ -133,14 +230,43 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
+    "keywords": [
+      "哈哈哈哈",
+      "想夜",
+      "扫个",
+      "单车",
+      "纠结",
+      "共享",
+      "次数",
+      "自行车"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "positive",
+      "score": 2,
+      "positive": 2,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 4,
     "sentiment_attribute": [
+      "兴奋",
+      "担忧",
       "高兴"
     ],
-    "topics": [],
+    "topics": [
+      {
+        "parent_topic": "社会民生",
+        "sub_topic": "居民生活"
+      },
+      {
+        "parent_topic": "民众反应",
+        "sub_topic": "民众情绪"
+      }
+    ],
     "publisher": "个人用户",
     "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "publisher_decision": "自媒体"
   },
   {
     "username": "卡通胶片笑声",
@@ -152,19 +278,40 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
+    "keywords": [
+      "quot",
+      "夜骑",
+      "單車",
+      "夜晚",
+      "小龙虾",
+      "...",
+      "最靓",
+      "18"
+    ],
+    "entities": [
+      "每一场夜骑终点都是夜宵摊"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "高兴",
+      "支持",
+      "兴奋",
       "期待"
     ],
     "topics": [
       {
-        "parent_topic": "经济影响",
-        "sub_topic": "餐饮业"
-      },
-      {
         "parent_topic": "社会民生",
         "sub_topic": "居民生活"
+      },
+      {
+        "parent_topic": "经济影响",
+        "sub_topic": "餐饮业"
       }
     ],
     "publisher": "自媒体",
@@ -185,14 +332,41 @@
       "media/5234750801_Ou2J1A4of/img_2.jpg",
       "media/5234750801_Ou2J1A4of/img_3.jpg"
     ],
-    "sentiment_polarity": 2,
+    "keywords": [
+      "新体验",
+      "夜骑",
+      "不夜",
+      "11",
+      "点半",
+      "60",
+      "工位",
+      "解锁"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "失望"
+      "失望",
+      "沮丧",
+      "无奈"
     ],
     "topics": [],
-    "publisher": "个人用户",
-    "belief_signals": [],
-    "publisher_decision": "事件利益相关者"
+    "publisher": "自媒体",
+    "belief_signals": [
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全"
+        ]
+      }
+    ],
+    "publisher_decision": "自媒体"
   },
   {
     "username": "EVA-hangzhou",
@@ -204,24 +378,51 @@
     "comment_count": 29,
     "like_count": 19,
     "image_urls": [],
+    "keywords": [
+      "张艺兴",
+      "city",
+      "张艺兴夜",
+      "zyx",
+      "2024",
+      "巡演",
+      "会降",
+      "Vlog"
+    ],
+    "entities": [
+      "张艺兴夜骑主动停车捡垃圾",
+      "张艺兴2024世界巡演",
+      "原创音乐制作人张艺兴",
+      "张艺兴"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "支持",
       "赞赏",
-      "高兴"
+      "期待"
     ],
     "topics": [
       {
-        "parent_topic": "公共事业",
-        "sub_topic": "环卫服务"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "环境卫生"
+        "parent_topic": "媒体传播",
+        "sub_topic": "社交媒体"
       }
     ],
     "publisher": "个人用户",
-    "belief_signals": [],
+    "belief_signals": [
+      {
+        "category": "行动/政策类",
+        "subcategories": [
+          "改善相关行业或系统",
+          "加强公众教育和培训"
+        ]
+      }
+    ],
     "publisher_decision": "事件旁观者"
   },
   {
@@ -234,14 +435,43 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
+    "keywords": [
+      "张艺兴",
+      "停车",
+      "垃圾",
+      "张艺兴夜",
+      "夜骑",
+      "处见",
+      "单车",
+      "人品"
+    ],
+    "entities": [
+      "张艺兴夜骑主动停车捡垃圾"
+    ],
+    "lexicon_sentiment": {
+      "label": "positive",
+      "score": 1,
+      "positive": 1,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "高兴",
       "赞赏",
-      "支持"
+      "高兴",
+      "信任"
     ],
-    "topics": [],
-    "publisher": "个人用户",
+    "topics": [
+      {
+        "parent_topic": "公共事业",
+        "sub_topic": "环卫服务"
+      },
+      {
+        "parent_topic": "社会民生",
+        "sub_topic": "环境卫生"
+      }
+    ],
+    "publisher": "自媒体",
     "belief_signals": [],
     "publisher_decision": "自媒体"
   },
@@ -255,23 +485,47 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
-    "sentiment_polarity": 3,
+    "keywords": [
+      "张艺兴夜",
+      "张哥",
+      "单车",
+      "坐地",
+      "铁骑",
+      "共享",
+      "停车",
+      "垃圾"
+    ],
+    "entities": [
+      "张艺兴夜骑主动停车捡垃圾"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "支持",
-      "赞赏"
+      "赞赏",
+      "支持"
     ],
     "topics": [
       {
         "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "互助行为"
+        "sub_topic": "环境卫生"
       }
     ],
     "publisher": "个人用户",
-    "belief_signals": [],
+    "belief_signals": [
+      {
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "加强公众教育和培训"
+        ]
+      }
+    ],
     "publisher_decision": "自媒体"
   },
   {
@@ -288,15 +542,42 @@
       "media/7300056497_OtNAt7PbN/img_2.jpg",
       "media/7300056497_OtNAt7PbN/img_3.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "夜骑",
+      "cry",
+      "单车",
+      "长安街",
+      "最难",
+      "共享",
+      "收获",
+      "一辆"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "高兴",
-      "兴奋"
+      "兴奋",
+      "支持",
+      "欣慰"
     ],
     "topics": [],
     "publisher": "个人用户",
-    "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "belief_signals": [
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "管理不到位",
+          "技术手段不足"
+        ]
+      }
+    ],
+    "publisher_decision": "自媒体"
   },
   {
     "username": "KA_khoo",
@@ -312,15 +593,34 @@
       "media/2690819910_OtNmX80qY/img_2.jpg",
       "media/2690819910_OtNmX80qY/img_3.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "达标",
+      "第二盘",
+      "儿用",
+      "各耍",
+      "单车",
+      "主打",
+      "裂开",
+      "共享"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
       "高兴",
+      "尴尬",
       "满意"
     ],
     "topics": [],
     "publisher": "个人用户",
     "belief_signals": [],
-    "publisher_decision": "自媒体"
+    "publisher_decision": "事件利益相关者"
   },
   {
     "username": "V妮佳沙",
@@ -336,16 +636,36 @@
       "media/1824776422_OtDRx7Z1y/img_2.jpg",
       "media/1824776422_OtDRx7Z1y/img_3.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "绿道",
+      "环城",
+      "一圈",
+      "一百公里",
+      "此沙",
+      "超话",
+      "夜骑",
+      "我能"
+    ],
+    "entities": [
+      "此沙[超话]"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "高兴",
       "满意",
-      "期待"
+      "高兴",
+      "鼓励"
     ],
     "topics": [],
-    "publisher": "个人用户",
+    "publisher": "旅游博主",
     "belief_signals": [],
-    "publisher_decision": "自媒体"
+    "publisher_decision": "事件旁观者"
   },
   {
     "username": "乡村刘三好",
@@ -359,7 +679,21 @@
     "image_urls": [
       "media/1831575321_OtA0OiftS/img_1.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "夜骑",
+      "单车",
+      "哈哈哈",
+      "共享"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
       "高兴",
       "兴奋"
@@ -379,16 +713,38 @@
     "comment_count": 4,
     "like_count": 3,
     "image_urls": [],
+    "keywords": [
+      "好爽",
+      "夜骑",
+      "晚风",
+      "单车",
+      "共享",
+      "随手",
+      "舒服",
+      "慢慢"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "positive",
+      "score": 1,
+      "positive": 1,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 4,
     "sentiment_attribute": [
       "高兴",
-      "满意",
-      "平静"
+      "满意"
     ],
-    "topics": [],
+    "topics": [
+      {
+        "parent_topic": "社会民生",
+        "sub_topic": "居民生活"
+      }
+    ],
     "publisher": "个人用户",
     "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "publisher_decision": "自媒体"
   },
   {
     "username": "没有碳酸不能活",
@@ -402,15 +758,30 @@
     "image_urls": [
       "media/7870283079_Otmcw3Hqf/img_1.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "但夜",
+      "单车",
+      "共享",
+      "快乐",
+      "真的",
+      "虽然"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "高兴",
-      "平静"
+      "高兴"
     ],
     "topics": [],
     "publisher": "个人用户",
     "belief_signals": [],
-    "publisher_decision": "事件利益相关者"
+    "publisher_decision": "事件旁观者"
   },
   {
     "username": "观海融媒",
@@ -422,202 +793,46 @@
     "comment_count": 1,
     "like_count": 0,
     "image_urls": [],
-    "sentiment_polarity": 3,
+    "keywords": [
+      "星星",
+      "珠海",
+      "热点新闻",
+      "热闻",
+      "12306",
+      "观海",
+      "网警",
+      "点赞"
+    ],
+    "entities": [
+      "全红婵陈艺文等被记大功",
+      "12306回应男子把卧铺让给妹妹被拒",
+      "观海热闻榜",
+      "珠海[超话]"
+    ],
+    "lexicon_sentiment": {
+      "label": "positive",
+      "score": 1,
+      "positive": 1,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 4,
     "sentiment_attribute": [
-      "中立",
-      "客观"
+      "支持",
+      "高兴",
+      "欣慰"
     ],
     "topics": [
       {
+        "parent_topic": "应急管理",
+        "sub_topic": "应急响应"
+      },
+      {
         "parent_topic": "自然灾害",
         "sub_topic": "暴雨"
-      },
-      {
-        "parent_topic": "应急管理",
-        "sub_topic": "预警发布"
-      },
-      {
-        "parent_topic": "交通运输",
-        "sub_topic": "地铁运营"
-      },
-      {
-        "parent_topic": "交通运输",
-        "sub_topic": "铁路停运"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "就业影响"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "社区管理"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "物价稳定"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "就业影响"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "住房安全"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "食品安全"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "环境卫生"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "公共秩序"
-      },
-      {
-        "parent_topic": "社会民生",
-        "sub_topic": "社会救助"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "政策发布"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "部门协调"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "信息公开"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "监督检查"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "工作部署"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "会议通报"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "领导指示"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "部门联动"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "工作总结"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "新闻报道"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "信息发布"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "舆论引导"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "网络传播"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "社交媒体"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "商业损失"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "农业损失"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "工业影响"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "旅游业"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "餐饮业"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "零售业"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "保险理赔"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "经济损失"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "市场影响"
-      },
-      {
-        "parent_topic": "经济影响",
-        "sub_topic": "恢复重建"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众情绪"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "网络热议"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "公众关注"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众建议"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "投诉举报"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "求助信息"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "互助行为"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "志愿服务"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "公众参与"
       }
     ],
-    "publisher": "自媒体",
+    "publisher": "官方新闻媒体",
     "belief_signals": [],
     "publisher_decision": "事件旁观者"
   },
@@ -633,15 +848,33 @@
     "image_urls": [
       "media/6252378511_OtlJJEnNw/img_1.jpg"
     ],
-    "sentiment_polarity": 2,
+    "keywords": [
+      "夜骑",
+      "30km",
+      "单车",
+      "运动量",
+      "共享",
+      "小姐",
+      "足够",
+      "今日"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "失望",
-      "沮丧"
+      "欣慰",
+      "无奈"
     ],
     "topics": [],
     "publisher": "个人用户",
     "belief_signals": [],
-    "publisher_decision": "事件利益相关者"
+    "publisher_decision": "自媒体"
   },
   {
     "username": "沈夏夏的后花园",
@@ -656,11 +889,29 @@
       "media/7396236870_OsYEIul0y/img_1.jpg",
       "media/7396236870_OsYEIul0y/img_2.jpg"
     ],
-    "sentiment_polarity": 4,
+    "keywords": [
+      "情绪性",
+      "偶尔",
+      "跑步",
+      "进食",
+      "养成",
+      "决策",
+      "习惯",
+      "四公里"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "positive",
+      "score": 1,
+      "positive": 1,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
+    "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "高兴",
       "满意",
-      "自豪"
+      "自豪",
+      "乐观"
     ],
     "topics": [],
     "publisher": "个人用户",
@@ -679,39 +930,44 @@
     "image_urls": [
       "media/2590508332_OsXBVz9Lt/img_1.jpg"
     ],
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "首都骑游文明公约",
+      "文旅北京"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "支持",
       "满意"
     ],
-    "topics": [
+    "topics": [],
+    "publisher": "旅游部门",
+    "belief_signals": [
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "交通运输",
-        "sub_topic": "交通拥堵"
-      },
-      {
-        "parent_topic": "公共事业",
-        "sub_topic": "环卫服务"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众情绪"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "政策发布"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "信息发布"
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "改善相关行业或系统",
+          "加强公众教育和培训"
+        ]
       }
     ],
-    "publisher": "事业单位",
-    "belief_signals": [],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -726,40 +982,45 @@
     "image_urls": [
       "media/1910355794_OsXrQjBoW/img_1.jpg"
     ],
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "首都骑游文明公约",
+      "文旅北京收"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "支持",
-      "满意",
-      "鼓励"
+      "期待",
+      "赞赏"
     ],
-    "topics": [
+    "topics": [],
+    "publisher": "官方新闻媒体",
+    "belief_signals": [
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "交通运输",
-        "sub_topic": "交通拥堵"
-      },
-      {
-        "parent_topic": "公共事业",
-        "sub_topic": "环卫服务"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众建议"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "政策发布"
-      },
-      {
-        "parent_topic": "媒体传播",
-        "sub_topic": "信息发布"
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "改善相关行业或系统",
+          "加强公众教育和培训"
+        ]
       }
     ],
-    "publisher": "事业单位",
-    "belief_signals": [],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -772,11 +1033,33 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
-    "sentiment_polarity": 3,
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "首都骑游文明公约",
+      "海小宣提示",
+      "文旅北京"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
+    "sentiment_polarity": 4,
     "sentiment_attribute": [
       "支持",
-      "满意",
-      "鼓励"
+      "欣慰",
+      "期待"
     ],
     "topics": [
       {
@@ -788,8 +1071,23 @@
         "sub_topic": "居民生活"
       }
     ],
-    "publisher": "事业单位",
-    "belief_signals": [],
+    "publisher": "宣传部门",
+    "belief_signals": [
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全",
+          "担心公共安全"
+        ]
+      },
+      {
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "加强公众教育和培训"
+        ]
+      }
+    ],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -804,28 +1102,51 @@
     "image_urls": [
       "media/2590508280_OsS3ejI8N/img_1.jpg"
     ],
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "首都骑游文明公约",
+      "文旅北京"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "支持",
       "满意",
-      "鼓励"
+      "欣慰"
     ],
-    "topics": [
+    "topics": [],
+    "publisher": "政府机构",
+    "belief_signals": [
       {
-        "parent_topic": "交通运输",
-        "sub_topic": "出行安全"
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "加强公众教育和培训"
+        ]
       },
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "政策发布"
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全",
+          "担心公共安全"
+        ]
       }
     ],
-    "publisher": "事业单位",
-    "belief_signals": [],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -842,16 +1163,33 @@
       "media/5501801775_OsRWpgBeW/img_2.jpg",
       "media/5501801775_OsRWpgBeW/img_3.jpg"
     ],
+    "keywords": [
+      "偶尔",
+      "微笑",
+      "con",
+      "like",
+      "不痒",
+      "不红",
+      "wzry",
+      "夜骑"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "失望",
-      "平静",
-      "困惑"
+      "无奈",
+      "不满"
     ],
     "topics": [],
     "publisher": "个人用户",
     "belief_signals": [],
-    "publisher_decision": "事件旁观者"
+    "publisher_decision": "自媒体"
   },
   {
     "username": "山水怀柔",
@@ -865,20 +1203,45 @@
     "image_urls": [
       "media/2590506210_OsQhV7DYG/img_1.jpg"
     ],
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "小柔提醒",
+      "首都骑游文明公约",
+      "文旅北京"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "支持",
-      "满意",
-      "鼓励"
+      "欣慰",
+      "期待"
     ],
-    "topics": [
+    "topics": [],
+    "publisher": "政府机构",
+    "belief_signals": [
       {
-        "parent_topic": "交通运输",
-        "sub_topic": "出行安全"
+        "category": "行动/政策类",
+        "subcategories": [
+          "政府应加强监管",
+          "加强公众教育和培训"
+        ]
       }
     ],
-    "publisher": "事业单位",
-    "belief_signals": [],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -893,20 +1256,44 @@
     "image_urls": [
       "media/2418724427_OsQ9cFd63/img_1.jpg"
     ],
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "首都骑游文明公约",
+      "文旅北京"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "支持",
-      "满意",
-      "希望"
+      "期待",
+      "乐观"
     ],
-    "topics": [
+    "topics": [],
+    "publisher": "政府机构",
+    "belief_signals": [
       {
-        "parent_topic": "交通运输",
-        "sub_topic": "出行安全"
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "改善相关行业或系统"
+        ]
       }
     ],
-    "publisher": "事业单位",
-    "belief_signals": [],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -921,32 +1308,52 @@
     "image_urls": [
       "media/1936009361_OsJSc2mfS/img_1.jpg"
     ],
+    "keywords": [
+      "骑游",
+      "避免",
+      "文明",
+      "公约",
+      "骑行",
+      "单车",
+      "车灯",
+      "居民区"
+    ],
+    "entities": [
+      "月光骑遇季",
+      "首都骑游文明公约"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": 20,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
       "支持",
-      "满意",
-      "理性"
+      "欣慰",
+      "期待"
     ],
-    "topics": [
+    "topics": [],
+    "publisher": "旅游部门",
+    "belief_signals": [
       {
-        "parent_topic": "交通运输",
-        "sub_topic": "道路管制"
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全",
+          "担心公共安全"
+        ]
       },
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
-      },
-      {
-        "parent_topic": "政府工作",
-        "sub_topic": "政策发布"
-      },
-      {
-        "parent_topic": "民众反应",
-        "sub_topic": "民众建议"
+        "category": "行动/政策类",
+        "subcategories": [
+          "支持政策改进",
+          "改善相关行业或系统",
+          "加强公众教育和培训"
+        ]
       }
     ],
-    "publisher": "社会组织",
-    "belief_signals": [],
     "publisher_decision": "官方媒体或政府机构"
   },
   {
@@ -959,14 +1366,50 @@
     "comment_count": 1,
     "like_count": 2,
     "image_urls": [],
+    "keywords": [
+      "夜骑",
+      "单车",
+      "拖鞋",
+      "共享",
+      "实力",
+      "什么"
+    ],
+    "entities": [],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "困惑"
+      "困惑",
+      "怀疑"
     ],
-    "topics": [],
+    "topics": [
+      {
+        "parent_topic": "交通运输",
+        "sub_topic": "出行安全"
+      }
+    ],
     "publisher": "个人用户",
-    "belief_signals": [],
-    "publisher_decision": "自媒体"
+    "belief_signals": [
+      {
+        "category": "风险感知类",
+        "subcategories": [
+          "担心自身安全"
+        ]
+      },
+      {
+        "category": "归因信念类",
+        "subcategories": [
+          "管理不到位",
+          "企业/机构责任缺位"
+        ]
+      }
+    ],
+    "publisher_decision": "事件旁观者"
   },
   {
     "username": "用户6884768548",
@@ -978,18 +1421,40 @@
     "comment_count": 0,
     "like_count": 0,
     "image_urls": [],
+    "keywords": [
+      "河财",
+      "超话",
+      "夜骑",
+      "搭子",
+      "qq2788512930",
+      "单车",
+      "纯净",
+      "共享"
+    ],
+    "entities": [
+      "河财纯净版[超话]"
+    ],
+    "lexicon_sentiment": {
+      "label": "neutral",
+      "score": 0,
+      "positive": 0,
+      "negative": 0
+    },
+    "text_similarity_group": -1,
     "sentiment_polarity": 3,
     "sentiment_attribute": [
-      "中立"
+      "支持",
+      "期待",
+      "高兴"
     ],
     "topics": [
       {
-        "parent_topic": "社会民生",
-        "sub_topic": "居民生活"
+        "parent_topic": "媒体传播",
+        "sub_topic": "社交媒体"
       },
       {
-        "parent_topic": "民众反应",
-        "sub_topic": "公众参与"
+        "parent_topic": "交通运输",
+        "sub_topic": "出行安全"
       }
     ],
     "publisher": "个人用户",

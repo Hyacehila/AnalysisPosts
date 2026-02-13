@@ -122,7 +122,7 @@ class TestFormatReportNode:
         result = node.exec("")
         assert result == ""
 
-    @patch("nodes.stage3._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3.format._load_analysis_charts", return_value=[])
     def test_exec_fixes_image_paths(self, mock_charts):
         """Windows 路径 → 标准化为 ./images/"""
         node = FormatReportNode()
@@ -130,7 +130,7 @@ class TestFormatReportNode:
         result = node.exec(content)
         assert "./images/chart.png" in result
 
-    @patch("nodes.stage3._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3.format._load_analysis_charts", return_value=[])
     def test_exec_adds_toc(self, mock_charts):
         """无目录时自动添加"""
         node = FormatReportNode()
@@ -138,7 +138,7 @@ class TestFormatReportNode:
         result = node.exec(content)
         assert "## 目录" in result
 
-    @patch("nodes.stage3._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3.format._load_analysis_charts", return_value=[])
     def test_exec_no_duplicate_toc(self, mock_charts):
         """已有目录时不重复添加"""
         node = FormatReportNode()
@@ -146,7 +146,7 @@ class TestFormatReportNode:
         result = node.exec(content)
         assert result.count("## 目录") == 1
 
-    @patch("nodes.stage3._load_analysis_charts", return_value=[])
+    @patch("nodes.stage3.format._load_analysis_charts", return_value=[])
     def test_exec_ensures_trailing_newline(self, mock_charts):
         """确保结尾有换行"""
         node = FormatReportNode()
@@ -173,16 +173,13 @@ class TestSaveReportNode:
         result = node.prep(minimal_shared)
         assert result == "报告全文"
 
-    def test_exec_writes_file(self, tmp_path):
+    @patch("nodes.stage3.save.get_report_dir")
+    def test_exec_writes_file(self, mock_dir, tmp_path):
         node = SaveReportNode()
         report_text = "# 舆情分析报告\n\n## 引言\n"
-        report_file = tmp_path / "report.md"
-        with patch("builtins.open", create=True) as mock_open:
-            mock_file = MagicMock()
-            mock_open.return_value.__enter__ = lambda s: mock_file
-            mock_open.return_value.__exit__ = MagicMock(return_value=False)
-            result = node.exec(report_text)
-            assert result == "report/report.md"
+        mock_dir.return_value = str(tmp_path)
+        result = node.exec(report_text)
+        assert result.endswith("report.md")
 
     def test_post_records_path(self, minimal_shared):
         minimal_shared["stage3_results"] = {}
@@ -205,7 +202,7 @@ class TestGenerateFullReportNodePost:
         report = "# 完整报告\n## 引言\n报告内容"
         action = node.post(minimal_shared, {}, report)
         assert minimal_shared["report"]["full_content"] == report
-        assert minimal_shared["report"]["generation_mode"] == "one_shot"
+        assert minimal_shared["report"]["generation_mode"] == "template"
         assert minimal_shared["stage3_results"]["current_draft"] == report
         assert action == "default"
 
@@ -271,7 +268,7 @@ class TestReviewReportNode:
         assert result["satisfaction_threshold"] == 80
         assert result["max_iterations"] == 5
 
-    @patch("nodes.stage3.call_glm46")
+    @patch("nodes.stage3.iterative.call_glm46")
     def test_exec_parses_review_result(self, mock_llm):
         mock_llm.return_value = json.dumps({
             "structure_score": 18,
@@ -298,7 +295,7 @@ class TestReviewReportNode:
         assert result["total_score"] == 84
         assert result["needs_revision"] is False
 
-    @patch("nodes.stage3.call_glm46", return_value="invalid json!!!")
+    @patch("nodes.stage3.iterative.call_glm46", return_value="invalid json!!!")
     def test_exec_fallback_on_json_error(self, mock_llm):
         """JSON 解析失败 → 使用默认评分"""
         node = ReviewReportNode()

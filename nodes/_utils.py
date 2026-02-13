@@ -90,7 +90,7 @@ from utils.data_loader import (
 )
 
 def _strip_timestamp_suffix(stem: str) -> str:
-    return re.sub(r"_\\d{8}_\\d{6}$", "", stem)
+    return re.sub(r"_\d{8}_\d{6}$", "", stem)
 
 def _build_chart_path_index(charts):
     allowed_paths = set()

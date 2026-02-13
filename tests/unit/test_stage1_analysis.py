@@ -43,7 +43,7 @@ class TestSentimentPolarityNode:
         node.apply_item_result(post, 4)
         assert post["sentiment_polarity"] == 4
 
-    @patch("nodes.stage1.call_glm_45_air", return_value="3")
+    @patch("nodes.stage1.sentiment.call_glm_45_air", return_value="3")
     def test_exec_async_text_only(self, mock_llm, sample_blog_data):
         """无图博文 → 调用 call_glm_45_air"""
         node = AsyncSentimentPolarityAnalysisBatchNode()
@@ -54,7 +54,7 @@ class TestSentimentPolarityNode:
         assert result == 3
         mock_llm.assert_called_once()
 
-    @patch("nodes.stage1.call_glm4v_plus", return_value="5")
+    @patch("nodes.stage1.sentiment.call_glm4v_plus", return_value="5")
     def test_exec_async_with_images(self, mock_llm, sample_blog_data):
         """带图博文 → 调用 call_glm4v_plus"""
         node = AsyncSentimentPolarityAnalysisBatchNode()
@@ -64,7 +64,7 @@ class TestSentimentPolarityNode:
         assert result == 5
         mock_llm.assert_called_once()
 
-    @patch("nodes.stage1.call_glm_45_air", return_value="abc")
+    @patch("nodes.stage1.sentiment.call_glm_45_air", return_value="abc")
     def test_exec_async_non_numeric_raises(self, mock_llm, sample_blog_data):
         """LLM 返回非数字 → 抛异常"""
         node = AsyncSentimentPolarityAnalysisBatchNode()
@@ -73,7 +73,7 @@ class TestSentimentPolarityNode:
         with pytest.raises(ValueError, match="不是数字"):
             run_async(node.exec_async(post))
 
-    @patch("nodes.stage1.call_glm_45_air", return_value="7")
+    @patch("nodes.stage1.sentiment.call_glm_45_air", return_value="7")
     def test_exec_async_out_of_range_raises(self, mock_llm, sample_blog_data):
         """LLM 返回范围外数字 → 抛异常"""
         node = AsyncSentimentPolarityAnalysisBatchNode()

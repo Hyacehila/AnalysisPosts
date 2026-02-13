@@ -6,7 +6,7 @@ Uses a YAML file as the single source of truth for runtime settings.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import Dict, List
 import os
 
 import yaml
@@ -16,6 +16,7 @@ import yaml
 class DataConfig:
     input_path: str = "data/posts.json"
     output_path: str = "data/enhanced_posts.json"
+    resume_if_exists: bool = True
     topics_path: str = "data/topics.json"
     sentiment_attributes_path: str = "data/sentiment_attributes.json"
     publisher_objects_path: str = "data/publisher_objects.json"
@@ -37,16 +38,35 @@ class Stage1CheckpointConfig:
 
 
 @dataclass
+class Stage1NlpConfig:
+    enabled: bool = True
+    keyword_top_n: int = 8
+    similarity_threshold: float = 0.85
+    min_cluster_size: int = 2
+
+
+@dataclass
 class Stage1Config:
     mode: str = "async"
     checkpoint: Stage1CheckpointConfig = field(default_factory=Stage1CheckpointConfig)
+    nlp: Stage1NlpConfig = field(default_factory=Stage1NlpConfig)
 
 
 @dataclass
 class Stage2Config:
-    mode: str = "workflow"
-    tool_source: str = "local"
+    mode: str = "agent"
+    tool_source: str = "mcp"
     agent_max_iterations: int = 10
+    chart_min_per_category: Dict[str, int] = field(default_factory=lambda: {
+        "sentiment": 1,
+        "topic": 1,
+        "geographic": 1,
+        "interaction": 1,
+        "nlp": 1,
+    })
+    chart_tool_policy: str = "coverage_first"
+    chart_tool_allowlist: List[str] = field(default_factory=list)
+    chart_missing_policy: str = "warn"
 
 
 @dataclass
@@ -64,6 +84,11 @@ class RuntimeConfig:
 
 
 @dataclass
+class LLMConfig:
+    glm_api_key: str = ""
+
+
+@dataclass
 class AppConfig:
     data: DataConfig = field(default_factory=DataConfig)
     pipeline: PipelineConfig = field(default_factory=PipelineConfig)
@@ -71,6 +96,7 @@ class AppConfig:
     stage2: Stage2Config = field(default_factory=Stage2Config)
     stage3: Stage3Config = field(default_factory=Stage3Config)
     runtime: RuntimeConfig = field(default_factory=RuntimeConfig)
+    llm: LLMConfig = field(default_factory=LLMConfig)
 
 
 def load_config(path: str) -> AppConfig:
@@ -86,11 +112,17 @@ def load_config(path: str) -> AppConfig:
 
     stage1_raw = raw.get("stage1", {}) or {}
     checkpoint = Stage1CheckpointConfig(**(stage1_raw.get("checkpoint", {}) or {}))
-    stage1 = Stage1Config(mode=stage1_raw.get("mode", Stage1Config().mode), checkpoint=checkpoint)
+    nlp_cfg = Stage1NlpConfig(**(stage1_raw.get("nlp", {}) or {}))
+    stage1 = Stage1Config(
+        mode=stage1_raw.get("mode", Stage1Config().mode),
+        checkpoint=checkpoint,
+        nlp=nlp_cfg,
+    )
 
     stage2 = Stage2Config(**(raw.get("stage2", {}) or {}))
     stage3 = Stage3Config(**(raw.get("stage3", {}) or {}))
     runtime = RuntimeConfig(**(raw.get("runtime", {}) or {}))
+    llm = LLMConfig(**(raw.get("llm", {}) or {}))
 
     return AppConfig(
         data=data,
@@ -99,6 +131,7 @@ def load_config(path: str) -> AppConfig:
         stage2=stage2,
         stage3=stage3,
         runtime=runtime,
+        llm=llm,
     )
 
 
@@ -111,18 +144,28 @@ def _derive_data_source_type(pipeline: PipelineConfig) -> str:
 def validate_config(config: AppConfig) -> None:
     """Validate configuration constraints and prerequisites."""
     valid_stage1_modes = {"async"}
-    valid_stage2_modes = {"workflow", "agent"}
+    valid_stage2_modes = {"agent"}
     valid_stage3_modes = {"template", "iterative"}
-    valid_tool_sources = {"local", "mcp"}
+    valid_tool_sources = {"mcp"}
 
     if config.stage1.mode not in valid_stage1_modes:
         raise ValueError(f"Invalid stage1 mode: {config.stage1.mode}")
     if config.stage2.mode not in valid_stage2_modes:
-        raise ValueError(f"Invalid stage2 mode: {config.stage2.mode}")
+        raise ValueError(
+            f"Invalid stage2 mode: {config.stage2.mode}. Stage2 only supports agent mode."
+        )
     if config.stage3.mode not in valid_stage3_modes:
         raise ValueError(f"Invalid stage3 mode: {config.stage3.mode}")
     if config.stage2.tool_source not in valid_tool_sources:
-        raise ValueError(f"Invalid stage2 tool_source: {config.stage2.tool_source}")
+        raise ValueError(
+            f"Invalid stage2 tool_source: {config.stage2.tool_source}. Stage2 only supports mcp tools."
+        )
+
+    effective_key = resolve_glm_api_key(config)
+    if not effective_key:
+        raise EnvironmentError(
+            "GLM API key is required (set env GLM_API_KEY or llm.glm_api_key in YAML)."
+        )
 
     run_stages = config.pipeline.run_stages
     start_stage = config.pipeline.start_stage
@@ -149,6 +192,21 @@ def validate_config(config: AppConfig) -> None:
     if config.stage2.mode == "agent" and config.stage2.tool_source == "mcp":
         if not os.environ.get("ENHANCED_DATA_PATH"):
             raise EnvironmentError("ENHANCED_DATA_PATH must be set for agent+mcp mode")
+
+    if config.stage2.chart_tool_policy not in {"coverage_first"}:
+        raise ValueError(f"Invalid stage2 chart_tool_policy: {config.stage2.chart_tool_policy}")
+    if config.stage2.chart_missing_policy not in {"warn", "fail"}:
+        raise ValueError(f"Invalid stage2 chart_missing_policy: {config.stage2.chart_missing_policy}")
+
+    if not isinstance(config.stage2.chart_min_per_category, dict):
+        raise ValueError("stage2.chart_min_per_category must be a dict")
+    for key, value in config.stage2.chart_min_per_category.items():
+        try:
+            value_int = int(value)
+        except Exception:
+            raise ValueError(f"stage2.chart_min_per_category[{key}] must be int")
+        if value_int < 0:
+            raise ValueError(f"stage2.chart_min_per_category[{key}] must be >= 0")
 
 
 def config_to_shared(config: AppConfig) -> dict:
@@ -184,8 +242,26 @@ def config_to_shared(config: AppConfig) -> dict:
                 "save_every": config.stage1.checkpoint.save_every,
                 "min_interval_seconds": config.stage1.checkpoint.min_interval_seconds,
             },
+            "stage1_nlp": {
+                "enabled": config.stage1.nlp.enabled,
+                "keyword_top_n": config.stage1.nlp.keyword_top_n,
+                "similarity_threshold": config.stage1.nlp.similarity_threshold,
+                "min_cluster_size": config.stage1.nlp.min_cluster_size,
+            },
             "analysis_mode": config.stage2.mode,
             "tool_source": config.stage2.tool_source,
+            "stage2_chart": {
+                "min_per_category": (config.stage2.chart_min_per_category or {
+                    "sentiment": 1,
+                    "topic": 1,
+                    "geographic": 1,
+                    "interaction": 1,
+                    "nlp": 1,
+                }),
+                "tool_policy": config.stage2.chart_tool_policy,
+                "tool_allowlist": list(config.stage2.chart_tool_allowlist or []),
+                "missing_policy": config.stage2.chart_missing_policy,
+            },
             "report_mode": config.stage3.mode,
             "agent_config": {"max_iterations": config.stage2.agent_max_iterations},
             "iterative_report_config": {
@@ -196,7 +272,7 @@ def config_to_shared(config: AppConfig) -> dict:
             },
             "data_source": {
                 "type": data_source_type,
-                "resume_if_exists": True,
+                "resume_if_exists": config.data.resume_if_exists,
                 "enhanced_data_path": config.data.output_path,
             },
         },
@@ -265,6 +341,7 @@ def config_to_shared(config: AppConfig) -> dict:
                 "total_charts": 0,
                 "total_tables": 0,
                 "execution_time": 0.0,
+                "charts_by_category": {},
             },
             "output_files": {
                 "charts_dir": "report/images/",
@@ -298,3 +375,18 @@ def config_to_shared(config: AppConfig) -> dict:
     }
 
     return shared
+
+
+def resolve_glm_api_key(config: AppConfig) -> str:
+    """Resolve GLM API key with YAML taking precedence over environment."""
+    yaml_key = (config.llm.glm_api_key or "").strip()
+    if yaml_key:
+        return yaml_key
+    return os.environ.get("GLM_API_KEY", "").strip()
+
+
+def apply_glm_api_key(config: AppConfig) -> None:
+    """Apply GLM API key from config to environment when provided."""
+    yaml_key = (config.llm.glm_api_key or "").strip()
+    if yaml_key:
+        os.environ["GLM_API_KEY"] = yaml_key

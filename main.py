@@ -23,7 +23,8 @@ from dataclasses import asdict
 from typing import Dict, Any, List
 
 from flow import create_main_flow
-from config import load_config, validate_config, config_to_shared
+from config import load_config, validate_config, config_to_shared, apply_glm_api_key
+from utils.run_state import set_running
 
 
 def init_shared(
@@ -41,9 +42,12 @@ def init_shared(
     # 阶段1配置
     enhancement_mode: str = "async",
     # 阶段2配置
-    analysis_mode: str = "workflow",
-    tool_source: str = "local",
+    analysis_mode: str = "agent",
+    tool_source: str = "mcp",
     agent_max_iterations: int = 10,
+    chart_min_per_category: Dict[str, int] | None = None,
+    chart_tool_policy: str = "coverage_first",
+    chart_tool_allowlist: List[str] | None = None,
     # 阶段3配置
     report_mode: str = "template",
     report_max_iterations: int = 5,
@@ -66,9 +70,12 @@ def init_shared(
         start_stage: 起始阶段 (1/2/3)
         run_stages: 需要执行的阶段列表，默认[1, 2]
         enhancement_mode: 阶段1处理模式 ("async")
-        analysis_mode: 阶段2分析模式 ("workflow" | "agent")
-        tool_source: Agent工具来源 ("local" | "mcp")
+        analysis_mode: 阶段2分析模式 ("agent")
+        tool_source: Agent工具来源 ("mcp")
         agent_max_iterations: Agent最大迭代次数
+        chart_min_per_category: 图表覆盖最低要求（按维度）
+        chart_tool_policy: 图表覆盖策略
+        chart_tool_allowlist: 图表工具白名单（可选）
         report_mode: 阶段3报告模式 ("template" | "iterative")
         report_max_iterations: 报告最大迭代次数
         report_min_score: 报告满意度阈值
@@ -121,8 +128,19 @@ def init_shared(
             },
 
             # 阶段2: 分析执行方式（对应需求：分析工具集）
-            "analysis_mode": analysis_mode,   # "workflow" | "agent"
+            "analysis_mode": analysis_mode,   # "agent"
             "tool_source": tool_source,          # "mcp" (Agent模式下的唯一工具来源)
+            "stage2_chart": {
+                "min_per_category": chart_min_per_category or {
+                    "sentiment": 1,
+                    "topic": 1,
+                    "geographic": 1,
+                    "interaction": 1,
+                    "nlp": 1,
+                },
+                "tool_policy": chart_tool_policy,
+                "tool_allowlist": list(chart_tool_allowlist or []),
+            },
 
             # 阶段3: 报告生成方式（对应需求：报告输出）
             "report_mode": report_mode,     # "template" | "iterative"
@@ -225,7 +243,8 @@ def init_shared(
                 "tools_executed": [],        # 已执行的工具列表
                 "total_charts": 0,           # 生成的图表总数
                 "total_tables": 0,           # 生成的表格总数
-                "execution_time": 0.0        # 执行耗时（秒）
+                "execution_time": 0.0,       # 执行耗时（秒）
+                "charts_by_category": {}     # 按维度统计图表数量
             },
             # 阶段2输出文件路径（供阶段3加载）
             "output_files": {
@@ -380,6 +399,7 @@ def main():
     系统会根据run_stages配置自动执行对应阶段。
     """
     config = load_config("config.yaml")
+    apply_glm_api_key(config)
 
     # Agent(MCP)模式下：MCP server 是独立子进程，需通过环境变量告知增强数据路径
     if config.stage2.mode == "agent" and config.stage2.tool_source == "mcp":
@@ -389,7 +409,11 @@ def main():
     validate_config(config)
     shared = config_to_shared(config)
 
-    asyncio.run(run(shared=shared, **asdict(config.runtime)))
+    set_running(True)
+    try:
+        asyncio.run(run(shared=shared, **asdict(config.runtime)))
+    finally:
+        set_running(False)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # 工具函数文档
 
-> **文档状态**: 2026-02-10 创建  
-> **关联源码**: `utils/call_llm.py`, `utils/data_loader.py`, `utils/console_safe.py`  
+> **文档状态**: 2026-02-11 更新  
+> **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/monitor.py`, `utils/data_sources/*`, `utils/nlp/*`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -15,11 +15,11 @@
 | 调用函数 | 底层模型 | 类型 | 主要用途 | 默认温度 |
 |:---|:---|:---|:---|:---|
 | `call_glm_45_air` | `glm-4.5-air` | 纯文本 | 阶段 1 数据增强 | 0.7 |
-| `call_glm4v_plus` | `glm-4.5-air`* | 纯文本 | 兼容旧代码（已废弃视觉功能） | 0.7 |
+| `call_glm4v_plus` | `glm-4v-plus` | 多模态（文本+图像） | 图像理解与视觉分析 | 0.7 |
 | `call_glm45v_thinking` | `glm-4.5v` | 多模态（文本+图像） | 图表视觉分析 | 0.7 |
 | `call_glm46` | `glm-4.6` | 纯文本+推理 | Agent 决策、洞察生成、报告撰写 | 0.8 |
 
-> \* `call_glm4v_plus` 原调用 `glm-4v-plus` 视觉模型，现已切换为 `glm-4.5-air`，保留函数签名（含 `image_paths`、`image_data` 参数）以兼容旧代码，但所有图像参数均被忽略。
+> `call_glm4v_plus` 使用 `glm-4v-plus` 视觉模型，支持 `image_paths` / `image_data` 输入并进行 base64 编码。
 
 ### 1.2 客户端管理
 
@@ -41,6 +41,7 @@ def get_client():
 - 每个线程独立持有一个 `ZaiClient` 实例
 - 避免锁竞争，同时实现连接复用
 - 适配阶段 1 的高并发异步批处理场景（60+ 并发信号量）
+- API Key 来源：`config.yaml` 的 `llm.glm_api_key` 优先（运行时会写入 `GLM_API_KEY`），否则读取环境变量 `GLM_API_KEY`
 
 ### 1.3 `call_glm_45_air` 详细说明
 
@@ -88,20 +89,22 @@ if enable_thinking:
 | `temperature` | `float` | 0.8 | 控制随机性 |
 | `max_tokens` | `int?` | `None` | 最大生成 token 数 |
 | `enable_reasoning` | `bool` | `True` | 开启推理模式 |
-| `max_retries` | `int` | 3 | 429 错误最大重试次数 |
-| `retry_delay` | `int` | 5 | 重试初始延迟秒数 |
-
-**重试策略**：
-- 仅对 429/并发限制/rate limit 错误进行重试
-- **指数退避**：第 1 次等 5 秒，第 2 次等 10 秒，第 3 次等 15 秒
-- 非并发类错误直接抛出
-- 超过最大重试次数后抛出最终异常
+| `max_retries` | `int` | 3 | 保留参数（由统一重试装饰器处理） |
+| `retry_delay` | `int` | 5 | 保留参数（由统一重试装饰器处理） |
 
 **推理模式参数**：
 ```python
 if enable_reasoning:
     params["thinking"] = {"enabled": True}
 ```
+
+### 1.6 统一重试装饰器 `llm_retry`
+
+`utils/llm_retry.py` 提供统一的 LLM 重试策略（默认线性退避），并已应用到：
+- `call_glm_45_air`
+- `call_glm4v_plus`
+- `call_glm45v_thinking`
+- `call_glm46`
 
 ---
 
@@ -177,3 +180,46 @@ os.replace(temp_file.name, output_path)  # 原子替换
 - 遍历所有博文，截断 `image_urls` 至 ≤ 3 条
 - 自动创建 `_backup.json` 备份文件
 - 打印修复统计信息
+
+---
+
+## 4. 路径管理 `path_manager.py`
+
+统一管理报告与图表输出目录：
+
+- `get_report_dir()` → `report/`
+- `get_images_dir()` → `report/images/`
+
+所有图表工具通过 PathManager 确保输出目录存在。
+
+---
+
+## 5. 运行监控 `monitor.py`
+
+节点执行时会记录运行状态到 `report/status.json`，字段包含：
+
+- `current_stage` / `current_node`
+- `execution_log` / `error_log`
+
+用于 Dashboard 的进度展示与故障定位。
+
+---
+
+## 6. 数据源适配 `data_sources/`
+
+当前仅实现 JSON 数据源：
+
+- `JsonDataSource`：封装 `data_loader` 的加载逻辑，供 Stage1 `DataLoadNode` 使用。
+
+---
+
+## 7. 本地 NLP 工具 `utils/nlp/`
+
+提供轻量文本处理能力（不依赖外部模型）：
+
+- `text_cleaner`：清洗 URL/HTML/Emoji
+- `tokenizer`：分词（jieba + fallback）
+- `keyword_extractor`：关键词抽取
+- `ner`：规则实体抽取（#话题#, @用户）
+- `sentiment_lexicon`：词典情感
+- `similarity`：文本相似度聚类（sklearn + fallback）

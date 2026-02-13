@@ -1,34 +1,40 @@
 data:
-  input_path: "data/posts.json"
-  output_path: "data/enhanced_posts.json"
-  topics_path: "data/topics.json"
-  sentiment_attributes_path: "data/sentiment_attributes.json"
-  publisher_objects_path: "data/publisher_objects.json"
-  belief_system_path: "data/believe_system_common.json"
-  publisher_decision_path: "data/publisher_decision.json"
-
+  input_path: data/posts_sample_30.json
+  output_path: data/enhanced_posts_sample_30.json
+  resume_if_exists: true
+  topics_path: data/topics.json
+  sentiment_attributes_path: data/sentiment_attributes.json
+  publisher_objects_path: data/publisher_objects.json
+  belief_system_path: data/believe_system_common.json
+  publisher_decision_path: data/publisher_decision.json
 pipeline:
   start_stage: 1
-  run_stages: [1, 2, 3]
-
+  run_stages:
+  - 1
+  - 2
+  - 3
 stage1:
-  mode: "async"
+  mode: async
   checkpoint:
     enabled: true
     save_every: 100
-    min_interval_seconds: 20
-
+    min_interval_seconds: 20.0
+  nlp:
+    enabled: true
+    keyword_top_n: 8
+    similarity_threshold: 0.85
+    min_cluster_size: 2
 stage2:
-  mode: "workflow"
-  tool_source: "local"
-  agent_max_iterations: 10
-
+  mode: agent
+  tool_source: mcp
+  agent_max_iterations: 30
 stage3:
-  mode: "template"
+  mode: template
   max_iterations: 5
   min_score: 80
-
 runtime:
   concurrent_num: 60
   max_retries: 3
   wait_time: 8
+llm:
+  glm_api_key: fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH

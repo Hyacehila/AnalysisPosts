@@ -67,7 +67,8 @@ def minimal_shared(sample_blog_data, sample_topics, sample_sentiment_attrs, samp
         },
         "config": {
             "enhancement_mode": "async",
-            "analysis_mode": "workflow",
+            "analysis_mode": "agent",
+            "tool_source": "mcp",
             "report_mode": "template",
             "data_source": {
                 "type": "original",
@@ -84,7 +85,7 @@ def minimal_shared(sample_blog_data, sample_topics, sample_sentiment_attrs, samp
             },
             "stage2": {},
             "stage3": {
-                "report_template_path": "templates/report_template.md",
+                "report_template_path": "data/report_template.md",
                 "output_path": "report/report.md",
                 "max_iterations": 3,
                 "quality_threshold": 80,
@@ -144,17 +145,20 @@ def mock_llm_calls():
             mock_llm_calls["air"].return_value = "3"
             # ... 执行节点 ...
     """
-    with patch("nodes.stage1.call_glm_45_air") as m_air, \
-         patch("nodes.stage1.call_glm4v_plus") as m_4v, \
-         patch("nodes.stage2.call_glm45v_thinking") as m_thinking, \
-         patch("nodes.stage2.call_glm46") as m_46:
+    with patch("nodes.stage1.sentiment.call_glm_45_air") as m_air, \
+         patch("nodes.stage1.sentiment.call_glm4v_plus") as m_4v, \
+         patch("nodes.stage2.chart_analysis.call_glm45v_thinking") as m_thinking, \
+         patch("nodes.stage2.agent.call_glm46") as m_46_agent, \
+         patch("nodes.stage2.insight.call_glm46") as m_46_insight:
         m_air.return_value = "mocked_air_response"
         m_4v.return_value = "mocked_4v_response"
         m_thinking.return_value = "mocked_thinking_response"
-        m_46.return_value = "mocked_46_response"
+        m_46_agent.return_value = "mocked_46_response"
+        m_46_insight.return_value = "mocked_46_response"
         yield {
             "air": m_air,
             "4v": m_4v,
             "thinking": m_thinking,
-            "46": m_46,
+            "46_agent": m_46_agent,
+            "46_insight": m_46_insight,
         }

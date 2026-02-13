@@ -65,16 +65,10 @@ class TestNormalizePath:
 # =============================================================================
 
 class TestStripTimestampSuffix:
-    # 注意: 源码中 _strip_timestamp_suffix 的 regex 为 r"_\\d{8}_\\d{6}$"
-    # 由于 raw string + 双反斜杠，实际匹配的是字面的 "\d" 而非数字。
-    # 这是一个已知的源码 bug (nodes.py:93)。
-    # 以下测试验证 _当前_ 行为而非 _期望_ 行为。
-
-    def test_with_digit_timestamp_not_stripped(self):
-        """由于 regex bug，数字时间戳实际不会被剥离"""
+    def test_with_digit_timestamp_is_stripped(self):
+        """数字时间戳应被剥离"""
         result = _strip_timestamp_suffix("sentiment_trend_20240101_120000")
-        # 当前行为：不剥离（因为 regex 匹配的是字面 \d）
-        assert result == "sentiment_trend_20240101_120000"
+        assert result == "sentiment_trend"
 
     def test_without_timestamp(self):
         assert _strip_timestamp_suffix("sentiment_trend") == "sentiment_trend"
@@ -116,12 +110,10 @@ class TestBuildChartPathIndex:
             assert f"./images/test_{key}.png" in allowed
 
     def test_timestamp_alias_full_stem(self):
-        """由于 _strip_timestamp_suffix 的 regex bug，
-        带时间戳的 stem 不会被精简，alias key 为完整 stem"""
+        """带时间戳的 stem 会被精简为基础名"""
         charts = [{"file_path": "report/images/topic_ranking_20240101_120000.png"}]
         _, alias = _build_chart_path_index(charts)
-        # 当前行为：alias key 是完整的 stem（包含时间戳）
-        assert "topic_ranking_20240101_120000" in alias
+        assert "topic_ranking" in alias
 
     def test_source_tool_alias(self):
         charts = [{

@@ -17,10 +17,13 @@ from typing import List, Dict, Any, Tuple
 from collections import Counter, defaultdict
 from itertools import combinations
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from utils.path_manager import get_images_dir
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
@@ -456,7 +459,7 @@ def topic_ranking_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_ranking_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -535,7 +538,7 @@ def topic_evolution_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_evolution_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -612,7 +615,7 @@ def topic_focus_distribution_chart(blog_data: List[Dict[str, Any]],
         for p in top_parents:
             series[p].append(counts[p])
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_focus_distribution_{timestamp}.png")
 
@@ -744,7 +747,7 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_network_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -811,7 +814,7 @@ def topic_focus_evolution_chart(blog_data: List[Dict[str, Any]],
         ax.set_xticklabels(times, rotation=45, ha="right")
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_focus_evolution_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -885,7 +888,7 @@ def topic_keyword_trend_chart(blog_data: List[Dict[str, Any]],
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"topic_keyword_trend_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")

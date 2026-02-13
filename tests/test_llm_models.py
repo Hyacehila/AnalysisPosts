@@ -17,8 +17,8 @@ from utils.call_llm import (
     call_glm46,
 )
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "posts.json"
-MAX_SAMPLE_POSTS = 100
+DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "posts_sample_30.json"
+MAX_SAMPLE_POSTS = 30
 
 
 def _load_sample_posts(max_posts: int = MAX_SAMPLE_POSTS) -> list[dict]:

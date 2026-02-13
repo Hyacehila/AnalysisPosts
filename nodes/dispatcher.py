@@ -4,11 +4,11 @@ dispatcher.py - 中央调度节点与阶段完成节点
 包含 DispatcherNode, TerminalNode, Stage{1,2,3}CompletionNode
 """
 
-from pocketflow import Node
+from nodes.base import MonitoredNode
 
 
 
-class DispatcherNode(Node):
+class DispatcherNode(MonitoredNode):
     """
     综合调度节点 - 系统入口和中央控制器
     
@@ -20,7 +20,6 @@ class DispatcherNode(Node):
     
     返回的Action类型：
     - stage1_async: 阶段1异步处理路径
-    - stage2_workflow: 阶段2固定脚本分析
     - stage2_agent: 阶段2 LLM自主分析
     - stage3_template: 阶段3模板填充
     - stage3_iterative: 阶段3多轮迭代
@@ -48,7 +47,6 @@ class DispatcherNode(Node):
             "current_stage": dispatcher.get("current_stage", 0),
             "completed_stages": dispatcher.get("completed_stages", []),
             "enhancement_mode": config.get("enhancement_mode", "async"),
-            "analysis_mode": config.get("analysis_mode", "workflow"),
             "report_mode": config.get("report_mode", "template")
         }
     
@@ -59,7 +57,6 @@ class DispatcherNode(Node):
         current_stage = prep_res["current_stage"]
         completed_stages = prep_res["completed_stages"]
         enhancement_mode = prep_res["enhancement_mode"]
-        analysis_mode = prep_res["analysis_mode"]
         report_mode = prep_res["report_mode"]
         
         # 确定下一个需要执行的阶段
@@ -82,7 +79,7 @@ class DispatcherNode(Node):
         if next_stage == 1:
             action = f"stage1_{enhancement_mode}"
         elif next_stage == 2:
-            action = f"stage2_{analysis_mode}"
+            action = "stage2_agent"
         elif next_stage == 3:
             action = f"stage3_{report_mode}"
         else:
@@ -106,7 +103,7 @@ class DispatcherNode(Node):
         return action
 
 
-class TerminalNode(Node):
+class TerminalNode(MonitoredNode):
     """
     终止节点 - 宣布流程结束
     
@@ -161,7 +158,7 @@ class TerminalNode(Node):
         return "default"
 
 
-class Stage1CompletionNode(Node):
+class Stage1CompletionNode(MonitoredNode):
     """
     阶段1完成节点
     
@@ -203,7 +200,7 @@ class Stage1CompletionNode(Node):
         return "dispatch"
 
 
-class Stage2CompletionNode(Node):
+class Stage2CompletionNode(MonitoredNode):
     """
     阶段2完成节点
     
@@ -243,7 +240,7 @@ class Stage2CompletionNode(Node):
 
 
 
-class Stage3CompletionNode(Node):
+class Stage3CompletionNode(MonitoredNode):
     """
     阶段3完成节点
 

@@ -1,7 +1,7 @@
 # 分析工具库文档
 
-> **文档状态**: 2026-02-10 创建  
-> **关联源码**: `utils/analysis_tools/` 目录（5 个模块 + 注册表）  
+> **文档状态**: 2026-02-11 更新  
+> **关联源码**: `utils/analysis_tools/` 目录（6 个模块 + 注册表）  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -22,7 +22,8 @@ utils/analysis_tools/
 ├── topic_tools.py           # 主题演化分析（905 行，9 个工具）
 ├── geographic_tools.py      # 地理分布分析（625 行，8 个工具）
 ├── interaction_tools.py     # 多维交互分析（865 行，10 个工具）
-└── belief_tools.py          # 信念系统分析（336 行，1 个工具）
+├── belief_tools.py          # 信念系统分析（336 行，1 个工具）
+└── nlp_tools.py             # NLP 增强分析（5 个工具）
 ```
 
 ### 1.3 输出规范
@@ -32,7 +33,7 @@ utils/analysis_tools/
 | **Data 类** (`*_stats`, `*_analysis`, `*_series`) | 内存数据 | `{"data": {...}, "summary": "..."}` |
 | **Chart 类** (`*_chart`, `*_heatmap`) | PNG 图表文件 | `{"charts": [{id, title, path, type, ...}], "data": {...}}` |
 
-- 所有图表默认输出到 `report/images/`
+- 所有图表默认输出到 `report/images/`，路径由 `PathManager` 统一管理
 - 文件名格式：`{tool_name}_{timestamp}.png`（时间戳避免覆盖）
 - 可视化使用 matplotlib，中文字体配置为 `SimHei` / `Microsoft YaHei`
 
@@ -85,7 +86,7 @@ result = execute_tool("sentiment_trend_chart", blog_data, granularity="day")
 
 - **`CollectToolsNode`**：通过 MCP Server 获取工具列表（MCP Server 读取 `TOOL_REGISTRY`）
 - **`DecisionToolsNode`**：使用工具的 `name`、`category`、`description` 信息辅助 LLM 决策
-- **`ExecuteAnalysisScriptNode`**（Workflow 模式）：使用注册表进行工具补齐——执行完预定义列表后，自动调用未执行的注册工具
+- **`ExecuteToolsNode`**：通过 MCP 调用工具，并将结果规范化为图表/表格输出
 
 ---
 
@@ -328,3 +329,15 @@ flowchart LR
 | `publisher_focus_distribution_chart` | interaction_tools | 窗口内发布者类型趋势 |
 
 所有焦点窗口工具共享 `_detect_focus_window()` 算法，支持 `window_days` 参数（默认 14 天）。
+
+---
+
+## 10. NLP 增强分析工具集 `nlp_tools.py`（新增）
+
+| # | 工具名称 | 类型 | 说明 | 关键参数 |
+|:---|:---|:---|:---|:---|
+| 1 | `keyword_wordcloud` | Chart | 关键词频次分布（条形图） | `top_n` |
+| 2 | `entity_cooccurrence_network` | Chart+Data | 实体共现热力图 | `top_n` |
+| 3 | `text_cluster_analysis` | Chart+Data | 文本相似聚类分布 | `threshold`, `min_cluster_size` |
+| 4 | `sentiment_lexicon_comparison` | Chart+Data | 词典情感分布 | — |
+| 5 | `temporal_keyword_heatmap` | Chart+Data | 关键词时间热力图 | `top_n`, `granularity` |

@@ -1,7 +1,7 @@
 # 阶段 3：报告生成子系统
 
-> **文档状态**: 2026-02-10 创建  
-> **关联源码**: `nodes.py` L3349-4600, `flow.py` L306-378  
+> **文档状态**: 2026-02-11 更新  
+> **关联源码**: `nodes/stage3/*`, `flow.py`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -20,7 +20,7 @@
 | | `report/chart_analyses.json` — 图表分析结果 |
 | | `report/insights.json` — LLM 洞察摘要 |
 | | `report/images/*.png` — 可视化图表文件 |
-| | `data/enhanced_blogs.json` — 博文样本（典型案例引用） |
+| | `config.data_source.enhanced_data_path` — 博文样本（典型案例引用，默认 `data/enhanced_posts_sample_30.json`） |
 | **输出** | `report/report.md` — 最终报告 |
 
 ### 1.3 两种执行模式
@@ -29,6 +29,15 @@
 |:---|:---|:---|:---|
 | 模板（一次性） | `report_mode = "template"` | `Flow` | 一次性生成完整报告，速度快 |
 | 迭代 | `report_mode = "iterative"` | `AsyncFlow` | 生成 → 评审 → 修改循环，质量更高 |
+
+---
+
+## 1.4 清理策略
+
+为避免多次运行导致 `report/` 目录膨胀，执行策略如下：
+
+- **Stage2 开始前**：清空整个 `report/` 目录，并重建 `report/` 与 `report/images/`。
+- **Stage3 开始前**：仅清理 `report/report.md` 与 `report/status.json`，保留 Stage2 产物与 `images/`。
 
 ---
 
@@ -131,6 +140,8 @@ flowchart LR
 ### 3.4 `SaveReportNode`
 
 固定保存到 `report/report.md`，UTF-8 编码。
+
+**写回结果**：`shared["stage3_results"]["report_file"]` 记录输出路径。
 
 ---
 
@@ -253,7 +264,7 @@ flowchart LR
 
 | 节点 | 说明 |
 |:---|:---|
-| `LoadTemplateNode` | 加载 `report/template.md` 模板文件 |
+| `LoadTemplateNode` | 加载 `data/report_template.md` 模板文件 |
 | `FillSectionNode` | 逐章节调用 LLM 填充内容 |
 | `AssembleReportNode` | 将各章节按预定义顺序组装 |
 

@@ -47,17 +47,14 @@ class TestDispatcherNodePrep:
         result = node.prep(minimal_shared)
         assert result["start_stage"] == 1
         assert result["enhancement_mode"] == "async"
-        assert result["analysis_mode"] == "workflow"
         assert result["report_mode"] == "template"
 
     def test_reads_mode_from_config(self, minimal_shared):
         """从 config 中读取各阶段模式"""
-        minimal_shared["config"]["analysis_mode"] = "agent"
         minimal_shared["config"]["report_mode"] = "iterative"
         node = DispatcherNode()
         result = node.prep(minimal_shared)
         assert result["enhancement_mode"] == "async"
-        assert result["analysis_mode"] == "agent"
         assert result["report_mode"] == "iterative"
 
 
@@ -67,7 +64,6 @@ class TestDispatcherNodeExec:
     def _make_prep_res(self, current_stage=0, completed_stages=None,
                        run_stages=None, start_stage=1,
                        enhancement_mode="async",
-                       analysis_mode="workflow",
                        report_mode="template"):
         return {
             "start_stage": start_stage,
@@ -75,7 +71,6 @@ class TestDispatcherNodeExec:
             "current_stage": current_stage,
             "completed_stages": completed_stages or [],
             "enhancement_mode": enhancement_mode,
-            "analysis_mode": analysis_mode,
             "report_mode": report_mode,
         }
 
@@ -87,24 +82,14 @@ class TestDispatcherNodeExec:
         assert result["next_stage"] == 1
 
     def test_stage1_done_routes_to_stage2(self):
-        """Stage 1 完成后 → stage2_workflow"""
+        """Stage 1 完成后 → stage2_agent"""
         node = DispatcherNode()
         result = node.exec(self._make_prep_res(
             current_stage=1,
             completed_stages=[1],
-        ))
-        assert result["action"] == "stage2_workflow"
-        assert result["next_stage"] == 2
-
-    def test_stage2_agent_mode(self):
-        """analysis_mode=agent → stage2_agent"""
-        node = DispatcherNode()
-        result = node.exec(self._make_prep_res(
-            current_stage=1,
-            completed_stages=[1],
-            analysis_mode="agent",
         ))
         assert result["action"] == "stage2_agent"
+        assert result["next_stage"] == 2
 
     def test_stage2_done_routes_to_stage3(self):
         """Stage 2 完成后 → stage3_template"""
@@ -144,7 +129,7 @@ class TestDispatcherNodeExec:
             start_stage=2,
             run_stages=[2, 3],
         ))
-        assert result["action"] == "stage2_workflow"
+        assert result["action"] == "stage2_agent"
         assert result["next_stage"] == 2
 
     def test_single_stage_run(self):

@@ -1,6 +1,6 @@
 # 测试工作流指南
 
-> **文档状态**: 2026-02-10 更新  
+> **文档状态**: 2026-02-11 更新  
 > **关联源码**: `tests/` 目录  
 > **上级文档**: [系统设计总览](design.md)
 
@@ -21,12 +21,25 @@ tests/
 │   ├── test_config.py             # P0 — YAML 配置加载/校验
 │   ├── test_utils.py              # P0 — 纯工具函数
 │   ├── test_dispatcher.py         # P0 — 调度器状态机
+│   ├── test_call_llm.py           # P0 — LLM 调用封装
+│   ├── test_llm_retry.py          # P0 — LLM 重试装饰器
+│   ├── test_dynamic_tool_loader.py# P1 — 动态工具加载
+│   ├── test_path_manager.py       # P1 — 路径管理
+│   ├── test_json_data_source.py   # P1 — JSON 数据源适配器
 │   ├── test_stage1_nodes.py       # P1 — Stage 1 通用节点
 │   ├── test_stage1_analysis.py    # P1 — Stage 1 六维分析节点
-│   ├── test_stage2_workflow.py    # P2 — Stage 2 Workflow 路径
+│   ├── test_stage1_nlp_pipeline.py# P1 — Stage 1 NLP 预处理
 │   ├── test_stage2_agent.py       # P2 — Stage 2 Agent 路径
 │   ├── test_stage3_report.py      # P3 — Stage 3 报告生成
-│   └── test_flow_integration.py   # P4 — 端到端集成测试
+│   ├── test_flow_integration.py   # P4 — 端到端集成测试
+│   ├── test_tool_registry.py      # P1 — 工具注册表
+│   ├── test_sentiment_tools.py    # P1 — 情感工具
+│   ├── test_topic_tools.py        # P1 — 主题工具
+│   ├── test_geographic_tools.py   # P1 — 地理工具
+│   ├── test_interaction_tools.py  # P1 — 交互工具
+│   ├── test_belief_tools.py       # P1 — 信念工具
+│   ├── test_nlp_tools.py          # P1 — NLP 工具
+│   └── test_nlp_analysis_tools.py # P1 — NLP 分析工具
 ├── test_data_format.py            # 数据格式验证（独立）
 ├── test_data_loader.py            # 数据加载器测试（独立）
 ├── test_json_files.py             # JSON 配置文件验证（独立）
@@ -42,7 +55,7 @@ tests/
 .venv/Scripts/python.exe -m pytest tests/unit/ -v --tb=short
 ```
 
-当前基线: **153 passed, 0 failed** (< 1s)
+当前基线: **226 passed, 0 failed** (~10s)
 
 ### 2.2 运行特定模块
 
@@ -87,11 +100,12 @@ RUN_LLM_TESTS=1 .venv/Scripts/python.exe -m pytest tests/test_llm_models.py -v
 |---|---|---|
 | `nodes/_utils.py` — `normalize_path`, `_strip_timestamp_suffix`, `_build_chart_path_index`, `_remap_report_images`, `ensure_dir_exists`, `get_project_relative_path` | `test_utils.py` | P0 |
 | `nodes/dispatcher.py` — `DispatcherNode`, `TerminalNode`, `Stage{1,2,3}CompletionNode` | `test_dispatcher.py` | P0 |
-| `nodes/stage1.py` — `DataLoadNode`, `SaveEnhancedDataNode`, `DataValidationAndOverviewNode` | `test_stage1_nodes.py` | P1 |
-| `nodes/stage1.py` — `AsyncSentimentPolarityAnalysisBatchNode`, `AsyncSentimentAttributeAnalysisBatchNode`, `AsyncTwoLevelTopicAnalysisBatchNode`, `AsyncPublisherObjectAnalysisBatchNode`, `AsyncBeliefSystemAnalysisBatchNode`, `AsyncPublisherDecisionAnalysisBatchNode` | `test_stage1_analysis.py` | P1 |
-| `nodes/stage2.py` — `LoadEnhancedDataNode`, `DataSummaryNode`, `ExecuteAnalysisScriptNode`, `ChartAnalysisNode`, `SaveAnalysisResultsNode`, `LLMInsightNode` | `test_stage2_workflow.py` | P2 |
-| `nodes/stage2.py` — `CollectToolsNode`, `DecisionToolsNode` | `test_stage2_agent.py` | P2 |
-| `nodes/stage3.py` — `LoadAnalysisResultsNode`, `FormatReportNode`, `SaveReportNode`, `GenerateFullReportNode`, `InitReportStateNode`, `ReviewReportNode` | `test_stage3_report.py` | P3 |
+| `nodes/stage1/*` — `DataLoadNode`, `SaveEnhancedDataNode`, `DataValidationAndOverviewNode` | `test_stage1_nodes.py` | P1 |
+| `nodes/stage1/*` — `AsyncSentimentPolarityAnalysisBatchNode`, `AsyncSentimentAttributeAnalysisBatchNode`, `AsyncTwoLevelTopicAnalysisBatchNode`, `AsyncPublisherObjectAnalysisBatchNode`, `AsyncBeliefSystemAnalysisBatchNode`, `AsyncPublisherDecisionAnalysisBatchNode` | `test_stage1_analysis.py` | P1 |
+| `nodes/stage1/nlp_enrichment.py` — `NLPEnrichmentNode` | `test_stage1_nlp_pipeline.py` | P1 |
+| `nodes/stage2/*` — `LoadEnhancedDataNode`, `DataSummaryNode`, `CollectToolsNode`, `DecisionToolsNode`, `ExecuteToolsNode`, `ProcessResultNode`, `ChartAnalysisNode`, `SaveAnalysisResultsNode`, `LLMInsightNode` | `test_stage2_agent.py` | P2 |
+| `nodes/stage2/*` — `CollectToolsNode`, `DecisionToolsNode` | `test_stage2_agent.py` | P2 |
+| `nodes/stage3/*` — `LoadAnalysisResultsNode`, `FormatReportNode`, `SaveReportNode`, `GenerateFullReportNode`, `InitReportStateNode`, `ReviewReportNode` | `test_stage3_report.py` | P3 |
 | 多节点串联行为、`shared` 字典流转、Dispatcher 多阶段调度 | `test_flow_integration.py` | P4 |
 | `utils/data_loader.py` | `test_data_loader.py` | — |
 | `utils/call_llm.py` | `test_llm_models.py` | — |
@@ -181,7 +195,7 @@ RUN_LLM_TESTS=1 .venv/Scripts/python.exe -m pytest tests/test_llm_models.py -v
 
 ### 6.1 `_strip_timestamp_suffix` regex Bug
 
-**位置**: `nodes.py` 约第 93 行
+**位置**: `nodes/_utils.py` 约第 93 行
 
 **问题**: 正则表达式 `r"_\\d{8}_\\d{6}$"` 在 raw string 中使用了双转义 `\\d`，实际匹配的是字面的 `\d` 而非数字 `[0-9]`。该函数永远不会真正剥离时间戳后缀。
 

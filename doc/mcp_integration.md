@@ -173,8 +173,9 @@ def set_mcp_mode(use_mcp: bool):
     USE_MCP = use_mcp
 ```
 
-- `CollectToolsNode` 在初始化时根据 `config.tool_source` 调用 `set_mcp_mode(True/False)`
+- `CollectToolsNode` 在初始化时通过 `list_tools('utils/mcp_server')` 获取 MCP 工具列表
 - 后续所有工具操作通过统一接口 `get_tools()` / `call_tool()` 自动路由
+- **自动启用**：`get_tools()` / `call_tool()` 会在 `USE_MCP=False` 时自动调用 `set_mcp_mode(True)`，避免 “MCP模式未启用” 导致的兜底失败
 
 ### 3.2 统一接口
 
@@ -185,7 +186,7 @@ def set_mcp_mode(use_mcp: bool):
 
 **路由逻辑**：
 - `USE_MCP == True` → 调用 `mcp_get_tools()` / `mcp_call_tool()`
-- `USE_MCP == False` → 当前实现直接返回空/报错（本地模式由 `ExecuteAnalysisScriptNode` 直接处理）
+- `USE_MCP == False` → 当前实现直接返回空/报错
 
 ### 3.3 MCP 通信流程
 
@@ -267,9 +268,9 @@ except RuntimeError:
 
 MCP 返回的结果有多种格式，客户端按以下优先级解析：
 
-1. `result.content[0].text` → 尝试 `json.loads()`
-2. `result.content[0].text` 解析失败 → 包装为 `{"result": text}`
-3. `result.content[0].data` → 直接返回
+1. `result.content[*].data` → 优先返回（dict/list 原样返回）
+2. `result.content[*].text` → 依次尝试 `json.loads()` / `ast.literal_eval()`
+3. 解析失败 → 返回 `{"error": "...", "raw_text": text}`
 4. 其他 → 包装为 `{"result": result}`
 
 ---
@@ -281,7 +282,7 @@ MCP 返回的结果有多种格式，客户端按以下优先级解析：
 ```python
 shared = init_shared(
     analysis_mode="agent",     # 启用 Agent 模式
-    tool_source="mcp",         # 使用 MCP（可选 "local"）
+    tool_source="mcp",         # 使用 MCP
     ...
 )
 ```

@@ -55,6 +55,16 @@ class TestCollectToolsNode:
         assert result["tool_count"] == 2
         assert len(result["tools"]) == 2
 
+    @patch("utils.mcp_client.mcp_client.list_tools", return_value=[])
+    def test_exec_fail_fast_when_no_tools(self, mock_list_tools):
+        """工具发现失败 → 直接抛错（Fail Fast）"""
+        node = CollectToolsNode()
+        with pytest.raises(RuntimeError) as excinfo:
+            node.exec({"tool_source": "mcp"})
+        msg = str(excinfo.value)
+        assert "MCP工具发现失败" in msg
+        assert "uv sync" in msg
+
     def test_post_initializes_agent_state(self, minimal_shared):
         """post 初始化 agent 状态"""
         node = CollectToolsNode()
@@ -102,7 +112,7 @@ class TestDecisionToolsNode:
         assert len(result["available_tools"]) == 2
         assert result["current_iteration"] == 0
 
-    @patch("nodes.stage2.call_glm46")
+    @patch("nodes.stage2.agent.call_glm46")
     def test_exec_parses_execute_decision(self, mock_llm):
         """LLM 返回 execute 决策"""
         mock_llm.return_value = json.dumps({
@@ -125,7 +135,7 @@ class TestDecisionToolsNode:
         assert result["action"] == "execute"
         assert result["tool_name"] == "sentiment_distribution_stats"
 
-    @patch("nodes.stage2.call_glm46")
+    @patch("nodes.stage2.agent.call_glm46")
     def test_exec_parses_finish_decision(self, mock_llm):
         """LLM 返回 finish 决策"""
         mock_llm.return_value = json.dumps({
@@ -145,7 +155,7 @@ class TestDecisionToolsNode:
         result = node.exec(prep_res)
         assert result["action"] == "finish"
 
-    @patch("nodes.stage2.call_glm46", return_value="invalid json response")
+    @patch("nodes.stage2.agent.call_glm46", return_value="invalid json response")
     def test_exec_fallback_on_parse_error(self, mock_llm):
         """JSON 解析失败 → 默认从 sentiment_distribution_stats 开始"""
         node = DecisionToolsNode()
@@ -160,7 +170,7 @@ class TestDecisionToolsNode:
         assert result["action"] == "execute"
         assert result["tool_name"] == "sentiment_distribution_stats"
 
-    @patch("nodes.stage2.call_glm46")
+    @patch("nodes.stage2.agent.call_glm46")
     def test_exec_json_in_code_block(self, mock_llm):
         """LLM 返回被 ```json 包裹的 JSON"""
         mock_llm.return_value = '```json\n{"action": "execute", "tool_name": "topic_frequency_stats", "reason": "test"}\n```'
@@ -192,8 +202,34 @@ class TestDecisionToolsNode:
     def test_post_finish_action(self, minimal_shared):
         """action=finish → 设置 is_finished"""
         shared = self._make_agent_shared(minimal_shared)
+        shared["config"]["stage2_chart"] = {
+            "min_per_category": {"sentiment": 0, "topic": 0, "geographic": 0, "interaction": 0, "nlp": 0},
+            "tool_allowlist": [],
+        }
+        shared["stage2_results"] = {"charts": []}
         node = DecisionToolsNode()
         exec_res = {"action": "finish", "reason": "done"}
         action = node.post(shared, {}, exec_res)
         assert action == "finish"
         assert shared["agent"]["is_finished"] is True
+
+    def test_post_finish_forces_chart_when_missing(self, minimal_shared):
+        """action=finish 但图表不足 → 强制 execute"""
+        shared = self._make_agent_shared(minimal_shared)
+        shared["config"]["stage2_chart"] = {
+            "min_per_category": {"sentiment": 1, "topic": 0, "geographic": 0, "interaction": 0, "nlp": 0},
+            "tool_allowlist": [],
+        }
+        shared["stage2_results"] = {"charts": []}
+        shared["agent"]["available_tools"] = [{
+            "name": "sentiment_trend_chart",
+            "canonical_name": "sentiment_trend_chart",
+            "category": "情感趋势分析",
+            "description": "情感趋势图",
+            "generates_chart": True,
+        }]
+        node = DecisionToolsNode()
+        exec_res = {"action": "finish", "reason": "done"}
+        action = node.post(shared, {}, exec_res)
+        assert action == "execute"
+        assert shared["agent"]["next_tool"] == "sentiment_trend_chart"

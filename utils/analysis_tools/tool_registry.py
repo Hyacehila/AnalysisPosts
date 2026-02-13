@@ -62,6 +62,13 @@ from .belief_tools import (
     belief_network_chart,
 )
 
+from .nlp_tools import (
+    keyword_wordcloud,
+    entity_cooccurrence_network,
+    text_cluster_analysis,
+    sentiment_lexicon_comparison,
+    temporal_keyword_heatmap,
+)
 
 # 工具注册表
 TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
@@ -560,7 +567,75 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         },
         "output_type": "chart",
         "generates_chart": True
-    }
+    },
+
+    # ===== NLP增强分析工具 =====
+    "keyword_wordcloud": {
+        "name": "keyword_wordcloud",
+        "category": "NLP增强分析",
+        "description": "关键词频次分布图（词云替代）",
+        "function": keyword_wordcloud,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_n": {"type": "int", "description": "关键词数量", "required": False, "default": 30},
+        },
+        "output_type": "chart",
+        "generates_chart": True,
+    },
+    "entity_cooccurrence_network": {
+        "name": "entity_cooccurrence_network",
+        "category": "NLP增强分析",
+        "description": "实体共现网络热力图",
+        "function": entity_cooccurrence_network,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_n": {"type": "int", "description": "实体数量", "required": False, "default": 15},
+        },
+        "output_type": "chart",
+        "generates_chart": True,
+    },
+    "text_cluster_analysis": {
+        "name": "text_cluster_analysis",
+        "category": "NLP增强分析",
+        "description": "文本相似度聚类分布",
+        "function": text_cluster_analysis,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "threshold": {"type": "float", "description": "相似度阈值", "required": False, "default": 0.85},
+            "min_cluster_size": {"type": "int", "description": "最小聚类规模", "required": False, "default": 2},
+        },
+        "output_type": "chart",
+        "generates_chart": True,
+    },
+    "sentiment_lexicon_comparison": {
+        "name": "sentiment_lexicon_comparison",
+        "category": "NLP增强分析",
+        "description": "词典情感分布对比",
+        "function": sentiment_lexicon_comparison,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+        },
+        "output_type": "chart",
+        "generates_chart": True,
+    },
+    "temporal_keyword_heatmap": {
+        "name": "temporal_keyword_heatmap",
+        "category": "NLP增强分析",
+        "description": "关键词时间热力图",
+        "function": temporal_keyword_heatmap,
+        "parameters": {
+            "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
+            "output_dir": {"type": "string", "description": "图表输出目录", "required": False, "default": "report/images"},
+            "top_n": {"type": "int", "description": "关键词数量", "required": False, "default": 10},
+            "granularity": {"type": "string", "description": "时间粒度: day/hour", "required": False, "default": "day"},
+        },
+        "output_type": "chart",
+        "generates_chart": True,
+    },
 }
 
 

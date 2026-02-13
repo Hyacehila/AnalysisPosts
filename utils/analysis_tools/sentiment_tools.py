@@ -15,11 +15,14 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from collections import Counter, defaultdict
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
 
+from utils.path_manager import get_images_dir
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
@@ -514,7 +517,7 @@ def sentiment_bucket_trend_chart(blog_data: List[Dict[str, Any]],
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"sentiment_bucket_trend_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -578,7 +581,7 @@ def sentiment_attribute_trend_chart(blog_data: List[Dict[str, Any]],
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"sentiment_attribute_trend_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -690,7 +693,7 @@ def sentiment_trend_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"sentiment_trend_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -746,7 +749,7 @@ def sentiment_focus_window_chart(blog_data: List[Dict[str, Any]],
     bucket_counts = fdf.groupby(["date", "bucket"]).size().unstack(fill_value=0)
     bucket_counts = bucket_counts[["正面", "中性", "负面"]] if set(bucket_counts.columns) >= {"正面", "中性", "负面"} else bucket_counts
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"sentiment_focus_window_{timestamp}.png")
 
@@ -813,7 +816,7 @@ def sentiment_focus_publisher_chart(blog_data: List[Dict[str, Any]],
 
     pivot = fdf.pivot_table(index="date", columns="publisher", values="sentiment_polarity", aggfunc="mean")
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"sentiment_focus_publisher_{timestamp}.png")
 
@@ -916,7 +919,7 @@ def sentiment_pie_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"sentiment_pie_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')

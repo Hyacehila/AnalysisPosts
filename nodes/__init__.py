@@ -34,6 +34,7 @@ from nodes.stage1 import (
     DataLoadNode,
     SaveEnhancedDataNode,
     DataValidationAndOverviewNode,
+    NLPEnrichmentNode,
     AsyncSentimentPolarityAnalysisBatchNode,
     AsyncSentimentAttributeAnalysisBatchNode,
     AsyncTwoLevelTopicAnalysisBatchNode,
@@ -46,14 +47,15 @@ from nodes.stage1 import (
 from nodes.stage2 import (
     LoadEnhancedDataNode,
     DataSummaryNode,
+    ClearReportDirNode,
     SaveAnalysisResultsNode,
-    ExecuteAnalysisScriptNode,
     ChartAnalysisNode,
     LLMInsightNode,
     CollectToolsNode,
     DecisionToolsNode,
     ExecuteToolsNode,
     ProcessResultNode,
+    EnsureChartsNode,
 )
 
 # ── 阶段3：报告生成 ──────────────────────────────────────────
@@ -61,6 +63,7 @@ from nodes.stage3 import (
     LoadAnalysisResultsNode,
     FormatReportNode,
     SaveReportNode,
+    ClearStage3OutputsNode,
     LoadTemplateNode,
     FillSectionNode,
     AssembleReportNode,
@@ -100,6 +103,7 @@ __all__ = [
     "Stage1CompletionNode", "Stage2CompletionNode", "Stage3CompletionNode",
     # stage1
     "DataLoadNode", "SaveEnhancedDataNode", "DataValidationAndOverviewNode",
+    "NLPEnrichmentNode",
     "AsyncSentimentPolarityAnalysisBatchNode",
     "AsyncSentimentAttributeAnalysisBatchNode",
     "AsyncTwoLevelTopicAnalysisBatchNode",
@@ -108,10 +112,13 @@ __all__ = [
     "AsyncPublisherDecisionAnalysisBatchNode",
     # stage2
     "LoadEnhancedDataNode", "DataSummaryNode", "SaveAnalysisResultsNode",
-    "ExecuteAnalysisScriptNode", "ChartAnalysisNode", "LLMInsightNode",
+    "ClearReportDirNode",
+    "ChartAnalysisNode", "LLMInsightNode",
     "CollectToolsNode", "DecisionToolsNode", "ExecuteToolsNode", "ProcessResultNode",
+    "EnsureChartsNode",
     # stage3
     "LoadAnalysisResultsNode", "FormatReportNode", "SaveReportNode",
+    "ClearStage3OutputsNode",
     "LoadTemplateNode", "FillSectionNode", "AssembleReportNode",
     "GenerateFullReportNode", "InitReportStateNode", "GenerateReportNode",
     "ReviewReportNode", "ApplyFeedbackNode",

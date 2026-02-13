@@ -8,12 +8,68 @@ import asyncio
 import time
 from typing import Any, Dict, List, Optional
 
-from pocketflow import AsyncNode, BatchNode
+from pocketflow import AsyncNode, BatchNode, Node
 
 from utils.data_loader import save_enhanced_blog_data
+from utils.monitor import update_status
 
 
-class AsyncParallelBatchNode(AsyncNode, BatchNode):
+def _infer_stage(node: Node) -> str:
+    module = node.__class__.__module__
+    if ".stage1." in module:
+        return "stage1"
+    if ".stage2." in module:
+        return "stage2"
+    if ".stage3." in module:
+        return "stage3"
+    if "dispatcher" in module:
+        return "dispatcher"
+    return "system"
+
+
+class MonitoredNode(Node):
+    """Node with execution monitoring."""
+
+    def _run(self, shared):
+        stage = _infer_stage(self)
+        update_status(shared, node_name=self.__class__.__name__, status="running", stage=stage)
+        try:
+            result = super()._run(shared)
+            update_status(shared, node_name=self.__class__.__name__, status="completed", stage=stage)
+            return result
+        except Exception as exc:
+            update_status(
+                shared,
+                node_name=self.__class__.__name__,
+                status="failed",
+                stage=stage,
+                error=str(exc),
+            )
+            raise
+
+
+class MonitoredAsyncNode(AsyncNode):
+    """AsyncNode with execution monitoring."""
+
+    async def _run_async(self, shared):
+        stage = _infer_stage(self)
+        update_status(shared, node_name=self.__class__.__name__, status="running", stage=stage)
+        try:
+            result = await super()._run_async(shared)
+            update_status(shared, node_name=self.__class__.__name__, status="completed", stage=stage)
+            return result
+        except Exception as exc:
+            update_status(
+                shared,
+                node_name=self.__class__.__name__,
+                status="failed",
+                stage=stage,
+                error=str(exc),
+            )
+            raise
+
+
+class AsyncParallelBatchNode(MonitoredAsyncNode, BatchNode):
     """
     带并发限制的异步并行批处理节点
     

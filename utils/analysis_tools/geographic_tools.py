@@ -14,10 +14,13 @@ from datetime import datetime
 from typing import List, Dict, Any
 from collections import Counter, defaultdict
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from utils.path_manager import get_images_dir
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
@@ -310,7 +313,7 @@ def geographic_heatmap(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"geographic_heatmap_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -416,7 +419,7 @@ def geographic_bar_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"geographic_bar_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -474,7 +477,7 @@ def geographic_sentiment_bar_chart(blog_data: List[Dict[str, Any]],
     ax2.legend(loc="upper right")
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"geographic_sentiment_bar_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -542,7 +545,7 @@ def geographic_topic_heatmap(blog_data: List[Dict[str, Any]],
     cbar.set_label("博文数", fontsize=10)
     plt.tight_layout()
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"geographic_topic_heatmap_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -605,7 +608,7 @@ def geographic_temporal_heatmap(blog_data: List[Dict[str, Any]],
     cbar.set_label("博文数", fontsize=10)
     plt.tight_layout()
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"geographic_temporal_heatmap_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")

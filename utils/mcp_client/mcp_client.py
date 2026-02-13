@@ -4,7 +4,9 @@
 """
 
 import asyncio
+import ast
 import os
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client, get_default_environment
@@ -12,6 +14,64 @@ import json
 
 # 全局标志控制是否使用MCP
 USE_MCP = False
+
+_ALIAS_TO_CANONICAL = {
+    "sentiment_distribution": "sentiment_distribution_stats",
+    "sentiment_timeseries": "sentiment_time_series",
+    "sentiment_anomaly": "sentiment_anomaly_detection",
+    "topic_frequency": "topic_frequency_stats",
+    "topic_evolution": "topic_time_evolution",
+    "topic_cooccurrence": "topic_cooccurrence_analysis",
+    "topic_focus_evolution": "topic_focus_evolution_chart",
+    "topic_keyword_trend": "topic_keyword_trend_chart",
+    "topic_focus_distribution": "topic_focus_distribution_chart",
+    "geographic_distribution": "geographic_distribution_stats",
+    "geographic_hotspot": "geographic_hotspot_detection",
+    "geographic_sentiment": "geographic_sentiment_analysis",
+    "geographic_sentiment_bar": "geographic_sentiment_bar_chart",
+    "geographic_topic_heatmap_tool": "geographic_topic_heatmap",
+    "geographic_temporal_heatmap_tool": "geographic_temporal_heatmap",
+    "publisher_distribution": "publisher_distribution_stats",
+    "cross_matrix": "cross_dimension_matrix",
+    "publisher_sentiment_bucket": "publisher_sentiment_bucket_chart",
+    "publisher_topic_distribution": "publisher_topic_distribution_chart",
+    "participant_trend": "participant_trend_chart",
+    "publisher_focus_distribution": "publisher_focus_distribution_chart",
+    "generate_sentiment_bucket_trend_chart": "sentiment_bucket_trend_chart",
+    "generate_sentiment_attribute_trend_chart": "sentiment_attribute_trend_chart",
+    "generate_sentiment_focus_window_chart": "sentiment_focus_window_chart",
+    "generate_sentiment_focus_publisher_chart": "sentiment_focus_publisher_chart",
+    "generate_sentiment_trend_chart": "sentiment_trend_chart",
+    "generate_sentiment_pie_chart": "sentiment_pie_chart",
+    "generate_topic_ranking_chart": "topic_ranking_chart",
+    "generate_topic_evolution_chart": "topic_evolution_chart",
+    "generate_topic_network_chart": "topic_network_chart",
+    "generate_geographic_heatmap": "geographic_heatmap",
+    "generate_geographic_bar_chart": "geographic_bar_chart",
+    "generate_interaction_heatmap": "interaction_heatmap",
+    "generate_publisher_bar_chart": "publisher_bar_chart",
+}
+
+
+def _load_tool_registry() -> Dict[str, Dict[str, Any]]:
+    try:
+        from utils.analysis_tools.tool_registry import TOOL_REGISTRY
+        return TOOL_REGISTRY
+    except Exception:
+        return {}
+
+
+def _resolve_canonical_name(tool_name: str, registry: Dict[str, Dict[str, Any]]) -> str:
+    if tool_name in registry:
+        return tool_name
+    return _ALIAS_TO_CANONICAL.get(tool_name, tool_name)
+
+
+def _infer_generates_chart(tool_name: str) -> bool:
+    lower = tool_name.lower()
+    return any(token in lower for token in [
+        "chart", "heatmap", "network", "wordcloud", "trend", "bar", "pie"
+    ])
 
 def _build_mcp_env() -> dict:
     """Extend MCP's default safe env with data path needed by mcp_server."""
@@ -22,12 +82,22 @@ def _build_mcp_env() -> dict:
         print(f"[MCP Client] _build_mcp_env: 设置 ENHANCED_DATA_PATH={enhanced_path}")
     else:
         print(f"[MCP Client] _build_mcp_env: 警告 - ENHANCED_DATA_PATH 环境变量未设置")
+    project_root = Path(__file__).resolve().parents[2]
+    env.setdefault("PROJECT_ROOT", str(project_root))
+    env.setdefault("REPORT_DIR", str(project_root / "report"))
     return env
 
 def set_mcp_mode(use_mcp: bool):
     """设置MCP模式"""
     global USE_MCP
     USE_MCP = use_mcp
+
+def ensure_mcp_enabled() -> bool:
+    """确保MCP模式开启（工具来源为MCP时自动启用）"""
+    global USE_MCP
+    if not USE_MCP:
+        set_mcp_mode(True)
+    return USE_MCP
 
 def is_mcp_enabled() -> bool:
     """检查是否启用MCP"""
@@ -57,12 +127,19 @@ async def mcp_get_tools(server_script_path: str = "utils.mcp_server") -> List[Di
 
                 # 转换MCP工具格式为统一格式
                 tools = []
+                registry = _load_tool_registry()
                 for tool in tools_response.tools:
+                    canonical = _resolve_canonical_name(tool.name, registry)
+                    tool_info_registry = registry.get(canonical, {})
                     tool_info = {
                         "name": tool.name,
                         "description": tool.description,
-                        "category": _get_tool_category(tool.name),
+                        "category": tool_info_registry.get("category") or _get_tool_category(tool.name),
                         "input_schema": tool.inputSchema,
+                        "canonical_name": canonical,
+                        "generates_chart": tool_info_registry.get(
+                            "generates_chart", _infer_generates_chart(canonical)
+                        ),
                         "mcp_tool": tool  # 保留原始MCP工具对象
                     }
                     tools.append(tool_info)
@@ -72,6 +149,41 @@ async def mcp_get_tools(server_script_path: str = "utils.mcp_server") -> List[Di
     except Exception as e:
         print(f"[MCP Client] 获取MCP工具失败: {str(e)}")
         return []
+
+def _parse_text_payload(text: Any) -> Dict[str, Any]:
+    """解析MCP返回的文本内容为结构化数据"""
+    if not isinstance(text, str):
+        return {"result": text}
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    try:
+        return ast.literal_eval(text)
+    except Exception:
+        return {"error": "MCP返回文本无法解析为结构化数据", "raw_text": text}
+
+def _parse_mcp_result(result: Any) -> Any:
+    """统一解析MCP返回结果（优先 data，其次 text）"""
+    if result is None:
+        return {"error": "MCP返回空结果"}
+
+    content = getattr(result, "content", None)
+    if content:
+        # 优先解析 data
+        for item in content:
+            data = getattr(item, "data", None)
+            if data is not None:
+                if isinstance(data, (dict, list)):
+                    return data
+                return {"result": data}
+        # 其次解析 text
+        for item in content:
+            text = getattr(item, "text", None)
+            if text is not None:
+                return _parse_text_payload(text)
+
+    return {"result": result}
 
 async def mcp_call_tool(server_script_path: str, tool_name: str, arguments: Dict[str, Any]) -> Any:
     """调用MCP服务器上的工具"""
@@ -95,19 +207,7 @@ async def mcp_call_tool(server_script_path: str, tool_name: str, arguments: Dict
                 await session.initialize()
                 result = await session.call_tool(tool_name, arguments)
 
-                # 解析MCP返回结果
-                if hasattr(result, 'content') and result.content:
-                    # 处理文本内容
-                    if hasattr(result.content[0], 'text'):
-                        try:
-                            return json.loads(result.content[0].text)
-                        except json.JSONDecodeError:
-                            return {"result": result.content[0].text}
-                    # 处理其他内容类型
-                    elif hasattr(result.content[0], 'data'):
-                        return result.content[0].data
-
-                return {"result": result}
+                return _parse_mcp_result(result)
 
     except Exception as e:
         print(f"[MCP Client] 调用MCP工具失败: {str(e)}")
@@ -125,13 +225,21 @@ def _get_tool_category(tool_name: str) -> str:
         return "地理分析"
     elif "publisher" in name_lower or "interaction" in name_lower or "cross" in name_lower or "influence" in name_lower or "correlation" in name_lower:
         return "多维交互分析"
+    elif "keyword" in name_lower or "entity" in name_lower or "lexicon" in name_lower or "cluster" in name_lower:
+        return "NLP增强分析"
     elif "comprehensive" in name_lower:
         return "综合分析"
     else:
         return "其他"
 
+def list_tools(server_script_path: str = "utils.mcp_server") -> List[Dict[str, Any]]:
+    """兼容接口：强制启用MCP并获取工具列表"""
+    ensure_mcp_enabled()
+    return get_tools(server_script_path)
+
 def get_tools(server_script_path: str = "utils.mcp_server") -> List[Dict[str, Any]]:
     """获取可用工具列表，根据配置选择MCP或本地"""
+    ensure_mcp_enabled()
     if USE_MCP:
         try:
             # 检查是否已经在事件循环中
@@ -148,15 +256,15 @@ def get_tools(server_script_path: str = "utils.mcp_server") -> List[Dict[str, An
         except Exception as e:
             print(f"[MCP Client] MCP工具获取失败: {str(e)}")
             return []
-    else:
-        print(f"[MCP Client] MCP模式未启用")
-        return []
+    print(f"[MCP Client] MCP模式未启用")
+    return []
 
 def call_tool(server_script_path: str, tool_name: str, arguments: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """调用工具，根据配置选择MCP或本地"""
     if arguments is None:
         arguments = {}
 
+    ensure_mcp_enabled()
     if USE_MCP:
         try:
             # 检查是否已经在事件循环中
@@ -173,10 +281,9 @@ def call_tool(server_script_path: str, tool_name: str, arguments: Optional[Dict[
         except Exception as e:
             print(f"[MCP Client] MCP工具调用失败: {str(e)}")
             return {"error": f"MCP工具调用失败: {str(e)}"}
-    else:
-        # MCP模式未启用
-        print(f"[MCP Client] MCP模式未启用")
-        return {"error": "MCP模式未启用"}
+    # MCP模式未启用
+    print(f"[MCP Client] MCP模式未启用")
+    return {"error": "MCP模式未启用"}
 
 def _get_local_tools() -> List[Dict[str, Any]]:
     """获取本地工具列表"""

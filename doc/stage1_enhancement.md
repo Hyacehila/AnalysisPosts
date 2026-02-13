@@ -1,7 +1,7 @@
 # 阶段 1：数据增强子系统
 
-> **文档状态**: 2026-02-10 创建  
-> **关联源码**: `nodes/stage1.py`, `nodes/base.py`, `flow.py`  
+> **文档状态**: 2026-02-11 更新  
+> **关联源码**: `nodes/stage1/*`, `nodes/base.py`, `flow.py`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -16,13 +16,13 @@
 
 | 项目 | 说明 |
 |:---|:---|
-| **输入** | `data/posts.json` — 原始博文 JSON 数组 |
-| **输出** | `data/enhanced_blogs.json` — 增强后的博文 JSON 数组 |
+| **输入** | `data/posts_sample_30.json` — 原始博文 JSON 数组（可配置） |
+| **输出** | `data/enhanced_posts_sample_30.json` — 增强后的博文 JSON 数组（可配置） |
 | **参考数据** | `data/topics.json`、`data/sentiment_attributes.json`、`data/publisher_objects.json`、`data/believe_system_common.json`、`data/publisher_decision.json` |
 
 ### 1.3 执行模式
 
-阶段 1 采用异步并行模式（`enhancement_mode = "async"`）：通过 `AsyncFlow` 直接调用 LLM API，支持并发控制与 Checkpoint。
+阶段 1 采用异步并行模式（`enhancement_mode = "async"`）：通过 `AsyncFlow` 直接调用 LLM API，支持并发控制与 Checkpoint。并发上限由 `runtime.concurrent_num` 统一配置。
 
 ---
 
@@ -55,6 +55,17 @@
 
 > `sentiment_polarity` 维度不需要参考数据，直接由 LLM 输出 1-5 的数字。
 
+### 2.3 NLP 增强字段（新增）
+
+阶段 1 在六维增强前增加 **NLPEnrichmentNode**，对文本进行本地处理，新增字段：
+
+| 字段名 | 类型 | 说明 |
+|:---|:---|:---|
+| `keywords` | `List[str]` | 关键词列表（Top-N） |
+| `entities` | `List[str]` | 轻量命名实体（#话题#、@用户 等规则） |
+| `lexicon_sentiment` | `Dict` | 词典情感（label/score/pos/neg） |
+| `text_similarity_group` | `int` | 文本相似聚类编号（无聚类记为 -1） |
+
 ---
 
 ## 3. 异步并行模式 (Async)
@@ -63,7 +74,8 @@
 
 ```mermaid
 flowchart LR
-    DL[DataLoadNode] --> SP[SentimentPolarity]
+    DL[DataLoadNode] --> NE[NLPEnrichment]
+    NE --> SP[SentimentPolarity]
     SP --> SA[SentimentAttribute]
     SA --> TP[TopicAnalysis]
     TP --> PO[PublisherObject]
@@ -84,7 +96,7 @@ flowchart LR
 
 | 特性 | 实现方式 |
 |:---|:---|
-| **并发控制** | 构造时传入 `max_concurrent`，内部使用 worker 数量限制（`max_workers = max_concurrent or min(200, total)`） |
+| **并发控制** | 构造时传入 `max_concurrent`，来源为 `runtime.concurrent_num`（默认 60），内部使用 worker 数量限制（`max_workers = max_concurrent or min(200, total)`） |
 | **断点续传** | Checkpoint 机制：每完成 N 条自动保存到增强数据文件 |
 | **错误处理** | 子类可实现 `exec_fallback_async` 提供降级返回值 |
 | **增量写回** | 子类实现 `apply_item_result` 将单条结果立即写回原博文对象 |
@@ -277,7 +289,7 @@ post_async(shared, prep_res, exec_res) → 将结果批量写回 shared
 
 #### 断点续传逻辑（`original` 模式）
 
-当 `resume_if_exists == True`（默认）且增强数据文件已存在时：
+当 `data.resume_if_exists == True`（默认）且增强数据文件已存在时：
 
 1. 加载已有的增强数据
 2. 长度校验：`len(enhanced) == len(original)`

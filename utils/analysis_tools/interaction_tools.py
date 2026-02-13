@@ -15,10 +15,13 @@ from datetime import datetime
 from typing import List, Dict, Any, Tuple
 from collections import Counter, defaultdict
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from utils.path_manager import get_images_dir
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
@@ -479,7 +482,7 @@ def interaction_heatmap(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"interaction_heatmap_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -578,7 +581,7 @@ def publisher_bar_chart(blog_data: List[Dict[str, Any]],
     plt.tight_layout()
     
     # 保存图表
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"publisher_bar_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches='tight')
@@ -645,7 +648,7 @@ def publisher_sentiment_bucket_chart(blog_data: List[Dict[str, Any]],
     ax.grid(True, axis="y", alpha=0.3)
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"publisher_sentiment_bucket_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -702,7 +705,7 @@ def publisher_focus_distribution_chart(blog_data: List[Dict[str, Any]],
 
     pivot = fdf.pivot_table(index="date", columns="publisher", values="content", aggfunc="count").fillna(0)
 
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"publisher_focus_distribution_{timestamp}.png")
 
@@ -773,7 +776,7 @@ def publisher_topic_distribution_chart(blog_data: List[Dict[str, Any]],
     ax.grid(True, axis="y", alpha=0.3)
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"publisher_topic_distribution_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
@@ -845,7 +848,7 @@ def participant_trend_chart(blog_data: List[Dict[str, Any]],
     ax1.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     file_path = os.path.join(output_dir, f"participant_trend_{timestamp}.png")
     plt.savefig(file_path, dpi=150, bbox_inches="tight")

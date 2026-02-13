@@ -3,6 +3,8 @@ from datetime import datetime
 from itertools import combinations
 from typing import Any, Dict, List, Tuple
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib import patheffects
@@ -10,6 +12,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
+from utils.path_manager import get_images_dir, get_report_dir
 plt.rcParams["font.sans-serif"] = ["SimHei"]
 plt.rcParams["axes.unicode_minus"] = False
 
@@ -117,7 +120,7 @@ def build_belief_network_data(
         )
     edges_df = pd.DataFrame(edges_list)
 
-    os.makedirs(data_dir, exist_ok=True)
+    data_dir = get_report_dir(data_dir)
     nodes_path = os.path.join(data_dir, f"nodes_{event_name}.csv")
     edges_path = os.path.join(data_dir, f"edges_{event_name}.csv")
     nodes_df.to_csv(nodes_path, index=False, encoding="utf_8_sig")
@@ -305,7 +308,7 @@ def belief_network_chart(
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     chart_id = f"belief_network_{timestamp}"
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = get_images_dir(output_dir)
     file_path = os.path.join(output_dir, f"{chart_id}.png")
 
     G, nodes_df, edges_df = build_belief_network_data(

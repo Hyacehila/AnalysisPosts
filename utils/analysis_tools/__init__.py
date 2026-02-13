@@ -62,6 +62,13 @@ from .belief_tools import (
     belief_network_chart,
 )
 
+from .nlp_tools import (
+    keyword_wordcloud,
+    entity_cooccurrence_network,
+    text_cluster_analysis,
+    sentiment_lexicon_comparison,
+    temporal_keyword_heatmap,
+)
 from .tool_registry import (
     TOOL_REGISTRY,
     get_all_tools,
@@ -112,6 +119,12 @@ __all__ = [
     "publisher_focus_distribution_chart",
     # 信念系统工具
     "belief_network_chart",
+    # NLP tools
+    "keyword_wordcloud",
+    "entity_cooccurrence_network",
+    "text_cluster_analysis",
+    "sentiment_lexicon_comparison",
+    "temporal_keyword_heatmap",
     # 工具注册
     "TOOL_REGISTRY",
     "get_all_tools",

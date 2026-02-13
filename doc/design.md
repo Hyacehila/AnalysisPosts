@@ -1,7 +1,7 @@
 # 舆情分析智能体 — 系统设计总览
 
-> **文档状态**: 2026-02-10 重构  
-> **适用版本**: v0.1.0  
+> **文档状态**: 2026-02-11 更新  
+> **适用版本**: v0.1.0 → v1.0.0 (Phase 1–3)  
 > **类型**: 核心设计文档（全景地图）
 
 本文档是项目的**核心设计参考**，提供系统级的架构、数据流与配置概览。各子系统的**代码级实现细节**请参阅对应的分支文档（见 [§8 文档索引](#8-文档索引)）。
@@ -27,7 +27,7 @@
 ### 1.3 设计理念
 
 1. **中央调度 + 阶段解耦**：`DispatcherNode` 统一管理三阶段的执行顺序，各阶段封装为独立 Flow，互不依赖。
-2. **多模式可切换**：每个阶段提供不同的执行模式（如 workflow/agent），在 `config.yaml` 中通过配置项切换（`main.py` 读取 YAML）。
+2. **阶段2固定 Agent + MCP**：Stage2 仅保留 Agent 模式，通过 MCP 进行工具发现与调用。
 3. **单一数据源 (`shared`)**：所有节点通过共享字典 `shared` 通信，无隐式状态。
 4. **容错与断点续传**：阶段 1 的长时间批处理支持 Checkpoint 机制，中断后可恢复。
 
@@ -43,15 +43,12 @@ graph TD
     
     Dispatcher -->|"stage1_async"| S1A["AsyncEnhancementFlow<br>(异步并行增强)"]
     
-    Dispatcher -->|"stage2_workflow"| S2A["WorkflowAnalysisFlow<br>(预定义分析)"]
     Dispatcher -->|"stage2_agent"| S2B["AgentAnalysisFlow<br>(自主探索分析)"]
     
     Dispatcher -->|"stage3_template"| S3A["TemplateReportFlow<br>(一次性生成)"]
     Dispatcher -->|"stage3_iterative"| S3B["IterativeReportFlow<br>(多轮迭代)"]
     
     S1A -->|"dispatch"| Dispatcher
-    S1B -->|"dispatch"| Dispatcher
-    S2A -->|"dispatch"| Dispatcher
     S2B -->|"dispatch"| Dispatcher
     S3A -->|"dispatch"| Dispatcher
     S3B -->|"dispatch"| Dispatcher
@@ -69,7 +66,7 @@ flowchart LR
     end
 
     subgraph "阶段1: 数据增强"
-        S1["6维 LLM 分析<br>情感极性 · 情感属性<br>主题 · 发布者 · 信念 · 身份"]
+        S1["6维 LLM 分析 + 本地NLP<br>情感极性 · 情感属性<br>主题 · 发布者 · 信念 · 身份<br>关键词 · 实体 · 词典情感 · 相似度聚类"]
     end
 
     subgraph "阶段2: 深度分析"
@@ -83,8 +80,8 @@ flowchart LR
     subgraph 输出
         ENH["data/enhanced_blogs.json"]
         CHARTS["report/images/*.png"]
-        ANALYSIS["report/analysis_data.json<br>report/chart_analyses.json<br>report/insights.json"]
-        REPORT["report/report.md"]
+    ANALYSIS["report/analysis_data.json<br>report/chart_analyses.json<br>report/insights.json"]
+    REPORT["report/report.md"]
     end
 
     RAW --> S1
@@ -97,6 +94,10 @@ flowchart LR
     ANALYSIS --> S3
     S3 --> REPORT
 ```
+
+**输出路径说明**：
+- 图表输出目录由 `PathManager` 统一管理（`report/images/`）
+- 运行状态写入 `report/status.json` 供 Dashboard 监控
 
 ### 2.3 PocketFlow 节点类型
 
@@ -137,16 +138,15 @@ stateDiagram-v2
 | Action 字符串 | 目标 Flow | 触发条件 |
 |:---|:---|:---|
 | `stage1_async` | `AsyncEnhancementFlow` | `next_stage == 1` 且 `enhancement_mode == "async"` |
-| `stage2_workflow` | `WorkflowAnalysisFlow` | `next_stage == 2` 且 `analysis_mode == "workflow"` |
-| `stage2_agent` | `AgentAnalysisFlow` | `next_stage == 2` 且 `analysis_mode == "agent"` |
+| `stage2_agent` | `AgentAnalysisFlow` | `next_stage == 2` |
 | `stage3_template` | `TemplateReportFlow` | `next_stage == 3` 且 `report_mode == "template"` |
 | `stage3_iterative` | `IterativeReportFlow` | `next_stage == 3` 且 `report_mode == "iterative"` |
 | `done` | `TerminalNode` | 所有计划阶段已完成 |
 
 ### 3.3 `prep → exec → post` 实现
 
-- **`prep`**：读取 `shared["dispatcher"]` 和 `shared["config"]`，提取 `start_stage`、`run_stages`、`current_stage`、`completed_stages` 及三个模式配置
-- **`exec`**：计算下一个未完成的阶段编号，拼接 `stage{N}_{mode}` 形式的 Action 字符串
+- **`prep`**：读取 `shared["dispatcher"]` 和 `shared["config"]`，提取 `start_stage`、`run_stages`、`current_stage`、`completed_stages` 与阶段模式配置
+- **`exec`**：计算下一个未完成阶段编号；Stage1/Stage3 使用 `stage{N}_{mode}`，Stage2 固定返回 `stage2_agent`
 - **`post`**：更新 `shared["dispatcher"]["current_stage"]`，返回 Action
 
 各阶段的 CompletionNode 在执行完毕后会将阶段编号追加到 `shared["dispatcher"]["completed_stages"]`，然后返回 `"dispatch"` 跳回 DispatcherNode。
@@ -155,14 +155,13 @@ stateDiagram-v2
 
 ## 4. Flow 编排 (`flow.py`)
 
-`flow.py` 定义了 **5 个子 Flow** 和 **1 个主 Flow**。所有 Flow 由 `create_main_flow()` 统一注册到 DispatcherNode 的 Action 路由中。
+`flow.py` 定义了 **4 个子 Flow** 和 **1 个主 Flow**。所有 Flow 由 `create_main_flow()` 统一注册到 DispatcherNode 的 Action 路由中。
 
 ### 4.1 Flow 清单
 
 | 函数 | 类型 | 节点链路 |
 |:---|:---|:---|
 | `_create_async_enhancement_flow` | `AsyncFlow` | DataLoad → SentimentPolarity → SentimentAttribute → Topic → Publisher → Belief → PublisherDecision → Save → Validate → Complete |
-| `_create_workflow_analysis_flow` | `Flow` | LoadEnhanced → Summary → ExecuteScript → ChartAnalysis → LLMInsight → SaveResults → Complete |
 | `_create_agent_analysis_flow` | `AsyncFlow` | LoadEnhanced → Summary → CollectTools → Decision ⇄ Execute ⇄ Process → ChartAnalysis → LLMInsight → SaveResults → Complete |
 | `_create_template_report_flow` | `Flow` | LoadResults → GenerateFullReport → Format → Save → Complete |
 | `_create_iterative_report_flow` | `AsyncFlow` | LoadResults → InitState → Generate ⇄ Review ⇄ ApplyFeedback → Format → Save → Complete |
@@ -179,19 +178,21 @@ create_main_flow(
 ) -> AsyncFlow
 ```
 
-此函数创建 DispatcherNode + TerminalNode，实例化 6 个子 Flow，并通过 PocketFlow 的 `>>` 操作符连接 Action 路由：
+> `concurrent_num` 作为 Stage 1 异步增强的并发上限（传入所有 Stage1 的 AsyncParallelBatchNode）。
+
+此函数创建 DispatcherNode + TerminalNode，实例化 4 个子 Flow，并通过 PocketFlow 的 `>>` 操作符连接 Action 路由：
 
 ```python
 dispatcher - "stage1_async" >> async_enhancement_flow
 async_enhancement_flow - "dispatch" >> dispatcher
-# ... 其余 5 个子 Flow 同理
+# ... 其余 3 个子 Flow 同理
 dispatcher - "done" >> terminal
 ```
 
 ### 4.3 独立运行入口
 
 为方便调试，`flow.py` 还提供了两个独立运行函数：
-- `create_stage2_only_flow(analysis_mode)` — 跳过阶段 1，直接运行阶段 2
+- `create_stage2_only_flow()` — 跳过阶段 1，直接运行阶段 2
 - `create_stage3_only_flow(report_mode)` — 跳过阶段 1 和 2，直接运行阶段 3
 
 ---
@@ -211,7 +212,7 @@ dispatcher - "done" >> terminal
 | `report` | Dict | Stage 3 报告迭代状态 | `init_shared` 初始化 → 报告节点读写 |
 | `stage1_results` | Dict | 阶段 1 统计与保存状态 | 阶段 1 节点填充 |
 | `stage2_results` | Dict | 阶段 2 图表、洞察产出 | 阶段 2 节点填充 |
-| `stage3_results` | Dict | 阶段 3 最终报告路径和元数据 | 阶段 3 节点填充 |
+| `stage3_results` | Dict | 阶段 3 报告状态与输出路径 | 阶段 3 节点填充 |
 | `monitor` | Dict | 系统监控日志 | 各阶段节点追加 |
 | `thinking` | Dict | LLM 思考过程记录 | Stage 2/3 LLM 节点填充 |
 
@@ -222,13 +223,18 @@ dispatcher - "done" >> terminal
 ```
 config
 ├── enhancement_mode         "async"
-├── analysis_mode            "workflow" | "agent"
+├── analysis_mode            "agent"
 ├── report_mode              "template" | "iterative"
-├── tool_source              "local" | "mcp"
+├── tool_source              "mcp"
 ├── stage1_checkpoint
 │   ├── enabled              bool (默认 True)
 │   ├── save_every           int  (默认 100，每 N 条保存一次)
 │   └── min_interval_seconds float (默认 20 秒)
+├── stage1_nlp
+│   ├── enabled              bool (默认 True)
+│   ├── keyword_top_n         int  (默认 8)
+│   ├── similarity_threshold  float (默认 0.85)
+│   └── min_cluster_size      int  (默认 2)
 ├── agent_config
 │   └── max_iterations       int  (默认 10)
 ├── iterative_report_config
@@ -292,6 +298,16 @@ stage2_results
 └── output_files{}           输出文件路径
 ```
 
+### 5.5 `stage3_results` 子结构详情
+
+```
+stage3_results
+├── generation_mode          "template" | "iterative"
+├── current_draft            当前报告草稿（迭代/模板中间态）
+├── final_report_text        最终 Markdown 文本
+└── report_file              报告文件路径（report/report.md）
+```
+
 ---
 
 ## 6. 入口配置（`config.yaml` + `config.py`）
@@ -299,14 +315,18 @@ stage2_results
 ### 6.1 `config.yaml` 结构
 
 ```yaml
-data:
-  input_path: "data/posts.json"
-  output_path: "data/enhanced_posts.json"
-  topics_path: "data/topics.json"
-  sentiment_attributes_path: "data/sentiment_attributes.json"
-  publisher_objects_path: "data/publisher_objects.json"
-  belief_system_path: "data/believe_system_common.json"
-  publisher_decision_path: "data/publisher_decision.json"
+  data:
+    input_path: "data/posts_sample_30.json"
+    output_path: "data/enhanced_posts_sample_30.json"
+    resume_if_exists: true
+    topics_path: "data/topics.json"
+    sentiment_attributes_path: "data/sentiment_attributes.json"
+    publisher_objects_path: "data/publisher_objects.json"
+    belief_system_path: "data/believe_system_common.json"
+    publisher_decision_path: "data/publisher_decision.json"
+
+  llm:
+    glm_api_key: ""
 
 pipeline:
   start_stage: 1
@@ -318,10 +338,15 @@ stage1:
     enabled: true
     save_every: 100
     min_interval_seconds: 20
+  nlp:
+    enabled: true
+    keyword_top_n: 8
+    similarity_threshold: 0.85
+    min_cluster_size: 2
 
 stage2:
-  mode: "workflow"   # workflow | agent
-  tool_source: "local"  # local | mcp
+  mode: "agent"
+  tool_source: "mcp"
   agent_max_iterations: 10
 
 stage3:
@@ -353,11 +378,12 @@ pipeline:
   run_stages: [2, 3]
 
 stage2:
-  mode: "workflow"
+  mode: "agent"
+  tool_source: "mcp"
 ```
 
 ```yaml
-# Agent 模式分析 + MCP
+# Agent 模式分析 + MCP（可调迭代次数）
 stage2:
   mode: "agent"
   tool_source: "mcp"
@@ -366,10 +392,11 @@ stage2:
 
 ### 6.4 前置条件检查
 
-`validate_config()` 自动检查：
-- 仅运行阶段2/3时，增强数据文件必须存在  
-- 仅运行阶段3时，`report/analysis_data.json` / `report/chart_analyses.json` / `report/insights.json` 必须存在  
-- Agent + MCP 模式下需要 `ENHANCED_DATA_PATH`（`main.py` 会自动设置）
+  `validate_config()` 自动检查：
+  - 仅运行阶段2/3时，增强数据文件必须存在  
+  - 仅运行阶段3时，`report/analysis_data.json` / `report/chart_analyses.json` / `report/insights.json` 必须存在  
+  - Agent + MCP 模式下需要 `ENHANCED_DATA_PATH`（`main.py` 会自动设置）
+  - 需要 GLM API Key（优先使用 `llm.glm_api_key`，否则读取环境变量 `GLM_API_KEY`）
 
 ---
 
@@ -385,7 +412,8 @@ stage2:
 |:---|:---|:---|
 | `async` | `AsyncEnhancementFlow` | 异步并行调用 LLM，支持并发控制与 Checkpoint |
 
-**六个增强维度**：情感极性 · 情感属性 · 二级主题 · 发布者类型 · 信念体系 · 事件关联身份
+**六个增强维度**：情感极性 · 情感属性 · 二级主题 · 发布者类型 · 信念体系 · 事件关联身份  
+**新增 NLP 维度**：关键词 · 命名实体 · 词典情感 · 相似度聚类
 
 → 详见 [阶段 1：数据增强子系统](stage1_enhancement.md)
 
@@ -395,7 +423,6 @@ stage2:
 
 | 模式 | Flow | 特点 |
 |:---|:---|:---|
-| `workflow` | `WorkflowAnalysisFlow` | 预定义分析脚本，稳定高效 |
 | `agent` | `AgentAnalysisFlow` | LLM 自主决策分析，探索性强 |
 
 → 详见 [阶段 2：深度分析子系统](stage2_analysis.md)
@@ -409,6 +436,8 @@ stage2:
 | `template` | `TemplateReportFlow` | 一次性长文本生成（推荐） |
 | `iterative` | `IterativeReportFlow` | 生成 → 评审 → 修改的多轮循环 |
 
+**报告输出**：Markdown (`report/report.md`)
+
 → 详见 [阶段 3：报告生成子系统](stage3_report.md)
 
 ---
@@ -419,12 +448,13 @@ stage2:
 |:---|:---|
 | **本文档 `design.md`** | 系统全景地图：架构、数据流、配置 |
 | [阶段 1：数据增强子系统](stage1_enhancement.md) | 六维分析节点、Checkpoint、Prompt 策略 |
-| [阶段 2：深度分析子系统](stage2_analysis.md) | Workflow/Agent 模式、决策循环、图表分析 |
+| [阶段 2：深度分析子系统](stage2_analysis.md) | Agent + MCP 模式、决策循环、图表分析 |
 | [阶段 3：报告生成子系统](stage3_report.md) | Template/Iterative 模式、图片路径处理 |
 | [分析工具库](analysis_tools.md) | 5 类工具模块、算法实现、注册表 |
 | [工具函数文档](utils.md) | LLM 调用层、数据加载、路径处理 |
-| [MCP 协议集成](mcp_integration.md) | MCP Server/Client、双模式工具分发 |
+| [MCP 协议集成](mcp_integration.md) | MCP Server/Client、工具分发 |
 | [测试工作流](testing_workflow.md) | 测试架构、Mock 策略、运行指南 |
+| **新增 `docs/design.md`** | 面向 AI 的高层设计总览 |
 
 ---
 
