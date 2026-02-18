@@ -446,7 +446,8 @@ stage2:
 
 | 文档 | 说明 |
 |:---|:---|
-| **本文档 `design.md`** | 系统全景地图：架构、数据流、配置 |
+| **本文档 `design_full.md`** | 系统全景地图：架构、数据流、配置（详细版） |
+| [design.md](design.md) | 面向 AI 的高层设计总览（简化版） |
 | [阶段 1：数据增强子系统](stage1_enhancement.md) | 六维分析节点、Checkpoint、Prompt 策略 |
 | [阶段 2：深度分析子系统](stage2_analysis.md) | Agent + MCP 模式、决策循环、图表分析 |
 | [阶段 3：报告生成子系统](stage3_report.md) | Template/Iterative 模式、图片路径处理 |
@@ -454,7 +455,7 @@ stage2:
 | [工具函数文档](utils.md) | LLM 调用层、数据加载、路径处理 |
 | [MCP 协议集成](mcp_integration.md) | MCP Server/Client、工具分发 |
 | [测试工作流](testing_workflow.md) | 测试架构、Mock 策略、运行指南 |
-| **新增 `docs/design.md`** | 面向 AI 的高层设计总览 |
+| [MCP 工具审计](mcp_tool_audit.md) | tool_registry → MCP 工具映射表 |
 
 ---
 
