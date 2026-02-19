@@ -47,6 +47,7 @@ uv run pytest tests/ -v
 - E2E 必须调用真实外部依赖（包括真实 GLM API）。
 - E2E 配置来源为项目预留 `config.yaml`，仅在测试运行时覆盖 `runtime` 与输出路径。
 - E2E 的 API Key 仅使用 `config.yaml.llm.glm_api_key`；缺失时直接失败（`pytest.fail`）。
+- Tavily live E2E 使用 `config.yaml.stage2.search_api_key`，若为空则回退环境变量 `TAVILY_API_KEY`。
 - E2E 同时覆盖两条真实入口：Dashboard 后端 API 与 CLI 入口。
 - E2E 验证至少覆盖：
   - 进程退出码
@@ -57,6 +58,8 @@ uv run pytest tests/ -v
 
 | 关注模块 | 当前测试文件 |
 |---|---|
+| 配置加载/校验 + A3 搜索配置映射 | `tests/unit/core/test_config.py` |
+| A3 搜索封装（Tavily） | `tests/unit/core/test_web_search.py` |
 | Dispatcher 调度与阶段切换 | `tests/unit/core/test_dispatcher.py` |
 | Stage 1 节点/六维增强/NLP | `tests/unit/stage1/test_stage1_nodes.py`, `tests/unit/stage1/test_stage1_analysis.py`, `tests/unit/stage1/test_stage1_nlp_pipeline.py` |
 | Stage 2 Agent 决策与执行 | `tests/unit/stage2/test_stage2_agent.py`, `tests/unit/stage2/test_stage2_execute_tools.py`, `tests/unit/stage2/test_stage2_ensure_charts.py` |
@@ -65,6 +68,8 @@ uv run pytest tests/ -v
 | I/O 契约与数据格式 | `tests/integration/io/test_data_loader_integration.py`, `tests/integration/io/test_data_format_contract.py`, `tests/integration/io/test_json_reference_contract.py` |
 | 跨阶段串联集成 | `tests/integration/pipeline/test_flow_pipeline_integration.py` |
 | 真实 API + 完整生命周期端到端 | `tests/e2e/cli/test_dashboard_pipeline_e2e.py`, `tests/e2e/cli/test_cli_pipeline_e2e.py` |
+| Tavily 搜索真实 API E2E | `tests/e2e/cli/test_tavily_live_api_e2e.py` |
+| Dashboard 配置读写/默认合并 | `dashboard/tests/test_pipeline_api.py` |
 
 ## 5. 重构中的测试流程（Red-Green-Refactor）
 
@@ -88,3 +93,16 @@ uv run pytest tests/ -v
 - 仅为过测删除断言/删除用例；
 - 用 `assert True` 或 `pass` 替代真实验证；
 - 在未定位根因时随意修改期望值。
+
+## 7. 开发过程文件与 Git 忽略约定
+
+为避免将开发过程临时文件误提交到仓库，`.gitignore` 需要至少覆盖以下内容：
+
+- 测试缓存与临时目录：`.pytest_cache/`、`.pytest_tmp/`、`.pytest_tmp_local/`
+- 开发过程记录：`/dev_progress.md`、`/development_plan.md`
+
+如果文件在新增忽略规则前已经被 Git 跟踪，需要额外执行：
+
+```bash
+git rm --cached <file>
+```

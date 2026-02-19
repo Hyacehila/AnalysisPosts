@@ -21,5 +21,10 @@ report/images/
 
 # Agent artifacts
 .agent/
+.pytest_cache/
 .pytest_tmp/
 .pytest_tmp_local/
+
+# Development process docs
+/dev_progress.md
+/development_plan.md

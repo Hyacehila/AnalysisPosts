@@ -5,6 +5,7 @@ import json
 import os
 
 from nodes.base import MonitoredNode
+from utils.trace_manager import dump_trace_json
 
 
 class SaveAnalysisResultsNode(MonitoredNode):
@@ -20,6 +21,7 @@ class SaveAnalysisResultsNode(MonitoredNode):
             "chart_analyses": stage2_results.get("chart_analyses", {}),
             "insights": stage2_results.get("insights", {}),
             "execution_log": stage2_results.get("execution_log", {}),
+            "trace": shared.get("trace", {}),
         }
 
     def exec(self, prep_res):
@@ -44,11 +46,15 @@ class SaveAnalysisResultsNode(MonitoredNode):
         with open(insights_path, "w", encoding="utf-8") as f:
             json.dump(prep_res["insights"], f, ensure_ascii=False, indent=2)
 
+        trace_path = os.path.join(output_dir, "trace.json")
+        dump_trace_json(prep_res["trace"], trace_path)
+
         return {
             "success": True,
             "analysis_data_path": analysis_data_path,
             "chart_analyses_path": chart_analyses_path,
             "insights_path": insights_path,
+            "trace_path": trace_path,
             "charts_count": len(prep_res["charts"]),
             "tables_count": len(prep_res["tables"]),
             "chart_analyses_count": len(prep_res["chart_analyses"]),
@@ -63,6 +69,7 @@ class SaveAnalysisResultsNode(MonitoredNode):
             "analysis_data": exec_res["analysis_data_path"],
             "chart_analyses_file": exec_res["chart_analyses_path"],
             "insights_file": exec_res["insights_path"],
+            "trace_file": exec_res["trace_path"],
         }
 
         print(f"\n[SaveAnalysisResults] [OK] 分析结果已保存")

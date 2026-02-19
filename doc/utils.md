@@ -1,7 +1,7 @@
 # 工具函数文档
 
-> **文档状态**: 2026-02-11 更新  
-> **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/monitor.py`, `utils/data_sources/*`, `utils/nlp/*`  
+> **文档状态**: 2026-02-19 更新  
+> **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/monitor.py`, `utils/trace_manager.py`, `utils/web_search.py`, `utils/data_sources/*`, `utils/nlp/*`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -223,3 +223,55 @@ os.replace(temp_file.name, output_path)  # 原子替换
 - `ner`：规则实体抽取（#话题#, @用户）
 - `sentiment_lexicon`：词典情感
 - `similarity`：文本相似度聚类（sklearn + fallback）
+
+---
+
+## 8. 追溯管理 `trace_manager.py`
+
+用于 Stage2 追溯数据统一写入与落盘，避免节点内重复拼装 trace 结构。
+
+| 函数 | 输入 | 输出 |
+|:---|:---|:---|
+| `init_trace` | `shared` | 初始化并返回 `shared["trace"]` |
+| `append_decision` | action/tool/reason/iteration | 追加 `decisions[]` 并返回 `decision_id` |
+| `append_execution` | status/summary/decision_ref 等 | 追加 `executions[]` 并返回 `execution_id` |
+| `set_insight_provenance` | provenance 字典 | 覆盖 `insight_provenance` |
+| `build_lite_confidence` | evidence 列表 | `(high/medium/low, reason)` |
+| `dump_trace_json` | trace + output_path | 写入 `report/trace.json` |
+
+---
+
+## 9. 搜索封装 `web_search.py`
+
+用于 Track A A3 的网络搜索基础能力，当前实现 provider 为 `tavily`。
+
+### 9.1 函数概览
+
+| 函数 | 输入 | 输出 |
+|:---|:---|:---|
+| `search_web` | `query` + provider/key/limit/timeout | `{query, provider, results[], error}` |
+| `batch_search` | `queries[]` + provider/key/limit/timeout | `{queries, provider, results_by_query[], total_results}` |
+
+### 9.2 API Key 解析顺序
+
+1. 显式参数 `api_key`  
+2. `config.yaml.stage2.search_api_key`（调用方传入）  
+3. 环境变量 `TAVILY_API_KEY`  
+
+若以上均为空，抛出 `EnvironmentError`。
+
+### 9.3 标准化结果结构
+
+每条结果统一输出：
+
+```json
+{
+  "title": "...",
+  "url": "...",
+  "snippet": "...",
+  "date": "...",
+  "source": "..."
+}
+```
+
+调用失败时不抛异常到上层，返回 `error` 字段并给出空 `results`，便于在流程中统一处理失败分支。

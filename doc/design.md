@@ -27,7 +27,7 @@
 ### Flow High-Level Design
 
 1. **Stage 1 (Enhancement)**: Load raw posts → enrich with LLM + local NLP → save enhanced data.
-2. **Stage 2 (Analysis)**: Load enhanced data → execute analysis tools (dynamic registry) → analyze charts → save results.
+2. **Stage 2 (Analysis)**: Load enhanced data → execute analysis tools (dynamic registry) → analyze charts → save results + trace.（Track A 第 3 项已提供 `utils/web_search.py`，供后续 QuerySearchFlow 接入）
 3. **Stage 3 (Report)**: Load analysis results → generate report → format → save Markdown.
 4. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
    - A shared lock file at `report/.pipeline_running.lock` is used for concurrency control, created/cleared by both CLI and dashboard runs.
@@ -99,6 +99,16 @@ flowchart TD
    - Output: tool list or tool result payload
    - Used by Stage 2 Agent nodes for tool discovery/execution
 
+7. **Trace Manager** (`utils/trace_manager.py`)
+   - Input: shared state + decision/execution/insight evidence payload
+   - Output: trace mutation + serialized `report/trace.json`
+   - Used by Stage 2 nodes and result save node
+
+8. **Web Search Wrapper** (`utils/web_search.py`)
+   - Input: query / queries + provider + API key + limits
+   - Output: normalized search payload (`title/url/snippet/date/source`)
+   - Used by upcoming Stage 2 QuerySearchFlow (Track A 第 3 项基础设施已就绪)
+
 ## Node Design
 
 ### Shared Store
@@ -110,6 +120,7 @@ shared = {
   "stage1_results": {...},
   "stage2_results": {...},
   "stage3_results": {...},
+  "trace": {"decisions": [], "executions": [], "reflections": [], "insight_provenance": {}},
   "monitor": {...}
 }
 ```

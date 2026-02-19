@@ -1,7 +1,7 @@
 # 阶段 2：深度分析子系统
 
-> **文档状态**: 2026-02-11 更新  
-> **关联源码**: `nodes/stage2/*`, `flow.py`  
+> **文档状态**: 2026-02-19 更新  
+> **关联源码**: `nodes/stage2/*`, `flow.py`, `utils/web_search.py`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -20,6 +20,7 @@
 | **输出** | `report/analysis_data.json` — 图表与表格元数据 |
 | | `report/chart_analyses.json` — GLM-4.5V 图表分析结果 |
 | | `report/insights.json` — LLM 洞察摘要 |
+| | `report/trace.json` — 决策/执行/证据索引追溯数据 |
 | | `report/images/*.png` — 可视化图表文件 |
 
 ### 1.3 执行模式
@@ -78,6 +79,7 @@ Stage2 仅保留 **Agent 模式**，通过 MCP 进行工具发现与调用。
 | `report/analysis_data.json` | `charts[]` + `tables[]` + `execution_log{}` |
 | `report/chart_analyses.json` | `{chart_id: analysis_result}` 字典 |
 | `report/insights.json` | LLM 生成的洞察摘要 |
+| `report/trace.json` | `trace{decisions, executions, reflections, insight_provenance}` |
 
 ### 2.4 `Stage2CompletionNode`
 
@@ -154,6 +156,10 @@ flowchart LR
 - `"finish"` → 设置 `is_finished=True`，返回 `"finish"` 跳出循环
 - `"execute"` → 将 `tool_name` 写入 `shared["agent"]["next_tool"]`，返回 `"execute"` 进入执行
 
+**Trace 写入**：
+- 每次决策都会写入 `shared["trace"]["decisions"]`
+- 记录字段：`id`、`iteration`、`action`、`tool_name`、`reason`、`timestamp`
+
 ### 3.4 `ExecuteToolsNode`
 
 | 属性 | 值 |
@@ -174,6 +180,7 @@ flowchart LR
 - 图表注册到 `shared["stage2_results"]["charts"]`
 - 数据表格注册到 `shared["stage2_results"]["tables"]`
 - 执行记录写入 `shared["agent"]["last_tool_result"]`
+- 执行追溯写入 `shared["trace"]["executions"]`（成功/失败/警告都写）
 
 ### 3.5 `ProcessResultNode`
 
@@ -210,6 +217,27 @@ flowchart LR
 | **回退模型** | `call_glm_45_air` |
 
 **作用**：基于图表分析结果 + 统计数据 + 数据概况，生成洞察摘要并写入 `shared["stage2_results"]["insights"]`。
+
+**证据索引（A2 Lite）**：
+- 在 `post` 阶段根据洞察文本与 `trace.executions` 做轻量匹配
+- 输出 `shared["trace"]["insight_provenance"]`
+- 每个洞察包含：`text`、`supporting_evidence[]`、`confidence`、`confidence_reasoning`
+
+---
+
+### 3.8 A3 搜索 API 封装（预备能力）
+
+Track A 的 A3 已落地 `utils/web_search.py`，提供 Tavily 搜索封装，供后续 `QuerySearchFlow`（Track B/B1）接入。
+
+当前阶段说明：
+
+- **已完成**：统一搜索函数 `search_web` / `batch_search` 与标准化输出结构（`title/url/snippet/date/source`）。
+- **已配置**：`config.yaml.stage2` 支持以下字段：
+  - `search_provider`（当前固定 `tavily`）
+  - `search_max_results`
+  - `search_timeout_seconds`
+  - `search_api_key`（为空时回退环境变量 `TAVILY_API_KEY`）
+- **未接入**：现有 Stage2 Agent 主流程仍不直接调用搜索 API；该能力仅作为 B1 前置基础设施。
 
 ---
 

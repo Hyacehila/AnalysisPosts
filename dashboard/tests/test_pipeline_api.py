@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from dashboard.api.pipeline_api import (
+    apply_defaults,
     build_config_dict_from_form,
     build_shared_from_config,
     list_data_candidates,
@@ -42,13 +43,14 @@ def test_build_shared_from_config(tmp_path, monkeypatch):
     path = tmp_path / "config.yaml"
     save_config_dict(cfg, str(path))
     monkeypatch.setenv("ENHANCED_DATA_PATH", cfg["data"]["output_path"])
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
 
     shared = build_shared_from_config(str(path))
     assert "config" in shared
     assert shared["dispatcher"]["start_stage"] == 1
 
 
-def test_run_pipeline_dry_run(tmp_path):
+def test_run_pipeline_dry_run(tmp_path, monkeypatch):
     cfg = {
         "data": {
             "input_path": "tests/fixtures/sample_posts.json",
@@ -67,6 +69,7 @@ def test_run_pipeline_dry_run(tmp_path):
     }
     path = tmp_path / "config.yaml"
     save_config_dict(cfg, str(path))
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
 
     shared = run_pipeline(str(path), dry_run=True)
     assert "config" in shared
@@ -95,3 +98,12 @@ def test_build_config_dict_from_form():
     assert cfg["pipeline"]["start_stage"] == 2
     assert cfg["pipeline"]["run_stages"] == [2, 3]
     assert cfg["stage1"]["checkpoint"]["enabled"] is False
+
+
+def test_apply_defaults_includes_stage2_web_search_defaults():
+    merged = apply_defaults({})
+
+    assert merged["stage2"]["search_provider"] == "tavily"
+    assert merged["stage2"]["search_max_results"] == 5
+    assert merged["stage2"]["search_timeout_seconds"] == 20
+    assert merged["stage2"]["search_api_key"] == ""

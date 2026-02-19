@@ -1,0 +1,62 @@
+"""
+Live E2E tests for Tavily search wrapper.
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import pytest
+
+from utils.web_search import batch_search, search_web
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _e2e_config_runtime import (  # noqa: E402
+    load_reserved_config,
+    require_tavily_api_key,
+)
+
+pytestmark = [pytest.mark.e2e, pytest.mark.live_api]
+
+
+def _assert_result_shape(result: dict) -> None:
+    assert set(result.keys()) >= {"title", "url", "snippet", "date", "source"}
+    assert isinstance(result["title"], str)
+    assert isinstance(result["url"], str)
+
+
+def test_tavily_live_single_query_from_reserved_config():
+    config_dict = load_reserved_config()
+    key = require_tavily_api_key(config_dict)
+
+    output = search_web(
+        "郑州 夜骑 开封 舆情",
+        provider="tavily",
+        api_key=key,
+        max_results=3,
+        timeout_seconds=20,
+    )
+
+    assert output["provider"] == "tavily"
+    assert output["error"] == ""
+    assert len(output["results"]) >= 1
+    _assert_result_shape(output["results"][0])
+
+
+def test_tavily_live_batch_query_from_reserved_config():
+    config_dict = load_reserved_config()
+    key = require_tavily_api_key(config_dict)
+
+    output = batch_search(
+        ["郑州 夜骑 开封 舆情", "开封 夜骑 官方回应"],
+        provider="tavily",
+        api_key=key,
+        max_results=2,
+        timeout_seconds=20,
+    )
+
+    assert output["provider"] == "tavily"
+    assert output["queries"] == ["郑州 夜骑 开封 舆情", "开封 夜骑 官方回应"]
+    assert len(output["results_by_query"]) == 2
+    assert output["total_results"] >= 1
+    assert all(item.get("error", "") == "" for item in output["results_by_query"])

@@ -189,6 +189,12 @@ class TestDecisionToolsNode:
     def test_post_execute_action(self, minimal_shared):
         """action=execute → 设置 next_tool"""
         shared = self._make_agent_shared(minimal_shared)
+        shared["trace"] = {
+            "decisions": [],
+            "executions": [],
+            "reflections": [],
+            "insight_provenance": {},
+        }
         node = DecisionToolsNode()
         exec_res = {
             "action": "execute",
@@ -198,6 +204,12 @@ class TestDecisionToolsNode:
         action = node.post(shared, {}, exec_res)
         assert action == "execute"
         assert shared["agent"]["next_tool"] == "sentiment_distribution_stats"
+        assert len(shared["trace"]["decisions"]) == 1
+        decision = shared["trace"]["decisions"][0]
+        assert decision["action"] == "execute"
+        assert decision["tool_name"] == "sentiment_distribution_stats"
+        assert decision["reason"] == "test"
+        assert shared["agent"]["last_trace_decision_id"] == decision["id"]
 
     def test_post_finish_action(self, minimal_shared):
         """action=finish → 设置 is_finished"""
@@ -207,11 +219,20 @@ class TestDecisionToolsNode:
             "tool_allowlist": [],
         }
         shared["stage2_results"] = {"charts": []}
+        shared["trace"] = {
+            "decisions": [],
+            "executions": [],
+            "reflections": [],
+            "insight_provenance": {},
+        }
         node = DecisionToolsNode()
         exec_res = {"action": "finish", "reason": "done"}
         action = node.post(shared, {}, exec_res)
         assert action == "finish"
         assert shared["agent"]["is_finished"] is True
+        assert len(shared["trace"]["decisions"]) == 1
+        assert shared["trace"]["decisions"][0]["action"] == "finish"
+        assert shared["trace"]["decisions"][0]["tool_name"] == ""
 
     def test_post_finish_forces_chart_when_missing(self, minimal_shared):
         """action=finish 但图表不足 → 强制 execute"""
@@ -221,6 +242,12 @@ class TestDecisionToolsNode:
             "tool_allowlist": [],
         }
         shared["stage2_results"] = {"charts": []}
+        shared["trace"] = {
+            "decisions": [],
+            "executions": [],
+            "reflections": [],
+            "insight_provenance": {},
+        }
         shared["agent"]["available_tools"] = [{
             "name": "sentiment_trend_chart",
             "canonical_name": "sentiment_trend_chart",
@@ -233,3 +260,99 @@ class TestDecisionToolsNode:
         action = node.post(shared, {}, exec_res)
         assert action == "execute"
         assert shared["agent"]["next_tool"] == "sentiment_trend_chart"
+        assert len(shared["trace"]["decisions"]) == 1
+        assert shared["trace"]["decisions"][0]["action"] == "execute"
+        assert shared["trace"]["decisions"][0]["tool_name"] == "sentiment_trend_chart"
+
+
+class TestExecuteToolsNodeTrace:
+
+    def test_post_success_appends_trace_execution(self):
+        from nodes.stage2.agent import ExecuteToolsNode
+
+        shared = {
+            "stage2_results": {
+                "charts": [],
+                "tables": [],
+                "insights": {},
+                "execution_log": {"tools_executed": []},
+            },
+            "agent": {
+                "available_tools": [{
+                    "name": "sentiment_distribution_stats",
+                    "canonical_name": "sentiment_distribution_stats",
+                    "category": "情感分析",
+                    "generates_chart": False,
+                }],
+                "current_iteration": 2,
+                "last_trace_decision_id": "d_0003",
+            },
+            "monitor": {},
+            "trace": {
+                "decisions": [{"id": "d_0003"}],
+                "executions": [],
+                "reflections": [],
+                "insight_provenance": {},
+            },
+        }
+
+        node = ExecuteToolsNode()
+        exec_res = {
+            "tool_name": "sentiment_distribution_stats",
+            "tool_source": "mcp",
+            "result": {
+                "charts": [],
+                "data": {"value": 1},
+                "category": "情感分析",
+                "summary": "tool ok",
+            },
+        }
+
+        node.post(shared, {}, exec_res)
+
+        assert len(shared["trace"]["executions"]) == 1
+        execution = shared["trace"]["executions"][0]
+        assert execution["decision_ref"] == "d_0003"
+        assert execution["status"] == "success"
+        assert execution["tool_name"] == "sentiment_distribution_stats"
+        assert execution["has_data"] is True
+        assert execution["error"] is False
+
+    def test_post_error_appends_trace_execution(self):
+        from nodes.stage2.agent import ExecuteToolsNode
+
+        shared = {
+            "stage2_results": {
+                "charts": [],
+                "tables": [],
+                "insights": {},
+                "execution_log": {"tools_executed": []},
+            },
+            "agent": {
+                "available_tools": [],
+                "current_iteration": 1,
+                "last_trace_decision_id": "d_0001",
+            },
+            "monitor": {},
+            "trace": {
+                "decisions": [{"id": "d_0001"}],
+                "executions": [],
+                "reflections": [],
+                "insight_provenance": {},
+            },
+        }
+
+        node = ExecuteToolsNode()
+        exec_res = {
+            "tool_name": "sentiment_distribution_stats",
+            "tool_source": "mcp",
+            "result": {"error": "mock failed"},
+        }
+
+        node.post(shared, {}, exec_res)
+
+        assert len(shared["trace"]["executions"]) == 1
+        execution = shared["trace"]["executions"][0]
+        assert execution["decision_ref"] == "d_0001"
+        assert execution["status"] == "failed"
+        assert execution["error"] is True

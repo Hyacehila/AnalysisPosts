@@ -11,13 +11,19 @@
 # 安装依赖
 uv sync
 
-# 设置 API Key
+# 设置 API Key（GLM + Tavily）
 $env:GLM_API_KEY="your_api_key"
+$env:TAVILY_API_KEY="your_tavily_key"
 ```
 也可在 `config.yaml` 中设置：
 ```yaml
 llm:
   glm_api_key: "your_api_key"
+stage2:
+  search_provider: "tavily"
+  search_max_results: 5
+  search_timeout_seconds: 20
+  search_api_key: "your_tavily_key"
 ```
 Dashboard 里也支持配置（会写回 `config.yaml`）。当 YAML 中提供 key 时，会覆盖环境变量。
 
@@ -48,11 +54,17 @@ $env:PYTHONPATH = (Resolve-Path .)
 Stage3 仅输出：
 - `report/report.md`
 
+Stage2 追溯数据输出：
+- `report/trace.json`
+
 ### Troubleshooting
 - **Stage2 工具发现失败 / tool_count=0 / no_candidate_tool**：
   - 先在项目根目录执行 `uv sync` 安装依赖（如 `matplotlib`, `fastmcp`, `mcp`）。
   - 运行时务必使用 `uv run analysis` 或 `uv run main.py`，避免使用系统 Python。
   - 若依旧失败，检查报错信息中的 “模块导入错误”，优先修复缺失依赖或导入异常。
+- **Tavily 搜索调用报 key 缺失**：
+  - 在 `config.yaml.stage2.search_api_key` 填入 key，或设置环境变量 `TAVILY_API_KEY`。
+  - Dashboard → Pipeline Console → Advanced settings → Stage 2 也可配置上述字段。
 
 ## 文档索引
 

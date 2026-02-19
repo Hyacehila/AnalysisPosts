@@ -6,6 +6,7 @@ import json
 from nodes.base import MonitoredNode
 
 from utils.call_llm import call_glm_45_air, call_glm46
+from utils.trace_manager import build_lite_confidence, set_insight_provenance
 
 
 class LLMInsightNode(MonitoredNode):
@@ -134,6 +135,11 @@ class LLMInsightNode(MonitoredNode):
             shared["stage2_results"] = {}
 
         shared["stage2_results"]["insights"] = exec_res
+        provenance = self._build_insight_provenance(
+            insights=exec_res,
+            trace_executions=shared.get("trace", {}).get("executions", []),
+        )
+        set_insight_provenance(shared, provenance)
 
         print(f"\n[LLMInsight] [OK] 洞察分析生成完成")
         for key, value in exec_res.items():
@@ -141,3 +147,66 @@ class LLMInsightNode(MonitoredNode):
             print(f"  - {key}: {preview}")
 
         return "default"
+
+    @staticmethod
+    def _extract_insights(insights):
+        if not isinstance(insights, dict):
+            return []
+        results = []
+        for key, value in insights.items():
+            if isinstance(value, str) and value.strip():
+                results.append((f"insight_{key}", value.strip()))
+        return results
+
+    @staticmethod
+    def _fallback_evidence(trace_executions):
+        recent = []
+        for execution in trace_executions:
+            if execution.get("status") == "success":
+                recent.append(execution)
+        return recent[-2:]
+
+    @staticmethod
+    def _match_evidence(insight_text, trace_executions):
+        text_lower = insight_text.lower()
+        matches = []
+        for execution in trace_executions:
+            tool_name = str(execution.get("tool_name", "")).lower()
+            summary = str(execution.get("summary", "")).lower()
+            if tool_name and tool_name in text_lower:
+                matches.append(execution)
+                continue
+            if summary and summary in text_lower:
+                matches.append(execution)
+                continue
+            for token in tool_name.split("_"):
+                if len(token) > 2 and token in text_lower:
+                    matches.append(execution)
+                    break
+        return matches
+
+    def _build_insight_provenance(self, insights, trace_executions):
+        provenance = {}
+        for insight_id, insight_text in self._extract_insights(insights):
+            matched = self._match_evidence(insight_text, trace_executions)
+            if not matched:
+                matched = self._fallback_evidence(trace_executions)
+
+            evidence = [
+                {
+                    "type": "execution",
+                    "ref": execution.get("id"),
+                    "tool": execution.get("tool_name", ""),
+                    "summary": execution.get("summary", ""),
+                    "status": execution.get("status", ""),
+                }
+                for execution in matched
+            ]
+            confidence, reason = build_lite_confidence(evidence)
+            provenance[insight_id] = {
+                "text": insight_text,
+                "supporting_evidence": evidence,
+                "confidence": confidence,
+                "confidence_reasoning": reason,
+            }
+        return provenance

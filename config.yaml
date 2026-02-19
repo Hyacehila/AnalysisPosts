@@ -28,6 +28,10 @@ stage2:
   mode: agent
   tool_source: mcp
   agent_max_iterations: 30
+  search_provider: tavily
+  search_max_results: 5
+  search_timeout_seconds: 20
+  search_api_key: ""
 stage3:
   mode: template
   max_iterations: 5

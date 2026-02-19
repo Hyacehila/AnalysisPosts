@@ -244,6 +244,29 @@ with st.form("config_form"):
             step=1,
             value=int(config["stage2"]["agent_max_iterations"]),
         )
+        search_provider = st.selectbox(
+            "Stage2 search provider",
+            ["tavily"],
+            index=_safe_index(["tavily"], config["stage2"].get("search_provider", "tavily"), fallback=0),
+        )
+        search_max_results = st.number_input(
+            "Stage2 search max results",
+            min_value=1,
+            step=1,
+            value=int(config["stage2"].get("search_max_results", 5)),
+        )
+        search_timeout_seconds = st.number_input(
+            "Stage2 search timeout (seconds)",
+            min_value=1,
+            step=1,
+            value=int(config["stage2"].get("search_timeout_seconds", 20)),
+        )
+        search_api_key = st.text_input(
+            "Stage2 Tavily API Key",
+            value=config["stage2"].get("search_api_key", ""),
+            type="password",
+            help="Saved to config.yaml in plaintext. If empty, runtime falls back to TAVILY_API_KEY env.",
+        )
 
         st.markdown("**Stage 3**")
         report_max_iterations = st.number_input(
@@ -288,6 +311,10 @@ flat_config = {
     "stage2.mode": "agent",
     "stage2.tool_source": "mcp",
     "stage2.agent_max_iterations": int(agent_max_iterations),
+    "stage2.search_provider": search_provider,
+    "stage2.search_max_results": int(search_max_results),
+    "stage2.search_timeout_seconds": int(search_timeout_seconds),
+    "stage2.search_api_key": search_api_key,
     "stage3.mode": stage3_mode,
     "stage3.max_iterations": int(report_max_iterations),
     "stage3.min_score": int(report_min_score),

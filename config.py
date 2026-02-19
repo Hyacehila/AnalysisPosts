@@ -57,6 +57,10 @@ class Stage2Config:
     mode: str = "agent"
     tool_source: str = "mcp"
     agent_max_iterations: int = 10
+    search_provider: str = "tavily"
+    search_max_results: int = 5
+    search_timeout_seconds: int = 20
+    search_api_key: str = ""
     chart_min_per_category: Dict[str, int] = field(default_factory=lambda: {
         "sentiment": 1,
         "topic": 1,
@@ -197,6 +201,12 @@ def validate_config(config: AppConfig) -> None:
         raise ValueError(f"Invalid stage2 chart_tool_policy: {config.stage2.chart_tool_policy}")
     if config.stage2.chart_missing_policy not in {"warn", "fail"}:
         raise ValueError(f"Invalid stage2 chart_missing_policy: {config.stage2.chart_missing_policy}")
+    if config.stage2.search_provider not in {"tavily"}:
+        raise ValueError(f"Invalid stage2 search_provider: {config.stage2.search_provider}")
+    if int(config.stage2.search_max_results) <= 0:
+        raise ValueError("stage2.search_max_results must be >= 1")
+    if int(config.stage2.search_timeout_seconds) <= 0:
+        raise ValueError("stage2.search_timeout_seconds must be >= 1")
 
     if not isinstance(config.stage2.chart_min_per_category, dict):
         raise ValueError("stage2.chart_min_per_category must be a dict")
@@ -261,6 +271,12 @@ def config_to_shared(config: AppConfig) -> dict:
                 "tool_policy": config.stage2.chart_tool_policy,
                 "tool_allowlist": list(config.stage2.chart_tool_allowlist or []),
                 "missing_policy": config.stage2.chart_missing_policy,
+            },
+            "web_search": {
+                "provider": config.stage2.search_provider,
+                "max_results": int(config.stage2.search_max_results),
+                "timeout_seconds": int(config.stage2.search_timeout_seconds),
+                "api_key": config.stage2.search_api_key,
             },
             "report_mode": config.stage3.mode,
             "agent_config": {"max_iterations": config.stage2.agent_max_iterations},
@@ -357,6 +373,12 @@ def config_to_shared(config: AppConfig) -> dict:
             "report_reasoning": "",
             "data_citations": {},
             "hallucination_check": {},
+        },
+        "trace": {
+            "decisions": [],
+            "executions": [],
+            "reflections": [],
+            "insight_provenance": {},
         },
         "monitor": {
             "start_time": "",

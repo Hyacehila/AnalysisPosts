@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from nodes.base import MonitoredNode
 
 from utils.call_llm import call_glm46
+from utils.trace_manager import append_decision, append_execution
 
 
 _DIMENSION_KEYWORDS = {
@@ -427,6 +428,18 @@ class DecisionToolsNode(MonitoredNode):
         return decision
 
     def post(self, shared, prep_res, exec_res):
+        agent = shared.setdefault("agent", {})
+
+        def _record_decision(action_name: str, tool_name: str, reason: str) -> None:
+            decision_id = append_decision(
+                shared,
+                action=action_name,
+                tool_name=tool_name or "",
+                reason=reason or "",
+                iteration=agent.get("current_iteration", 0) + 1,
+            )
+            agent["last_trace_decision_id"] = decision_id
+
         action = exec_res.get("action", "execute")
 
         if action == "finish":
@@ -451,6 +464,11 @@ class DecisionToolsNode(MonitoredNode):
                     shared["agent"]["next_tool_reason"] = (
                         f"图表覆盖不足，缺少维度: {', '.join(missing_dims)}"
                     )
+                    _record_decision(
+                        "execute",
+                        next_tool,
+                        shared["agent"]["next_tool_reason"],
+                    )
                     print(
                         f"\n[DecisionTools] 覆盖不足，强制补图表: {next_tool} "
                         f"(missing: {', '.join(missing_dims)})"
@@ -458,6 +476,7 @@ class DecisionToolsNode(MonitoredNode):
                     return "execute"
 
             shared["agent"]["is_finished"] = True
+            _record_decision("finish", "", exec_res.get("reason", ""))
             print(f"\n[DecisionTools] GLM4.6智能体决定: 分析已充分，结束循环")
             print(f"  推理理由: {exec_res.get('reason', '无')}")
             return "finish"
@@ -465,6 +484,7 @@ class DecisionToolsNode(MonitoredNode):
         tool_name = exec_res.get("tool_name", "")
         shared["agent"]["next_tool"] = tool_name
         shared["agent"]["next_tool_reason"] = exec_res.get("reason", "")
+        _record_decision("execute", tool_name, shared["agent"]["next_tool_reason"])
 
         print(f"\n[DecisionTools] GLM4.6智能体决定: 执行工具 {tool_name}")
         print(f"  推理理由: {exec_res.get('reason', '无')}")
@@ -549,6 +569,9 @@ class ExecuteToolsNode(MonitoredNode):
         tool_name = exec_res["tool_name"]
         tool_source = exec_res["tool_source"]
         result = exec_res.get("result", {})
+        agent_state = shared.setdefault("agent", {})
+        trace_iteration = agent_state.get("current_iteration", 0) + 1
+        decision_ref = agent_state.get("last_trace_decision_id")
         result_payload = result
         if isinstance(result, dict):
             if isinstance(result.get("result"), dict):
@@ -584,6 +607,18 @@ class ExecuteToolsNode(MonitoredNode):
                 "error": result_payload["error"],
             })
             tool_stats[tool_name] = {"charts": 0, "data": 0, "error": True}
+            execution_id = append_execution(
+                shared,
+                tool_name=tool_name,
+                iteration=trace_iteration,
+                status="failed",
+                summary=f"工具执行失败: {result_payload['error']}",
+                has_chart=False,
+                has_data=False,
+                error=True,
+                decision_ref=decision_ref,
+            )
+            agent_state["last_trace_execution_id"] = execution_id
             return "default"
 
         if result_payload.get("charts"):
@@ -645,6 +680,18 @@ class ExecuteToolsNode(MonitoredNode):
                 "has_data": bool(result_payload.get("data")),
                 "error": True,
             }
+            execution_id = append_execution(
+                shared,
+                tool_name=tool_name,
+                iteration=trace_iteration,
+                status="warning",
+                summary=error_msg,
+                has_chart=False,
+                has_data=bool(result_payload.get("data")),
+                error=True,
+                decision_ref=decision_ref,
+            )
+            agent_state["last_trace_execution_id"] = execution_id
             return "default"
 
         shared["agent"]["last_tool_result"] = {
@@ -655,6 +702,18 @@ class ExecuteToolsNode(MonitoredNode):
             "has_data": bool(result_payload.get("data")),
             "error": False,
         }
+        execution_id = append_execution(
+            shared,
+            tool_name=tool_name,
+            iteration=trace_iteration,
+            status="success",
+            summary=result_payload.get("summary", "执行完成"),
+            has_chart=bool(result_payload.get("charts")),
+            has_data=bool(result_payload.get("data")),
+            error=False,
+            decision_ref=decision_ref,
+        )
+        agent_state["last_trace_execution_id"] = execution_id
 
         return "default"
 

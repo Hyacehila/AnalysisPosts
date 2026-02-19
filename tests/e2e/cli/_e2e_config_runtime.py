@@ -42,6 +42,22 @@ def require_yaml_api_key(config_dict: dict[str, Any]) -> str:
     return key
 
 
+def require_tavily_api_key(config_dict: dict[str, Any]) -> str:
+    stage2_cfg = config_dict.get("stage2", {}) or {}
+    yaml_key = str(stage2_cfg.get("search_api_key", "")).strip()
+    if yaml_key:
+        return yaml_key
+
+    env_key = os.environ.get("TAVILY_API_KEY", "").strip()
+    if env_key:
+        return env_key
+
+    pytest.fail(
+        "Tavily API key is required for Tavily live e2e tests "
+        "(set config.yaml.stage2.search_api_key or env TAVILY_API_KEY)."
+    )
+
+
 def _to_absolute_path(raw_path: str) -> str:
     path_obj = Path(raw_path)
     if path_obj.is_absolute():
