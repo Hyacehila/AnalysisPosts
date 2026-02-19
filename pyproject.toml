@@ -29,7 +29,12 @@ addopts = "--basetemp=.pytest_tmp"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 pythonpath = ["."]
-markers = ["integration: live LLM API connectivity"]
+markers = [
+    "unit: unit-level tests for isolated logic",
+    "integration: integration tests across modules and IO",
+    "e2e: end-to-end tests through CLI and system flows",
+    "live_api: tests that call real external APIs",
+]
 
 [dependency-groups]
 dev = ["pytest>=8.0"]

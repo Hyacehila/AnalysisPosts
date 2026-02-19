@@ -37,4 +37,5 @@ runtime:
   max_retries: 3
   wait_time: 8
 llm:
-  glm_api_key: fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH
+  glm_api_key: ""
+

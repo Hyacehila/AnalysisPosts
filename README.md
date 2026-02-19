@@ -56,6 +56,7 @@ Stage3 仅输出：
 
 ## 文档索引
 
+- **[文档总览](doc/README.md)** — `doc/` 目录导航与文档入口
 - **[系统设计总览](doc/design.md)** — 核心文档：系统架构、`shared` 数据结构、中央调度器、Flow 编排、入口配置
 - **[Agent 开发指南](AGENTS.md)** — Agentic Coding 规范及核心原则
 - **子系统文档**:
@@ -68,6 +69,16 @@ Stage3 仅输出：
     - [MCP 协议集成](doc/mcp_integration.md) — MCP 服务端/客户端、工具注册、通信流程
 - **测试**:
     - [测试工作流指南](doc/testing_workflow.md) — 测试架构、源码↔测试映射、重构工作流
+
+### 测试命令（TDD）
+```bash
+uv run pytest tests/unit -v
+uv run pytest tests/integration -v
+uv run pytest tests/e2e -v
+uv run pytest tests/ -v
+```
+
+> `tests/e2e/` 默认调用真实 API，并直接使用 `config.yaml` 的真实配置（含 `llm.glm_api_key`）。
 
 ## 主要特性
 

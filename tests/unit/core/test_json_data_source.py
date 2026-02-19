@@ -6,7 +6,7 @@ from pathlib import Path
 from utils.data_sources.json_source import JsonDataSource
 
 
-FIXTURES_DIR = Path(__file__).resolve().parent.parent / "fixtures"
+FIXTURES_DIR = Path(__file__).resolve().parents[2] / "fixtures"
 
 
 def test_json_source_loads_blog_data():

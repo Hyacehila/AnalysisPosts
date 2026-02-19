@@ -8,6 +8,8 @@ import re
 
 import pytest
 
+pytestmark = pytest.mark.integration
+
 
 REQUIRED_FIELDS = [
     "username",
@@ -23,7 +25,7 @@ REQUIRED_FIELDS = [
 
 
 def test_posts_schema_and_types():
-    data_file = Path(__file__).resolve().parent.parent / "data" / "posts.json"
+    data_file = Path(__file__).resolve().parents[3] / "data" / "posts.json"
     if not data_file.exists():
         pytest.skip(f"data file missing: {data_file}")
 
@@ -54,7 +56,7 @@ def test_posts_schema_and_types():
 
 
 def test_publish_time_format():
-    data_file = Path(__file__).resolve().parent.parent / "data" / "posts.json"
+    data_file = Path(__file__).resolve().parents[3] / "data" / "posts.json"
     if not data_file.exists():
         pytest.skip(f"data file missing: {data_file}")
 

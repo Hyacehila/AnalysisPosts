@@ -212,19 +212,24 @@ The agent must write tests at different levels depending on the scope of the cha
 
 #### C. System / CLI Tests (E2E) — The Black Box
 
-- **Target**: The full application execution flow, from CLI input to final output.
+- **Target**: The full application execution flow, from CLI input to final output. **It MUST cover the complete system lifecycle**, simulating real user interactions from the entry point (Frontend UI or CLI arguments) to the final artifacts. Partial testing is insufficient; if no frontend exists, the test must execute the complete backend logic chain.
 - **Method**: Invoke the script via `subprocess` or shell commands within the test.
 - **Verification**:
     - Check exit codes (0 = success)
     - Check `stdout`/`stderr` for specific output strings
     - Check the file system for generated artifacts (logs, reports, result files)
 - **Location**: `tests/e2e/`
+- **Time Consumption**: E2E tests integrating real APIs often take a significant amount of time. The agent receives authorization to reserve sufficient time for these tests and should wait patiently for completion.
 
-### 6.4 Mocking Strategy: Simulating External Dependencies
+### 6.4 Mocking Strategy: External Dependencies and E2E Exemptions
 
-- **Mandatory rule**: Tests **MUST NEVER** depend on live external systems (real API calls, real large dataset downloads, paid services).
-- **Tools**: Use `unittest.mock` or `pytest-mock` to simulate external responses.
-- **Rationale**: Ensures tests are fast (millisecond-level), stable (unaffected by network fluctuations), and free (no paid quota consumption).
+- **Default Rule**: For most Unit and Integration tests (Class A & B), tests **MUST NEVER** depend on live external systems (real API calls, real large dataset downloads, paid services). `unittest.mock` or `pytest-mock` **MUST** be used to simulate external responses.
+    - **Rationale**: Ensures tests are fast (millisecond-level), stable (unaffected by network fluctuations), and free (no paid quota consumption).
+- **Exemptions**: For unit tests specifically designed to verify the connectivity or correctness of external API environments, it is **ALLOWED** to bypass mocks and consume real APIs.
+- **E2E Mandatory Rule (Class C)**: For Class C System/E2E Level tests, the Mocking strategy is **STRICTLY PROHIBITED**.
+    - **MUST** consume real APIs.
+    - **ALLOWED** to use any external dependencies.
+    - **Goal**: Perform a comprehensive real-world execution for E2E testing and full system troubleshooting.
 
 ### 6.5 Test Directory Structure
 

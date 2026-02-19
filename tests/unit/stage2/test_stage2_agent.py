@@ -12,7 +12,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from nodes import (
     CollectToolsNode,

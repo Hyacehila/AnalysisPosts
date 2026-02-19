@@ -8,9 +8,11 @@ import json
 
 import pytest
 
+pytestmark = pytest.mark.integration
+
 
 def _data_path(filename: str) -> Path:
-    return Path(__file__).resolve().parent.parent / "data" / filename
+    return Path(__file__).resolve().parents[3] / "data" / filename
 
 
 def test_sentiment_attributes_json():

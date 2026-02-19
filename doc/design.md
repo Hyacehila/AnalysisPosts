@@ -1,6 +1,7 @@
 # Design Doc: AnalysisPosts v1.0 (Phase 1–3)
 
 > Please DON'T remove notes for AI
+> Last Updated: 2026-02-19
 
 ## Requirements
 
@@ -38,7 +39,7 @@
 - **Coverage enforcement**: If the agent decides to finish but any dimension is missing, the system injects a chart tool to close the gap.
 - **Coverage fallback**: After the agent loop, a dedicated fallback node attempts to generate missing charts.
 - **MCP tool migration**: Every tool in `utils/analysis_tools/tool_registry.py` must be exposed in the MCP server with a canonical name, plus backward-compatible aliases for legacy MCP names.
-- **Tool audit**: Mapping table lives in `docs/mcp_tool_audit.md`.
+- **Tool audit**: Mapping table lives in `mcp_tool_audit.md`.
 - **Preflight + Fail Fast**: 如果 MCP 工具发现返回空列表，立即报错并输出依赖自检信息，避免进入后续节点产生误导性错误。
 - **MCP Auto-Enable + Parsing**: MCP 客户端在 tool_source=mcp 时自动启用；解析优先级为 `content.data` > `content.text`，避免图表结构丢失。
 - **Chart Missing Policy**: `stage2.chart_missing_policy` 控制图表覆盖不足时行为（`warn` 继续 / `fail` 终止）。
