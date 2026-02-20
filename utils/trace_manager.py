@@ -85,6 +85,25 @@ def append_execution(
     return execution_id
 
 
+def append_reflection(
+    shared: Dict[str, Any],
+    *,
+    iteration: int,
+    result: Dict[str, Any],
+) -> str:
+    trace = init_trace(shared)
+    reflection_id = _next_id("r", trace["reflections"])
+    trace["reflections"].append(
+        {
+            "id": reflection_id,
+            "iteration": int(iteration),
+            "result": dict(result or {}),
+            "timestamp": _timestamp(),
+        }
+    )
+    return reflection_id
+
+
 def set_insight_provenance(shared: Dict[str, Any], provenance: Dict[str, Any]) -> None:
     trace = init_trace(shared)
     trace["insight_provenance"] = dict(provenance or {})
@@ -111,6 +130,7 @@ __all__ = [
     "init_trace",
     "append_decision",
     "append_execution",
+    "append_reflection",
     "set_insight_provenance",
     "build_lite_confidence",
     "dump_trace_json",

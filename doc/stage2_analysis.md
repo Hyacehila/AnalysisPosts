@@ -1,248 +1,169 @@
 # 阶段 2：深度分析子系统
 
-> **文档状态**: 2026-02-19 更新  
-> **关联源码**: `nodes/stage2/*`, `flow.py`, `utils/web_search.py`  
+> **文档状态**: 2026-02-20 更新  
+> **关联源码**: `nodes/stage2/*`, `flow.py`, `config.py`, `utils/web_search.py`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
 
 ## 1. 概述
 
-### 1.1 目标
+Stage2 将 Stage1 增强数据转换为可报告化分析产物，输出：
 
-对阶段 1 产出的增强数据进行**统计分析与可视化**，生成图表、数据表格和 LLM 洞察，供阶段 3 报告生成使用。
+- `report/analysis_data.json`（图表/表格/执行日志/搜索上下文）
+- `report/chart_analyses.json`（图表视觉分析，含论坛视觉复用 + 批量补漏）
+- `report/insights.json`（LLM 洞察）
+- `report/trace.json`（决策/执行/反思/循环状态）
 
-### 1.2 输入/输出
-
-| 项目 | 说明 |
-|:---|:---|
-| **输入** | `data/enhanced_blogs.json` — 阶段 1 增强后的博文数据 |
-| **输出** | `report/analysis_data.json` — 图表与表格元数据 |
-| | `report/chart_analyses.json` — GLM-4.5V 图表分析结果 |
-| | `report/insights.json` — LLM 洞察摘要 |
-| | `report/trace.json` — 决策/执行/证据索引追溯数据 |
-| | `report/images/*.png` — 可视化图表文件 |
-
-### 1.3 执行模式
-
-Stage2 仅保留 **Agent 模式**，通过 MCP 进行工具发现与调用。
-
-| 模式 | 配置值 | Flow 类型 | 特点 |
-|:---|:---|:---|:---|
-| Agent | `analysis_mode = "agent"` | `AsyncFlow` | GLM-4.6 自主决策工具调用，探索性分析 |
+当前已完成 **Track B 全量（B1~B9）**：双信源 + 动态论坛循环 + 实时补充 + 合并收敛 + 全链路 live API 验证。
 
 ---
 
-## 2. 通用节点
-
-以下节点在 Stage2 中**共享使用**。
-
-### 2.1 `LoadEnhancedDataNode`
-
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node` |
-| **数据来源** | `config.data_source.enhanced_data_path` |
-
-**执行逻辑**：
-1. **prep**：读取增强数据路径，检查文件是否存在（不存在则抛出 `FileNotFoundError`）
-2. **exec**：加载 JSON 数据，验证 4 个核心增强字段（`sentiment_polarity`、`sentiment_attribute`、`topics`、`publisher`）的完整率
-3. **post**：将数据存入 `shared["data"]["blog_data"]`，打印完整增强率
-
-### 2.2 `DataSummaryNode`
-
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node` |
-| **输出位置** | `shared["agent"]["data_summary"]` + `shared["agent"]["data_statistics"]` |
-
-**统计维度**：
-
-| 统计项 | 数据来源 |
-|:---|:---|
-| 总博文数 | `len(blog_data)` |
-| 情感分布 | `Counter(sentiment_polarity)` |
-| 发布者分布 | `Counter(publisher)` |
-| 主题分布 Top10 | `Counter(parent_topic)` |
-| 地理分布 Top10 | `Counter(location)` |
-| 时间范围 | `min/max(publish_time)` + 跨度（小时） |
-| 互动量汇总 | 转发/评论/点赞总量 |
-
-**输出格式**：生成人类可读的文本摘要 `summary_text`，用于 Agent 模式的决策参考。
-
-### 2.3 `SaveAnalysisResultsNode`
-
-**输出文件**：
-
-| 文件 | 内容 |
-|:---|:---|
-| `report/analysis_data.json` | `charts[]` + `tables[]` + `execution_log{}` |
-| `report/chart_analyses.json` | `{chart_id: analysis_result}` 字典 |
-| `report/insights.json` | LLM 生成的洞察摘要 |
-| `report/trace.json` | `trace{decisions, executions, reflections, insight_provenance}` |
-
-### 2.4 `Stage2CompletionNode`
-
-将 `2` 追加到 `shared["dispatcher"]["completed_stages"]`，返回 `"dispatch"` 跳回调度器。
-
----
-
-## 3. Agent 模式（自主探索）
-
-### 3.1 Flow 节点链路
+## 2. 当前 Flow（B1~B9）
 
 ```mermaid
 flowchart LR
-    LD[LoadEnhancedData] --> DS[DataSummary]
-    DS --> CT[CollectTools]
-    CT --> DT[DecisionTools]
-    DT -->|execute| ET[ExecuteTools]
-    ET --> PR[ProcessResult]
-    PR -->|continue| DT
-    DT -->|finish| CA[ChartAnalysis]
-    PR -->|finish| CA
+    CLR[ClearReportDir] --> LD[LoadEnhancedData]
+    LD --> DS[DataSummary]
+    DS --> QSF[QuerySearchFlow]
+    QSF --> PF[ParallelAgentFlow]
+    PF --> FH{ForumHost}
+
+    FH -->|supplement_data| SDA[SupplementData]
+    FH -->|supplement_search| SSA[SupplementSearch]
+    FH -->|supplement_visual| VA[VisualAnalysis]
+    SDA --> FH
+    SSA --> FH
+    VA --> FH
+
+    FH -->|sufficient| MRG[MergeResults]
+    MRG --> CA[ChartAnalysis GapFill]
     CA --> LI[LLMInsight]
     LI --> SR[SaveResults]
     SR --> SC[Stage2Completion]
 ```
 
-核心特征是 **Decision → Execute → Process** 的**循环结构**，由 GLM-4.6 自主决定何时结束。
+---
 
-### 3.2 `CollectToolsNode`
+## 3. 关键能力
 
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node` |
-| **工具来源** | `config.tool_source`（`"mcp"`） |
+### 3.1 QuerySearchFlow（B1）
 
-**执行逻辑**：
-1. 使用 `list_tools('utils/mcp_server')` 从 MCP Server 获取工具列表
-2. 初始化 Agent 状态：`available_tools`、`execution_history`（空）、`current_iteration`（0）、`is_finished`（False）
+文件：`nodes/stage2/search.py`
 
-**输出**：按类别分组打印所有收集到的工具。
+- `ExtractQueriesNode`：基于 `data_summary` 与上一轮缺口提取查询词
+- `WebSearchNode`：通过 `utils.web_search.batch_search` 调用 Tavily
+- `SearchProcessNode`：去重/规整外部文档
+- `SearchReflectionNode`：判断 `need_more/sufficient`
+- `SearchSummaryNode`：生成 `shared["search_results"]`
 
-### 3.3 `DecisionToolsNode`
+循环治理：
 
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node`（LLM 调用） |
-| **LLM 模型** | `call_glm46`（GLM-4.6 + 推理模式） |
-| **Temperature** | 0.6 |
+- `stage2.search_reflection_max_rounds` 控制最大反思轮次
+- 写入 `trace.search_reflections`
+- 写入 `trace.loop_status.search_reflection = {current,max,termination_reason}`
 
-**Prompt 构建**（超长上下文，包含完整的决策框架）：
+### 3.2 双信源并行（B2~B4）
 
-1. **数据概况**：`data_summary` 文本
-2. **可用工具列表**：名称 + 类别 + 描述
-3. **完整执行历史**：每条记录含状态图标（✅/❌）、图表/数据标识（📊/📋）
-4. **执行状态总览**：已执行工具清单、覆盖率 `n/total`
-5. **推理决策要求**：
-   - 执行历史分析（避免重复）
-   - 四维度覆盖检查（情感/主题/地理/交互）
-   - 工具价值评估（数据价值 > 可视化 > 互补性）
-   - 执行策略（统计先行 → 可视化 → 综合）
+文件：`nodes/stage2/parallel.py`, `nodes/stage2/search_agent.py`
 
-**输出格式**：
+- `ParallelAgentFlow` 并行分支：
+  - `data_agent`：复用 DataAgent 决策-执行循环
+  - `search_agent`：对搜索摘要结构化分析
+- 输出隔离写入 `shared["agent_results"]["data_agent|search_agent"]`
+- DataAgent trace 回写主 shared（含 `loop_status.data_agent`）
 
-```json
-{
-    "thinking": "推理过程",
-    "action": "execute" | "finish",
-    "tool_name": "未执行的工具名",
-    "reason": "选择理由"
+### 3.3 Forum 动态循环（B5~B8）
+
+文件：`nodes/stage2/forum.py`, `nodes/stage2/supplement.py`, `nodes/stage2/visual.py`, `nodes/stage2/merge.py`
+
+- `ForumHostNode`：中央状态机，动作路由为：
+  - `supplement_data`
+  - `supplement_search`
+  - `supplement_visual`
+  - `sufficient`
+- `SupplementDataNode`：按主持人 directive 调用指定 MCP 工具子集
+- `SupplementSearchNode`：追加搜索并刷新 SearchAgent 结论
+- `VisualAnalysisNode`：按需调用 GLM4.5V 解析图表
+- `MergeResultsNode`：合并 Data/Search/Forum 产物，回填兼容 `stage2_results`
+
+循环治理：
+
+- `stage2.forum_max_rounds`
+- `stage2.forum_min_rounds_for_sufficient`
+- 写入 `trace.forum_rounds`
+- 写入 `trace.loop_status.forum = {current,max,termination_reason}`
+
+### 3.4 图表补漏分析（B8）
+
+文件：`nodes/stage2/chart_analysis.py`
+
+- 先复用 `forum.visual_analyses`（已分析图表不重复调用视觉模型）
+- 对未覆盖图表执行批量分析
+- 最终 `stage2_results.chart_analyses` 统一包含：
+  - 论坛视觉分析结果
+  - 批量补漏分析结果
+
+### 3.5 洞察语义兼容（修复项）
+
+文件：`nodes/stage2/insight.py`
+
+- 洞察节点读取图表分析内容时，优先使用 `analysis_content`
+- 同时兼容历史字段 `analysis`，避免旧数据结构导致洞察提示词丢失
+
+---
+
+## 4. Shared 契约（Stage2 新增/稳定字段）
+
+```python
+shared["config"]["stage2_loops"] = {
+    "agent_max_iterations": int,
+    "search_reflection_max_rounds": int,
+    "forum_max_rounds": int,
+    "forum_min_rounds_for_sufficient": int,
+}
+
+shared["forum"] = {
+    "current_round": 0,
+    "rounds": [],
+    "current_directive": {},
+    "visual_analyses": [],
+}
+
+shared["trace"]["loop_status"] = {
+    "data_agent": {"current": int, "max": int, "termination_reason": str},
+    "search_reflection": {"current": int, "max": int, "termination_reason": str},
+    "forum": {"current": int, "max": int, "termination_reason": str},
 }
 ```
 
-**Action 路由**：
-- `"finish"` → 设置 `is_finished=True`，返回 `"finish"` 跳出循环
-- `"execute"` → 将 `tool_name` 写入 `shared["agent"]["next_tool"]`，返回 `"execute"` 进入执行
-
-**Trace 写入**：
-- 每次决策都会写入 `shared["trace"]["decisions"]`
-- 记录字段：`id`、`iteration`、`action`、`tool_name`、`reason`、`timestamp`
-
-### 3.4 `ExecuteToolsNode`
-
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node` |
-| **调用方式** | MCP 客户端 — `call_tool('utils/mcp_server', tool_name, {})` |
-
-**MCP 调用流程**：
-
-1. 设置 `ENHANCED_DATA_PATH` 环境变量（MCP Server 子进程需要此路径加载数据）
-2. 调用 `call_tool()` — 内部启动 MCP Server 子进程，通过 stdio transport 通信
-3. 结果规范化：
-   - 兼容多种图表路径字段（`path`/`file_path`/`chart_path`/`image_path`）
-   - 每个 chart 对象标准化为 `{id, title, path, file_path, type, description, source_tool}`
-4. 根据工具名推断类别（`_get_tool_category`）
-
-**Post 处理**：
-- 图表注册到 `shared["stage2_results"]["charts"]`
-- 数据表格注册到 `shared["stage2_results"]["tables"]`
-- 执行记录写入 `shared["agent"]["last_tool_result"]`
-- 执行追溯写入 `shared["trace"]["executions"]`（成功/失败/警告都写）
-
-### 3.5 `ProcessResultNode`
-
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node` |
-| **循环控制** | 根据是否满足终止条件决定 Action |
-
-**终止条件**（满足任一即终止循环）：
-1. `is_finished == True`：Agent（DecisionToolsNode）已判断分析充分
-2. `new_iteration >= max_iterations`：达到最大迭代次数
-
-**Action 路由**：
-- `"continue"` → 返回 `DecisionToolsNode` 继续循环
-- `"finish"` → 进入 `ChartAnalysisNode` 开始图表分析
+`stage2_results` 继续向后兼容，核心字段不变，保留 `search_context` 并新增论坛综合上下文（如 `forum_conclusions`）。
 
 ---
 
-### 3.6 `ChartAnalysisNode`
+## 5. 测试覆盖（B1~B9）
 
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node`（同步顺序处理） |
-| **LLM 模型** | `call_glm45v_thinking`（GLM-4.5V + 思考模式） |
+### 5.1 Unit
 
-**作用**：对 `shared["stage2_results"]["charts"]` 中的图表进行视觉理解分析，并写入 `shared["stage2_results"]["chart_analyses"]`。
+- `tests/unit/stage2/test_stage2_search_flow.py`
+- `tests/unit/stage2/test_stage2_search_agent.py`
+- `tests/unit/stage2/test_stage2_parallel_flow.py`
+- `tests/unit/stage2/test_stage2_data_agent_trace.py`
+- `tests/unit/stage2/test_stage2_forum.py`
+- `tests/unit/stage2/test_stage2_supplement.py`
+- `tests/unit/stage2/test_stage2_visual.py`
+- `tests/unit/stage2/test_stage2_merge.py`
+- `tests/unit/stage2/test_stage2_chart_analysis_gapfill.py`
+- `tests/unit/stage2/test_stage2_insight.py`
 
-### 3.7 `LLMInsightNode`
+### 5.2 Integration
 
-| 属性 | 值 |
-|:---|:---|
-| **类型** | `Node` |
-| **首选模型** | `call_glm46`（GLM-4.6 + 推理模式） |
-| **回退模型** | `call_glm_45_air` |
+- `tests/integration/pipeline/test_stage2_forum_pipeline_integration.py`
 
-**作用**：基于图表分析结果 + 统计数据 + 数据概况，生成洞察摘要并写入 `shared["stage2_results"]["insights"]`。
+### 5.3 Live API E2E（B9）
 
-**证据索引（A2 Lite）**：
-- 在 `post` 阶段根据洞察文本与 `trace.executions` 做轻量匹配
-- 输出 `shared["trace"]["insight_provenance"]`
-- 每个洞察包含：`text`、`supporting_evidence[]`、`confidence`、`confidence_reasoning`
+- `tests/e2e/cli/test_cli_pipeline_e2e.py`
+- `tests/e2e/cli/test_dashboard_pipeline_e2e.py`
+- `tests/e2e/cli/test_tavily_live_api_e2e.py`
 
----
-
-### 3.8 A3 搜索 API 封装（预备能力）
-
-Track A 的 A3 已落地 `utils/web_search.py`，提供 Tavily 搜索封装，供后续 `QuerySearchFlow`（Track B/B1）接入。
-
-当前阶段说明：
-
-- **已完成**：统一搜索函数 `search_web` / `batch_search` 与标准化输出结构（`title/url/snippet/date/source`）。
-- **已配置**：`config.yaml.stage2` 支持以下字段：
-  - `search_provider`（当前固定 `tavily`）
-  - `search_max_results`
-  - `search_timeout_seconds`
-  - `search_api_key`（为空时回退环境变量 `TAVILY_API_KEY`）
-- **未接入**：现有 Stage2 Agent 主流程仍不直接调用搜索 API；该能力仅作为 B1 前置基础设施。
-
----
-
-## 5. 分析工具详情
-
-所有分析工具的实现细节、算法逻辑、可视化风格请参阅 → [分析工具库文档](analysis_tools.md)
-
-工具注册表和执行分发机制请参阅 → [分析工具库文档 § 工具注册表](analysis_tools.md)
+> E2E 运行态采用平衡档循环上限（`agent=3`, `search_reflection=2`, `forum=3`）以控制 API 成本与总耗时。

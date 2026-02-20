@@ -36,10 +36,18 @@ def load_reserved_config() -> dict[str, Any]:
 
 
 def require_yaml_api_key(config_dict: dict[str, Any]) -> str:
-    key = str(config_dict.get("llm", {}).get("glm_api_key", "")).strip()
-    if not key:
-        pytest.fail("config.yaml.llm.glm_api_key is required for e2e live API tests.")
-    return key
+    yaml_key = str(config_dict.get("llm", {}).get("glm_api_key", "")).strip()
+    if yaml_key:
+        return yaml_key
+
+    env_key = os.environ.get("GLM_API_KEY", "").strip()
+    if env_key:
+        return env_key
+
+    pytest.fail(
+        "GLM API key is required for e2e live API tests "
+        "(set config.yaml.llm.glm_api_key or env GLM_API_KEY)."
+    )
 
 
 def require_tavily_api_key(config_dict: dict[str, Any]) -> str:
@@ -94,6 +102,12 @@ def build_runtime_config(
         runtime_cfg["concurrent_num"] = 4
         runtime_cfg["max_retries"] = 1
         runtime_cfg["wait_time"] = 1
+
+        # Balanced profile for live API E2E: lower loop caps to control cost and duration.
+        stage2_cfg = config_dict.setdefault("stage2", {})
+        stage2_cfg["agent_max_iterations"] = 3
+        stage2_cfg["search_reflection_max_rounds"] = 2
+        stage2_cfg["forum_max_rounds"] = 3
 
     config_path = tmp_path / "config.yaml"
     config_path.write_text(

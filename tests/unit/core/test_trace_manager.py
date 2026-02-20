@@ -7,6 +7,7 @@ from utils.trace_manager import (
     init_trace,
     append_decision,
     append_execution,
+    append_reflection,
     set_insight_provenance,
     dump_trace_json,
 )
@@ -67,6 +68,23 @@ def test_append_execution_generates_id_and_fields():
     assert item["has_chart"] is False
     assert item["has_data"] is True
     assert item["error"] is False
+    assert item["timestamp"]
+
+
+def test_append_reflection_generates_id_and_fields():
+    shared = {}
+    reflection_id = append_reflection(
+        shared,
+        iteration=2,
+        result={"should_continue": False, "gaps": ["topic"]},
+    )
+
+    assert reflection_id.startswith("r_")
+    item = shared["trace"]["reflections"][0]
+    assert item["id"] == reflection_id
+    assert item["iteration"] == 2
+    assert item["result"]["should_continue"] is False
+    assert item["result"]["gaps"] == ["topic"]
     assert item["timestamp"]
 
 

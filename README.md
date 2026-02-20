@@ -27,6 +27,8 @@ stage2:
 ```
 Dashboard 里也支持配置（会写回 `config.yaml`）。当 YAML 中提供 key 时，会覆盖环境变量。
 
+> 安全建议：仓库内 `config.yaml` 默认应保持空 key（`""`），避免提交真实凭证。
+
 ### 运行
 ```bash
 # 修改 config.yaml 后运行
@@ -73,7 +75,7 @@ Stage2 追溯数据输出：
 - **[Agent 开发指南](AGENTS.md)** — Agentic Coding 规范及核心原则
 - **子系统文档**:
     - [阶段 1：数据增强子系统](doc/stage1_enhancement.md) — 六维增强、异步并行、断点续传
-    - [阶段 2：深度分析子系统](doc/stage2_analysis.md) — Agent + MCP 模式、分析工具调用、图表分析
+    - [阶段 2：深度分析子系统](doc/stage2_analysis.md) — QuerySearchFlow、双信源并行、Forum 动态循环、Merge/GapFill
     - [阶段 3：报告生成子系统](doc/stage3_report.md) — 模板/迭代模式、评审循环、图片路径处理
 - **工具与基础设施**:
     - [分析工具库文档](doc/analysis_tools.md) — 37 个情感/主题/地理/交互/信念分析工具
@@ -90,10 +92,11 @@ uv run pytest tests/e2e -v
 uv run pytest tests/ -v
 ```
 
-> `tests/e2e/` 默认调用真实 API，并直接使用 `config.yaml` 的真实配置（含 `llm.glm_api_key`）。
+> `tests/e2e/` 默认调用真实 API；运行态会把 Stage2 循环上限收敛到平衡档（agent=3/search=2/forum=3）以控制成本。
 
 ## 主要特性
 
 - **三阶段流水线**: 数据增强 -> 深度分析 -> 报告生成。
+- **双信源 + 论坛循环**: Stage2 支持 DataAgent/SearchAgent 并行与 ForumHost 动态补充决策。
 - **灵活调度**: 支持异步并发与 Agent 自主分析等多种模式。
 - **高性能**: 基于 PocketFlow 框架，轻量且高效。

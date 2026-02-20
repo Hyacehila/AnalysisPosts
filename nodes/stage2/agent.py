@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 from nodes.base import MonitoredNode
 
 from utils.call_llm import call_glm46
-from utils.trace_manager import append_decision, append_execution
+from utils.trace_manager import append_decision, append_execution, append_reflection
 
 
 _DIMENSION_KEYWORDS = {
@@ -29,6 +29,8 @@ _CATEGORY_HINTS = {
     "交互": "interaction",
     "NLP": "nlp",
 }
+
+_DEFAULT_DIMENSIONS = ("sentiment", "topic", "geographic", "interaction", "nlp")
 
 
 def _infer_dimension(tool_name: str, category: Optional[str] = None) -> Optional[str]:
@@ -134,6 +136,24 @@ def _missing_chart_dimensions(
         if counts.get(dim, 0) < minimum:
             missing.append(dim)
     return missing
+
+
+def _summarize_dimension_coverage(
+    charts: List[Dict[str, Any]],
+    available_tools: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    counts = _count_charts_by_dimension(charts, available_tools)
+    coverage = {dim: counts.get(dim, 0) > 0 for dim in _DEFAULT_DIMENSIONS}
+    gaps = [dim for dim, covered in coverage.items() if not covered]
+    covered_count = sum(1 for covered in coverage.values() if covered)
+    ratio = covered_count / len(_DEFAULT_DIMENSIONS) if _DEFAULT_DIMENSIONS else 0
+    return {
+        "coverage": coverage,
+        "gaps": gaps,
+        "covered_count": covered_count,
+        "total_count": len(_DEFAULT_DIMENSIONS),
+        "coverage_ratio": round(ratio, 3),
+    }
 
 
 def _normalize_tool_result(tool_name: str, result: Any, tool_index: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
@@ -764,6 +784,48 @@ class ProcessResultNode(MonitoredNode):
 
         shared["agent"]["execution_history"] = exec_res["execution_history"]
         shared["agent"]["current_iteration"] = exec_res["new_iteration"]
+        max_iterations = int(prep_res.get("max_iterations", 10))
+
+        available_tools = shared.get("agent", {}).get("available_tools", [])
+        charts = shared.get("stage2_results", {}).get("charts", [])
+        coverage = _summarize_dimension_coverage(charts, available_tools)
+        history = exec_res.get("execution_history") or []
+        last_tool = history[-1] if history else {}
+        reflection_result = {
+            "should_continue": bool(exec_res.get("should_continue")),
+            "reason": exec_res.get("reason", ""),
+            "last_tool": {
+                "tool_name": last_tool.get("tool_name", ""),
+                "has_chart": bool(last_tool.get("has_chart")),
+                "has_data": bool(last_tool.get("has_data")),
+                "error": bool(last_tool.get("error")),
+                "summary": last_tool.get("summary", ""),
+            },
+            "dimension_coverage": coverage["coverage"],
+            "gaps": coverage["gaps"],
+            "coverage_ratio": coverage["coverage_ratio"],
+            "executed_tool_count": len(history),
+        }
+        reflection_id = append_reflection(
+            shared,
+            iteration=exec_res["new_iteration"],
+            result=reflection_result,
+        )
+        shared["agent"]["last_trace_reflection_id"] = reflection_id
+
+        termination_reason = "continue"
+        if not exec_res.get("should_continue"):
+            if shared.get("agent", {}).get("is_finished", False):
+                termination_reason = "agent_sufficient"
+            elif int(exec_res.get("new_iteration", 0)) >= max_iterations:
+                termination_reason = "max_iterations_reached"
+            else:
+                termination_reason = "stopped"
+        shared.setdefault("trace", {}).setdefault("loop_status", {})["data_agent"] = {
+            "current": int(exec_res.get("new_iteration", 0)),
+            "max": max_iterations,
+            "termination_reason": termination_reason,
+        }
 
         print(f"\n[ProcessResult] 迭代 {exec_res['new_iteration']}: {exec_res['reason']}")
 

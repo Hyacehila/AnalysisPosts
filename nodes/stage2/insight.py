@@ -31,7 +31,7 @@ class LLMInsightNode(MonitoredNode):
         for chart_id, analysis in chart_analyses.items():
             if analysis.get("analysis_status") == "success":
                 title = analysis.get("chart_title", chart_id)
-                content = analysis.get("analysis", "")
+                content = analysis.get("analysis_content") or analysis.get("analysis", "")
 
                 chart_summary.append(f"### {title}")
                 content_preview = content[:500] + ("..." if len(content) > 500 else "")

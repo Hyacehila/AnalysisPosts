@@ -18,22 +18,34 @@ class ChartAnalysisNode(MonitoredNode):
         super().__init__(max_retries=max_retries, wait=wait)
 
     def prep(self, shared):
-        charts = shared.get("stage2_results", {}).get("charts", [])
+        charts = list(shared.get("stage2_results", {}).get("charts", []) or [])
+        visual_analyses = list(shared.get("forum", {}).get("visual_analyses", []) or [])
+        covered_ids = {
+            str(item.get("chart_id", "")).strip()
+            for item in visual_analyses
+            if str(item.get("chart_id", "")).strip()
+            and str(item.get("analysis_status", "success")).lower() == "success"
+        }
+        pending = [
+            chart
+            for chart in charts
+            if str(chart.get("id", "")).strip() not in covered_ids
+        ]
         limit_raw = os.getenv("CHART_ANALYSIS_LIMIT")
         if limit_raw is not None:
             try:
                 limit = int(limit_raw)
                 if limit < 0:
                     raise ValueError("limit must be non-negative")
-                charts = charts[:limit]
+                pending = pending[:limit]
                 print(f"[ChartAnalysis] CHART_ANALYSIS_LIMIT={limit} applied")
             except ValueError:
                 print(f"[ChartAnalysis] 无效的 CHART_ANALYSIS_LIMIT: {limit_raw}")
-        print(f"\n[ChartAnalysis] 准备分析 {len(charts)} 张图表")
-        return charts
+        print(f"\n[ChartAnalysis] 视觉已覆盖 {len(covered_ids)} 张图表，待补漏分析 {len(pending)} 张")
+        return {"pending_charts": pending, "visual_analyses": visual_analyses}
 
     def exec(self, prep_res):
-        charts = prep_res
+        charts = list(prep_res.get("pending_charts", []) or [])
         chart_analyses = {}
         success_count = 0
 
@@ -120,6 +132,7 @@ class ChartAnalysisNode(MonitoredNode):
         execution_time = time.time() - start_time
         return {
             "chart_analyses": chart_analyses,
+            "visual_analyses": list(prep_res.get("visual_analyses", []) or []),
             "success_count": success_count,
             "total_charts": len(charts),
             "success_rate": success_count / len(charts) if charts else 0,
@@ -130,10 +143,29 @@ class ChartAnalysisNode(MonitoredNode):
         if "stage2_results" not in shared:
             shared["stage2_results"] = {}
 
-        shared["stage2_results"]["chart_analyses"] = exec_res["chart_analyses"]
+        merged_analyses = {}
+        for visual_item in list(exec_res.get("visual_analyses", []) or []):
+            chart_id = str(visual_item.get("chart_id", "")).strip()
+            if not chart_id:
+                continue
+            merged_analyses[chart_id] = {
+                "chart_id": chart_id,
+                "chart_title": visual_item.get("chart_title", chart_id),
+                "chart_path": visual_item.get("chart_path", ""),
+                "analysis_content": (
+                    visual_item.get("analysis")
+                    or visual_item.get("analysis_content")
+                    or ""
+                ),
+                "analysis_timestamp": visual_item.get("analysis_timestamp", time.time()),
+                "analysis_status": visual_item.get("analysis_status", "success"),
+            }
+        merged_analyses.update(exec_res["chart_analyses"])
+        shared["stage2_results"]["chart_analyses"] = merged_analyses
 
         print(f"\n[ChartAnalysis] 图表分析完成:")
-        print(f"  ├─ 总图表数: {exec_res['total_charts']}")
+        print(f"  ├─ 本轮补漏图表数: {exec_res['total_charts']}")
+        print(f"  ├─ 论坛视觉复用: {len(exec_res.get('visual_analyses', []) or [])}")
         print(f"  ├─ 成功分析: {exec_res['success_count']}")
         print(f"  ├─ 失败数量: {exec_res['total_charts'] - exec_res['success_count']}")
         print(f"  └─ 成功率: {exec_res['success_rate']*100:.1f}%")

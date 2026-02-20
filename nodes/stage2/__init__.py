@@ -13,6 +13,25 @@ from nodes.stage2.agent import (
     ProcessResultNode,
     EnsureChartsNode,
 )
+from nodes.stage2.search import (
+    ExtractQueriesNode,
+    WebSearchNode,
+    SearchProcessNode,
+    SearchReflectionNode,
+    SearchSummaryNode,
+    create_query_search_flow,
+)
+from nodes.stage2.search_agent import SearchAgentNode
+from nodes.stage2.parallel import (
+    RunParallelAgentBranchNode,
+    ParallelAgentFlow,
+    create_parallel_agent_flow,
+)
+from nodes.stage2.assemble import AssembleStage2ResultsNode
+from nodes.stage2.forum import ForumHostNode
+from nodes.stage2.supplement import SupplementDataNode, SupplementSearchNode
+from nodes.stage2.visual import VisualAnalysisNode
+from nodes.stage2.merge import MergeResultsNode
 
 __all__ = [
     "LoadEnhancedDataNode",
@@ -26,4 +45,20 @@ __all__ = [
     "ExecuteToolsNode",
     "ProcessResultNode",
     "EnsureChartsNode",
+    "ExtractQueriesNode",
+    "WebSearchNode",
+    "SearchProcessNode",
+    "SearchReflectionNode",
+    "SearchSummaryNode",
+    "create_query_search_flow",
+    "SearchAgentNode",
+    "RunParallelAgentBranchNode",
+    "ParallelAgentFlow",
+    "create_parallel_agent_flow",
+    "AssembleStage2ResultsNode",
+    "ForumHostNode",
+    "SupplementDataNode",
+    "SupplementSearchNode",
+    "VisualAnalysisNode",
+    "MergeResultsNode",
 ]

@@ -153,6 +153,76 @@ def test_validate_config_rejects_non_positive_search_limits(tmp_path, monkeypatc
         validate_config(bad_timeout_cfg)
 
 
+def test_validate_config_rejects_non_positive_stage2_loop_limits(tmp_path, monkeypatch):
+    output_path = tmp_path / "enhanced.json"
+    output_path.write_text("[]", encoding="utf-8")
+    monkeypatch.setenv("ENHANCED_DATA_PATH", str(output_path))
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
+
+    bad_search_loop = AppConfig(
+        data=DataConfig(output_path=str(output_path)),
+        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        stage1=Stage1Config(mode="async"),
+        stage2=Stage2Config(
+            mode="agent",
+            tool_source="mcp",
+            search_provider="tavily",
+            search_max_results=5,
+            search_timeout_seconds=20,
+            search_reflection_max_rounds=0,
+        ),
+        stage3=Stage3Config(mode="template"),
+        runtime=RuntimeConfig(),
+    )
+    with pytest.raises(ValueError):
+        validate_config(bad_search_loop)
+
+    bad_forum_loop = AppConfig(
+        data=DataConfig(output_path=str(output_path)),
+        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        stage1=Stage1Config(mode="async"),
+        stage2=Stage2Config(
+            mode="agent",
+            tool_source="mcp",
+            search_provider="tavily",
+            search_max_results=5,
+            search_timeout_seconds=20,
+            forum_max_rounds=0,
+        ),
+        stage3=Stage3Config(mode="template"),
+        runtime=RuntimeConfig(),
+    )
+    with pytest.raises(ValueError):
+        validate_config(bad_forum_loop)
+
+
+def test_validate_config_rejects_forum_min_rounds_over_max(tmp_path, monkeypatch):
+    output_path = tmp_path / "enhanced.json"
+    output_path.write_text("[]", encoding="utf-8")
+    monkeypatch.setenv("ENHANCED_DATA_PATH", str(output_path))
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
+
+    bad_relation_cfg = AppConfig(
+        data=DataConfig(output_path=str(output_path)),
+        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        stage1=Stage1Config(mode="async"),
+        stage2=Stage2Config(
+            mode="agent",
+            tool_source="mcp",
+            search_provider="tavily",
+            search_max_results=5,
+            search_timeout_seconds=20,
+            forum_max_rounds=2,
+            forum_min_rounds_for_sufficient=3,
+        ),
+        stage3=Stage3Config(mode="template"),
+        runtime=RuntimeConfig(),
+    )
+
+    with pytest.raises(ValueError):
+        validate_config(bad_relation_cfg)
+
+
 def test_resolve_glm_api_key_yaml_over_env(monkeypatch):
     monkeypatch.setenv("GLM_API_KEY", "env-key")
     config = AppConfig(llm=LLMConfig(glm_api_key="yaml-key"))
@@ -172,6 +242,9 @@ def test_config_to_shared_contains_required_keys():
     assert "stage2_results" in shared
     assert "stage3_results" in shared
     assert "trace" in shared
+    assert "search" in shared
+    assert "search_results" in shared
+    assert "agent_results" in shared
     assert shared["config"]["data_source"]["resume_if_exists"] is True
     assert shared["config"]["web_search"] == {
         "provider": "tavily",
@@ -179,9 +252,26 @@ def test_config_to_shared_contains_required_keys():
         "timeout_seconds": 20,
         "api_key": "",
     }
+    assert shared["config"]["stage2_loops"] == {
+        "agent_max_iterations": 10,
+        "search_reflection_max_rounds": 2,
+        "forum_max_rounds": 5,
+        "forum_min_rounds_for_sufficient": 2,
+    }
+    assert shared["forum"] == {
+        "current_round": 0,
+        "rounds": [],
+        "current_directive": {},
+        "visual_analyses": [],
+    }
     assert set(shared["trace"].keys()) == {
         "decisions",
         "executions",
         "reflections",
         "insight_provenance",
+        "loop_status",
+    }
+    assert shared["agent_results"] == {
+        "data_agent": {},
+        "search_agent": {},
     }

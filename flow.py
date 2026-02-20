@@ -47,12 +47,14 @@ from nodes import (
     Stage2CompletionNode,
     ChartAnalysisNode,
     LLMInsightNode,
-    EnsureChartsNode,
-    # 阶段2 Agent路径节点
-    CollectToolsNode,
-    DecisionToolsNode,
-    ExecuteToolsNode,
-    ProcessResultNode,
+    # 阶段2 双信源节点
+    create_query_search_flow,
+    create_parallel_agent_flow,
+    ForumHostNode,
+    SupplementDataNode,
+    SupplementSearchNode,
+    VisualAnalysisNode,
+    MergeResultsNode,
     # 阶段3通用节点
     LoadAnalysisResultsNode,
     FormatReportNode,
@@ -138,17 +140,18 @@ def _create_async_enhancement_flow(
 
 def _create_agent_analysis_flow() -> AsyncFlow:
     """
-    创建Agent自主调度分析Flow (analysis_mode="agent")
+    创建Stage2双信源分析Flow (analysis_mode="agent")
     
     执行流程：
     1. 加载增强数据
     2. 生成数据概况
-    3. 收集可用工具
-    4. Agent决策循环：决策 → 执行 → 处理 → 决策...
-    5. GLM4.5V分析生成的图表
-    6. 生成洞察分析
-    7. 保存分析结果
-    8. 返回调度器
+    3. QuerySearchFlow（查询词提取 → 检索 → 反思循环 → 搜索摘要）
+    4. ParallelAgentFlow（DataAgent + SearchAgent 并行）
+    5. ForumHost 动态路由（SupplementData / SupplementSearch / VisualAnalysis）
+    6. MergeResults 合并双信源 + 论坛结果（保持 stage2_results 兼容）
+    7. Batch ChartAnalysis（补漏分析）
+    8. 生成洞察分析
+    9. 保存分析结果并返回调度器
     
     内部函数，由create_main_flow调用。
     """
@@ -156,12 +159,14 @@ def _create_agent_analysis_flow() -> AsyncFlow:
     clear_report_node = ClearReportDirNode()
     load_data_node = LoadEnhancedDataNode()
     data_summary_node = DataSummaryNode()
-    collect_tools_node = CollectToolsNode()
-    decision_node = DecisionToolsNode()
-    execute_node = ExecuteToolsNode()
-    process_result_node = ProcessResultNode()
+    query_search_flow = create_query_search_flow()
+    parallel_agent_flow = create_parallel_agent_flow()
+    forum_host_node = ForumHostNode()
+    supplement_data_node = SupplementDataNode()
+    supplement_search_node = SupplementSearchNode()
+    visual_analysis_node = VisualAnalysisNode()
+    merge_node = MergeResultsNode()
     chart_analysis_node = ChartAnalysisNode(max_retries=2, wait=3)
-    ensure_charts_node = EnsureChartsNode()
     llm_insight_node = LLMInsightNode()
     save_results_node = SaveAnalysisResultsNode()
     completion_node = Stage2CompletionNode()
@@ -169,19 +174,20 @@ def _create_agent_analysis_flow() -> AsyncFlow:
     # 连接节点 - 线性部分
     clear_report_node >> load_data_node
     load_data_node >> data_summary_node
-    data_summary_node >> collect_tools_node
-    collect_tools_node >> decision_node
+    data_summary_node >> query_search_flow
+    query_search_flow >> parallel_agent_flow
+    parallel_agent_flow >> forum_host_node
 
-    # Agent循环部分
-    decision_node - "execute" >> execute_node
-    execute_node >> process_result_node
-    process_result_node - "continue" >> decision_node  # 继续循环
+    forum_host_node - "supplement_data" >> supplement_data_node
+    forum_host_node - "supplement_search" >> supplement_search_node
+    forum_host_node - "supplement_visual" >> visual_analysis_node
+    forum_host_node - "sufficient" >> merge_node
 
-    # 结束循环的路径
-    decision_node - "finish" >> ensure_charts_node  # Agent判断分析充分，先补齐图表
-    process_result_node - "finish" >> ensure_charts_node  # 达到最大迭代次数，先补齐图表
+    supplement_data_node >> forum_host_node
+    supplement_search_node >> forum_host_node
+    visual_analysis_node >> forum_host_node
 
-    ensure_charts_node >> chart_analysis_node
+    merge_node >> chart_analysis_node
     chart_analysis_node >> llm_insight_node  # 图表分析完成后生成洞察
     llm_insight_node >> save_results_node
     save_results_node >> completion_node

@@ -57,6 +57,9 @@ class Stage2Config:
     mode: str = "agent"
     tool_source: str = "mcp"
     agent_max_iterations: int = 10
+    search_reflection_max_rounds: int = 2
+    forum_max_rounds: int = 5
+    forum_min_rounds_for_sufficient: int = 2
     search_provider: str = "tavily"
     search_max_results: int = 5
     search_timeout_seconds: int = 20
@@ -207,6 +210,14 @@ def validate_config(config: AppConfig) -> None:
         raise ValueError("stage2.search_max_results must be >= 1")
     if int(config.stage2.search_timeout_seconds) <= 0:
         raise ValueError("stage2.search_timeout_seconds must be >= 1")
+    if int(config.stage2.search_reflection_max_rounds) <= 0:
+        raise ValueError("stage2.search_reflection_max_rounds must be >= 1")
+    if int(config.stage2.forum_max_rounds) <= 0:
+        raise ValueError("stage2.forum_max_rounds must be >= 1")
+    if int(config.stage2.forum_min_rounds_for_sufficient) <= 0:
+        raise ValueError("stage2.forum_min_rounds_for_sufficient must be >= 1")
+    if int(config.stage2.forum_min_rounds_for_sufficient) > int(config.stage2.forum_max_rounds):
+        raise ValueError("stage2.forum_min_rounds_for_sufficient must be <= stage2.forum_max_rounds")
 
     if not isinstance(config.stage2.chart_min_per_category, dict):
         raise ValueError("stage2.chart_min_per_category must be a dict")
@@ -280,6 +291,12 @@ def config_to_shared(config: AppConfig) -> dict:
             },
             "report_mode": config.stage3.mode,
             "agent_config": {"max_iterations": config.stage2.agent_max_iterations},
+            "stage2_loops": {
+                "agent_max_iterations": int(config.stage2.agent_max_iterations),
+                "search_reflection_max_rounds": int(config.stage2.search_reflection_max_rounds),
+                "forum_max_rounds": int(config.stage2.forum_max_rounds),
+                "forum_min_rounds_for_sufficient": int(config.stage2.forum_min_rounds_for_sufficient),
+            },
             "iterative_report_config": {
                 "max_iterations": config.stage3.max_iterations,
                 "satisfaction_threshold": config.stage3.min_score,
@@ -298,6 +315,31 @@ def config_to_shared(config: AppConfig) -> dict:
             "current_iteration": 0,
             "max_iterations": config.stage2.agent_max_iterations,
             "is_finished": False,
+        },
+        "search": {
+            "round": 0,
+            "queries": [],
+            "raw_results": [],
+            "documents": [],
+            "reflections": [],
+            "total_results": 0,
+        },
+        "search_results": {
+            "event_timeline": [],
+            "key_actors": [],
+            "official_responses": [],
+            "public_reactions_summary": "",
+            "related_events": [],
+        },
+        "agent_results": {
+            "data_agent": {},
+            "search_agent": {},
+        },
+        "forum": {
+            "current_round": 0,
+            "rounds": [],
+            "current_directive": {},
+            "visual_analyses": [],
         },
         "report": {
             "iteration": 0,
@@ -359,6 +401,7 @@ def config_to_shared(config: AppConfig) -> dict:
                 "execution_time": 0.0,
                 "charts_by_category": {},
             },
+            "search_context": {},
             "output_files": {
                 "charts_dir": "report/images/",
                 "analysis_data": "report/analysis_data.json",
@@ -379,6 +422,7 @@ def config_to_shared(config: AppConfig) -> dict:
             "executions": [],
             "reflections": [],
             "insight_provenance": {},
+            "loop_status": {},
         },
         "monitor": {
             "start_time": "",

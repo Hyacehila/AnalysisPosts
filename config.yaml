@@ -28,6 +28,9 @@ stage2:
   mode: agent
   tool_source: mcp
   agent_max_iterations: 30
+  search_reflection_max_rounds: 2
+  forum_max_rounds: 5
+  forum_min_rounds_for_sufficient: 2
   search_provider: tavily
   search_max_results: 5
   search_timeout_seconds: 20
@@ -42,4 +45,3 @@ runtime:
   wait_time: 8
 llm:
   glm_api_key: ""
-

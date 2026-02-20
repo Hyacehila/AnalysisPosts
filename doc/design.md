@@ -1,7 +1,7 @@
 # Design Doc: AnalysisPosts v1.0 (Phase 1–3)
 
 > Please DON'T remove notes for AI
-> Last Updated: 2026-02-19
+> Last Updated: 2026-02-20
 
 ## Requirements
 
@@ -27,7 +27,7 @@
 ### Flow High-Level Design
 
 1. **Stage 1 (Enhancement)**: Load raw posts → enrich with LLM + local NLP → save enhanced data.
-2. **Stage 2 (Analysis)**: Load enhanced data → execute analysis tools (dynamic registry) → analyze charts → save results + trace.（Track A 第 3 项已提供 `utils/web_search.py`，供后续 QuerySearchFlow 接入）
+2. **Stage 2 (Analysis)**: Load enhanced data → QuerySearchFlow 外部检索 → DataAgent/SearchAgent 双信源并行 → ForumHost 动态循环（SupplementData / SupplementSearch / VisualAnalysis）→ MergeResults 收敛 → chart gap-fill analysis + insight → save results + trace.
 3. **Stage 3 (Report)**: Load analysis results → generate report → format → save Markdown.
 4. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
    - A shared lock file at `report/.pipeline_running.lock` is used for concurrency control, created/cleared by both CLI and dashboard runs.
@@ -43,6 +43,7 @@
 - **Preflight + Fail Fast**: 如果 MCP 工具发现返回空列表，立即报错并输出依赖自检信息，避免进入后续节点产生误导性错误。
 - **MCP Auto-Enable + Parsing**: MCP 客户端在 tool_source=mcp 时自动启用；解析优先级为 `content.data` > `content.text`，避免图表结构丢失。
 - **Chart Missing Policy**: `stage2.chart_missing_policy` 控制图表覆盖不足时行为（`warn` 继续 / `fail` 终止）。
+- **Loop Governance**: `stage2.search_reflection_max_rounds`、`stage2.forum_max_rounds`、`stage2.forum_min_rounds_for_sufficient` + `stage2.agent_max_iterations` 统一收敛 Stage2 自主循环。
 
 ### Stage 3 Report Image Fallback
 
@@ -107,7 +108,7 @@ flowchart TD
 8. **Web Search Wrapper** (`utils/web_search.py`)
    - Input: query / queries + provider + API key + limits
    - Output: normalized search payload (`title/url/snippet/date/source`)
-   - Used by upcoming Stage 2 QuerySearchFlow (Track A 第 3 项基础设施已就绪)
+   - Used by Stage 2 QuerySearchFlow
 
 ## Node Design
 
@@ -117,10 +118,14 @@ flowchart TD
 shared = {
   "data": {...},
   "config": {...},
+  "search": {...},
+  "search_results": {...},
+  "agent_results": {...},
+  "forum": {...},
   "stage1_results": {...},
   "stage2_results": {...},
   "stage3_results": {...},
-  "trace": {"decisions": [], "executions": [], "reflections": [], "insight_provenance": {}},
+  "trace": {"decisions": [], "executions": [], "reflections": [], "insight_provenance": {}, "loop_status": {}},
   "monitor": {...}
 }
 ```
@@ -133,19 +138,31 @@ shared = {
    - exec: run text cleaner → tokenizer → keyword/NER/lexicon/similarity
    - post: write NLP fields back to shared
 
-2. **CollectToolsNode (Agent)**
+2. **QuerySearchFlow (Stage2)**
    - Type: Regular
-   - prep: read config (tool_source=mcp)
-   - exec: discover tools via MCP
-   - post: write available_tools to shared
+   - prep: read `data_summary` and search reflections
+   - exec: query extraction → web search → reflection loop
+   - post: write structured `search_results`
 
-3. **DecisionToolsNode (Agent)**
+3. **ParallelAgentFlow (Stage2)**
+   - Type: AsyncParallelBatchFlow
+   - prep: prepare `data_agent` + `search_agent` branch params
+   - exec: run both branches in parallel
+   - post: write outputs into `agent_results`
+
+4. **ForumHostNode (Stage2)**
    - Type: Regular
-   - prep: read data summary + execution history
-   - exec: decide next tool
-   - post: write next_tool to shared
+   - prep: collect dual-source results + forum history
+   - exec: choose one action (`supplement_data/search/visual/sufficient`)
+   - post: update forum rounds + loop status + route action
 
-4. **Report Save Node**
+5. **MergeResultsNode (Stage2)**
+   - Type: Regular
+   - prep: read `agent_results` + `forum`
+   - exec: merge to backward-compatible `stage2_results`
+   - post: persist merged structure for Stage3 readers
+
+6. **Report Save Node**
    - Type: Regular
    - prep: read final report
    - exec: save Markdown

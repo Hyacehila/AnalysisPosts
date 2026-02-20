@@ -1,6 +1,6 @@
 # 工具函数文档
 
-> **文档状态**: 2026-02-19 更新  
+> **文档状态**: 2026-02-20 更新  
 > **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/monitor.py`, `utils/trace_manager.py`, `utils/web_search.py`, `utils/data_sources/*`, `utils/nlp/*`  
 > **上级文档**: [系统设计总览](design.md)
 
@@ -235,6 +235,7 @@ os.replace(temp_file.name, output_path)  # 原子替换
 | `init_trace` | `shared` | 初始化并返回 `shared["trace"]` |
 | `append_decision` | action/tool/reason/iteration | 追加 `decisions[]` 并返回 `decision_id` |
 | `append_execution` | status/summary/decision_ref 等 | 追加 `executions[]` 并返回 `execution_id` |
+| `append_reflection` | iteration + result | 追加 `reflections[]` 并返回 `reflection_id` |
 | `set_insight_provenance` | provenance 字典 | 覆盖 `insight_provenance` |
 | `build_lite_confidence` | evidence 列表 | `(high/medium/low, reason)` |
 | `dump_trace_json` | trace + output_path | 写入 `report/trace.json` |
@@ -243,7 +244,7 @@ os.replace(temp_file.name, output_path)  # 原子替换
 
 ## 9. 搜索封装 `web_search.py`
 
-用于 Track A A3 的网络搜索基础能力，当前实现 provider 为 `tavily`。
+用于 Stage2 QuerySearchFlow 的网络搜索能力，当前实现 provider 为 `tavily`。
 
 ### 9.1 函数概览
 
