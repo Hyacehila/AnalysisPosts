@@ -6,7 +6,8 @@ from __future__ import annotations
 from _e2e_config_runtime import build_runtime_config, load_yaml
 
 
-def test_build_runtime_config_applies_balanced_stage2_loop_caps(tmp_path):
+def test_build_runtime_config_applies_balanced_stage2_loop_caps(tmp_path, monkeypatch):
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
     config_path = build_runtime_config(tmp_path, override_runtime=True)
     cfg = load_yaml(config_path)
     stage2 = cfg.get("stage2", {})

@@ -32,10 +32,12 @@ def test_clear_stage3_outputs_node_preserves_stage2_outputs(tmp_path, monkeypatc
     images_dir.mkdir()
 
     report_md = report_dir / "report.md"
+    report_html = report_dir / "report.html"
     status_json = report_dir / "status.json"
     analysis_data = report_dir / "analysis_data.json"
 
     report_md.write_text("report", encoding="utf-8")
+    report_html.write_text("<html></html>", encoding="utf-8")
     status_json.write_text("status", encoding="utf-8")
     analysis_data.write_text("analysis", encoding="utf-8")
 
@@ -45,6 +47,7 @@ def test_clear_stage3_outputs_node_preserves_stage2_outputs(tmp_path, monkeypatc
     node.exec(None)
 
     assert not report_md.exists()
+    assert not report_html.exists()
     assert not status_json.exists()
     assert analysis_data.exists()
     assert images_dir.exists()

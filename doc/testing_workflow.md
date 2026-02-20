@@ -41,6 +41,12 @@ uv run pytest tests/e2e -v
 uv run pytest tests/ -v
 ```
 
+若本地未配置 live API key，可先执行：
+
+```bash
+uv run pytest tests/ -v -m "not live_api"
+```
+
 ## 3. E2E 与外部依赖策略
 
 - `tests/e2e/` 默认执行，不使用 Mock。
@@ -72,10 +78,10 @@ uv run pytest tests/ -v
 | Stage 2 QuerySearchFlow + SearchAgent + 并行桥接 | `tests/unit/stage2/test_stage2_search_flow.py`, `tests/unit/stage2/test_stage2_search_agent.py`, `tests/unit/stage2/test_stage2_parallel_flow.py` |
 | Stage 2 Forum 动态循环（B5~B8） | `tests/unit/stage2/test_stage2_forum.py`, `tests/unit/stage2/test_stage2_supplement.py`, `tests/unit/stage2/test_stage2_visual.py`, `tests/unit/stage2/test_stage2_merge.py`, `tests/unit/stage2/test_stage2_chart_analysis_gapfill.py` |
 | Stage 2 洞察语义兼容（analysis_content/analysis） | `tests/unit/stage2/test_stage2_insight.py` |
-| Stage 3 报告链路 | `tests/unit/stage3/test_stage3_report.py`, `tests/unit/stage3/test_report_cleanup.py`, `tests/unit/stage3/test_report_image_fallback.py` |
+| Stage 3 统一报告链路（Outline/Chapters/Review/Trace/Methodology/Render） | `tests/unit/stage3/test_stage3_outline.py`, `tests/unit/stage3/test_stage3_chapters.py`, `tests/unit/stage3/test_stage3_review.py`, `tests/unit/stage3/test_stage3_trace_inject.py`, `tests/unit/stage3/test_stage3_methodology.py`, `tests/unit/stage3/test_stage3_render_html.py`, `tests/unit/stage3/test_stage3_report.py`, `tests/unit/stage3/test_report_cleanup.py`, `tests/unit/stage3/test_report_image_fallback.py` |
 | 工具注册与 MCP 暴露一致性 | `tests/unit/tools/test_tool_registry.py`, `tests/unit/tools/test_mcp_tool_exposure.py` |
 | I/O 契约与数据格式 | `tests/integration/io/test_data_loader_integration.py`, `tests/integration/io/test_data_format_contract.py`, `tests/integration/io/test_json_reference_contract.py` |
-| 跨阶段串联集成 | `tests/integration/pipeline/test_flow_pipeline_integration.py`, `tests/integration/pipeline/test_stage2_forum_pipeline_integration.py` |
+| 跨阶段串联集成 | `tests/integration/pipeline/test_flow_pipeline_integration.py`, `tests/integration/pipeline/test_stage2_forum_pipeline_integration.py`, `tests/integration/pipeline/test_stage3_unified_pipeline_integration.py` |
 | 真实 API + 完整生命周期端到端 | `tests/e2e/cli/test_dashboard_pipeline_e2e.py`, `tests/e2e/cli/test_cli_pipeline_e2e.py` |
 | Tavily 搜索真实 API E2E | `tests/e2e/cli/test_tavily_live_api_e2e.py` |
 | E2E 运行时限额配置校验 | `tests/e2e/cli/test_e2e_runtime_profile.py` |

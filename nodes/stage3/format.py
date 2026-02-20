@@ -2,28 +2,61 @@
 Stage 3 report formatting node.
 """
 from pathlib import Path
+from typing import Any, Dict
 
 from nodes.base import MonitoredNode
-
 from nodes._utils import _load_analysis_charts, _remap_report_images
 
 
+def _build_execution_summary(loop_status: Dict[str, Any]) -> str:
+    if not loop_status:
+        return ""
+    lines = ["## 运行执行摘要", ""]
+    for loop_id, status in loop_status.items():
+        if isinstance(status, dict):
+            current = status.get("current", 0)
+            max_rounds = status.get("max", 0)
+            reason = status.get("termination_reason", "")
+            lines.append(f"- {loop_id}: {current}/{max_rounds} ({reason})")
+        else:
+            lines.append(f"- {loop_id}: {status}")
+    lines.append("")
+    return "\n".join(lines)
+
+
 class FormatReportNode(MonitoredNode):
-    """
-    报告格式化节点
-    """
+    """Normalize report markdown and inject execution summary."""
 
-    def prep(self, shared):
-        full_content = shared.get("report", {}).get("full_content", "")
-        if full_content:
-            return full_content
-        return shared.get("stage3_results", {}).get("current_draft", "")
+    def prep(self, shared: Dict[str, Any]) -> Dict[str, Any]:
+        stage3_results = shared.get("stage3_results", {})
+        report_text = (
+            stage3_results.get("report_text")
+            or stage3_results.get("reviewed_report_text")
+            or stage3_results.get("final_report_text")
+            or shared.get("report", {}).get("full_content", "")
+            or stage3_results.get("current_draft", "")
+        )
+        loop_status = shared.get("trace", {}).get("loop_status", {})
+        return {
+            "report_text": report_text,
+            "loop_status": loop_status,
+        }
 
-    def exec(self, prep_res):
-        if not prep_res:
+    def exec(self, prep_res: Any) -> str:
+        if isinstance(prep_res, dict):
+            report_text = str(prep_res.get("report_text", ""))
+            loop_status = prep_res.get("loop_status", {}) or {}
+        else:
+            report_text = str(prep_res or "")
+            loop_status = {}
+
+        if not report_text:
             return ""
 
-        formatted_content = prep_res
+        execution_summary = _build_execution_summary(loop_status)
+        formatted_content = report_text
+        if execution_summary and "运行执行摘要" not in formatted_content:
+            formatted_content = execution_summary + "\n" + formatted_content.lstrip()
 
         path_replacements = [
             ("report\\images\\", "./images/"),
@@ -31,7 +64,6 @@ class FormatReportNode(MonitoredNode):
             ("./report/images/", "./images/"),
             ("../report/images/", "./images/"),
         ]
-
         for old_path, new_path in path_replacements:
             formatted_content = formatted_content.replace(old_path, new_path)
 
@@ -71,7 +103,8 @@ class FormatReportNode(MonitoredNode):
                 toc_lines = ["## 目录\n"]
                 for level, title in headers:
                     indent = "  " * (len(level) - 1)
-                    toc_lines.append(f"{indent}- [{title}](#{title.replace(' ', '-').lower()})")
+                    anchor = title.strip().lower().replace(" ", "-")
+                    toc_lines.append(f"{indent}- [{title}](#{anchor})")
                 toc = "\n".join(toc_lines) + "\n\n"
                 formatted_content = toc + formatted_content
 
@@ -80,10 +113,9 @@ class FormatReportNode(MonitoredNode):
 
         return formatted_content
 
-    def post(self, shared, prep_res, exec_res):
-        if "stage3_results" not in shared:
-            shared["stage3_results"] = {}
-
-        shared["stage3_results"]["final_report_text"] = exec_res
+    def post(self, shared: Dict[str, Any], prep_res: Any, exec_res: str) -> str:
+        stage3_results = shared.setdefault("stage3_results", {})
+        stage3_results["final_report_text"] = exec_res
+        stage3_results["generation_mode"] = "unified"
         print(f"[Stage3] 报告最终图片引用数: {exec_res.count('![')}")
         return "default"

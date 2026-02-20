@@ -21,8 +21,7 @@ class DispatcherNode(MonitoredNode):
     返回的Action类型：
     - stage1_async: 阶段1异步处理路径
     - stage2_agent: 阶段2 LLM自主分析
-    - stage3_template: 阶段3模板填充
-    - stage3_iterative: 阶段3多轮迭代
+    - stage3_report: 阶段3统一报告流程
     - done: 所有阶段完成，跳转到TerminalNode
     """
     
@@ -47,7 +46,6 @@ class DispatcherNode(MonitoredNode):
             "current_stage": dispatcher.get("current_stage", 0),
             "completed_stages": dispatcher.get("completed_stages", []),
             "enhancement_mode": config.get("enhancement_mode", "async"),
-            "report_mode": config.get("report_mode", "template")
         }
     
     def exec(self, prep_res):
@@ -57,7 +55,6 @@ class DispatcherNode(MonitoredNode):
         current_stage = prep_res["current_stage"]
         completed_stages = prep_res["completed_stages"]
         enhancement_mode = prep_res["enhancement_mode"]
-        report_mode = prep_res["report_mode"]
         
         # 确定下一个需要执行的阶段
         if current_stage == 0:
@@ -81,7 +78,7 @@ class DispatcherNode(MonitoredNode):
         elif next_stage == 2:
             action = "stage2_agent"
         elif next_stage == 3:
-            action = f"stage3_{report_mode}"
+            action = "stage3_report"
         else:
             action = "done"
         

@@ -49,7 +49,6 @@ def init_shared(
     chart_tool_policy: str = "coverage_first",
     chart_tool_allowlist: List[str] | None = None,
     # 阶段3配置
-    report_mode: str = "template",
     report_max_iterations: int = 5,
     report_min_score: int = 80,
     # 数据源配置
@@ -76,9 +75,8 @@ def init_shared(
         chart_min_per_category: 图表覆盖最低要求（按维度）
         chart_tool_policy: 图表覆盖策略
         chart_tool_allowlist: 图表工具白名单（可选）
-        report_mode: 阶段3报告模式 ("template" | "iterative")
-        report_max_iterations: 报告最大迭代次数
-        report_min_score: 报告满意度阈值
+        report_max_iterations: Stage3 章节评审最大轮次
+        report_min_score: Stage3 章节评审最低分阈值
 
     
     Returns:
@@ -142,20 +140,15 @@ def init_shared(
                 "tool_allowlist": list(chart_tool_allowlist or []),
             },
 
-            # 阶段3: 报告生成方式（对应需求：报告输出）
-            "report_mode": report_mode,     # "template" | "iterative"
+            # 阶段3: 统一报告评审配置
+            "stage3_review": {
+                "chapter_review_max_rounds": report_max_iterations,
+                "min_score": report_min_score,
+            },
 
             # 阶段2 Agent配置
             "agent_config": {
                 "max_iterations": agent_max_iterations
-            },
-
-            # 阶段3 迭代报告配置
-            "iterative_report_config": {
-                "max_iterations": report_max_iterations,
-                "satisfaction_threshold": 80,      # 满意度阈值（默认80分）
-                "enable_review": True,            # 启用评审机制
-                "quality_check": True             # 启用质量检查
             },
 
             # 数据源配置
@@ -300,7 +293,12 @@ def print_config(shared: Dict[str, Any], concurrent_num: int, max_retries: int, 
     print(f"  ├─ 执行阶段: {shared['dispatcher']['run_stages']}")
     print(f"  ├─ 增强模式: {shared['config']['enhancement_mode']}")
     print(f"  ├─ 分析模式: {shared['config']['analysis_mode']}")
-    print(f"  ├─ 报告模式: {shared['config']['report_mode']}")
+    stage3_review = shared["config"].get("stage3_review", {})
+    print(
+        "  ├─ Stage3评审: "
+        f\"max_rounds={stage3_review.get('chapter_review_max_rounds', 2)}, \"
+        f\"min_score={stage3_review.get('min_score', 80)}\"
+    )
     print(f"  ├─ 输入路径: {shared['data']['data_paths']['blog_data_path']}")
     print(f"  ├─ 输出路径: {shared['config']['data_source']['enhanced_data_path']}")
     print(f"  ├─ 并发数: {concurrent_num}")

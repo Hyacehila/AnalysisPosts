@@ -78,9 +78,9 @@ class Stage2Config:
 
 @dataclass
 class Stage3Config:
-    mode: str = "template"
     max_iterations: int = 5
     min_score: int = 80
+    chapter_review_max_rounds: int = 2
 
 
 @dataclass
@@ -152,7 +152,6 @@ def validate_config(config: AppConfig) -> None:
     """Validate configuration constraints and prerequisites."""
     valid_stage1_modes = {"async"}
     valid_stage2_modes = {"agent"}
-    valid_stage3_modes = {"template", "iterative"}
     valid_tool_sources = {"mcp"}
 
     if config.stage1.mode not in valid_stage1_modes:
@@ -161,8 +160,6 @@ def validate_config(config: AppConfig) -> None:
         raise ValueError(
             f"Invalid stage2 mode: {config.stage2.mode}. Stage2 only supports agent mode."
         )
-    if config.stage3.mode not in valid_stage3_modes:
-        raise ValueError(f"Invalid stage3 mode: {config.stage3.mode}")
     if config.stage2.tool_source not in valid_tool_sources:
         raise ValueError(
             f"Invalid stage2 tool_source: {config.stage2.tool_source}. Stage2 only supports mcp tools."
@@ -218,6 +215,13 @@ def validate_config(config: AppConfig) -> None:
         raise ValueError("stage2.forum_min_rounds_for_sufficient must be >= 1")
     if int(config.stage2.forum_min_rounds_for_sufficient) > int(config.stage2.forum_max_rounds):
         raise ValueError("stage2.forum_min_rounds_for_sufficient must be <= stage2.forum_max_rounds")
+
+    if int(config.stage3.max_iterations) <= 0:
+        raise ValueError("stage3.max_iterations must be >= 1")
+    if int(config.stage3.chapter_review_max_rounds) <= 0:
+        raise ValueError("stage3.chapter_review_max_rounds must be >= 1")
+    if int(config.stage3.min_score) < 0 or int(config.stage3.min_score) > 100:
+        raise ValueError("stage3.min_score must be in [0, 100]")
 
     if not isinstance(config.stage2.chart_min_per_category, dict):
         raise ValueError("stage2.chart_min_per_category must be a dict")
@@ -289,7 +293,6 @@ def config_to_shared(config: AppConfig) -> dict:
                 "timeout_seconds": int(config.stage2.search_timeout_seconds),
                 "api_key": config.stage2.search_api_key,
             },
-            "report_mode": config.stage3.mode,
             "agent_config": {"max_iterations": config.stage2.agent_max_iterations},
             "stage2_loops": {
                 "agent_max_iterations": int(config.stage2.agent_max_iterations),
@@ -297,11 +300,9 @@ def config_to_shared(config: AppConfig) -> dict:
                 "forum_max_rounds": int(config.stage2.forum_max_rounds),
                 "forum_min_rounds_for_sufficient": int(config.stage2.forum_min_rounds_for_sufficient),
             },
-            "iterative_report_config": {
-                "max_iterations": config.stage3.max_iterations,
-                "satisfaction_threshold": config.stage3.min_score,
-                "enable_review": True,
-                "quality_check": True,
+            "stage3_review": {
+                "chapter_review_max_rounds": int(config.stage3.chapter_review_max_rounds),
+                "min_score": int(config.stage3.min_score),
             },
             "data_source": {
                 "type": data_source_type,
@@ -410,7 +411,7 @@ def config_to_shared(config: AppConfig) -> dict:
         },
         "stage3_results": {
             "report_file": "report/report.md",
-            "generation_mode": "",
+            "generation_mode": "unified",
             "iterations": 0,
             "final_score": 0,
             "report_reasoning": "",

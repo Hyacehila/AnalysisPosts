@@ -150,11 +150,7 @@ with st.form("config_form"):
         )
 
         st.markdown("**Stage2**: `agent + mcp` (fixed)")
-        stage3_mode = st.selectbox(
-            "Stage3 mode",
-            ["template", "iterative"],
-            index=_safe_index(["template", "iterative"], config["stage3"]["mode"], fallback=0),
-        )
+        st.markdown("**Stage3**: `unified report` (fixed)")
 
     with st.expander("Advanced settings", expanded=False):
         st.markdown("**LLM settings**")
@@ -282,6 +278,12 @@ with st.form("config_form"):
             step=1,
             value=int(config["stage3"]["min_score"]),
         )
+        chapter_review_max_rounds = st.number_input(
+            "Stage3 chapter review max rounds",
+            min_value=1,
+            step=1,
+            value=int(config["stage3"].get("chapter_review_max_rounds", 2)),
+        )
 
     col1, col2, col3 = st.columns(3)
     save_clicked = col1.form_submit_button("Save Config")
@@ -315,9 +317,9 @@ flat_config = {
     "stage2.search_max_results": int(search_max_results),
     "stage2.search_timeout_seconds": int(search_timeout_seconds),
     "stage2.search_api_key": search_api_key,
-    "stage3.mode": stage3_mode,
     "stage3.max_iterations": int(report_max_iterations),
     "stage3.min_score": int(report_min_score),
+    "stage3.chapter_review_max_rounds": int(chapter_review_max_rounds),
     "runtime.concurrent_num": int(concurrent_num),
     "runtime.max_retries": int(max_retries),
     "runtime.wait_time": int(wait_time),

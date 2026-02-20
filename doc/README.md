@@ -13,4 +13,4 @@
 - [MCP Tool Audit](mcp_tool_audit.md)
 - [Testing Workflow](testing_workflow.md)
 
-> 注：Stage2 已完成 B1~B9（双信源 + Forum 动态循环 + merge/gap-fill），E2E 文档已补充 live API 平衡档限额策略。
+> 注：Stage2 已完成 B1~B9；Stage3 已完成 Track C（统一报告流：大纲规划→并行章节→章节评审循环→trace 注入→方法论附录→MD/HTML 输出）。

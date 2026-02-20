@@ -69,7 +69,10 @@ def minimal_shared(sample_blog_data, sample_topics, sample_sentiment_attrs, samp
             "enhancement_mode": "async",
             "analysis_mode": "agent",
             "tool_source": "mcp",
-            "report_mode": "template",
+            "stage3_review": {
+                "chapter_review_max_rounds": 2,
+                "min_score": 80,
+            },
             "data_source": {
                 "type": "original",
                 "blog_data_path": "data/posts.json",

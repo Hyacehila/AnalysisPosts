@@ -10,7 +10,7 @@
 - As an analyst, I can run a full pipeline (Stage 1–3) and get a report with charts and data-backed insights.
 - As an operator, I can configure the pipeline visually and monitor progress in a web dashboard.
 - As a developer, I can rely on tests to safely refactor nodes and tools (TDD-first).
-- As a data user, I can export reports in Markdown.
+- As a data user, I can export reports in Markdown and HTML.
 - As a maintainer, I can extend analysis tools without editing core workflow code.
 
 ## Flow Design
@@ -28,7 +28,7 @@
 
 1. **Stage 1 (Enhancement)**: Load raw posts → enrich with LLM + local NLP → save enhanced data.
 2. **Stage 2 (Analysis)**: Load enhanced data → QuerySearchFlow 外部检索 → DataAgent/SearchAgent 双信源并行 → ForumHost 动态循环（SupplementData / SupplementSearch / VisualAnalysis）→ MergeResults 收敛 → chart gap-fill analysis + insight → save results + trace.
-3. **Stage 3 (Report)**: Load analysis results → generate report → format → save Markdown.
+3. **Stage 3 (Report)**: Load analysis results → PlanOutline → GenerateChaptersBatch → ReviewChapters(loop) → InjectTrace + MethodologyAppendix → Format → RenderHTML → save Markdown/HTML/trace.
 4. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
    - A shared lock file at `report/.pipeline_running.lock` is used for concurrency control, created/cleared by both CLI and dashboard runs.
    - Status file reliability: reads fall back to an empty status when the file is missing/empty/invalid; writes use atomic replace to avoid partial files.

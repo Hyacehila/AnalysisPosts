@@ -77,17 +77,15 @@ from nodes.stage2 import (
 # ── 阶段3：报告生成 ──────────────────────────────────────────
 from nodes.stage3 import (
     LoadAnalysisResultsNode,
+    PlanOutlineNode,
+    GenerateChaptersBatchNode,
+    ReviewChaptersNode,
+    InjectTraceNode,
+    MethodologyAppendixNode,
     FormatReportNode,
+    RenderHTMLNode,
     SaveReportNode,
     ClearStage3OutputsNode,
-    LoadTemplateNode,
-    FillSectionNode,
-    AssembleReportNode,
-    GenerateFullReportNode,
-    InitReportStateNode,
-    GenerateReportNode,
-    ReviewReportNode,
-    ApplyFeedbackNode,
 )
 
 # ── 让 @patch("nodes.xxx") 能找到被 mock 的底层依赖 ─────────
@@ -139,9 +137,8 @@ __all__ = [
     "ForumHostNode", "SupplementDataNode", "SupplementSearchNode",
     "VisualAnalysisNode", "MergeResultsNode",
     # stage3
-    "LoadAnalysisResultsNode", "FormatReportNode", "SaveReportNode",
+    "LoadAnalysisResultsNode", "PlanOutlineNode", "GenerateChaptersBatchNode",
+    "ReviewChaptersNode", "InjectTraceNode", "MethodologyAppendixNode",
+    "FormatReportNode", "RenderHTMLNode", "SaveReportNode",
     "ClearStage3OutputsNode",
-    "LoadTemplateNode", "FillSectionNode", "AssembleReportNode",
-    "GenerateFullReportNode", "InitReportStateNode", "GenerateReportNode",
-    "ReviewReportNode", "ApplyFeedbackNode",
 ]

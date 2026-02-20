@@ -37,7 +37,7 @@ def test_build_shared_from_config(tmp_path, monkeypatch):
         "pipeline": {"start_stage": 1, "run_stages": [1]},
         "stage1": {"mode": "async", "checkpoint": {"enabled": False}},
         "stage2": {"mode": "agent", "tool_source": "mcp", "agent_max_iterations": 1},
-        "stage3": {"mode": "template", "max_iterations": 1, "min_score": 80},
+        "stage3": {"max_iterations": 1, "min_score": 80, "chapter_review_max_rounds": 1},
         "runtime": {"concurrent_num": 1, "max_retries": 1, "wait_time": 1},
     }
     path = tmp_path / "config.yaml"
@@ -64,7 +64,7 @@ def test_run_pipeline_dry_run(tmp_path, monkeypatch):
         "pipeline": {"start_stage": 1, "run_stages": [1]},
         "stage1": {"mode": "async", "checkpoint": {"enabled": False}},
         "stage2": {"mode": "agent", "tool_source": "mcp", "agent_max_iterations": 1},
-        "stage3": {"mode": "template", "max_iterations": 1, "min_score": 80},
+        "stage3": {"max_iterations": 1, "min_score": 80, "chapter_review_max_rounds": 1},
         "runtime": {"concurrent_num": 1, "max_retries": 1, "wait_time": 1},
     }
     path = tmp_path / "config.yaml"

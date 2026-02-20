@@ -11,7 +11,7 @@ from utils.path_manager import PathManager
 
 class ClearStage3OutputsNode(MonitoredNode):
     """
-    清理 Stage3 输出文件（仅 report.md 与 status.json）。
+    清理 Stage3 输出文件（report.md/report.html/status.json）。
     保留 Stage2 产物与 images/ 目录。
     """
 
@@ -24,6 +24,7 @@ class ClearStage3OutputsNode(MonitoredNode):
 
         targets = [
             report_dir / "report.md",
+            report_dir / "report.html",
             report_dir / "status.json",
         ]
 

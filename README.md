@@ -53,8 +53,9 @@ $env:PYTHONPATH = (Resolve-Path .)
 - `data/enhanced_posts_sample_30.json`
 
 ### 报告导出
-Stage3 仅输出：
+Stage3 输出：
 - `report/report.md`
+- `report/report.html`
 
 Stage2 追溯数据输出：
 - `report/trace.json`
@@ -76,7 +77,7 @@ Stage2 追溯数据输出：
 - **子系统文档**:
     - [阶段 1：数据增强子系统](doc/stage1_enhancement.md) — 六维增强、异步并行、断点续传
     - [阶段 2：深度分析子系统](doc/stage2_analysis.md) — QuerySearchFlow、双信源并行、Forum 动态循环、Merge/GapFill
-    - [阶段 3：报告生成子系统](doc/stage3_report.md) — 模板/迭代模式、评审循环、图片路径处理
+    - [阶段 3：报告生成子系统](doc/stage3_report.md) — 统一报告流、章节评审循环、追溯注入与 HTML 渲染
 - **工具与基础设施**:
     - [分析工具库文档](doc/analysis_tools.md) — 37 个情感/主题/地理/交互/信念分析工具
     - [工具函数文档](doc/utils.md) — LLM 调用层、数据加载层、辅助脚本
@@ -98,5 +99,6 @@ uv run pytest tests/ -v
 
 - **三阶段流水线**: 数据增强 -> 深度分析 -> 报告生成。
 - **双信源 + 论坛循环**: Stage2 支持 DataAgent/SearchAgent 并行与 ForumHost 动态补充决策。
+- **统一 Stage3 报告**: 单一路由生成 Markdown + HTML，并注入 trace 证据与方法论附录。
 - **灵活调度**: 支持异步并发与 Agent 自主分析等多种模式。
 - **高性能**: 基于 PocketFlow 框架，轻量且高效。

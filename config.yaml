@@ -36,9 +36,9 @@ stage2:
   search_timeout_seconds: 20
   search_api_key: ""
 stage3:
-  mode: template
   max_iterations: 5
   min_score: 80
+  chapter_review_max_rounds: 2
 runtime:
   concurrent_num: 60
   max_retries: 3
