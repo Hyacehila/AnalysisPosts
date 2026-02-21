@@ -30,10 +30,13 @@
 2. **Stage 2 (Analysis)**: Load enhanced data → QuerySearchFlow 外部检索 → DataAgent/SearchAgent 双信源并行 → ForumHost 动态循环（SupplementData / SupplementSearch / VisualAnalysis）→ MergeResults 收敛 → chart gap-fill analysis + insight → save results + trace.
 3. **Stage 3 (Report)**: Load analysis results → PlanOutline → GenerateChaptersBatch → ReviewChapters(loop) → InjectTrace + MethodologyAppendix → Format → RenderHTML → save Markdown/HTML/trace.
    - Quality gate: Stage3 prompts must use real insights/chart analyses/search context and explicitly prohibit placeholder text (`[议题A]` etc.).
-   - Review gate: chapter revision is controlled by model review + hard checks (placeholder hit => forced revision); no `min_score` threshold.
+   - Review gate: chapter revision is controlled by model review + hard checks (placeholder hit / paragraph evidence note missing => forced revision); no `min_score` threshold.
+   - Evidence policy: each narrative paragraph should end with an LLM-generated `证据说明` line containing evidence index, source explanation, and confidence reasoning.
 4. **Pipeline Entry**: `pipeline.start_stage` 仅支持 `1/2/3`，从指定阶段进入后按线性主链顺序执行到结束。
    - E2E 可观测性：循环状态统一写入 `trace.loop_status`，关键字段包括 `forum` 与 `stage3_chapter_review`。
 5. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
+   - Pipeline Console supports `pipeline.user_analysis_instruction` input and persists it to `config.yaml`.
+   - Report Preview supports both Markdown and HTML report download/preview (`report.md` + `report.html`).
    - A shared lock file at `report/.pipeline_running.lock` is used for concurrency control, created/cleared by both CLI and dashboard runs.
    - Status file reliability: reads fall back to an empty status when the file is missing/empty/invalid; writes use atomic replace to avoid partial files.
    - `report/status.json` 使用事件流结构（`version/run_id/events[]`），仅记录节点 `enter/exit`。
@@ -123,6 +126,7 @@ flowchart TD
 ```
 shared = {
   "pipeline_state": {"start_stage": 1, "current_stage": 0, "completed_stages": []},
+  "analysis_context": {"time_range": {...}, "time_range_text": "...", "user_analysis_instruction": "..."},
   "data": {...},
   "config": {...},
   "search": {...},

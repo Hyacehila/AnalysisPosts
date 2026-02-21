@@ -87,6 +87,13 @@ config = apply_defaults(raw_config)
 data_candidates = list_data_candidates("data")
 
 with st.form("config_form"):
+    user_analysis_instruction = st.text_area(
+        "User Analysis Instruction",
+        value=str(config.get("pipeline", {}).get("user_analysis_instruction", "") or ""),
+        placeholder="例如：重点分析官方回应时效性、公众质疑焦点与证据一致性。",
+        help="该指令会注入到 Stage2/Stage3 智能体提示词中，用于定向分析重点。",
+    )
+
     st.subheader("Key Settings")
     left, right = st.columns(2)
 
@@ -372,6 +379,7 @@ flat_config = {
     "data.belief_system_path": belief_system_path,
     "data.publisher_decision_path": publisher_decision_path,
     "pipeline.start_stage": int(start_stage),
+    "pipeline.user_analysis_instruction": user_analysis_instruction.strip(),
     "stage1.mode": stage1_mode,
     "stage1.checkpoint.enabled": bool(checkpoint_enabled),
     "stage1.checkpoint.save_every": int(checkpoint_save_every),

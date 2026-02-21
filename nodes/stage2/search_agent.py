@@ -49,9 +49,12 @@ class SearchAgentNode(MonitoredNode):
     """Analyze search-derived context and produce cross-source findings."""
 
     def prep(self, shared):
+        analysis_context = shared.get("analysis_context", {}) or {}
         return {
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
             "search_results": shared.get("search_results", {}),
+            "analysis_time_range_text": str(analysis_context.get("time_range_text", "")).strip(),
+            "user_analysis_instruction": str(analysis_context.get("user_analysis_instruction", "")).strip(),
             "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
@@ -64,6 +67,12 @@ class SearchAgentNode(MonitoredNode):
 
 ## 搜索结果
 {json.dumps(prep_res.get("search_results", {}), ensure_ascii=False)}
+
+## 约束上下文
+- 分析时间范围: {prep_res.get("analysis_time_range_text") or "未知"}
+- 用户分析指令: {prep_res.get("user_analysis_instruction") or "无"}
+
+请优先筛选和分析与该时间范围和用户指令直接相关的外部信息，避免引入无关时段或偏题内容。
 
 输出 JSON：
 {{

@@ -78,20 +78,6 @@ def _extract_keywords(*texts: str, limit: int = 8) -> List[str]:
     return [token for token, _ in sorted_tokens[:limit]]
 
 
-def _extract_dates(*texts: str, limit: int = 6) -> List[str]:
-    seen = set()
-    ordered = []
-    for text in texts:
-        for date in re.findall(r"\d{4}-\d{2}-\d{2}", str(text or "")):
-            if date in seen:
-                continue
-            seen.add(date)
-            ordered.append(date)
-            if len(ordered) >= limit:
-                return ordered
-    return ordered
-
-
 class PlanOutlineNode(MonitoredNode):
     """Plan report outline from Stage2 outputs."""
 
@@ -101,6 +87,7 @@ class PlanOutlineNode(MonitoredNode):
         insights = stage3_data.get("insights", {})
         search_context = stage3_data.get("analysis_data", {}).get("search_context", {})
         trace = stage3_data.get("trace") or shared.get("trace", {})
+        analysis_context = shared.get("analysis_context", {}) or {}
         forum_rounds = trace.get("forum_rounds", [])
         data_summary = shared.get("agent", {}).get("data_summary", {})
         keywords = _extract_keywords(
@@ -108,10 +95,8 @@ class PlanOutlineNode(MonitoredNode):
             json.dumps(search_context, ensure_ascii=False),
             json.dumps(data_summary, ensure_ascii=False),
         )
-        dates = _extract_dates(
-            json.dumps(insights, ensure_ascii=False),
-            json.dumps(search_context, ensure_ascii=False),
-        )
+        time_range_text = str(analysis_context.get("time_range_text", "")).strip()
+        user_analysis_instruction = str(analysis_context.get("user_analysis_instruction", "")).strip()
 
         return {
             "charts": charts,
@@ -120,7 +105,8 @@ class PlanOutlineNode(MonitoredNode):
             "search_context": search_context,
             "data_summary": data_summary,
             "event_keywords": keywords,
-            "event_dates": dates,
+            "analysis_time_range_text": time_range_text,
+            "user_analysis_instruction": user_analysis_instruction,
             "reasoning_enabled_stage3": reasoning_enabled_stage3(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
@@ -142,13 +128,15 @@ class PlanOutlineNode(MonitoredNode):
             f"图表数量: {len(charts)}\n"
             f"图表ID候选: {chart_ids[:12]}\n"
             f"事件关键词: {prep_res.get('event_keywords', [])}\n"
-            f"时间线线索: {prep_res.get('event_dates', [])}\n"
+            f"分析时间范围: {prep_res.get('analysis_time_range_text') or '未知'}\n"
+            f"用户分析指令: {prep_res.get('user_analysis_instruction') or '无'}\n"
             f"洞察摘要:\n{chr(10).join(insight_preview) if insight_preview else '无'}\n"
             f"论坛轮次: {len(prep_res.get('forum_rounds', []))}\n"
             "章节要求：\n"
             "1. 标题必须贴合真实事件，不得泛化。\n"
             "2. 禁止使用[议题A]/[争议点]/[媒体A]等占位符。\n"
             "3. 每章 relevant_charts 必须给出可用图表ID。\n"
+            "4. 章节组织必须显式回应用户分析指令。\n"
             "仅输出 JSON 对象。"
         )
 

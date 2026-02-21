@@ -35,6 +35,15 @@ def _build_shared() -> dict:
             "reflections": [],
             "insight_provenance": {},
         },
+        "analysis_context": {
+            "time_range": {
+                "start": "2024-08-16 10:00:00",
+                "end": "2024-08-31 22:00:00",
+                "span_hours": 373.0,
+            },
+            "time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "重点分析官方部门回应是否充分",
+        },
     }
 
 
@@ -226,3 +235,7 @@ def test_forum_prompt_contains_explicit_event_keyword_context(monkeypatch):
     node.exec(prep_res)
 
     assert "事件关键词" in captured["prompt"]
+    assert "分析时间范围" in captured["prompt"]
+    assert "2024-08-16 10:00:00 至 2024-08-31 22:00:00" in captured["prompt"]
+    assert "用户分析指令" in captured["prompt"]
+    assert "重点分析官方部门回应是否充分" in captured["prompt"]

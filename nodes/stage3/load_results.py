@@ -70,6 +70,7 @@ class LoadAnalysisResultsNode(MonitoredNode):
                 "tables": stage2_results.get("tables", []),
                 "execution_log": stage2_results.get("execution_log", {}),
                 "search_context": stage2_results.get("search_context", {}),
+                "analysis_context": stage2_results.get("analysis_context", {}),
             }
 
             chart_analyses = stage2_results.get("chart_analyses", {})
@@ -111,6 +112,13 @@ class LoadAnalysisResultsNode(MonitoredNode):
 
     def post(self, shared: Dict[str, Any], prep_res: Dict[str, Any], exec_res: Dict[str, Any]) -> str:
         shared["stage3_data"] = exec_res
+        loaded_context = exec_res.get("analysis_data", {}).get("analysis_context", {})
+        if isinstance(loaded_context, dict) and loaded_context:
+            current_context = shared.setdefault("analysis_context", {})
+            for key, value in loaded_context.items():
+                if key not in current_context or current_context.get(key) in (None, "", {}, []):
+                    current_context[key] = value
+            shared["analysis_context"] = current_context
         loaded_trace = exec_res.get("trace", {})
         if isinstance(loaded_trace, dict):
             shared_trace = shared.get("trace", {})

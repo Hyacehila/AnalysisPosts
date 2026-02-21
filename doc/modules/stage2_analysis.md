@@ -17,6 +17,12 @@ Stage2 将 Stage1 增强数据转换为可报告化分析产物，输出：
 
 当前已完成 **Track B 全量（B1~B9）**：双信源 + 动态论坛循环 + 实时补充 + 合并收敛 + 全链路 live API 验证。
 
+新增上下文能力（本轮）：
+
+- `analysis_context.time_range / time_range_text`：由增强数据时间字段（`publish_time`/`created_at`）提取。
+- `analysis_context.user_analysis_instruction`：来自 `pipeline.user_analysis_instruction`。
+- Stage2 提示词在 Decision / Forum / SearchAgent 中统一注入上述上下文，以约束时效与分析重点。
+
 ---
 
 ## 2. 当前 Flow（B1~B9）
@@ -86,7 +92,8 @@ flowchart LR
 - `SupplementSearchNode`：追加搜索并刷新 SearchAgent 结论
 - `VisualAnalysisNode`：按需调用 GLM4.5V 解析图表
 - `MergeResultsNode`：合并 Data/Search/Forum 产物，回填兼容 `stage2_results`
-- `ForumHostNode` 提示词显式注入“事件关键词”上下文，避免无焦点补充检索。
+- `ForumHostNode` 提示词显式注入“事件关键词 + 分析时间范围 + 用户分析指令”上下文，避免无焦点补充检索。
+- 当用户诉求尚未覆盖时，主持人优先引导 `supplement_search` 并输出更明确的查询 directive。
 
 循环治理：
 
@@ -133,6 +140,12 @@ shared["config"]["stage2_loops"] = {
     "forum_min_rounds_for_sufficient": int,
 }
 
+shared["analysis_context"] = {
+    "user_analysis_instruction": str,
+    "time_range": {"start": str, "end": str, "span_hours": float, "source_field": str} | None,
+    "time_range_text": str,
+}
+
 shared["forum"] = {
     "current_round": 0,
     "rounds": [],
@@ -159,6 +172,7 @@ shared["trace"]["loop_status"] = {
 - `tests/unit/stage2/test_stage2_search_agent.py`
 - `tests/unit/stage2/test_stage2_parallel_flow.py`
 - `tests/unit/stage2/test_stage2_data_agent_trace.py`
+- `tests/unit/stage2/test_stage2_load_data.py`
 - `tests/unit/stage2/test_stage2_forum.py`
 - `tests/unit/stage2/test_stage2_supplement.py`
 - `tests/unit/stage2/test_stage2_visual.py`

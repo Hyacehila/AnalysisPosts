@@ -22,6 +22,7 @@ class SaveAnalysisResultsNode(MonitoredNode):
             "insights": stage2_results.get("insights", {}),
             "execution_log": stage2_results.get("execution_log", {}),
             "search_context": stage2_results.get("search_context", {}),
+            "analysis_context": shared.get("analysis_context", {}),
             "trace": shared.get("trace", {}),
         }
 
@@ -34,6 +35,7 @@ class SaveAnalysisResultsNode(MonitoredNode):
             "tables": prep_res["tables"],
             "execution_log": prep_res["execution_log"],
             "search_context": prep_res["search_context"],
+            "analysis_context": prep_res.get("analysis_context", {}),
         }
 
         analysis_data_path = os.path.join(output_dir, "analysis_data.json")

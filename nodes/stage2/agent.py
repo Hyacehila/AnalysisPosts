@@ -326,12 +326,15 @@ class DecisionToolsNode(MonitoredNode):
 
     def prep(self, shared):
         agent = shared.get("agent", {})
+        analysis_context = shared.get("analysis_context", {}) or {}
         return {
             "data_summary": agent.get("data_summary", ""),
             "available_tools": agent.get("available_tools", []),
             "execution_history": agent.get("execution_history", []),
             "current_iteration": agent.get("current_iteration", 0),
             "max_iterations": agent.get("max_iterations", 10),
+            "analysis_time_range_text": str(analysis_context.get("time_range_text", "")).strip(),
+            "user_analysis_instruction": str(analysis_context.get("user_analysis_instruction", "")).strip(),
             "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
@@ -378,6 +381,10 @@ class DecisionToolsNode(MonitoredNode):
 
 ## 数据概况
 {data_summary}
+
+## 分析上下文约束
+- 分析时间范围: {prep_res.get("analysis_time_range_text") or "未知"}
+- 用户分析指令: {prep_res.get("user_analysis_instruction") or "无"}
 
 ## 可用分析工具
 {tools_text}

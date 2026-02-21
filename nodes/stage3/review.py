@@ -95,6 +95,40 @@ def _find_placeholder(text: str) -> str:
     return ""
 
 
+def _is_narrative_block(block: str) -> bool:
+    text = str(block or "").strip()
+    if not text:
+        return False
+    if text.startswith("#"):
+        return False
+    if text.startswith("- ") or text.startswith("* "):
+        return False
+    if text.startswith("!["):
+        return False
+    if text.startswith("证据说明："):
+        return False
+    return True
+
+
+def _missing_evidence_notes(chapter_text: str) -> List[str]:
+    blocks = [chunk.strip() for chunk in re.split(r"\n\s*\n", str(chapter_text or "")) if chunk.strip()]
+    issues: List[str] = []
+    for idx, block in enumerate(blocks):
+        if not _is_narrative_block(block):
+            continue
+        next_block = blocks[idx + 1] if idx + 1 < len(blocks) else ""
+        if not next_block.startswith("证据说明："):
+            issues.append("段落后缺少“证据说明：”")
+            continue
+        if re.search(r"\[E\d+\]", next_block) is None:
+            issues.append("证据说明缺少证据索引（如 [E1]）")
+        if "置信度：" not in next_block:
+            issues.append("证据说明缺少置信度字段")
+        if "理由：" not in next_block:
+            issues.append("证据说明缺少置信度理由")
+    return list(dict.fromkeys(issues))
+
+
 class ReviewChaptersNode(MonitoredNode):
     """Review generated chapters and control revision loop."""
 
@@ -129,7 +163,8 @@ class ReviewChaptersNode(MonitoredNode):
                 "评审要求:\n"
                 "1. 发现[议题X]/[争议点]/[媒体A]等占位符必须判定 needs_revision=true。\n"
                 "2. 数据、人物、事件名称需与参考数据一致。\n"
-                "3. 反馈需指出具体缺失点（证据、数字、逻辑）。\n"
+                "3. 每个正文段落后都应有“证据说明：”并包含证据索引、置信度、理由。\n"
+                "4. 反馈需指出具体缺失点（证据、数字、逻辑）。\n"
                 "仅输出 JSON。"
             )
             try:
@@ -155,6 +190,17 @@ class ReviewChaptersNode(MonitoredNode):
                 score = min(score, 35)
                 addition = f"检测到占位符[{placeholder}]，必须替换为真实事件信息。"
                 feedback = f"{feedback} {addition}".strip() if feedback else addition
+
+            evidence_issues = _missing_evidence_notes(chapter_text)
+            if evidence_issues:
+                needs_revision = True
+                score = min(score, 45)
+                addition = "；".join(evidence_issues)
+                feedback = (
+                    f"{feedback} 段落证据融合不完整：{addition}。".strip()
+                    if feedback
+                    else f"段落证据融合不完整：{addition}。"
+                )
 
             reviews.append(
                 {

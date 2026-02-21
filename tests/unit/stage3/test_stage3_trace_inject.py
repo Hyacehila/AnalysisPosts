@@ -5,10 +5,10 @@ InjectTraceNode unit tests.
 from nodes import InjectTraceNode
 
 
-def test_inject_trace_appends_details_block():
+def test_inject_trace_appends_reference_index_without_details():
     shared = {
         "stage3_results": {
-            "reviewed_report_text": "# 报告\n\n## 结论\n文本",
+            "reviewed_report_text": "# 报告\n\n## 结论\n这是正文段落。\n\n证据说明：该判断由[E1]支持。来源为统计图表。置信度：高。理由：多源一致。",
         },
         "trace": {
             "insight_provenance": {
@@ -29,7 +29,9 @@ def test_inject_trace_appends_details_block():
     action = node.post(shared, prep_res, exec_res)
 
     assert action == "default"
-    assert "<details>" in shared["stage3_results"]["report_text"]
+    assert "<details>" not in shared["stage3_results"]["report_text"]
+    assert "参考资料与证据索引" in shared["stage3_results"]["report_text"]
+    assert "[E1]" in shared["stage3_results"]["report_text"]
     assert "DataAgent" in shared["stage3_results"]["report_text"]
 
 
@@ -79,3 +81,4 @@ def test_inject_trace_supports_dict_provenance_schema():
     report_text = shared["stage3_results"]["report_text"]
     assert "sentiment_trend_chart" in report_text
     assert "生成了情感趋势图" in report_text
+    assert "置信度" in report_text

@@ -9,6 +9,7 @@ data:
   publisher_decision_path: data/publisher_decision.json
 pipeline:
   start_stage: 1
+  user_analysis_instruction: ""
 stage1:
   mode: async
   checkpoint:

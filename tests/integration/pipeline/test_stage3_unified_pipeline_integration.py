@@ -19,8 +19,16 @@ def _shared(max_rounds=2):
         },
         "stage3_results": {
             "chapters": [
-                {"id": "ch01", "title": "执行摘要", "content": "A"},
-                {"id": "ch02", "title": "趋势分析", "content": "B"},
+                {
+                    "id": "ch01",
+                    "title": "执行摘要",
+                    "content": "A。\n\n证据说明：该判断由[E1]支持。来源为统计结果。置信度：高。理由：口径一致。",
+                },
+                {
+                    "id": "ch02",
+                    "title": "趋势分析",
+                    "content": "B。\n\n证据说明：该判断由[E2]支持。来源为趋势图。置信度：中。理由：局部样本不足。",
+                },
             ],
             "review_round": 0,
         },

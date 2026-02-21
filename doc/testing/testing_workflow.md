@@ -48,7 +48,19 @@ uv run pytest tests/e2e/cli -v -m "live_api"
 uv run pytest tests/e2e/dashboard_ui -v -m "ui_e2e and live_api"
 ```
 
-### 2.3 全量验收（脚本）
+### 2.3 真实运行验收（本地人工）
+
+```bash
+uv run main.py
+```
+
+验收时需额外检查 `report/`：
+
+- `report.md`、`report.html`、`trace.json`、`status.json` 均已刷新
+- 报告正文为段落级“证据说明”融合（非 `<details>` 堆叠）
+- `status.json` 事件流显示进入终端节点并完成输出
+
+### 2.4 全量验收（脚本）
 
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1

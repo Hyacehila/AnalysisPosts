@@ -23,6 +23,15 @@ def _build_shared():
             "reflections": [],
             "insight_provenance": {},
         },
+        "analysis_context": {
+            "time_range": {
+                "start": "2024-08-16 10:00:00",
+                "end": "2024-08-31 22:00:00",
+                "span_hours": 373.0,
+            },
+            "time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "重点分析官方回应是否及时",
+        },
     }
 
 
@@ -85,3 +94,26 @@ def test_search_agent_respects_stage2_reasoning_switch(monkeypatch):
     node.exec(prep_res)
 
     assert captured["kwargs"]["enable_reasoning"] is False
+
+
+def test_search_agent_prompt_contains_time_range_and_user_instruction(monkeypatch):
+    shared = _build_shared()
+    captured = {}
+
+    def _fake_llm(*args, **kwargs):
+        captured["prompt"] = args[0]
+        return (
+            '{"background_context":"背景补充",'
+            '"consistency_points":[],"conflict_points":[],"blind_spots":[],"recommended_followups":[]}'
+        )
+
+    monkeypatch.setattr(search_agent_module, "call_glm46", _fake_llm)
+
+    node = SearchAgentNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert "分析时间范围" in captured["prompt"]
+    assert "2024-08-16 10:00:00 至 2024-08-31 22:00:00" in captured["prompt"]
+    assert "用户分析指令" in captured["prompt"]
+    assert "重点分析官方回应是否及时" in captured["prompt"]

@@ -9,7 +9,7 @@
 ## Modules & Processing Detail
 - [Stage 1 Enhancement](modules/stage1_enhancement.md) — Six-dimensional expansion, parallel NLP, and asynchronous operations.
 - [Stage 2 Analysis](modules/stage2_analysis.md) — Agent decision loops, query search flow, ForumHost debate cycles.
-- [Stage 3 Report](modules/stage3_report.md) — Document outline planning, chapter parallel generation, and traceback evidence details injection.
+- [Stage 3 Report](modules/stage3_report.md) — Document outline planning, chapter parallel generation, and paragraph-level evidence fusion with indexed appendix.
 - [Analysis Tools](modules/analysis_tools.md) — Technical details of the 37 available tools (categorization, purpose).
 - [Utilities](modules/utils.md) — Prompt wrapper, LLM retry wrapper, File IO.
 

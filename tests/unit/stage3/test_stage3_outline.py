@@ -9,6 +9,15 @@ from nodes import PlanOutlineNode
 def _shared_for_outline():
     return {
         "agent": {"data_summary": {"total_posts": 30}},
+        "analysis_context": {
+            "time_range": {
+                "start": "2024-08-16 10:00:00",
+                "end": "2024-08-31 22:00:00",
+                "span_hours": 373.0,
+            },
+            "time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "重点分析官方回应时效性",
+        },
         "stage3_data": {
             "analysis_data": {
                 "charts": [{"id": "c1", "title": "情感趋势"}],
@@ -85,3 +94,7 @@ def test_outline_prompt_contains_real_insight_context_and_placeholder_guard(mock
     prompt = mock_llm.call_args.args[0]
     assert "首都骑游文明公约与张艺兴夜骑在8月21日出现峰值" in prompt
     assert "占位符" in prompt
+    assert "分析时间范围" in prompt
+    assert "2024-08-16 10:00:00 至 2024-08-31 22:00:00" in prompt
+    assert "用户分析指令" in prompt
+    assert "重点分析官方回应时效性" in prompt

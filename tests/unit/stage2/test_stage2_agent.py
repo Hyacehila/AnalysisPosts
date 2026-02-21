@@ -102,6 +102,15 @@ class TestDecisionToolsNode:
             "max_iterations": 10,
             "is_finished": False,
         }
+        minimal_shared["analysis_context"] = {
+            "time_range": {
+                "start": "2024-08-16 10:00:00",
+                "end": "2024-08-31 22:00:00",
+                "span_hours": 373.0,
+            },
+            "time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "优先核验官方回应与公众质疑是否一致",
+        }
         return minimal_shared
 
     def test_prep_extracts_agent_state(self, minimal_shared):
@@ -130,6 +139,8 @@ class TestDecisionToolsNode:
             "execution_history": [],
             "current_iteration": 0,
             "max_iterations": 10,
+            "analysis_time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "优先核验官方回应与公众质疑是否一致",
         }
         result = node.exec(prep_res)
         assert result["action"] == "execute"
@@ -151,6 +162,8 @@ class TestDecisionToolsNode:
             "execution_history": [{"tool_name": "a", "summary": "done"}],
             "current_iteration": 5,
             "max_iterations": 10,
+            "analysis_time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "优先核验官方回应与公众质疑是否一致",
         }
         result = node.exec(prep_res)
         assert result["action"] == "finish"
@@ -165,6 +178,8 @@ class TestDecisionToolsNode:
             "execution_history": [],
             "current_iteration": 0,
             "max_iterations": 10,
+            "analysis_time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "优先核验官方回应与公众质疑是否一致",
         }
         result = node.exec(prep_res)
         assert result["action"] == "execute"
@@ -181,6 +196,8 @@ class TestDecisionToolsNode:
             "execution_history": [],
             "current_iteration": 0,
             "max_iterations": 10,
+            "analysis_time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "优先核验官方回应与公众质疑是否一致",
         }
         result = node.exec(prep_res)
         assert result["action"] == "execute"
@@ -204,6 +221,27 @@ class TestDecisionToolsNode:
 
         assert result["action"] == "execute"
         assert mock_llm.call_args.kwargs["enable_reasoning"] is False
+
+    @patch("nodes.stage2.agent.call_glm46")
+    def test_decision_prompt_contains_time_range_and_user_instruction(self, mock_llm, minimal_shared):
+        mock_llm.return_value = json.dumps(
+            {
+                "action": "execute",
+                "tool_name": "sentiment_distribution_stats",
+                "reason": "test",
+            }
+        )
+        shared = self._make_agent_shared(minimal_shared)
+        node = DecisionToolsNode()
+
+        prep_res = node.prep(shared)
+        node.exec(prep_res)
+        prompt = mock_llm.call_args.args[0]
+
+        assert "分析时间范围" in prompt
+        assert "2024-08-16 10:00:00 至 2024-08-31 22:00:00" in prompt
+        assert "用户分析指令" in prompt
+        assert "优先核验官方回应与公众质疑是否一致" in prompt
 
     def test_post_execute_action(self, minimal_shared):
         """action=execute → 设置 next_tool"""

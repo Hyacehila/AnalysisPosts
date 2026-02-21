@@ -49,10 +49,10 @@ flowchart LR
 |:---|:---|
 | `ClearStage3OutputsNode` | 清理 `report.md/report.html`，保留 Stage2 产物、`images/` 与 `status.json` |
 | `LoadAnalysisResultsNode` | 内存优先读取 Stage2 结果，文件回退加载 JSON 与 trace |
-| `PlanOutlineNode` | LLM 规划报告大纲（失败时回退默认大纲）；提示词注入洞察摘要、事件关键词、时间线并禁止占位符 |
-| `GenerateChaptersBatchNode` | 并行逐章生成内容（支持反馈驱动重生成）；提示词注入图表分析正文、洞察摘要、搜索背景并禁止占位符 |
-| `ReviewChaptersNode` | 章节级评审循环，输出 `needs_revision/satisfied` 路由；占位符命中为硬失败并强制修订 |
-| `InjectTraceNode` | 注入 `<details>` 证据追溯块 |
+| `PlanOutlineNode` | LLM 规划报告大纲（失败时回退默认大纲）；提示词注入洞察摘要、事件关键词、分析时间范围、用户指令并禁止占位符 |
+| `GenerateChaptersBatchNode` | 并行逐章生成内容（支持反馈驱动重生成）；提示词注入图表分析正文、洞察摘要、搜索背景、证据卡索引，并要求“段落后证据说明” |
+| `ReviewChaptersNode` | 章节级评审循环，输出 `needs_revision/satisfied` 路由；占位符命中或段落证据说明缺失为硬失败并强制修订 |
+| `InjectTraceNode` | 追加“参考资料与证据索引”精简附录（正文证据说明为主，附录用于审计） |
 | `MethodologyAppendixNode` | 追加方法论附录（工具调用、循环状态、局限性） |
 | `FormatReportNode` | 执行摘要注入、目录生成、图片路径归一化、图表附录兜底 |
 | `RenderHTMLNode` | Markdown 渲染为交互 HTML（图片放大预览 + `<details>` 保留） |
@@ -88,6 +88,7 @@ stage3:
 由 `LoadAnalysisResultsNode` 写入：
 
 - `analysis_data`
+- `analysis_data.analysis_context`
 - `chart_analyses`
 - `insights`
 - `trace`
@@ -135,10 +136,20 @@ stage3:
 
 ### 5.3 Trace 追溯块
 
-`InjectTraceNode` 将 `trace.insight_provenance` 以 `<details>` 折叠块形式注入报告，并兼容两种证据结构：
+`InjectTraceNode` 将 `trace.insight_provenance` 归一化为证据索引附录，并兼容两种证据结构：
 
 - 旧结构：`insight_key -> [ {source,evidence,...}, ... ]`
 - 新结构：`insight_key -> {text, supporting_evidence:[...], confidence,...}`
+
+正文证据融合规则（本轮）：
+
+- 每个实质性段落后必须有一行 `证据说明：...`
+- `证据说明` 必须包含：
+  - 证据索引（如 `[E1]`）
+  - 来源解释（非裸 source 名）
+  - 置信度（高/中/低）
+  - 置信度理由
+- 若缺失上述要素，`ReviewChaptersNode` 会强制进入修订循环
 
 ---
 

@@ -15,8 +15,16 @@ def _shared_for_review(round_no=0, max_rounds=2):
         },
         "stage3_results": {
             "chapters": [
-                {"id": "ch01", "title": "执行摘要", "content": "内容 A"},
-                {"id": "ch02", "title": "趋势分析", "content": "内容 B"},
+                {
+                    "id": "ch01",
+                    "title": "执行摘要",
+                    "content": "内容 A。\n\n证据说明：该结论由[E1]支持。来源为情感分布统计。置信度：高。理由：样本覆盖完整。",
+                },
+                {
+                    "id": "ch02",
+                    "title": "趋势分析",
+                    "content": "内容 B。\n\n证据说明：该结论由[E2]支持。来源为趋势图。置信度：中。理由：部分时间段数据缺失。",
+                },
             ],
             "review_round": round_no,
         },
@@ -113,3 +121,22 @@ def test_review_flags_placeholder_as_hard_failure(mock_llm):
     first_review = exec_res["reviews"][0]
     assert first_review["needs_revision"] is True
     assert "占位符" in first_review["feedback"]
+
+
+@patch("nodes.stage3.review.call_glm46")
+def test_review_flags_missing_paragraph_evidence_note_as_hard_failure(mock_llm):
+    mock_llm.side_effect = [
+        '{"score": 90, "needs_revision": false, "feedback": "ok"}',
+        '{"score": 92, "needs_revision": false, "feedback": "ok"}',
+    ]
+    shared = _shared_for_review(round_no=0, max_rounds=2)
+    shared["stage3_results"]["chapters"][0]["content"] = "这是一个没有证据说明的段落。"
+
+    node = ReviewChaptersNode()
+    prep_res = node.prep(shared)
+    exec_res = node.exec(prep_res)
+
+    assert exec_res["needs_revision"] is True
+    first_review = exec_res["reviews"][0]
+    assert first_review["needs_revision"] is True
+    assert "证据说明" in first_review["feedback"]

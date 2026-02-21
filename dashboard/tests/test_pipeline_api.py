@@ -35,7 +35,10 @@ def test_build_shared_from_config(tmp_path, monkeypatch):
             "belief_system_path": "data/believe_system_common.json",
             "publisher_decision_path": "data/publisher_decision.json",
         },
-        "pipeline": {"start_stage": 1},
+        "pipeline": {
+            "start_stage": 1,
+            "user_analysis_instruction": "重点分析官方回应时效性",
+        },
         "stage1": {"mode": "async", "checkpoint": {"enabled": False}},
         "stage2": {"mode": "agent", "tool_source": "mcp", "agent_max_iterations": 1},
         "stage3": {"max_iterations": 1, "chapter_review_max_rounds": 1},
@@ -49,6 +52,7 @@ def test_build_shared_from_config(tmp_path, monkeypatch):
     shared = build_shared_from_config(str(path))
     assert "config" in shared
     assert shared["pipeline_state"]["start_stage"] == 1
+    assert shared["analysis_context"]["user_analysis_instruction"] == "重点分析官方回应时效性"
 
 
 def test_run_pipeline_dry_run(tmp_path, monkeypatch):
@@ -62,7 +66,10 @@ def test_run_pipeline_dry_run(tmp_path, monkeypatch):
             "belief_system_path": "data/believe_system_common.json",
             "publisher_decision_path": "data/publisher_decision.json",
         },
-        "pipeline": {"start_stage": 1},
+        "pipeline": {
+            "start_stage": 1,
+            "user_analysis_instruction": "重点分析官方回应时效性",
+        },
         "stage1": {"mode": "async", "checkpoint": {"enabled": False}},
         "stage2": {"mode": "agent", "tool_source": "mcp", "agent_max_iterations": 1},
         "stage3": {"max_iterations": 1, "chapter_review_max_rounds": 1},
@@ -74,6 +81,7 @@ def test_run_pipeline_dry_run(tmp_path, monkeypatch):
 
     shared = run_pipeline(str(path), dry_run=True)
     assert "config" in shared
+    assert shared["analysis_context"]["user_analysis_instruction"] == "重点分析官方回应时效性"
 
 
 def test_list_data_candidates(tmp_path):
@@ -90,12 +98,14 @@ def test_build_config_dict_from_form():
         "data.input_path": "data/sample.json",
         "data.resume_if_exists": False,
         "pipeline.start_stage": 2,
+        "pipeline.user_analysis_instruction": "重点分析官方回应时效性",
         "stage1.checkpoint.enabled": False,
     }
     cfg = build_config_dict_from_form(flat)
     assert cfg["data"]["input_path"] == "data/sample.json"
     assert cfg["data"]["resume_if_exists"] is False
     assert cfg["pipeline"]["start_stage"] == 2
+    assert cfg["pipeline"]["user_analysis_instruction"] == "重点分析官方回应时效性"
     assert cfg["stage1"]["checkpoint"]["enabled"] is False
 
 

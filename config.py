@@ -27,6 +27,7 @@ class DataConfig:
 @dataclass
 class PipelineConfig:
     start_stage: int = 1
+    user_analysis_instruction: str = ""
 
 
 @dataclass
@@ -211,6 +212,8 @@ def validate_config(config: AppConfig) -> None:
     start_stage = config.pipeline.start_stage
     if start_stage not in {1, 2, 3}:
         raise ValueError(f"start_stage must be one of [1,2,3], got {start_stage}")
+    if not isinstance(config.pipeline.user_analysis_instruction, str):
+        raise ValueError("pipeline.user_analysis_instruction must be a string")
 
     needs_stage2_output = start_stage > 1
     if needs_stage2_output and not os.path.exists(config.data.output_path):
@@ -305,7 +308,16 @@ def config_to_shared(config: AppConfig) -> dict:
             "current_stage": 0,
             "completed_stages": [],
         },
+        "analysis_context": {
+            "user_analysis_instruction": str(config.pipeline.user_analysis_instruction or "").strip(),
+            "time_range": None,
+            "time_range_text": "",
+        },
         "config": {
+            "pipeline": {
+                "start_stage": config.pipeline.start_stage,
+                "user_analysis_instruction": str(config.pipeline.user_analysis_instruction or "").strip(),
+            },
             "enhancement_mode": config.stage1.mode,
             "stage1_checkpoint": {
                 "enabled": config.stage1.checkpoint.enabled,

@@ -41,6 +41,7 @@ def test_load_config_from_yaml(tmp_path, monkeypatch):
                 "  request_timeout_seconds: 120",
                 "pipeline:",
                 "  start_stage: 2",
+                "  user_analysis_instruction: \"重点分析官方响应时效性\"",
                 "stage1:",
                 "  mode: \"async\"",
                 "stage2:",
@@ -64,6 +65,7 @@ def test_load_config_from_yaml(tmp_path, monkeypatch):
     assert config.data.input_path == "data/posts.json"
     assert config.data.resume_if_exists is False
     assert config.pipeline.start_stage == 2
+    assert config.pipeline.user_analysis_instruction == "重点分析官方响应时效性"
     assert config.runtime.concurrent_num == 10
     assert config.llm.glm_api_key == "yaml-key"
     assert config.llm.acceptance_profile == "quality"
@@ -407,6 +409,23 @@ def test_config_to_shared_contains_required_keys():
         "data_agent": {},
         "search_agent": {},
     }
+    assert shared["analysis_context"] == {
+        "user_analysis_instruction": "",
+        "time_range": None,
+        "time_range_text": "",
+    }
+
+
+def test_config_to_shared_contains_user_analysis_instruction():
+    config = AppConfig(
+        pipeline=PipelineConfig(
+            start_stage=1,
+            user_analysis_instruction="优先分析官方回应是否及时且一致",
+        ),
+    )
+    shared = config_to_shared(config)
+
+    assert shared["analysis_context"]["user_analysis_instruction"] == "优先分析官方回应是否及时且一致"
 
 
 def test_config_to_shared_defaults_llm_controls_to_fast_profile():

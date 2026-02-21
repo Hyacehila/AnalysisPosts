@@ -133,6 +133,7 @@ class ForumHostNode(MonitoredNode):
     def prep(self, shared):
         forum = shared.setdefault("forum", {})
         config_loops = shared.get("config", {}).get("stage2_loops", {}) or {}
+        analysis_context = shared.get("analysis_context", {}) or {}
         return {
             "round": int(forum.get("current_round", 0)),
             "max_rounds": int(config_loops.get("forum_max_rounds", 5)),
@@ -143,6 +144,8 @@ class ForumHostNode(MonitoredNode):
             "previous_rounds": list(forum.get("rounds", []) or []),
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
             "event_keywords": _extract_event_keywords(shared.get("agent", {}).get("data_summary", "")),
+            "analysis_time_range_text": str(analysis_context.get("time_range_text", "")).strip(),
+            "user_analysis_instruction": str(analysis_context.get("user_analysis_instruction", "")).strip(),
             "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
@@ -156,6 +159,12 @@ class ForumHostNode(MonitoredNode):
 
 事件关键词：
 {prep_res.get("event_keywords", [])}
+
+分析时间范围：
+{prep_res.get("analysis_time_range_text") or "未知"}
+
+用户分析指令：
+{prep_res.get("user_analysis_instruction") or "无"}
 
 DataAgent结果：
 {json.dumps(prep_res.get("data_agent_results", {}), ensure_ascii=False)[:2500]}
@@ -173,7 +182,11 @@ SearchAgent结果：
   "decision": "supplement_data|supplement_search|supplement_visual|sufficient",
   "directive": {{}},
   "synthesized_conclusions": []
-}}"""
+}}
+
+要求：
+1) 若用户分析指令尚未被现有证据充分覆盖，必须优先输出 supplement_search 并在 directive.queries 中给出明确检索指令。
+2) directive.reason 必须解释该动作如何弥补时间线或用户诉求缺口。"""
 
         try:
             resp = call_glm46(

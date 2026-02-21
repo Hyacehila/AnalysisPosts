@@ -1,76 +1,93 @@
 {
   "charts": [
     {
-      "id": "publisher_topic_distribution_20260221_154402",
-      "type": "bar_chart",
-      "title": "发布者话题偏好分布",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_topic_distribution_20260221_154402.png",
-      "source_tool": "publisher_topic_distribution_chart",
-      "description": "堆叠展示不同发布者的主题偏好差异"
-    },
-    {
-      "id": "sentiment_pie_20260221_154742",
-      "type": "pie_chart",
-      "title": "情感分布饼图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_pie_20260221_154742.png",
-      "source_tool": "sentiment_pie_chart",
-      "description": "展示博文情感极性的整体分布情况"
-    },
-    {
-      "id": "geographic_heatmap_20260221_154754",
-      "type": "heatmap",
-      "title": "地区舆情热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_heatmap_20260221_154754.png",
-      "source_tool": "geographic_heatmap",
-      "description": "展示各地区在不同舆情指标上的表现差异"
-    },
-    {
-      "id": "geographic_bar_20260221_154810",
-      "type": "bar_chart",
-      "title": "Top15 地区分布图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_bar_20260221_154810.png",
-      "source_tool": "geographic_bar_chart",
-      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
-    },
-    {
-      "id": "topic_evolution_20260221_154823",
+      "id": "sentiment_trend_20260221_182030",
       "type": "line_chart",
-      "title": "主题热度时序演化",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_evolution_20260221_154823.png",
-      "source_tool": "topic_evolution_chart",
-      "description": "展示Top5主题随时间的热度变化趋势"
+      "title": "情感趋势变化图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_trend_20260221_182030.png",
+      "source_tool": "sentiment_trend_chart",
+      "description": "展示情感极性随时间的变化趋势及正负面占比"
     },
     {
-      "id": "topic_ranking_20260221_154853",
+      "id": "topic_ranking_20260221_182218",
       "type": "bar_chart",
       "title": "Top10 主题热度排行",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_ranking_20260221_154853.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_ranking_20260221_182218.png",
       "source_tool": "topic_ranking_chart",
       "description": "展示热度最高的10个主题及其博文数量"
     },
     {
-      "id": "geographic_topic_heatmap_20260221_154948",
+      "id": "sentiment_pie_20260221_182242",
+      "type": "pie_chart",
+      "title": "情感分布饼图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_pie_20260221_182242.png",
+      "source_tool": "sentiment_pie_chart",
+      "description": "展示博文情感极性的整体分布情况"
+    },
+    {
+      "id": "geographic_bar_20260221_182256",
+      "type": "bar_chart",
+      "title": "Top15 地区分布图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_bar_20260221_182256.png",
+      "source_tool": "geographic_bar_chart",
+      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
+    },
+    {
+      "id": "geographic_heatmap_20260221_182313",
+      "type": "heatmap",
+      "title": "地区舆情热力图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_heatmap_20260221_182313.png",
+      "source_tool": "geographic_heatmap",
+      "description": "展示各地区在不同舆情指标上的表现差异"
+    },
+    {
+      "id": "geographic_topic_heatmap_20260221_182352",
       "type": "heatmap",
       "title": "地区话题差异热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_topic_heatmap_20260221_154948.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_topic_heatmap_20260221_182352.png",
       "source_tool": "geographic_topic_heatmap",
       "description": "地区 × 主题的热度差异，支持地理可视化叙事"
     },
     {
-      "id": "geographic_temporal_heatmap_20260221_155019",
-      "type": "heatmap",
-      "title": "地区时间差异热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_temporal_heatmap_20260221_155019.png",
-      "source_tool": "geographic_temporal_heatmap",
-      "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
-    },
-    {
-      "id": "publisher_sentiment_bucket_20260221_155132",
+      "id": "publisher_sentiment_bucket_20260221_182416",
       "type": "bar_chart",
       "title": "发布者情绪桶分布",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_sentiment_bucket_20260221_155132.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_sentiment_bucket_20260221_182416.png",
       "source_tool": "publisher_sentiment_bucket_chart",
       "description": "按发布者对比正/中/负面占比，突出情绪差异"
+    },
+    {
+      "id": "participant_trend_20260221_182433",
+      "type": "line_chart",
+      "title": "参与人数演化趋势",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\participant_trend_20260221_182433.png",
+      "source_tool": "participant_trend_chart",
+      "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
+    },
+    {
+      "id": "publisher_topic_distribution_20260221_182449",
+      "type": "bar_chart",
+      "title": "发布者话题偏好分布",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_topic_distribution_20260221_182449.png",
+      "source_tool": "publisher_topic_distribution_chart",
+      "description": "堆叠展示不同发布者的主题偏好差异"
+    },
+    {
+      "id": "topic_evolution_20260221_182529",
+      "type": "line_chart",
+      "title": "主题热度时序演化",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_evolution_20260221_182529.png",
+      "source_tool": "topic_evolution_chart",
+      "description": "展示Top5主题随时间的热度变化趋势"
+    },
+    {
+      "id": "keyword_wordcloud",
+      "title": "关键词频次分布",
+      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
+      "type": "bar",
+      "description": "Top keywords frequency bar chart",
+      "source_tool": "keyword_wordcloud"
     },
     {
       "id": "entity_cooccurrence_network",
@@ -82,14 +99,6 @@
       "source_tool": "entity_cooccurrence_network"
     },
     {
-      "id": "participant_trend_20260221_155212",
-      "type": "line_chart",
-      "title": "参与人数演化趋势",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\participant_trend_20260221_155212.png",
-      "source_tool": "participant_trend_chart",
-      "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
-    },
-    {
       "id": "text_cluster_analysis",
       "title": "文本相似聚类分布",
       "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\text_cluster_analysis.png",
@@ -99,47 +108,29 @@
       "source_tool": "text_cluster_analysis"
     },
     {
-      "id": "interaction_heatmap_20260221_155237",
-      "type": "heatmap",
-      "title": "发布者类型 × 情感极性 热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\interaction_heatmap_20260221_155237.png",
-      "source_tool": "interaction_heatmap",
-      "description": "展示发布者类型与情感极性的交叉分布"
-    },
-    {
-      "id": "sentiment_trend_20260221_155251",
-      "type": "line_chart",
-      "title": "情感趋势变化图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_trend_20260221_155251.png",
-      "source_tool": "sentiment_trend_chart",
-      "description": "展示情感极性随时间的变化趋势及正负面占比"
-    },
-    {
-      "id": "temporal_keyword_heatmap",
-      "title": "关键词时间热力图",
-      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\temporal_keyword_heatmap.png",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\temporal_keyword_heatmap.png",
-      "type": "heatmap",
-      "description": "Keyword temporal heatmap",
-      "source_tool": "temporal_keyword_heatmap"
-    },
-    {
-      "id": "belief_network_20260221_155351",
+      "id": "belief_network_20260221_182738",
       "title": "信念网络图（belief_network）",
-      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\belief_network_20260221_155351.png",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\belief_network_20260221_155351.png",
+      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\belief_network_20260221_182738.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\belief_network_20260221_182738.png",
       "type": "network",
       "description": "信念子类的共现关系与强度",
       "source_tool": "belief_network_chart"
     },
     {
-      "id": "keyword_wordcloud",
-      "title": "关键词频次分布",
-      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
-      "type": "bar",
-      "description": "Top keywords frequency bar chart",
-      "source_tool": "keyword_wordcloud"
+      "id": "topic_keyword_trend_20260221_182747",
+      "type": "line_chart",
+      "title": "焦点关键词热度趋势",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_keyword_trend_20260221_182747.png",
+      "source_tool": "topic_keyword_trend_chart",
+      "description": "按时间粒度展示焦点关键词热度，支持地理与主题差异解读"
+    },
+    {
+      "id": "geographic_sentiment_bar_20260221_182759",
+      "type": "bar_chart",
+      "title": "地区正负面差异",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_sentiment_bar_20260221_182759.png",
+      "source_tool": "geographic_sentiment_bar_chart",
+      "description": "正负面占比与平均极性对比，体现地区情绪差异"
     }
   ],
   "tables": [
@@ -312,6 +303,124 @@
         }
       },
       "source_tool": "topic_frequency_stats",
+      "source_type": "mcp"
+    },
+    {
+      "id": "geographic_distribution_stats",
+      "title": "地理分布分析 - geographic_distribution_stats",
+      "data": {
+        "distribution": {
+          "无位置信息": {
+            "count": 9,
+            "percentage": 30.0
+          },
+          "北京": {
+            "count": 5,
+            "percentage": 16.67
+          },
+          "湖北": {
+            "count": 3,
+            "percentage": 10.0
+          },
+          "上海": {
+            "count": 2,
+            "percentage": 6.67
+          },
+          "四川": {
+            "count": 2,
+            "percentage": 6.67
+          },
+          "江苏": {
+            "count": 2,
+            "percentage": 6.67
+          },
+          "云南": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "辽宁": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "重庆": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "浙江": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "吉林": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "山东": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "河南": {
+            "count": 1,
+            "percentage": 3.33
+          }
+        },
+        "total_posts": 30,
+        "posts_with_location": 30,
+        "coverage_percentage": 100.0,
+        "unique_locations": 13,
+        "top_locations": [
+          {
+            "location": "无位置信息",
+            "count": 9,
+            "percentage": 30.0
+          },
+          {
+            "location": "北京",
+            "count": 5,
+            "percentage": 16.67
+          },
+          {
+            "location": "湖北",
+            "count": 3,
+            "percentage": 10.0
+          },
+          {
+            "location": "上海",
+            "count": 2,
+            "percentage": 6.67
+          },
+          {
+            "location": "四川",
+            "count": 2,
+            "percentage": 6.67
+          },
+          {
+            "location": "江苏",
+            "count": 2,
+            "percentage": 6.67
+          },
+          {
+            "location": "云南",
+            "count": 1,
+            "percentage": 3.33
+          },
+          {
+            "location": "辽宁",
+            "count": 1,
+            "percentage": 3.33
+          },
+          {
+            "location": "重庆",
+            "count": 1,
+            "percentage": 3.33
+          },
+          {
+            "location": "浙江",
+            "count": 1,
+            "percentage": 3.33
+          }
+        ]
+      },
+      "source_tool": "geographic_distribution_stats",
       "source_type": "mcp"
     },
     {
@@ -2026,121 +2135,183 @@
       "source_type": "mcp"
     },
     {
-      "id": "geographic_distribution_stats",
-      "title": "地理分布分析 - geographic_distribution_stats",
+      "id": "cross_matrix",
+      "title": "多维交互分析 - cross_matrix",
       "data": {
-        "distribution": {
-          "无位置信息": {
-            "count": 9,
-            "percentage": 30.0
+        "matrix": {
+          "个人用户": {
+            "中性": {
+              "count": 11,
+              "row_percentage": 68.75,
+              "col_percentage": 52.38
+            },
+            "乐观": {
+              "count": 4,
+              "row_percentage": 25.0,
+              "col_percentage": 50.0
+            },
+            "悲观": {
+              "count": 1,
+              "row_percentage": 6.25,
+              "col_percentage": 100.0
+            }
           },
-          "北京": {
-            "count": 5,
-            "percentage": 16.67
+          "官方新闻媒体": {
+            "中性": {
+              "count": 2,
+              "row_percentage": 66.67,
+              "col_percentage": 9.52
+            },
+            "乐观": {
+              "count": 1,
+              "row_percentage": 33.33,
+              "col_percentage": 12.5
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           },
-          "湖北": {
-            "count": 3,
-            "percentage": 10.0
+          "自媒体": {
+            "中性": {
+              "count": 1,
+              "row_percentage": 33.33,
+              "col_percentage": 4.76
+            },
+            "乐观": {
+              "count": 2,
+              "row_percentage": 66.67,
+              "col_percentage": 25.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           },
-          "上海": {
-            "count": 2,
-            "percentage": 6.67
+          "政府机构": {
+            "中性": {
+              "count": 3,
+              "row_percentage": 100.0,
+              "col_percentage": 14.29
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           },
-          "四川": {
-            "count": 2,
-            "percentage": 6.67
+          "旅游部门": {
+            "中性": {
+              "count": 2,
+              "row_percentage": 100.0,
+              "col_percentage": 9.52
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           },
-          "江苏": {
-            "count": 2,
-            "percentage": 6.67
+          "学生": {
+            "中性": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 4.76
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           },
-          "云南": {
-            "count": 1,
-            "percentage": 3.33
+          "旅游博主": {
+            "中性": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 4.76
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           },
-          "辽宁": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "重庆": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "浙江": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "吉林": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "山东": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "河南": {
-            "count": 1,
-            "percentage": 3.33
+          "宣传部门": {
+            "中性": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "乐观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 12.5
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
           }
         },
-        "total_posts": 30,
-        "posts_with_location": 30,
-        "coverage_percentage": 100.0,
-        "unique_locations": 13,
-        "top_locations": [
-          {
-            "location": "无位置信息",
-            "count": 9,
-            "percentage": 30.0
-          },
-          {
-            "location": "北京",
-            "count": 5,
-            "percentage": 16.67
-          },
-          {
-            "location": "湖北",
-            "count": 3,
-            "percentage": 10.0
-          },
-          {
-            "location": "上海",
-            "count": 2,
-            "percentage": 6.67
-          },
-          {
-            "location": "四川",
-            "count": 2,
-            "percentage": 6.67
-          },
-          {
-            "location": "江苏",
-            "count": 2,
-            "percentage": 6.67
-          },
-          {
-            "location": "云南",
-            "count": 1,
-            "percentage": 3.33
-          },
-          {
-            "location": "辽宁",
-            "count": 1,
-            "percentage": 3.33
-          },
-          {
-            "location": "重庆",
-            "count": 1,
-            "percentage": 3.33
-          },
-          {
-            "location": "浙江",
-            "count": 1,
-            "percentage": 3.33
-          }
-        ]
+        "dimensions": {
+          "dim1": "publisher",
+          "dim2": "sentiment_polarity"
+        },
+        "dim1_values": [
+          "个人用户",
+          "官方新闻媒体",
+          "自媒体",
+          "政府机构",
+          "旅游部门",
+          "学生",
+          "旅游博主",
+          "宣传部门"
+        ],
+        "dim2_values": [
+          "中性",
+          "乐观",
+          "悲观"
+        ],
+        "dim1_totals": {
+          "个人用户": 16,
+          "官方新闻媒体": 3,
+          "自媒体": 3,
+          "政府机构": 3,
+          "旅游部门": 2,
+          "学生": 1,
+          "旅游博主": 1,
+          "宣传部门": 1
+        },
+        "dim2_totals": {
+          "中性": 21,
+          "乐观": 8,
+          "悲观": 1
+        }
       },
-      "source_tool": "geographic_distribution_stats",
+      "source_tool": "cross_matrix",
       "source_type": "mcp"
     },
     {
@@ -2394,6 +2565,46 @@
         "regions_analyzed": 2
       },
       "source_tool": "geographic_sentiment_analysis",
+      "source_type": "mcp"
+    },
+    {
+      "id": "sentiment_anomaly_detection",
+      "title": "情感趋势分析 - sentiment_anomaly_detection",
+      "data": {
+        "anomalies": [
+          {
+            "time": "2024-08-24 22:00",
+            "avg_polarity": 3.67,
+            "count": 3,
+            "reasons": [
+              "发帖量异常(偏离3.7个标准差)"
+            ]
+          },
+          {
+            "time": "2024-08-31 22:00",
+            "avg_polarity": 2.0,
+            "count": 1,
+            "reasons": [
+              "情感极性异常(偏离2.5个标准差)"
+            ]
+          }
+        ],
+        "volume_spikes": [
+          {
+            "time": "2024-08-24 22:00",
+            "count": 3,
+            "zscore": 3.67
+          }
+        ],
+        "threshold": 2.0,
+        "baseline": {
+          "mean_polarity": 3.21,
+          "std_polarity": 0.47,
+          "mean_count": 1.2,
+          "std_count": 0.49
+        }
+      },
+      "source_tool": "sentiment_anomaly_detection",
       "source_type": "mcp"
     },
     {
@@ -2697,46 +2908,6 @@
       "source_type": "mcp"
     },
     {
-      "id": "sentiment_anomaly_detection",
-      "title": "情感趋势分析 - sentiment_anomaly_detection",
-      "data": {
-        "anomalies": [
-          {
-            "time": "2024-08-24 22:00",
-            "avg_polarity": 3.67,
-            "count": 3,
-            "reasons": [
-              "发帖量异常(偏离3.7个标准差)"
-            ]
-          },
-          {
-            "time": "2024-08-31 22:00",
-            "avg_polarity": 2.0,
-            "count": 1,
-            "reasons": [
-              "情感极性异常(偏离2.5个标准差)"
-            ]
-          }
-        ],
-        "volume_spikes": [
-          {
-            "time": "2024-08-24 22:00",
-            "count": 3,
-            "zscore": 3.67
-          }
-        ],
-        "threshold": 2.0,
-        "baseline": {
-          "mean_polarity": 3.21,
-          "std_polarity": 0.47,
-          "mean_count": 1.2,
-          "std_count": 0.49
-        }
-      },
-      "source_tool": "sentiment_anomaly_detection",
-      "source_type": "mcp"
-    },
-    {
       "id": "geographic_hotspot_detection",
       "title": "地理分布分析 - geographic_hotspot_detection",
       "data": {
@@ -2762,183 +2933,133 @@
       "source_type": "mcp"
     },
     {
-      "id": "cross_dimension_matrix",
-      "title": "多维交互分析 - cross_dimension_matrix",
+      "id": "keyword_wordcloud",
+      "title": "NLP增强分析 - keyword_wordcloud",
       "data": {
-        "matrix": {
-          "个人用户": {
-            "中性": {
-              "count": 11,
-              "row_percentage": 68.75,
-              "col_percentage": 52.38
-            },
-            "乐观": {
-              "count": 4,
-              "row_percentage": 25.0,
-              "col_percentage": 50.0
-            },
-            "悲观": {
-              "count": 1,
-              "row_percentage": 6.25,
-              "col_percentage": 100.0
-            }
-          },
-          "官方新闻媒体": {
-            "中性": {
-              "count": 2,
-              "row_percentage": 66.67,
-              "col_percentage": 9.52
-            },
-            "乐观": {
-              "count": 1,
-              "row_percentage": 33.33,
-              "col_percentage": 12.5
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "自媒体": {
-            "中性": {
-              "count": 1,
-              "row_percentage": 33.33,
-              "col_percentage": 4.76
-            },
-            "乐观": {
-              "count": 2,
-              "row_percentage": 66.67,
-              "col_percentage": 25.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "政府机构": {
-            "中性": {
-              "count": 3,
-              "row_percentage": 100.0,
-              "col_percentage": 14.29
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "旅游部门": {
-            "中性": {
-              "count": 2,
-              "row_percentage": 100.0,
-              "col_percentage": 9.52
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "学生": {
-            "中性": {
-              "count": 1,
-              "row_percentage": 100.0,
-              "col_percentage": 4.76
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "旅游博主": {
-            "中性": {
-              "count": 1,
-              "row_percentage": 100.0,
-              "col_percentage": 4.76
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "宣传部门": {
-            "中性": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "乐观": {
-              "count": 1,
-              "row_percentage": 100.0,
-              "col_percentage": 12.5
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          }
-        },
-        "dimensions": {
-          "dim1": "publisher",
-          "dim2": "sentiment_polarity"
-        },
-        "dim1_values": [
-          "个人用户",
-          "官方新闻媒体",
-          "自媒体",
-          "政府机构",
-          "旅游部门",
-          "学生",
-          "旅游博主",
-          "宣传部门"
-        ],
-        "dim2_values": [
-          "中性",
-          "乐观",
-          "悲观"
-        ],
-        "dim1_totals": {
-          "个人用户": 16,
-          "官方新闻媒体": 3,
-          "自媒体": 3,
-          "政府机构": 3,
-          "旅游部门": 2,
-          "学生": 1,
-          "旅游博主": 1,
-          "宣传部门": 1
-        },
-        "dim2_totals": {
-          "中性": 21,
-          "乐观": 8,
-          "悲观": 1
-        }
+        "keywords": [
+          [
+            "单车",
+            21
+          ],
+          [
+            "夜骑",
+            13
+          ],
+          [
+            "共享",
+            11
+          ],
+          [
+            "骑行",
+            9
+          ],
+          [
+            "骑游",
+            7
+          ],
+          [
+            "避免",
+            7
+          ],
+          [
+            "文明",
+            7
+          ],
+          [
+            "公约",
+            7
+          ],
+          [
+            "车灯",
+            7
+          ],
+          [
+            "居民区",
+            7
+          ],
+          [
+            "张艺兴夜",
+            3
+          ],
+          [
+            "张艺兴",
+            2
+          ],
+          [
+            "停车",
+            2
+          ],
+          [
+            "垃圾",
+            2
+          ],
+          [
+            "超话",
+            2
+          ],
+          [
+            "偶尔",
+            2
+          ],
+          [
+            "骑单车",
+            1
+          ],
+          [
+            "盲骑",
+            1
+          ],
+          [
+            "路灯",
+            1
+          ],
+          [
+            "烦躁",
+            1
+          ],
+          [
+            "公园",
+            1
+          ],
+          [
+            "半毫",
+            1
+          ],
+          [
+            "艳阳天",
+            1
+          ],
+          [
+            "中未差",
+            1
+          ],
+          [
+            "电单车",
+            1
+          ],
+          [
+            "四辆",
+            1
+          ],
+          [
+            "恰如其分",
+            1
+          ],
+          [
+            "八里",
+            1
+          ],
+          [
+            "高唱",
+            1
+          ],
+          [
+            "变酸",
+            1
+          ]
+        ]
       },
-      "source_tool": "cross_dimension_matrix",
+      "source_tool": "keyword_wordcloud",
       "source_type": "mcp"
     },
     {
@@ -3059,6 +3180,115 @@
       "source_type": "mcp"
     },
     {
+      "id": "correlation_analysis",
+      "title": "多维交互分析 - correlation_analysis",
+      "data": {
+        "correlation_matrix": {
+          "sentiment_polarity": {
+            "sentiment_polarity": 1.0,
+            "repost_count": -0.176,
+            "comment_count": 0.19,
+            "like_count": 0.098,
+            "content_length": -0.06,
+            "image_count": -0.459,
+            "topic_count": 0.544
+          },
+          "repost_count": {
+            "sentiment_polarity": -0.176,
+            "repost_count": 1.0,
+            "comment_count": 0.008,
+            "like_count": 0.137,
+            "content_length": 0.167,
+            "image_count": 0.008,
+            "topic_count": -0.125
+          },
+          "comment_count": {
+            "sentiment_polarity": 0.19,
+            "repost_count": 0.008,
+            "comment_count": 1.0,
+            "like_count": 0.945,
+            "content_length": -0.002,
+            "image_count": 0.109,
+            "topic_count": -0.082
+          },
+          "like_count": {
+            "sentiment_polarity": 0.098,
+            "repost_count": 0.137,
+            "comment_count": 0.945,
+            "like_count": 1.0,
+            "content_length": 0.134,
+            "image_count": 0.092,
+            "topic_count": -0.141
+          },
+          "content_length": {
+            "sentiment_polarity": -0.06,
+            "repost_count": 0.167,
+            "comment_count": -0.002,
+            "like_count": 0.134,
+            "content_length": 1.0,
+            "image_count": -0.053,
+            "topic_count": -0.149
+          },
+          "image_count": {
+            "sentiment_polarity": -0.459,
+            "repost_count": 0.008,
+            "comment_count": 0.109,
+            "like_count": 0.092,
+            "content_length": -0.053,
+            "image_count": 1.0,
+            "topic_count": -0.696
+          },
+          "topic_count": {
+            "sentiment_polarity": 0.544,
+            "repost_count": -0.125,
+            "comment_count": -0.082,
+            "like_count": -0.141,
+            "content_length": -0.149,
+            "image_count": -0.696,
+            "topic_count": 1.0
+          }
+        },
+        "feature_names": [
+          "sentiment_polarity",
+          "repost_count",
+          "comment_count",
+          "like_count",
+          "content_length",
+          "image_count",
+          "topic_count"
+        ],
+        "significant_correlations": [
+          {
+            "feature1": "comment_count",
+            "feature2": "like_count",
+            "correlation": 0.945,
+            "strength": "强"
+          },
+          {
+            "feature1": "image_count",
+            "feature2": "topic_count",
+            "correlation": -0.696,
+            "strength": "中"
+          },
+          {
+            "feature1": "sentiment_polarity",
+            "feature2": "topic_count",
+            "correlation": 0.544,
+            "strength": "中"
+          },
+          {
+            "feature1": "image_count",
+            "feature2": "sentiment_polarity",
+            "correlation": -0.459,
+            "strength": "弱"
+          }
+        ],
+        "sample_size": 30
+      },
+      "source_tool": "correlation_analysis",
+      "source_type": "mcp"
+    },
+    {
       "id": "text_cluster_analysis",
       "title": "NLP增强分析 - text_cluster_analysis",
       "data": {
@@ -3067,31 +3297,6 @@
         }
       },
       "source_tool": "text_cluster_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "temporal_keyword_heatmap",
-      "title": "NLP增强分析 - temporal_keyword_heatmap",
-      "data": {
-        "matrix": {},
-        "time_keys": [
-          "2024-08-16",
-          "2024-08-17",
-          "2024-08-18",
-          "2024-08-19",
-          "2024-08-21",
-          "2024-08-22",
-          "2024-08-23",
-          "2024-08-24",
-          "2024-08-26",
-          "2024-08-28",
-          "2024-08-29",
-          "2024-08-30",
-          "2024-08-31"
-        ],
-        "keywords": []
-      },
-      "source_tool": "temporal_keyword_heatmap",
       "source_type": "mcp"
     },
     {
@@ -3246,289 +3451,50 @@
       },
       "source_tool": "belief_network_chart",
       "source_type": "mcp"
-    },
-    {
-      "id": "correlation_analysis",
-      "title": "多维交互分析 - correlation_analysis",
-      "data": {
-        "correlation_matrix": {
-          "sentiment_polarity": {
-            "sentiment_polarity": 1.0,
-            "repost_count": -0.176,
-            "comment_count": 0.19,
-            "like_count": 0.098,
-            "content_length": -0.06,
-            "image_count": -0.459,
-            "topic_count": 0.544
-          },
-          "repost_count": {
-            "sentiment_polarity": -0.176,
-            "repost_count": 1.0,
-            "comment_count": 0.008,
-            "like_count": 0.137,
-            "content_length": 0.167,
-            "image_count": 0.008,
-            "topic_count": -0.125
-          },
-          "comment_count": {
-            "sentiment_polarity": 0.19,
-            "repost_count": 0.008,
-            "comment_count": 1.0,
-            "like_count": 0.945,
-            "content_length": -0.002,
-            "image_count": 0.109,
-            "topic_count": -0.082
-          },
-          "like_count": {
-            "sentiment_polarity": 0.098,
-            "repost_count": 0.137,
-            "comment_count": 0.945,
-            "like_count": 1.0,
-            "content_length": 0.134,
-            "image_count": 0.092,
-            "topic_count": -0.141
-          },
-          "content_length": {
-            "sentiment_polarity": -0.06,
-            "repost_count": 0.167,
-            "comment_count": -0.002,
-            "like_count": 0.134,
-            "content_length": 1.0,
-            "image_count": -0.053,
-            "topic_count": -0.149
-          },
-          "image_count": {
-            "sentiment_polarity": -0.459,
-            "repost_count": 0.008,
-            "comment_count": 0.109,
-            "like_count": 0.092,
-            "content_length": -0.053,
-            "image_count": 1.0,
-            "topic_count": -0.696
-          },
-          "topic_count": {
-            "sentiment_polarity": 0.544,
-            "repost_count": -0.125,
-            "comment_count": -0.082,
-            "like_count": -0.141,
-            "content_length": -0.149,
-            "image_count": -0.696,
-            "topic_count": 1.0
-          }
-        },
-        "feature_names": [
-          "sentiment_polarity",
-          "repost_count",
-          "comment_count",
-          "like_count",
-          "content_length",
-          "image_count",
-          "topic_count"
-        ],
-        "significant_correlations": [
-          {
-            "feature1": "comment_count",
-            "feature2": "like_count",
-            "correlation": 0.945,
-            "strength": "强"
-          },
-          {
-            "feature1": "image_count",
-            "feature2": "topic_count",
-            "correlation": -0.696,
-            "strength": "中"
-          },
-          {
-            "feature1": "sentiment_polarity",
-            "feature2": "topic_count",
-            "correlation": 0.544,
-            "strength": "中"
-          },
-          {
-            "feature1": "image_count",
-            "feature2": "sentiment_polarity",
-            "correlation": -0.459,
-            "strength": "弱"
-          }
-        ],
-        "sample_size": 30
-      },
-      "source_tool": "correlation_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "keyword_wordcloud",
-      "title": "NLP增强分析 - keyword_wordcloud",
-      "data": {
-        "keywords": [
-          [
-            "单车",
-            21
-          ],
-          [
-            "夜骑",
-            13
-          ],
-          [
-            "共享",
-            11
-          ],
-          [
-            "骑行",
-            9
-          ],
-          [
-            "骑游",
-            7
-          ],
-          [
-            "避免",
-            7
-          ],
-          [
-            "文明",
-            7
-          ],
-          [
-            "公约",
-            7
-          ],
-          [
-            "车灯",
-            7
-          ],
-          [
-            "居民区",
-            7
-          ],
-          [
-            "张艺兴夜",
-            3
-          ],
-          [
-            "张艺兴",
-            2
-          ],
-          [
-            "停车",
-            2
-          ],
-          [
-            "垃圾",
-            2
-          ],
-          [
-            "超话",
-            2
-          ],
-          [
-            "偶尔",
-            2
-          ],
-          [
-            "骑单车",
-            1
-          ],
-          [
-            "盲骑",
-            1
-          ],
-          [
-            "路灯",
-            1
-          ],
-          [
-            "烦躁",
-            1
-          ],
-          [
-            "公园",
-            1
-          ],
-          [
-            "半毫",
-            1
-          ],
-          [
-            "艳阳天",
-            1
-          ],
-          [
-            "中未差",
-            1
-          ],
-          [
-            "电单车",
-            1
-          ],
-          [
-            "四辆",
-            1
-          ],
-          [
-            "恰如其分",
-            1
-          ],
-          [
-            "八里",
-            1
-          ],
-          [
-            "高唱",
-            1
-          ],
-          [
-            "变酸",
-            1
-          ]
-        ]
-      },
-      "source_tool": "keyword_wordcloud",
-      "source_type": "mcp"
     }
   ],
   "execution_log": {
     "tools_executed": [
       "sentiment_distribution_stats",
       "topic_frequency_stats",
+      "geographic_distribution_stats",
       "publisher_distribution_stats",
       "sentiment_time_series",
-      "geographic_distribution_stats",
+      "cross_matrix",
       "topic_time_evolution",
       "geographic_sentiment_analysis",
-      "topic_cooccurrence_analysis",
-      "publisher_topic_distribution",
-      "influence_analysis",
+      "sentiment_trend_chart",
       "sentiment_anomaly_detection",
-      "generate_sentiment_pie_chart",
-      "generate_geographic_heatmap",
-      "generate_geographic_bar_chart",
-      "generate_topic_evolution_chart",
+      "topic_cooccurrence_analysis",
+      "influence_analysis",
       "generate_topic_ranking_chart",
+      "generate_sentiment_pie_chart",
+      "generate_geographic_bar_chart",
+      "geographic_heatmap",
       "geographic_hotspot_detection",
       "geographic_topic_heatmap",
-      "cross_dimension_matrix",
-      "geographic_temporal_heatmap_tool",
       "publisher_sentiment_bucket_chart",
+      "participant_trend_chart",
+      "publisher_topic_distribution",
+      "topic_network_chart",
+      "generate_topic_evolution_chart",
+      "keyword_wordcloud",
       "entity_cooccurrence_network",
-      "participant_trend",
-      "text_cluster_analysis",
-      "generate_interaction_heatmap",
-      "generate_sentiment_trend_chart",
-      "temporal_keyword_heatmap",
-      "belief_network_chart",
       "correlation_analysis",
-      "keyword_wordcloud"
+      "text_cluster_analysis",
+      "belief_network_chart",
+      "topic_keyword_trend_chart",
+      "geographic_sentiment_bar_chart"
     ],
-    "total_charts": 17,
-    "total_tables": 18,
+    "total_charts": 16,
+    "total_tables": 17,
     "execution_time": 0.0,
     "charts_by_category": {
-      "interaction": 4,
       "sentiment": 2,
+      "topic": 4,
       "geographic": 4,
-      "topic": 3,
-      "nlp": 4
+      "interaction": 3,
+      "nlp": 3
     },
     "tool_stats": {
       "sentiment_distribution_stats": {
@@ -3538,6 +3504,12 @@
         "empty_chart": false
       },
       "topic_frequency_stats": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "geographic_distribution_stats": {
         "charts": 0,
         "data": 1,
         "error": false,
@@ -3555,7 +3527,7 @@
         "error": false,
         "empty_chart": false
       },
-      "geographic_distribution_stats": {
+      "cross_matrix": {
         "charts": 0,
         "data": 1,
         "error": false,
@@ -3573,21 +3545,9 @@
         "error": false,
         "empty_chart": false
       },
-      "topic_cooccurrence_analysis": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "publisher_topic_distribution": {
+      "sentiment_trend_chart": {
         "charts": 1,
         "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "influence_analysis": {
-        "charts": 0,
-        "data": 1,
         "error": false,
         "empty_chart": false
       },
@@ -3597,13 +3557,25 @@
         "error": false,
         "empty_chart": false
       },
-      "generate_sentiment_pie_chart": {
+      "topic_cooccurrence_analysis": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "influence_analysis": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "generate_topic_ranking_chart": {
         "charts": 1,
         "data": 0,
         "error": false,
         "empty_chart": false
       },
-      "generate_geographic_heatmap": {
+      "generate_sentiment_pie_chart": {
         "charts": 1,
         "data": 0,
         "error": false,
@@ -3615,13 +3587,7 @@
         "error": false,
         "empty_chart": false
       },
-      "generate_topic_evolution_chart": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "generate_topic_ranking_chart": {
+      "geographic_heatmap": {
         "charts": 1,
         "data": 0,
         "error": false,
@@ -3639,61 +3605,43 @@
         "error": false,
         "empty_chart": false
       },
-      "cross_dimension_matrix": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "geographic_temporal_heatmap_tool": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
       "publisher_sentiment_bucket_chart": {
         "charts": 1,
         "data": 0,
         "error": false,
         "empty_chart": false
       },
+      "participant_trend_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "publisher_topic_distribution": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "topic_network_chart": {
+        "charts": 0,
+        "data": 0,
+        "error": true,
+        "empty_chart": true
+      },
+      "generate_topic_evolution_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "keyword_wordcloud": {
+        "charts": 1,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
       "entity_cooccurrence_network": {
-        "charts": 1,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "participant_trend": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "text_cluster_analysis": {
-        "charts": 1,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "generate_interaction_heatmap": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "generate_sentiment_trend_chart": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "temporal_keyword_heatmap": {
-        "charts": 1,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "belief_network_chart": {
         "charts": 1,
         "data": 1,
         "error": false,
@@ -3705,62 +3653,90 @@
         "error": false,
         "empty_chart": false
       },
-      "keyword_wordcloud": {
+      "text_cluster_analysis": {
         "charts": 1,
         "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "belief_network_chart": {
+        "charts": 1,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "topic_keyword_trend_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "geographic_sentiment_bar_chart": {
+        "charts": 1,
+        "data": 0,
         "error": false,
         "empty_chart": false
       }
     },
     "forum_rounds": 2,
     "chart_analysis": {
-      "total_charts": 17,
-      "success_count": 17,
+      "total_charts": 16,
+      "success_count": 16,
       "success_rate": 1.0,
-      "analysis_timestamp": 459.43205761909485
+      "analysis_timestamp": 418.7712941169739
     }
   },
   "search_context": {
-    "background_context": "2024年8月16日至31日期间，社交媒体上关于京鄂交通的讨论达到一个高峰。这并非孤立事件，而是自2020年新冠疫情以来，两地交通逐步恢复与政策持续优化的延续。从2020年初的离鄂通道解禁、航班复航，到2021年进返京政策的简化，再到湖北省“十四五”规划对交通枢纽的长期布局，京鄂交通问题始终是连接两地民生与经济的关键议题。当前的讨论聚焦于后疫情时代下的出行便利性、具体政策执行细节以及基础设施升级带来的实际体验，反映了公众对恢复正常、高效跨区域流动的高度关注。",
+    "background_context": "本次社交媒体讨论的直接背景是京广高铁于2024年6月15日实现全线按时速350公里高标运营。这一服务升级将北京至广州的旅行时间进一步压缩，显著提升了旅客出行体验。讨论高峰发生在2024年8月，正值暑期旅游旺季，民众在密集出行后集中分享和反馈对新提速服务的正面体验，形成了此次社交媒体上的热议。官方媒体（如人民网、中国网）对此次全线提速进行了前期宣传和后续报道，为公众讨论提供了信息基础和话题框架。",
     "consistency_points": [
-      "主题高度一致：数据摘要中的热门主题“交通运输”与“社会民生”与搜索结果中描述的政策调整（如核酸检测要求变化）、交通恢复（航班复航）和基础设施升级（火车站地铁接驳）等官方响应完全吻合。",
-      "地理焦点明确：数据摘要中的主要地区“北京”和“湖北”与搜索结果揭示的“京鄂交通”核心议题及其关键行动者（北京市政府、湖北省政府）精准对应。",
-      "情感反应吻合：数据摘要显示情感分布以中性（21/30）和积极（8/30）为主，这与搜索结果中“公众反应总体中性偏积极”的总结一致。积极反应体现在对交通恢复便利性的认可（如赏花季满座），而中性反应则与对政策细节的关注相符。",
-      "时间点匹配：数据摘要的时间范围（2024-08-16 to 2024-08-31）被搜索结果的事件时间线明确标识为“博文讨论高峰期”，证实了数据捕捉到了舆论的关键节点。"
+      "主题高度一致：数据摘要中热门主题Top3为'社会民生'、'交通运输'、'民众反应'，与新增搜索结果中公众对高铁'体验升级'、'回家更快了'的讨论焦点完全吻合。",
+      "地域关联性强：数据摘要主要地区Top2为'北京'和'湖北'，与搜索结果核心事件'京广高铁'（连接北京与湖北、广东等地）的地理范围精准对应。",
+      "情感倾向吻合：数据摘要显示情感分布以正面（情感3和4）为主，占比约97%，与新增搜索结果中'全线都能每小时跑350公里，回家更快了！'、'舒适的体验令人震撼'等普遍积极反馈的结论一致。",
+      "发布者类型匹配：数据摘要中的'官方新闻媒体'和'政府机构'类型，与新增搜索结果中提到的'人民网'、'央视新闻'、'中国政务网'等关键信息发布和宣传方角色相符。"
     ],
     "conflict_points": [
-      "历史包袱与当前情绪的张力：数据摘要显示当前消极情绪极少（1/30），但搜索结果指出，公众的消极反应“可能与疫情期间的严格管控相关”。这暗示当前的积极或中性情绪可能建立在一段负面经历之上，存在一种“谨慎乐观”或“对比式满意”的潜在张力，而非纯粹的正面评价。",
-      "官方叙事与个体体验的潜在差距：数据摘要的发布者类型多样，包含官方与个人。搜索结果详细列出了官方的积极举措（如政策简化、基建升级），但数据摘要中的高评论量（79）可能暗示个体用户在具体执行层面仍遇到问题或有更细致的诉求，这些可能与官方的宏观叙事存在细微差距。"
+      "正面情感与低互动量的矛盾：数据摘要显示情感倾向非常正面，但总互动量（转发10, 评论79, 点赞66）相对较低。这与新增搜索结果揭示的'暑期运持续升温'、'高铁票紧俏'所暗示的高关注度存在一定张力，可能表明讨论虽正面但未形成大规模传播或深度互动，或参与讨论的用户群体较为小众。",
+      "整体正面评价与潜在担忧的并存：数据摘要中仅有1条负面情感博文，而新增搜索结果主要聚焦于提速带来的正面体验和官方宣传。这表明数据集的量化情感分布可能掩盖了讨论中存在的具体、细微的担忧点（如票价、服务细节等），这些点在官方报道中通常不会体现。"
     ],
     "blind_spots": [
-      "历史脉络缺失：数据摘要仅提供了两周的快照，完全缺失了自2020年以来京鄂交通政策演变的关键历史背景（如离鄂解禁、航班复航、政策放宽等），使得无法理解当前讨论的深层原因和公众情绪的演变轨迹。本次补充搜索未能找到相关的官方政策文件或历史回顾来填补此空白。",
-      "具体政策细节不明：数据摘要主题宽泛（“交通运输”），但未涉及具体是哪些政策引发了讨论。搜索结果揭示了健康登记、核酸检测、交通规划等具体内容，这些是理解舆论焦点的关键信息，但在数据摘要中无法体现。本次补充搜索针对“健康宝”、“核酸要求”等关键词的官方回应查询，未返回有效结果，此盲点依然存在。",
-      "关键行动者角色模糊：数据摘要将“政府机构”列为发布者之一，但无法区分是中央部委（如交通运输部）还是地方政府（如北京市政府）。搜索结果则明确了不同行动者的具体职责，这对于分析舆论的针对性和影响力至关重要。本次补充搜索未提供关于不同层级政府在京鄂交通议题上具体分工的新信息。",
-      "经济驱动因素被忽略：搜索结果提到交通恢复“促进区域经济恢复”和“赏花季”等经济活动，但数据摘要的“社会民生”主题较为笼统，未能揭示出经济因素在驱动民众出行和舆论讨论中的重要作用。本次补充搜索未找到能直接关联交通政策与经济数据的官方分析报告。"
+      "负面评论的具体内容缺失：数据摘要中唯一的负面博文具体指向什么问题（是票价、服务、延误还是其他）？新增搜索结果均为正面或中性报道，未能提供与数据集负面情感相对应的具体信息。",
+      "不同发布者类型的具体观点差异：数据摘要包含多种发布者类型（个人、学生、媒体、政府等），但新增搜索结果主要反映了官方和公众的整体正面反应。缺乏对'学生'、'旅游博主'等特定群体在暑期出行背景下观点的深入分析。",
+      "讨论热度的实际影响范围不明：虽然新增搜索结果解释了讨论的宏观背景（暑期），但数据摘要中较低的互动量与'暑运高峰'的背景形成反差，本次讨论的实际影响范围和深度仍不明确。"
     ],
     "recommended_followups": [
-      "进行历史舆情回溯分析：搜集2020年至2024年间关于“京鄂交通”、“进返京政策”等关键词的社交媒体数据，绘制公众情感与关键政策节点的关联图，以理解当前舆论格局的形成过程。",
-      "开展细粒度主题挖掘：对30篇博文进行更深度的文本分析，提取具体讨论的政策点（如“健康宝”、“核酸证明”、“高铁换乘”等），量化不同子话题的讨论热度，识别民众最关心的具体问题。",
-      "实施多维度发布者对比分析：分别研究官方媒体、政府机构、个人用户等不同类型发布者的言论框架、情感倾向和互动模式，探究官方叙事与民间舆论的异同点及互动关系。",
-      "关联经济与交通数据：尝试将社交媒体讨论热度与同期京鄂间的航班、铁路客流量以及湖北省的旅游收入等公开数据进行关联分析，验证交通恢复对经济和民生的实际影响，并寻找舆论背后的经济动因。"
+      "负面内容深挖：定位并分析情感值为2的博文内容，具体了解用户不满的细节，为服务改进提供精准反馈。",
+      "群体画像分析：区分不同发布者类型（如学生、旅游博主）的讨论内容，结合暑期出行背景，分析其关注点和情感倾向的差异，以实现更精细化的用户沟通。",
+      "热度与互动量归因分析：深入探究为何在'暑运高峰'背景下，相关讨论的互动量相对较低，是话题本身不具备强传播性，还是数据抓取范围有限。",
+      "关联主题挖掘：分析讨论中是否包含高铁票价、购票难度、与其他交通方式的联运体验等与暑期出行强相关的衍生话题，以评估民众对'一体化'出行体系的整体看法。"
     ],
     "supplements": [
       {
         "queries": [
-          "历史脉络缺失：当前数据仅为两周快照，完全缺失了自2020年以来京鄂交通政策演变的关键背景，无法理解当前舆论的成因。 官方回应",
-          "政策细节模糊：数据摘要中的'交通运输'主题过于宽泛，未能识别出引发讨论的具体政策点（如健康宝、核酸要求等），而这些是理解民众关切的核心。 官方回应"
+          "2024年8月15日至2024年8月20日 京广高铁 北京 武汉 爆文",
+          "京广高铁 体验 分享 2024年8月",
+          "2024年8月 暑期 高铁 出游 热点"
         ],
-        "reason": "补齐外部公开信源。",
-        "documents_count": 6
+        "reason": "当前分析存在一个关键的时间线缺口：核心事件（2022年高铁提速）与数据讨论高峰（2024年8月）之间存在显著滞后。SearchAgent的背景信息解释了事件本身，但未能揭示引发本轮讨论的直接诱因。不明确这个导火索，就无法准确判断舆情的性质（是偶发体验分享、二次传播还是新的政策关联），也无法解释低互动量的现象。因此，进行溯源检索是弥补这一核心缺口、确保分析深度的必要步骤。",
+        "documents_count": 9
       }
     ],
     "forum_conclusions": [
-      "本轮分析确认，舆论核心是关于'京鄂交通'在后疫情时代的恢复与优化，公众情绪总体中性偏积极，但背后可能隐藏着基于历史负面经历的'谨慎乐观'。",
-      "一个关键的潜在张力存在于官方发布的宏观利好政策与个人用户在微观执行层面的具体体验之间。高评论量也暗示了民众有较强的表达和反馈意愿。",
-      "当前分析的最大短板是缺乏历史背景和具体政策细节，导致对舆论的理解停留在表面。同时，视觉分析的缺失严重阻碍了对数据可视化潜力的挖掘，无法完成对DataAgent结果的交叉验证。",
-      "下一步最紧迫的任务是补充视觉分析，以充分利用现有图表，深入探究已识别的冲突点和叙事差距，为后续的深度搜索或数据补充提供更精确的方向。"
+      "本轮舆情核心是公众对京广高铁6月15日提速至350公里/小时的正面体验反馈，讨论高峰出现在8月中旬的暑期出行季。",
+      "舆情情感基调以绝对正面为主，与官方宣传和民众体验升级的背景相符，讨论主题和地域分布均与京广高铁高度相关。",
+      "当前存在一个核心矛盾：极高的正面情感比例与相对较低的互动量并存，这可能意味着讨论热度与实际传播影响力存在偏差。",
+      "分析的关键缺口在于未能识别出8月中旬引发讨论集中的直接诱因，这限制了对舆情生命周期和影响范围的准确判断。"
     ],
     "forum_rounds": 2,
     "visual_analyses": []
+  },
+  "analysis_context": {
+    "user_analysis_instruction": "",
+    "time_range": {
+      "start": "2024-08-16 10:15:00",
+      "end": "2024-08-31 22:02:00",
+      "span_hours": 371.8,
+      "source_field": "publish_time"
+    },
+    "time_range_text": "2024-08-16 10:15:00 至 2024-08-31 22:02:00"
   }
 }

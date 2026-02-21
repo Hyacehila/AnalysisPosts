@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "run_id": "23504b074e4744619c2a679140072d7f",
+  "run_id": "df0506152c6e47ef8ee446676433bc4d",
   "events": [
     {
       "seq": 1,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:48Z",
       "event": "enter",
       "stage": "stage1",
       "node": "DataLoadNode",
@@ -14,7 +14,7 @@
     },
     {
       "seq": 2,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:48Z",
       "event": "exit",
       "stage": "stage1",
       "node": "DataLoadNode",
@@ -24,7 +24,7 @@
     },
     {
       "seq": 3,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:48Z",
       "event": "enter",
       "stage": "stage1",
       "node": "NLPEnrichmentNode",
@@ -34,7 +34,7 @@
     },
     {
       "seq": 4,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "NLPEnrichmentNode",
@@ -44,7 +44,7 @@
     },
     {
       "seq": 5,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "AsyncSentimentPolarityAnalysisBatchNode",
@@ -54,7 +54,7 @@
     },
     {
       "seq": 6,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "AsyncSentimentPolarityAnalysisBatchNode",
@@ -64,7 +64,7 @@
     },
     {
       "seq": 7,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "AsyncSentimentAttributeAnalysisBatchNode",
@@ -74,7 +74,7 @@
     },
     {
       "seq": 8,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "AsyncSentimentAttributeAnalysisBatchNode",
@@ -84,7 +84,7 @@
     },
     {
       "seq": 9,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "AsyncTwoLevelTopicAnalysisBatchNode",
@@ -94,7 +94,7 @@
     },
     {
       "seq": 10,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "AsyncTwoLevelTopicAnalysisBatchNode",
@@ -104,7 +104,7 @@
     },
     {
       "seq": 11,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "AsyncPublisherObjectAnalysisBatchNode",
@@ -114,7 +114,7 @@
     },
     {
       "seq": 12,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "AsyncPublisherObjectAnalysisBatchNode",
@@ -124,7 +124,7 @@
     },
     {
       "seq": 13,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "AsyncBeliefSystemAnalysisBatchNode",
@@ -134,7 +134,7 @@
     },
     {
       "seq": 14,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "AsyncBeliefSystemAnalysisBatchNode",
@@ -144,7 +144,7 @@
     },
     {
       "seq": 15,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "AsyncPublisherDecisionAnalysisBatchNode",
@@ -154,7 +154,7 @@
     },
     {
       "seq": 16,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "AsyncPublisherDecisionAnalysisBatchNode",
@@ -164,7 +164,7 @@
     },
     {
       "seq": 17,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "SaveEnhancedDataNode",
@@ -174,7 +174,7 @@
     },
     {
       "seq": 18,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "SaveEnhancedDataNode",
@@ -184,7 +184,7 @@
     },
     {
       "seq": 19,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage1",
       "node": "DataValidationAndOverviewNode",
@@ -194,7 +194,7 @@
     },
     {
       "seq": 20,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage1",
       "node": "DataValidationAndOverviewNode",
@@ -204,7 +204,7 @@
     },
     {
       "seq": 21,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "pipeline",
       "node": "Stage1CompletionNode",
@@ -214,7 +214,7 @@
     },
     {
       "seq": 22,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "pipeline",
       "node": "Stage1CompletionNode",
@@ -224,7 +224,7 @@
     },
     {
       "seq": 23,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ClearReportDirNode",
@@ -234,7 +234,7 @@
     },
     {
       "seq": 24,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ClearReportDirNode",
@@ -244,7 +244,7 @@
     },
     {
       "seq": 25,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "LoadEnhancedDataNode",
@@ -254,7 +254,7 @@
     },
     {
       "seq": 26,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage2",
       "node": "LoadEnhancedDataNode",
@@ -264,7 +264,7 @@
     },
     {
       "seq": 27,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DataSummaryNode",
@@ -274,7 +274,7 @@
     },
     {
       "seq": 28,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DataSummaryNode",
@@ -284,7 +284,7 @@
     },
     {
       "seq": 29,
-      "ts": "2026-02-21T07:37:24Z",
+      "ts": "2026-02-21T10:15:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExtractQueriesNode",
@@ -294,7 +294,7 @@
     },
     {
       "seq": 30,
-      "ts": "2026-02-21T07:37:48Z",
+      "ts": "2026-02-21T10:16:03Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExtractQueriesNode",
@@ -304,7 +304,7 @@
     },
     {
       "seq": 31,
-      "ts": "2026-02-21T07:37:48Z",
+      "ts": "2026-02-21T10:16:03Z",
       "event": "enter",
       "stage": "stage2",
       "node": "WebSearchNode",
@@ -314,7 +314,7 @@
     },
     {
       "seq": 32,
-      "ts": "2026-02-21T07:37:53Z",
+      "ts": "2026-02-21T10:16:08Z",
       "event": "exit",
       "stage": "stage2",
       "node": "WebSearchNode",
@@ -324,7 +324,7 @@
     },
     {
       "seq": 33,
-      "ts": "2026-02-21T07:37:53Z",
+      "ts": "2026-02-21T10:16:08Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SearchProcessNode",
@@ -334,7 +334,7 @@
     },
     {
       "seq": 34,
-      "ts": "2026-02-21T07:37:53Z",
+      "ts": "2026-02-21T10:16:08Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SearchProcessNode",
@@ -344,7 +344,7 @@
     },
     {
       "seq": 35,
-      "ts": "2026-02-21T07:37:53Z",
+      "ts": "2026-02-21T10:16:08Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SearchReflectionNode",
@@ -354,7 +354,7 @@
     },
     {
       "seq": 36,
-      "ts": "2026-02-21T07:38:07Z",
+      "ts": "2026-02-21T10:16:33Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SearchReflectionNode",
@@ -364,7 +364,7 @@
     },
     {
       "seq": 37,
-      "ts": "2026-02-21T07:38:07Z",
+      "ts": "2026-02-21T10:16:33Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExtractQueriesNode",
@@ -374,7 +374,7 @@
     },
     {
       "seq": 38,
-      "ts": "2026-02-21T07:38:31Z",
+      "ts": "2026-02-21T10:16:46Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExtractQueriesNode",
@@ -384,7 +384,7 @@
     },
     {
       "seq": 39,
-      "ts": "2026-02-21T07:38:31Z",
+      "ts": "2026-02-21T10:16:46Z",
       "event": "enter",
       "stage": "stage2",
       "node": "WebSearchNode",
@@ -394,7 +394,7 @@
     },
     {
       "seq": 40,
-      "ts": "2026-02-21T07:38:39Z",
+      "ts": "2026-02-21T10:16:51Z",
       "event": "exit",
       "stage": "stage2",
       "node": "WebSearchNode",
@@ -404,7 +404,7 @@
     },
     {
       "seq": 41,
-      "ts": "2026-02-21T07:38:39Z",
+      "ts": "2026-02-21T10:16:51Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SearchProcessNode",
@@ -414,7 +414,7 @@
     },
     {
       "seq": 42,
-      "ts": "2026-02-21T07:38:39Z",
+      "ts": "2026-02-21T10:16:51Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SearchProcessNode",
@@ -424,7 +424,7 @@
     },
     {
       "seq": 43,
-      "ts": "2026-02-21T07:38:39Z",
+      "ts": "2026-02-21T10:16:51Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SearchReflectionNode",
@@ -434,7 +434,7 @@
     },
     {
       "seq": 44,
-      "ts": "2026-02-21T07:39:39Z",
+      "ts": "2026-02-21T10:17:10Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SearchReflectionNode",
@@ -444,7 +444,7 @@
     },
     {
       "seq": 45,
-      "ts": "2026-02-21T07:39:39Z",
+      "ts": "2026-02-21T10:17:10Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SearchSummaryNode",
@@ -454,7 +454,7 @@
     },
     {
       "seq": 46,
-      "ts": "2026-02-21T07:40:02Z",
+      "ts": "2026-02-21T10:17:44Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SearchSummaryNode",
@@ -464,7 +464,7 @@
     },
     {
       "seq": 47,
-      "ts": "2026-02-21T07:40:02Z",
+      "ts": "2026-02-21T10:17:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "RunParallelAgentBranchNode",
@@ -474,7 +474,7 @@
     },
     {
       "seq": 48,
-      "ts": "2026-02-21T07:40:02Z",
+      "ts": "2026-02-21T10:17:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "RunParallelAgentBranchNode",
@@ -484,7 +484,7 @@
     },
     {
       "seq": 49,
-      "ts": "2026-02-21T07:40:02Z",
+      "ts": "2026-02-21T10:17:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "CollectToolsNode",
@@ -494,7 +494,7 @@
     },
     {
       "seq": 50,
-      "ts": "2026-02-21T07:40:05Z",
+      "ts": "2026-02-21T10:17:47Z",
       "event": "exit",
       "stage": "stage2",
       "node": "CollectToolsNode",
@@ -504,7 +504,7 @@
     },
     {
       "seq": 51,
-      "ts": "2026-02-21T07:40:05Z",
+      "ts": "2026-02-21T10:17:47Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -514,7 +514,67 @@
     },
     {
       "seq": 52,
-      "ts": "2026-02-21T07:40:30Z",
+      "ts": "2026-02-21T10:18:01Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "DecisionToolsNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 53,
+      "ts": "2026-02-21T10:18:01Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExecuteToolsNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 54,
+      "ts": "2026-02-21T10:18:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExecuteToolsNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 55,
+      "ts": "2026-02-21T10:18:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ProcessResultNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 56,
+      "ts": "2026-02-21T10:18:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ProcessResultNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 57,
+      "ts": "2026-02-21T10:18:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "DecisionToolsNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 58,
+      "ts": "2026-02-21T10:18:13Z",
       "event": "exit",
       "stage": "stage2",
       "node": "RunParallelAgentBranchNode",
@@ -523,68 +583,8 @@
       "error": ""
     },
     {
-      "seq": 53,
-      "ts": "2026-02-21T07:40:52Z",
-      "event": "exit",
-      "stage": "stage2",
-      "node": "DecisionToolsNode",
-      "branch_id": "main",
-      "status": "completed",
-      "error": ""
-    },
-    {
-      "seq": 54,
-      "ts": "2026-02-21T07:40:52Z",
-      "event": "enter",
-      "stage": "stage2",
-      "node": "ExecuteToolsNode",
-      "branch_id": "main",
-      "status": "",
-      "error": ""
-    },
-    {
-      "seq": 55,
-      "ts": "2026-02-21T07:40:55Z",
-      "event": "exit",
-      "stage": "stage2",
-      "node": "ExecuteToolsNode",
-      "branch_id": "main",
-      "status": "completed",
-      "error": ""
-    },
-    {
-      "seq": 56,
-      "ts": "2026-02-21T07:40:55Z",
-      "event": "enter",
-      "stage": "stage2",
-      "node": "ProcessResultNode",
-      "branch_id": "main",
-      "status": "",
-      "error": ""
-    },
-    {
-      "seq": 57,
-      "ts": "2026-02-21T07:40:55Z",
-      "event": "exit",
-      "stage": "stage2",
-      "node": "ProcessResultNode",
-      "branch_id": "main",
-      "status": "completed",
-      "error": ""
-    },
-    {
-      "seq": 58,
-      "ts": "2026-02-21T07:40:55Z",
-      "event": "enter",
-      "stage": "stage2",
-      "node": "DecisionToolsNode",
-      "branch_id": "main",
-      "status": "",
-      "error": ""
-    },
-    {
       "seq": 59,
-      "ts": "2026-02-21T07:41:03Z",
+      "ts": "2026-02-21T10:18:19Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -594,7 +594,7 @@
     },
     {
       "seq": 60,
-      "ts": "2026-02-21T07:41:03Z",
+      "ts": "2026-02-21T10:18:19Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -604,7 +604,7 @@
     },
     {
       "seq": 61,
-      "ts": "2026-02-21T07:41:06Z",
+      "ts": "2026-02-21T10:18:22Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -614,7 +614,7 @@
     },
     {
       "seq": 62,
-      "ts": "2026-02-21T07:41:06Z",
+      "ts": "2026-02-21T10:18:22Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -624,7 +624,7 @@
     },
     {
       "seq": 63,
-      "ts": "2026-02-21T07:41:06Z",
+      "ts": "2026-02-21T10:18:22Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -634,7 +634,7 @@
     },
     {
       "seq": 64,
-      "ts": "2026-02-21T07:41:06Z",
+      "ts": "2026-02-21T10:18:22Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -644,7 +644,7 @@
     },
     {
       "seq": 65,
-      "ts": "2026-02-21T07:41:31Z",
+      "ts": "2026-02-21T10:18:29Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -654,7 +654,7 @@
     },
     {
       "seq": 66,
-      "ts": "2026-02-21T07:41:31Z",
+      "ts": "2026-02-21T10:18:29Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -664,7 +664,7 @@
     },
     {
       "seq": 67,
-      "ts": "2026-02-21T07:41:34Z",
+      "ts": "2026-02-21T10:18:32Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -674,7 +674,7 @@
     },
     {
       "seq": 68,
-      "ts": "2026-02-21T07:41:34Z",
+      "ts": "2026-02-21T10:18:32Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -684,7 +684,7 @@
     },
     {
       "seq": 69,
-      "ts": "2026-02-21T07:41:34Z",
+      "ts": "2026-02-21T10:18:32Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -694,7 +694,7 @@
     },
     {
       "seq": 70,
-      "ts": "2026-02-21T07:41:34Z",
+      "ts": "2026-02-21T10:18:32Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -704,7 +704,7 @@
     },
     {
       "seq": 71,
-      "ts": "2026-02-21T07:42:01Z",
+      "ts": "2026-02-21T10:18:46Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -714,7 +714,7 @@
     },
     {
       "seq": 72,
-      "ts": "2026-02-21T07:42:01Z",
+      "ts": "2026-02-21T10:18:46Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -724,7 +724,7 @@
     },
     {
       "seq": 73,
-      "ts": "2026-02-21T07:42:04Z",
+      "ts": "2026-02-21T10:18:50Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -734,7 +734,7 @@
     },
     {
       "seq": 74,
-      "ts": "2026-02-21T07:42:04Z",
+      "ts": "2026-02-21T10:18:50Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -744,7 +744,7 @@
     },
     {
       "seq": 75,
-      "ts": "2026-02-21T07:42:04Z",
+      "ts": "2026-02-21T10:18:50Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -754,7 +754,7 @@
     },
     {
       "seq": 76,
-      "ts": "2026-02-21T07:42:04Z",
+      "ts": "2026-02-21T10:18:50Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -764,7 +764,7 @@
     },
     {
       "seq": 77,
-      "ts": "2026-02-21T07:42:14Z",
+      "ts": "2026-02-21T10:19:07Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -774,7 +774,7 @@
     },
     {
       "seq": 78,
-      "ts": "2026-02-21T07:42:14Z",
+      "ts": "2026-02-21T10:19:07Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -784,7 +784,7 @@
     },
     {
       "seq": 79,
-      "ts": "2026-02-21T07:42:17Z",
+      "ts": "2026-02-21T10:19:10Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -794,7 +794,7 @@
     },
     {
       "seq": 80,
-      "ts": "2026-02-21T07:42:17Z",
+      "ts": "2026-02-21T10:19:10Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -804,7 +804,7 @@
     },
     {
       "seq": 81,
-      "ts": "2026-02-21T07:42:17Z",
+      "ts": "2026-02-21T10:19:10Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -814,7 +814,7 @@
     },
     {
       "seq": 82,
-      "ts": "2026-02-21T07:42:17Z",
+      "ts": "2026-02-21T10:19:10Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -824,7 +824,7 @@
     },
     {
       "seq": 83,
-      "ts": "2026-02-21T07:42:25Z",
+      "ts": "2026-02-21T10:19:27Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -834,7 +834,7 @@
     },
     {
       "seq": 84,
-      "ts": "2026-02-21T07:42:25Z",
+      "ts": "2026-02-21T10:19:27Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -844,7 +844,7 @@
     },
     {
       "seq": 85,
-      "ts": "2026-02-21T07:42:28Z",
+      "ts": "2026-02-21T10:19:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -854,7 +854,7 @@
     },
     {
       "seq": 86,
-      "ts": "2026-02-21T07:42:28Z",
+      "ts": "2026-02-21T10:19:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -864,7 +864,7 @@
     },
     {
       "seq": 87,
-      "ts": "2026-02-21T07:42:28Z",
+      "ts": "2026-02-21T10:19:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -874,7 +874,7 @@
     },
     {
       "seq": 88,
-      "ts": "2026-02-21T07:42:28Z",
+      "ts": "2026-02-21T10:19:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -884,7 +884,7 @@
     },
     {
       "seq": 89,
-      "ts": "2026-02-21T07:42:44Z",
+      "ts": "2026-02-21T10:19:48Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -894,7 +894,7 @@
     },
     {
       "seq": 90,
-      "ts": "2026-02-21T07:42:44Z",
+      "ts": "2026-02-21T10:19:48Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -904,7 +904,7 @@
     },
     {
       "seq": 91,
-      "ts": "2026-02-21T07:42:47Z",
+      "ts": "2026-02-21T10:19:51Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -914,7 +914,7 @@
     },
     {
       "seq": 92,
-      "ts": "2026-02-21T07:42:47Z",
+      "ts": "2026-02-21T10:19:51Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -924,7 +924,7 @@
     },
     {
       "seq": 93,
-      "ts": "2026-02-21T07:42:47Z",
+      "ts": "2026-02-21T10:19:51Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -934,7 +934,7 @@
     },
     {
       "seq": 94,
-      "ts": "2026-02-21T07:42:47Z",
+      "ts": "2026-02-21T10:19:51Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -944,7 +944,7 @@
     },
     {
       "seq": 95,
-      "ts": "2026-02-21T07:43:25Z",
+      "ts": "2026-02-21T10:20:14Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -954,7 +954,7 @@
     },
     {
       "seq": 96,
-      "ts": "2026-02-21T07:43:25Z",
+      "ts": "2026-02-21T10:20:14Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -964,7 +964,7 @@
     },
     {
       "seq": 97,
-      "ts": "2026-02-21T07:43:28Z",
+      "ts": "2026-02-21T10:20:17Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -974,7 +974,7 @@
     },
     {
       "seq": 98,
-      "ts": "2026-02-21T07:43:28Z",
+      "ts": "2026-02-21T10:20:17Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -984,7 +984,7 @@
     },
     {
       "seq": 99,
-      "ts": "2026-02-21T07:43:28Z",
+      "ts": "2026-02-21T10:20:17Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -994,7 +994,7 @@
     },
     {
       "seq": 100,
-      "ts": "2026-02-21T07:43:28Z",
+      "ts": "2026-02-21T10:20:17Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1004,7 +1004,7 @@
     },
     {
       "seq": 101,
-      "ts": "2026-02-21T07:44:00Z",
+      "ts": "2026-02-21T10:20:27Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1014,7 +1014,7 @@
     },
     {
       "seq": 102,
-      "ts": "2026-02-21T07:44:00Z",
+      "ts": "2026-02-21T10:20:27Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1024,7 +1024,7 @@
     },
     {
       "seq": 103,
-      "ts": "2026-02-21T07:44:03Z",
+      "ts": "2026-02-21T10:20:31Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1034,7 +1034,7 @@
     },
     {
       "seq": 104,
-      "ts": "2026-02-21T07:44:03Z",
+      "ts": "2026-02-21T10:20:31Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1044,7 +1044,7 @@
     },
     {
       "seq": 105,
-      "ts": "2026-02-21T07:44:03Z",
+      "ts": "2026-02-21T10:20:31Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1054,7 +1054,7 @@
     },
     {
       "seq": 106,
-      "ts": "2026-02-21T07:44:03Z",
+      "ts": "2026-02-21T10:20:31Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1064,7 +1064,7 @@
     },
     {
       "seq": 107,
-      "ts": "2026-02-21T07:44:42Z",
+      "ts": "2026-02-21T10:20:47Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1074,7 +1074,7 @@
     },
     {
       "seq": 108,
-      "ts": "2026-02-21T07:44:42Z",
+      "ts": "2026-02-21T10:20:47Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1084,7 +1084,7 @@
     },
     {
       "seq": 109,
-      "ts": "2026-02-21T07:44:45Z",
+      "ts": "2026-02-21T10:20:50Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1094,7 +1094,7 @@
     },
     {
       "seq": 110,
-      "ts": "2026-02-21T07:44:45Z",
+      "ts": "2026-02-21T10:20:50Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1104,7 +1104,7 @@
     },
     {
       "seq": 111,
-      "ts": "2026-02-21T07:44:45Z",
+      "ts": "2026-02-21T10:20:50Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1114,7 +1114,7 @@
     },
     {
       "seq": 112,
-      "ts": "2026-02-21T07:44:45Z",
+      "ts": "2026-02-21T10:20:50Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1124,7 +1124,7 @@
     },
     {
       "seq": 113,
-      "ts": "2026-02-21T07:45:04Z",
+      "ts": "2026-02-21T10:21:16Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1134,7 +1134,7 @@
     },
     {
       "seq": 114,
-      "ts": "2026-02-21T07:45:04Z",
+      "ts": "2026-02-21T10:21:16Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1144,7 +1144,7 @@
     },
     {
       "seq": 115,
-      "ts": "2026-02-21T07:45:07Z",
+      "ts": "2026-02-21T10:21:19Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1154,7 +1154,7 @@
     },
     {
       "seq": 116,
-      "ts": "2026-02-21T07:45:07Z",
+      "ts": "2026-02-21T10:21:19Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1164,7 +1164,7 @@
     },
     {
       "seq": 117,
-      "ts": "2026-02-21T07:45:07Z",
+      "ts": "2026-02-21T10:21:19Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1174,7 +1174,7 @@
     },
     {
       "seq": 118,
-      "ts": "2026-02-21T07:45:07Z",
+      "ts": "2026-02-21T10:21:19Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1184,7 +1184,7 @@
     },
     {
       "seq": 119,
-      "ts": "2026-02-21T07:47:39Z",
+      "ts": "2026-02-21T10:21:55Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1194,7 +1194,7 @@
     },
     {
       "seq": 120,
-      "ts": "2026-02-21T07:47:39Z",
+      "ts": "2026-02-21T10:21:55Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1204,7 +1204,7 @@
     },
     {
       "seq": 121,
-      "ts": "2026-02-21T07:47:43Z",
+      "ts": "2026-02-21T10:21:58Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1214,7 +1214,7 @@
     },
     {
       "seq": 122,
-      "ts": "2026-02-21T07:47:43Z",
+      "ts": "2026-02-21T10:21:58Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1224,7 +1224,7 @@
     },
     {
       "seq": 123,
-      "ts": "2026-02-21T07:47:43Z",
+      "ts": "2026-02-21T10:21:58Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1234,7 +1234,7 @@
     },
     {
       "seq": 124,
-      "ts": "2026-02-21T07:47:43Z",
+      "ts": "2026-02-21T10:21:58Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1244,7 +1244,7 @@
     },
     {
       "seq": 125,
-      "ts": "2026-02-21T07:47:52Z",
+      "ts": "2026-02-21T10:22:16Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1254,7 +1254,7 @@
     },
     {
       "seq": 126,
-      "ts": "2026-02-21T07:47:52Z",
+      "ts": "2026-02-21T10:22:16Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1264,7 +1264,7 @@
     },
     {
       "seq": 127,
-      "ts": "2026-02-21T07:47:55Z",
+      "ts": "2026-02-21T10:22:19Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1274,7 +1274,7 @@
     },
     {
       "seq": 128,
-      "ts": "2026-02-21T07:47:55Z",
+      "ts": "2026-02-21T10:22:19Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1284,7 +1284,7 @@
     },
     {
       "seq": 129,
-      "ts": "2026-02-21T07:47:55Z",
+      "ts": "2026-02-21T10:22:19Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1294,7 +1294,7 @@
     },
     {
       "seq": 130,
-      "ts": "2026-02-21T07:47:55Z",
+      "ts": "2026-02-21T10:22:19Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1304,7 +1304,7 @@
     },
     {
       "seq": 131,
-      "ts": "2026-02-21T07:48:07Z",
+      "ts": "2026-02-21T10:22:39Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1314,7 +1314,7 @@
     },
     {
       "seq": 132,
-      "ts": "2026-02-21T07:48:07Z",
+      "ts": "2026-02-21T10:22:39Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1324,7 +1324,7 @@
     },
     {
       "seq": 133,
-      "ts": "2026-02-21T07:48:11Z",
+      "ts": "2026-02-21T10:22:42Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1334,7 +1334,7 @@
     },
     {
       "seq": 134,
-      "ts": "2026-02-21T07:48:11Z",
+      "ts": "2026-02-21T10:22:42Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1344,7 +1344,7 @@
     },
     {
       "seq": 135,
-      "ts": "2026-02-21T07:48:11Z",
+      "ts": "2026-02-21T10:22:42Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1354,7 +1354,7 @@
     },
     {
       "seq": 136,
-      "ts": "2026-02-21T07:48:11Z",
+      "ts": "2026-02-21T10:22:42Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1364,7 +1364,7 @@
     },
     {
       "seq": 137,
-      "ts": "2026-02-21T07:48:20Z",
+      "ts": "2026-02-21T10:22:53Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1374,7 +1374,7 @@
     },
     {
       "seq": 138,
-      "ts": "2026-02-21T07:48:20Z",
+      "ts": "2026-02-21T10:22:53Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1384,7 +1384,7 @@
     },
     {
       "seq": 139,
-      "ts": "2026-02-21T07:48:24Z",
+      "ts": "2026-02-21T10:22:57Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1394,7 +1394,7 @@
     },
     {
       "seq": 140,
-      "ts": "2026-02-21T07:48:24Z",
+      "ts": "2026-02-21T10:22:57Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1404,7 +1404,7 @@
     },
     {
       "seq": 141,
-      "ts": "2026-02-21T07:48:24Z",
+      "ts": "2026-02-21T10:22:57Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1414,7 +1414,7 @@
     },
     {
       "seq": 142,
-      "ts": "2026-02-21T07:48:24Z",
+      "ts": "2026-02-21T10:22:57Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1424,7 +1424,7 @@
     },
     {
       "seq": 143,
-      "ts": "2026-02-21T07:48:50Z",
+      "ts": "2026-02-21T10:23:10Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1434,7 +1434,7 @@
     },
     {
       "seq": 144,
-      "ts": "2026-02-21T07:48:50Z",
+      "ts": "2026-02-21T10:23:10Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1444,7 +1444,7 @@
     },
     {
       "seq": 145,
-      "ts": "2026-02-21T07:48:54Z",
+      "ts": "2026-02-21T10:23:14Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1454,7 +1454,7 @@
     },
     {
       "seq": 146,
-      "ts": "2026-02-21T07:48:54Z",
+      "ts": "2026-02-21T10:23:14Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1464,7 +1464,7 @@
     },
     {
       "seq": 147,
-      "ts": "2026-02-21T07:48:54Z",
+      "ts": "2026-02-21T10:23:14Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1474,7 +1474,7 @@
     },
     {
       "seq": 148,
-      "ts": "2026-02-21T07:48:54Z",
+      "ts": "2026-02-21T10:23:14Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1484,7 +1484,7 @@
     },
     {
       "seq": 149,
-      "ts": "2026-02-21T07:49:33Z",
+      "ts": "2026-02-21T10:23:27Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1494,7 +1494,7 @@
     },
     {
       "seq": 150,
-      "ts": "2026-02-21T07:49:33Z",
+      "ts": "2026-02-21T10:23:27Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1504,7 +1504,7 @@
     },
     {
       "seq": 151,
-      "ts": "2026-02-21T07:49:37Z",
+      "ts": "2026-02-21T10:23:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1514,7 +1514,7 @@
     },
     {
       "seq": 152,
-      "ts": "2026-02-21T07:49:37Z",
+      "ts": "2026-02-21T10:23:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1524,7 +1524,7 @@
     },
     {
       "seq": 153,
-      "ts": "2026-02-21T07:49:37Z",
+      "ts": "2026-02-21T10:23:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1534,7 +1534,7 @@
     },
     {
       "seq": 154,
-      "ts": "2026-02-21T07:49:37Z",
+      "ts": "2026-02-21T10:23:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1544,7 +1544,7 @@
     },
     {
       "seq": 155,
-      "ts": "2026-02-21T07:49:46Z",
+      "ts": "2026-02-21T10:23:49Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1554,7 +1554,7 @@
     },
     {
       "seq": 156,
-      "ts": "2026-02-21T07:49:46Z",
+      "ts": "2026-02-21T10:23:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1564,7 +1564,7 @@
     },
     {
       "seq": 157,
-      "ts": "2026-02-21T07:49:49Z",
+      "ts": "2026-02-21T10:23:53Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1574,7 +1574,7 @@
     },
     {
       "seq": 158,
-      "ts": "2026-02-21T07:49:49Z",
+      "ts": "2026-02-21T10:23:53Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1584,7 +1584,7 @@
     },
     {
       "seq": 159,
-      "ts": "2026-02-21T07:49:49Z",
+      "ts": "2026-02-21T10:23:53Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1594,7 +1594,7 @@
     },
     {
       "seq": 160,
-      "ts": "2026-02-21T07:49:49Z",
+      "ts": "2026-02-21T10:23:53Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1604,7 +1604,7 @@
     },
     {
       "seq": 161,
-      "ts": "2026-02-21T07:49:59Z",
+      "ts": "2026-02-21T10:24:13Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1614,7 +1614,7 @@
     },
     {
       "seq": 162,
-      "ts": "2026-02-21T07:49:59Z",
+      "ts": "2026-02-21T10:24:13Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1624,7 +1624,7 @@
     },
     {
       "seq": 163,
-      "ts": "2026-02-21T07:50:02Z",
+      "ts": "2026-02-21T10:24:17Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1634,7 +1634,7 @@
     },
     {
       "seq": 164,
-      "ts": "2026-02-21T07:50:02Z",
+      "ts": "2026-02-21T10:24:17Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1644,7 +1644,7 @@
     },
     {
       "seq": 165,
-      "ts": "2026-02-21T07:50:02Z",
+      "ts": "2026-02-21T10:24:17Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1654,7 +1654,7 @@
     },
     {
       "seq": 166,
-      "ts": "2026-02-21T07:50:02Z",
+      "ts": "2026-02-21T10:24:17Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1664,7 +1664,7 @@
     },
     {
       "seq": 167,
-      "ts": "2026-02-21T07:50:16Z",
+      "ts": "2026-02-21T10:24:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1674,7 +1674,7 @@
     },
     {
       "seq": 168,
-      "ts": "2026-02-21T07:50:16Z",
+      "ts": "2026-02-21T10:24:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1684,7 +1684,7 @@
     },
     {
       "seq": 169,
-      "ts": "2026-02-21T07:50:20Z",
+      "ts": "2026-02-21T10:24:33Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1694,7 +1694,7 @@
     },
     {
       "seq": 170,
-      "ts": "2026-02-21T07:50:20Z",
+      "ts": "2026-02-21T10:24:33Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1704,7 +1704,7 @@
     },
     {
       "seq": 171,
-      "ts": "2026-02-21T07:50:20Z",
+      "ts": "2026-02-21T10:24:33Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1714,7 +1714,7 @@
     },
     {
       "seq": 172,
-      "ts": "2026-02-21T07:50:20Z",
+      "ts": "2026-02-21T10:24:33Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1724,7 +1724,7 @@
     },
     {
       "seq": 173,
-      "ts": "2026-02-21T07:51:29Z",
+      "ts": "2026-02-21T10:24:46Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1734,7 +1734,7 @@
     },
     {
       "seq": 174,
-      "ts": "2026-02-21T07:51:29Z",
+      "ts": "2026-02-21T10:24:46Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1744,7 +1744,7 @@
     },
     {
       "seq": 175,
-      "ts": "2026-02-21T07:51:33Z",
+      "ts": "2026-02-21T10:24:49Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1754,7 +1754,7 @@
     },
     {
       "seq": 176,
-      "ts": "2026-02-21T07:51:33Z",
+      "ts": "2026-02-21T10:24:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1764,7 +1764,7 @@
     },
     {
       "seq": 177,
-      "ts": "2026-02-21T07:51:33Z",
+      "ts": "2026-02-21T10:24:49Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1774,7 +1774,7 @@
     },
     {
       "seq": 178,
-      "ts": "2026-02-21T07:51:33Z",
+      "ts": "2026-02-21T10:24:49Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1784,7 +1784,7 @@
     },
     {
       "seq": 179,
-      "ts": "2026-02-21T07:51:57Z",
+      "ts": "2026-02-21T10:25:01Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1794,7 +1794,7 @@
     },
     {
       "seq": 180,
-      "ts": "2026-02-21T07:51:57Z",
+      "ts": "2026-02-21T10:25:01Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1804,7 +1804,7 @@
     },
     {
       "seq": 181,
-      "ts": "2026-02-21T07:52:00Z",
+      "ts": "2026-02-21T10:25:04Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1814,7 +1814,7 @@
     },
     {
       "seq": 182,
-      "ts": "2026-02-21T07:52:00Z",
+      "ts": "2026-02-21T10:25:04Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1824,7 +1824,7 @@
     },
     {
       "seq": 183,
-      "ts": "2026-02-21T07:52:00Z",
+      "ts": "2026-02-21T10:25:04Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1834,7 +1834,7 @@
     },
     {
       "seq": 184,
-      "ts": "2026-02-21T07:52:00Z",
+      "ts": "2026-02-21T10:25:04Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1844,7 +1844,7 @@
     },
     {
       "seq": 185,
-      "ts": "2026-02-21T07:52:09Z",
+      "ts": "2026-02-21T10:25:27Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1854,7 +1854,7 @@
     },
     {
       "seq": 186,
-      "ts": "2026-02-21T07:52:09Z",
+      "ts": "2026-02-21T10:25:27Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1864,7 +1864,7 @@
     },
     {
       "seq": 187,
-      "ts": "2026-02-21T07:52:13Z",
+      "ts": "2026-02-21T10:25:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1874,7 +1874,7 @@
     },
     {
       "seq": 188,
-      "ts": "2026-02-21T07:52:13Z",
+      "ts": "2026-02-21T10:25:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1884,7 +1884,7 @@
     },
     {
       "seq": 189,
-      "ts": "2026-02-21T07:52:13Z",
+      "ts": "2026-02-21T10:25:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1894,7 +1894,7 @@
     },
     {
       "seq": 190,
-      "ts": "2026-02-21T07:52:13Z",
+      "ts": "2026-02-21T10:25:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1904,7 +1904,7 @@
     },
     {
       "seq": 191,
-      "ts": "2026-02-21T07:52:24Z",
+      "ts": "2026-02-21T10:25:50Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1914,7 +1914,7 @@
     },
     {
       "seq": 192,
-      "ts": "2026-02-21T07:52:24Z",
+      "ts": "2026-02-21T10:25:50Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1924,7 +1924,7 @@
     },
     {
       "seq": 193,
-      "ts": "2026-02-21T07:52:27Z",
+      "ts": "2026-02-21T10:25:53Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1934,7 +1934,7 @@
     },
     {
       "seq": 194,
-      "ts": "2026-02-21T07:52:27Z",
+      "ts": "2026-02-21T10:25:53Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1944,7 +1944,7 @@
     },
     {
       "seq": 195,
-      "ts": "2026-02-21T07:52:27Z",
+      "ts": "2026-02-21T10:25:53Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -1954,7 +1954,7 @@
     },
     {
       "seq": 196,
-      "ts": "2026-02-21T07:52:27Z",
+      "ts": "2026-02-21T10:25:53Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1964,7 +1964,7 @@
     },
     {
       "seq": 197,
-      "ts": "2026-02-21T07:52:35Z",
+      "ts": "2026-02-21T10:26:15Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -1974,7 +1974,7 @@
     },
     {
       "seq": 198,
-      "ts": "2026-02-21T07:52:35Z",
+      "ts": "2026-02-21T10:26:15Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1984,7 +1984,7 @@
     },
     {
       "seq": 199,
-      "ts": "2026-02-21T07:52:38Z",
+      "ts": "2026-02-21T10:26:18Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -1994,7 +1994,7 @@
     },
     {
       "seq": 200,
-      "ts": "2026-02-21T07:52:38Z",
+      "ts": "2026-02-21T10:26:18Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2004,7 +2004,7 @@
     },
     {
       "seq": 201,
-      "ts": "2026-02-21T07:52:38Z",
+      "ts": "2026-02-21T10:26:18Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2014,7 +2014,7 @@
     },
     {
       "seq": 202,
-      "ts": "2026-02-21T07:52:38Z",
+      "ts": "2026-02-21T10:26:18Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2024,7 +2024,7 @@
     },
     {
       "seq": 203,
-      "ts": "2026-02-21T07:52:48Z",
+      "ts": "2026-02-21T10:26:40Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2034,7 +2034,7 @@
     },
     {
       "seq": 204,
-      "ts": "2026-02-21T07:52:48Z",
+      "ts": "2026-02-21T10:26:40Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2044,7 +2044,7 @@
     },
     {
       "seq": 205,
-      "ts": "2026-02-21T07:52:52Z",
+      "ts": "2026-02-21T10:26:44Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2054,7 +2054,7 @@
     },
     {
       "seq": 206,
-      "ts": "2026-02-21T07:52:52Z",
+      "ts": "2026-02-21T10:26:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2064,7 +2064,7 @@
     },
     {
       "seq": 207,
-      "ts": "2026-02-21T07:52:52Z",
+      "ts": "2026-02-21T10:26:44Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2074,7 +2074,7 @@
     },
     {
       "seq": 208,
-      "ts": "2026-02-21T07:52:52Z",
+      "ts": "2026-02-21T10:26:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2084,7 +2084,7 @@
     },
     {
       "seq": 209,
-      "ts": "2026-02-21T07:53:35Z",
+      "ts": "2026-02-21T10:27:05Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2094,7 +2094,7 @@
     },
     {
       "seq": 210,
-      "ts": "2026-02-21T07:53:35Z",
+      "ts": "2026-02-21T10:27:05Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2104,7 +2104,7 @@
     },
     {
       "seq": 211,
-      "ts": "2026-02-21T07:53:39Z",
+      "ts": "2026-02-21T10:27:08Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2114,7 +2114,7 @@
     },
     {
       "seq": 212,
-      "ts": "2026-02-21T07:53:39Z",
+      "ts": "2026-02-21T10:27:08Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2124,7 +2124,7 @@
     },
     {
       "seq": 213,
-      "ts": "2026-02-21T07:53:39Z",
+      "ts": "2026-02-21T10:27:08Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2134,7 +2134,7 @@
     },
     {
       "seq": 214,
-      "ts": "2026-02-21T07:53:39Z",
+      "ts": "2026-02-21T10:27:08Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2144,7 +2144,7 @@
     },
     {
       "seq": 215,
-      "ts": "2026-02-21T07:53:48Z",
+      "ts": "2026-02-21T10:27:35Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2154,7 +2154,7 @@
     },
     {
       "seq": 216,
-      "ts": "2026-02-21T07:53:48Z",
+      "ts": "2026-02-21T10:27:35Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2164,7 +2164,7 @@
     },
     {
       "seq": 217,
-      "ts": "2026-02-21T07:53:52Z",
+      "ts": "2026-02-21T10:27:39Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2174,7 +2174,7 @@
     },
     {
       "seq": 218,
-      "ts": "2026-02-21T07:53:52Z",
+      "ts": "2026-02-21T10:27:39Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2184,7 +2184,7 @@
     },
     {
       "seq": 219,
-      "ts": "2026-02-21T07:53:52Z",
+      "ts": "2026-02-21T10:27:39Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2194,7 +2194,7 @@
     },
     {
       "seq": 220,
-      "ts": "2026-02-21T07:53:52Z",
+      "ts": "2026-02-21T10:27:39Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2204,7 +2204,7 @@
     },
     {
       "seq": 221,
-      "ts": "2026-02-21T07:54:50Z",
+      "ts": "2026-02-21T10:27:44Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2214,7 +2214,7 @@
     },
     {
       "seq": 222,
-      "ts": "2026-02-21T07:54:50Z",
+      "ts": "2026-02-21T10:27:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2224,7 +2224,7 @@
     },
     {
       "seq": 223,
-      "ts": "2026-02-21T07:54:53Z",
+      "ts": "2026-02-21T10:27:48Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2234,7 +2234,7 @@
     },
     {
       "seq": 224,
-      "ts": "2026-02-21T07:54:53Z",
+      "ts": "2026-02-21T10:27:48Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2244,7 +2244,7 @@
     },
     {
       "seq": 225,
-      "ts": "2026-02-21T07:54:53Z",
+      "ts": "2026-02-21T10:27:48Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2254,7 +2254,7 @@
     },
     {
       "seq": 226,
-      "ts": "2026-02-21T07:54:53Z",
+      "ts": "2026-02-21T10:27:48Z",
       "event": "enter",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2264,7 +2264,7 @@
     },
     {
       "seq": 227,
-      "ts": "2026-02-21T07:55:03Z",
+      "ts": "2026-02-21T10:27:56Z",
       "event": "exit",
       "stage": "stage2",
       "node": "DecisionToolsNode",
@@ -2274,7 +2274,7 @@
     },
     {
       "seq": 228,
-      "ts": "2026-02-21T07:55:03Z",
+      "ts": "2026-02-21T10:27:56Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2284,7 +2284,7 @@
     },
     {
       "seq": 229,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ExecuteToolsNode",
@@ -2294,7 +2294,7 @@
     },
     {
       "seq": 230,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2304,7 +2304,7 @@
     },
     {
       "seq": 231,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ProcessResultNode",
@@ -2314,7 +2314,7 @@
     },
     {
       "seq": 232,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "enter",
       "stage": "stage2",
       "node": "EnsureChartsNode",
@@ -2324,7 +2324,7 @@
     },
     {
       "seq": 233,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "exit",
       "stage": "stage2",
       "node": "EnsureChartsNode",
@@ -2334,7 +2334,7 @@
     },
     {
       "seq": 234,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "exit",
       "stage": "stage2",
       "node": "RunParallelAgentBranchNode",
@@ -2344,7 +2344,7 @@
     },
     {
       "seq": 235,
-      "ts": "2026-02-21T07:55:06Z",
+      "ts": "2026-02-21T10:27:59Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ForumHostNode",
@@ -2354,7 +2354,7 @@
     },
     {
       "seq": 236,
-      "ts": "2026-02-21T07:55:34Z",
+      "ts": "2026-02-21T10:28:24Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ForumHostNode",
@@ -2364,7 +2364,7 @@
     },
     {
       "seq": 237,
-      "ts": "2026-02-21T07:55:34Z",
+      "ts": "2026-02-21T10:28:24Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SupplementSearchNode",
@@ -2374,7 +2374,7 @@
     },
     {
       "seq": 238,
-      "ts": "2026-02-21T07:55:57Z",
+      "ts": "2026-02-21T10:28:50Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SupplementSearchNode",
@@ -2384,7 +2384,7 @@
     },
     {
       "seq": 239,
-      "ts": "2026-02-21T07:55:57Z",
+      "ts": "2026-02-21T10:28:50Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ForumHostNode",
@@ -2394,7 +2394,7 @@
     },
     {
       "seq": 240,
-      "ts": "2026-02-21T07:56:19Z",
+      "ts": "2026-02-21T10:29:32Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ForumHostNode",
@@ -2404,7 +2404,7 @@
     },
     {
       "seq": 241,
-      "ts": "2026-02-21T07:56:19Z",
+      "ts": "2026-02-21T10:29:32Z",
       "event": "enter",
       "stage": "stage2",
       "node": "MergeResultsNode",
@@ -2414,7 +2414,7 @@
     },
     {
       "seq": 242,
-      "ts": "2026-02-21T07:56:19Z",
+      "ts": "2026-02-21T10:29:32Z",
       "event": "exit",
       "stage": "stage2",
       "node": "MergeResultsNode",
@@ -2424,7 +2424,7 @@
     },
     {
       "seq": 243,
-      "ts": "2026-02-21T07:56:19Z",
+      "ts": "2026-02-21T10:29:32Z",
       "event": "enter",
       "stage": "stage2",
       "node": "ChartAnalysisNode",
@@ -2434,7 +2434,7 @@
     },
     {
       "seq": 244,
-      "ts": "2026-02-21T08:03:59Z",
+      "ts": "2026-02-21T10:36:30Z",
       "event": "exit",
       "stage": "stage2",
       "node": "ChartAnalysisNode",
@@ -2444,7 +2444,7 @@
     },
     {
       "seq": 245,
-      "ts": "2026-02-21T08:03:59Z",
+      "ts": "2026-02-21T10:36:30Z",
       "event": "enter",
       "stage": "stage2",
       "node": "LLMInsightNode",
@@ -2454,7 +2454,7 @@
     },
     {
       "seq": 246,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "exit",
       "stage": "stage2",
       "node": "LLMInsightNode",
@@ -2464,7 +2464,7 @@
     },
     {
       "seq": 247,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "enter",
       "stage": "stage2",
       "node": "SaveAnalysisResultsNode",
@@ -2474,7 +2474,7 @@
     },
     {
       "seq": 248,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "exit",
       "stage": "stage2",
       "node": "SaveAnalysisResultsNode",
@@ -2484,7 +2484,7 @@
     },
     {
       "seq": 249,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "enter",
       "stage": "pipeline",
       "node": "Stage2CompletionNode",
@@ -2494,7 +2494,7 @@
     },
     {
       "seq": 250,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "exit",
       "stage": "pipeline",
       "node": "Stage2CompletionNode",
@@ -2504,7 +2504,7 @@
     },
     {
       "seq": 251,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "enter",
       "stage": "stage3",
       "node": "ClearStage3OutputsNode",
@@ -2514,7 +2514,7 @@
     },
     {
       "seq": 252,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "exit",
       "stage": "stage3",
       "node": "ClearStage3OutputsNode",
@@ -2524,7 +2524,7 @@
     },
     {
       "seq": 253,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "enter",
       "stage": "stage3",
       "node": "LoadAnalysisResultsNode",
@@ -2534,7 +2534,7 @@
     },
     {
       "seq": 254,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "exit",
       "stage": "stage3",
       "node": "LoadAnalysisResultsNode",
@@ -2544,7 +2544,7 @@
     },
     {
       "seq": 255,
-      "ts": "2026-02-21T08:04:36Z",
+      "ts": "2026-02-21T10:36:44Z",
       "event": "enter",
       "stage": "stage3",
       "node": "PlanOutlineNode",
@@ -2554,7 +2554,7 @@
     },
     {
       "seq": 256,
-      "ts": "2026-02-21T08:05:09Z",
+      "ts": "2026-02-21T10:37:24Z",
       "event": "exit",
       "stage": "stage3",
       "node": "PlanOutlineNode",
@@ -2564,7 +2564,7 @@
     },
     {
       "seq": 257,
-      "ts": "2026-02-21T08:05:09Z",
+      "ts": "2026-02-21T10:37:24Z",
       "event": "enter",
       "stage": "stage3",
       "node": "GenerateChaptersBatchNode",
@@ -2574,7 +2574,7 @@
     },
     {
       "seq": 258,
-      "ts": "2026-02-21T08:05:45Z",
+      "ts": "2026-02-21T10:38:10Z",
       "event": "exit",
       "stage": "stage3",
       "node": "GenerateChaptersBatchNode",
@@ -2584,7 +2584,7 @@
     },
     {
       "seq": 259,
-      "ts": "2026-02-21T08:05:45Z",
+      "ts": "2026-02-21T10:38:10Z",
       "event": "enter",
       "stage": "stage3",
       "node": "ReviewChaptersNode",
@@ -2594,7 +2594,7 @@
     },
     {
       "seq": 260,
-      "ts": "2026-02-21T08:07:05Z",
+      "ts": "2026-02-21T10:39:29Z",
       "event": "exit",
       "stage": "stage3",
       "node": "ReviewChaptersNode",
@@ -2604,7 +2604,7 @@
     },
     {
       "seq": 261,
-      "ts": "2026-02-21T08:07:05Z",
+      "ts": "2026-02-21T10:39:29Z",
       "event": "enter",
       "stage": "stage3",
       "node": "GenerateChaptersBatchNode",
@@ -2614,7 +2614,7 @@
     },
     {
       "seq": 262,
-      "ts": "2026-02-21T08:07:44Z",
+      "ts": "2026-02-21T10:40:27Z",
       "event": "exit",
       "stage": "stage3",
       "node": "GenerateChaptersBatchNode",
@@ -2624,7 +2624,7 @@
     },
     {
       "seq": 263,
-      "ts": "2026-02-21T08:07:44Z",
+      "ts": "2026-02-21T10:40:27Z",
       "event": "enter",
       "stage": "stage3",
       "node": "ReviewChaptersNode",
@@ -2634,7 +2634,7 @@
     },
     {
       "seq": 264,
-      "ts": "2026-02-21T08:09:24Z",
+      "ts": "2026-02-21T10:41:49Z",
       "event": "exit",
       "stage": "stage3",
       "node": "ReviewChaptersNode",
@@ -2644,7 +2644,7 @@
     },
     {
       "seq": 265,
-      "ts": "2026-02-21T08:09:24Z",
+      "ts": "2026-02-21T10:41:49Z",
       "event": "enter",
       "stage": "stage3",
       "node": "GenerateChaptersBatchNode",
@@ -2654,7 +2654,7 @@
     },
     {
       "seq": 266,
-      "ts": "2026-02-21T08:09:59Z",
+      "ts": "2026-02-21T10:42:43Z",
       "event": "exit",
       "stage": "stage3",
       "node": "GenerateChaptersBatchNode",
@@ -2664,7 +2664,7 @@
     },
     {
       "seq": 267,
-      "ts": "2026-02-21T08:09:59Z",
+      "ts": "2026-02-21T10:42:43Z",
       "event": "enter",
       "stage": "stage3",
       "node": "ReviewChaptersNode",
@@ -2674,7 +2674,7 @@
     },
     {
       "seq": 268,
-      "ts": "2026-02-21T08:11:34Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "stage3",
       "node": "ReviewChaptersNode",
@@ -2684,7 +2684,7 @@
     },
     {
       "seq": 269,
-      "ts": "2026-02-21T08:11:34Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "stage3",
       "node": "InjectTraceNode",
@@ -2694,7 +2694,7 @@
     },
     {
       "seq": 270,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "stage3",
       "node": "InjectTraceNode",
@@ -2704,7 +2704,7 @@
     },
     {
       "seq": 271,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "stage3",
       "node": "MethodologyAppendixNode",
@@ -2714,7 +2714,7 @@
     },
     {
       "seq": 272,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "stage3",
       "node": "MethodologyAppendixNode",
@@ -2724,7 +2724,7 @@
     },
     {
       "seq": 273,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "stage3",
       "node": "FormatReportNode",
@@ -2734,7 +2734,7 @@
     },
     {
       "seq": 274,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "stage3",
       "node": "FormatReportNode",
@@ -2744,7 +2744,7 @@
     },
     {
       "seq": 275,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "stage3",
       "node": "RenderHTMLNode",
@@ -2754,7 +2754,7 @@
     },
     {
       "seq": 276,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "stage3",
       "node": "RenderHTMLNode",
@@ -2764,7 +2764,7 @@
     },
     {
       "seq": 277,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "stage3",
       "node": "SaveReportNode",
@@ -2774,7 +2774,7 @@
     },
     {
       "seq": 278,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "stage3",
       "node": "SaveReportNode",
@@ -2784,7 +2784,7 @@
     },
     {
       "seq": 279,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "pipeline",
       "node": "Stage3CompletionNode",
@@ -2794,7 +2794,7 @@
     },
     {
       "seq": 280,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "pipeline",
       "node": "Stage3CompletionNode",
@@ -2804,7 +2804,7 @@
     },
     {
       "seq": 281,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "enter",
       "stage": "pipeline",
       "node": "TerminalNode",
@@ -2814,7 +2814,7 @@
     },
     {
       "seq": 282,
-      "ts": "2026-02-21T08:11:35Z",
+      "ts": "2026-02-21T10:44:00Z",
       "event": "exit",
       "stage": "pipeline",
       "node": "TerminalNode",

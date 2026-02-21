@@ -13,6 +13,15 @@ def run_async(coro):
 
 def _shared_for_chapters():
     return {
+        "analysis_context": {
+            "time_range": {
+                "start": "2024-08-16 10:00:00",
+                "end": "2024-08-31 22:00:00",
+                "span_hours": 373.0,
+            },
+            "time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+            "user_analysis_instruction": "重点分析官方回应时效性",
+        },
         "stage3_results": {
             "outline": {
                 "title": "测试报告",
@@ -145,6 +154,17 @@ def test_chapter_prompt_includes_chart_analysis_insights_and_placeholder_guard(m
         "_search_context": {
             "event_timeline": ["2024-08-21 声量峰值"],
         },
+        "_analysis_time_range_text": "2024-08-16 10:00:00 至 2024-08-31 22:00:00",
+        "_user_analysis_instruction": "重点分析官方回应时效性",
+        "_evidence_cards": [
+            {
+                "id": "E1",
+                "source": "sentiment_trend_chart",
+                "evidence": "中性占比70.0%，乐观占比26.7%。",
+                "confidence": "高",
+                "reason": "图表与统计口径一致",
+            }
+        ],
     }
 
     run_async(node.exec_async(chapter_input))
@@ -153,3 +173,7 @@ def test_chapter_prompt_includes_chart_analysis_insights_and_placeholder_guard(m
     assert "中性占比70.0%，乐观占比26.7%" in prompt
     assert "8月16日至8月31日讨论集中于共享单车夜骑治理" in prompt
     assert "占位符" in prompt
+    assert "证据说明" in prompt
+    assert "置信度" in prompt
+    assert "2024-08-16 10:00:00 至 2024-08-31 22:00:00" in prompt
+    assert "重点分析官方回应时效性" in prompt

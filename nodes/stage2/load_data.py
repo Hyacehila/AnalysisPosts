@@ -4,10 +4,49 @@ Stage 2 data loading and summary nodes.
 import os
 from collections import Counter
 from datetime import datetime
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from nodes.base import MonitoredNode
 
 from utils.data_loader import load_enhanced_blog_data
+
+
+_TIME_FIELD_PRIORITY: Tuple[str, ...] = ("publish_time", "created_at", "createdAt")
+_TIME_FORMATS: Tuple[str, ...] = (
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%d %H:%M",
+    "%Y-%m-%d",
+)
+
+
+def _parse_datetime(value: object) -> Optional[datetime]:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    normalized = text.replace("/", "-").replace("Z", "")
+    for fmt in _TIME_FORMATS:
+        try:
+            return datetime.strptime(normalized, fmt)
+        except ValueError:
+            continue
+    try:
+        return datetime.fromisoformat(normalized)
+    except Exception:
+        return None
+
+
+def _collect_time_points(blog_data: Iterable[dict]) -> List[Tuple[datetime, str]]:
+    points: List[Tuple[datetime, str]] = []
+    for post in blog_data:
+        if not isinstance(post, dict):
+            continue
+        for field in _TIME_FIELD_PRIORITY:
+            dt = _parse_datetime(post.get(field))
+            if dt:
+                points.append((dt, field))
+                break
+    return points
 
 
 class LoadEnhancedDataNode(MonitoredNode):
@@ -91,21 +130,22 @@ class DataSummaryNode(MonitoredNode):
 
         location_dist = Counter(p.get("location") for p in blog_data if p.get("location"))
 
-        publish_times = []
-        for p in blog_data:
-            pt = p.get("publish_time")
-            if pt:
-                try:
-                    publish_times.append(datetime.strptime(pt, "%Y-%m-%d %H:%M:%S"))
-                except Exception:
-                    pass
+        time_points = _collect_time_points(blog_data)
 
         time_range = None
-        if publish_times:
+        if time_points:
+            all_datetimes = [item[0] for item in time_points]
+            source_field = "publish_time"
+            used_fields = {item[1] for item in time_points}
+            for field in _TIME_FIELD_PRIORITY:
+                if field in used_fields:
+                    source_field = field
+                    break
             time_range = {
-                "start": min(publish_times).strftime("%Y-%m-%d %H:%M:%S"),
-                "end": max(publish_times).strftime("%Y-%m-%d %H:%M:%S"),
-                "span_hours": round((max(publish_times) - min(publish_times)).total_seconds() / 3600, 1),
+                "start": min(all_datetimes).strftime("%Y-%m-%d %H:%M:%S"),
+                "end": max(all_datetimes).strftime("%Y-%m-%d %H:%M:%S"),
+                "span_hours": round((max(all_datetimes) - min(all_datetimes)).total_seconds() / 3600, 1),
+                "source_field": source_field,
             }
 
         total_reposts = sum(p.get("repost_count", 0) for p in blog_data)
@@ -144,6 +184,23 @@ class DataSummaryNode(MonitoredNode):
 
         shared["agent"]["data_summary"] = exec_res["summary"]
         shared["agent"]["data_statistics"] = exec_res["statistics"]
+        analysis_context = shared.setdefault("analysis_context", {})
+        configured_instruction = str(
+            shared.get("config", {}).get("pipeline", {}).get("user_analysis_instruction", "")
+        ).strip()
+        existing_instruction = str(analysis_context.get("user_analysis_instruction", "")).strip()
+        analysis_context["user_analysis_instruction"] = existing_instruction or configured_instruction
+        time_range = exec_res.get("statistics", {}).get("time_range")
+        if isinstance(time_range, dict) and time_range:
+            analysis_context["time_range"] = dict(time_range)
+            analysis_context["time_range_text"] = (
+                f"{time_range.get('start', '未知')} 至 {time_range.get('end', '未知')}"
+            )
+        else:
+            analysis_context["time_range"] = None
+            analysis_context["time_range_text"] = ""
+        shared["analysis_context"] = analysis_context
+        shared.setdefault("stage2_results", {})["analysis_context"] = dict(analysis_context)
 
         print(f"\n[DataSummary] 数据概况已生成")
         print(exec_res["summary"])
