@@ -15,7 +15,6 @@ from nodes import (
     DataLoadNode,
     DataSummaryNode,
     DataValidationAndOverviewNode,
-    DispatcherNode,
     FormatReportNode,
     LLMInsightNode,
     PlanOutlineNode,
@@ -162,43 +161,26 @@ class TestStage3UnifiedFlow:
         assert Path(save_exec["report_md"]).exists()
 
 
-class TestDispatcherMultiStageFlow:
-    def test_three_stage_sequential_dispatch(self, minimal_shared):
-        minimal_shared["dispatcher"]["run_stages"] = [1, 2, 3]
+class TestLinearPipelineStateFlow:
+    def test_three_stage_completion_updates_pipeline_state(self, minimal_shared):
         minimal_shared["config"]["enhancement_mode"] = "async"
         minimal_shared["config"]["analysis_mode"] = "agent"
         minimal_shared["config"]["tool_source"] = "mcp"
 
-        dispatcher = DispatcherNode()
+        action1 = _complete_stage(minimal_shared, Stage1CompletionNode)
+        assert action1 == "default"
+        assert minimal_shared["pipeline_state"]["completed_stages"] == [1]
 
-        p1 = dispatcher.prep(minimal_shared)
-        e1 = dispatcher.exec(p1)
-        a1 = dispatcher.post(minimal_shared, p1, e1)
-        assert a1 == "stage1_async"
+        action2 = _complete_stage(minimal_shared, Stage2CompletionNode)
+        assert action2 == "default"
+        assert minimal_shared["pipeline_state"]["completed_stages"] == [1, 2]
 
-        _complete_stage(minimal_shared, Stage1CompletionNode)
-
-        p2 = dispatcher.prep(minimal_shared)
-        e2 = dispatcher.exec(p2)
-        a2 = dispatcher.post(minimal_shared, p2, e2)
-        assert a2 == "stage2_agent"
-
-        _complete_stage(minimal_shared, Stage2CompletionNode)
-
-        p3 = dispatcher.prep(minimal_shared)
-        e3 = dispatcher.exec(p3)
-        a3 = dispatcher.post(minimal_shared, p3, e3)
-        assert a3 == "stage3_report"
-
-        _complete_stage(minimal_shared, Stage3CompletionNode)
-
-        p4 = dispatcher.prep(minimal_shared)
-        e4 = dispatcher.exec(p4)
-        a4 = dispatcher.post(minimal_shared, p4, e4)
-        assert a4 == "done"
+        action3 = _complete_stage(minimal_shared, Stage3CompletionNode)
+        assert action3 == "default"
+        assert minimal_shared["pipeline_state"]["completed_stages"] == [1, 2, 3]
 
     def test_terminal_generates_summary(self, minimal_shared):
-        minimal_shared["dispatcher"]["completed_stages"] = [1, 2, 3]
+        minimal_shared["pipeline_state"]["completed_stages"] = [1, 2, 3]
         minimal_shared["stage1_results"]["statistics"]["total_blogs"] = 100
         minimal_shared["stage1_results"]["data_save"]["saved"] = True
 

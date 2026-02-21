@@ -94,3 +94,31 @@ def test_post_async_stores_generated_chapters():
     assert action == "default"
     assert len(shared["stage3_results"]["chapters"]) == 2
     assert shared["stage3_results"]["chapters"][1]["content"] == "B"
+
+
+@patch("nodes.stage3.chapters.call_glm46", return_value="章节内容")
+def test_exec_async_accepts_non_numeric_target_words(_mock_llm):
+    node = GenerateChaptersBatchNode(max_concurrent=2)
+    chapter_input = {
+        "id": "ch03",
+        "title": "风险评估",
+        "target_words": "约500字",
+        "key_data": [],
+    }
+
+    result = run_async(node.exec_async(chapter_input))
+
+    assert result["id"] == "ch03"
+    assert "章节内容" in result["content"]
+
+
+@patch("nodes.stage3.chapters.call_glm46", return_value="章节内容")
+def test_chapter_generation_respects_stage3_reasoning_switch(mock_llm):
+    shared = _shared_for_chapters()
+    shared["config"] = {"llm": {"reasoning_enabled_stage3": False}}
+    node = GenerateChaptersBatchNode(max_concurrent=2)
+    chapter_input = run_async(node.prep_async(shared))[0]
+
+    run_async(node.exec_async(chapter_input))
+
+    assert mock_llm.call_args.kwargs["enable_reasoning"] is False

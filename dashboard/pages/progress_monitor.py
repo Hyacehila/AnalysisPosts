@@ -17,12 +17,13 @@ current_node = status.get("current_node", "")
 st.metric("Current Stage", current_stage)
 st.metric("Current Node", current_node)
 
-st.subheader("Execution Log")
-st.dataframe(status.get("execution_log", [])[-20:], width="stretch")
+events = status.get("events", [])
+st.subheader("Status Events")
+st.dataframe(events[-50:], width="stretch")
 
-errors = status.get("error_log", [])
+errors = [item for item in events if item.get("event") == "exit" and item.get("status") == "failed"]
 if errors:
-    st.subheader("Errors")
+    st.subheader("Failed Exits")
     st.dataframe(errors[-20:], width="stretch")
 
 auto_refresh = st.toggle("Auto refresh", value=True, key="progress_auto_refresh")

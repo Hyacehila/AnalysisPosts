@@ -47,7 +47,7 @@ flowchart LR
 
 | 节点 | 职责 |
 |:---|:---|
-| `ClearStage3OutputsNode` | 清理 `report.md/report.html/status.json`，保留 Stage2 产物和 `images/` |
+| `ClearStage3OutputsNode` | 清理 `report.md/report.html`，保留 Stage2 产物、`images/` 与 `status.json` |
 | `LoadAnalysisResultsNode` | 内存优先读取 Stage2 结果，文件回退加载 JSON 与 trace |
 | `PlanOutlineNode` | LLM 规划报告大纲（失败时回退默认大纲） |
 | `GenerateChaptersBatchNode` | 并行逐章生成内容（支持反馈驱动重生成） |
@@ -165,6 +165,6 @@ shared["stage3_results"]["output_files"] = {
 
 `Stage3CompletionNode`：
 
-- 将 `3` 追加到 `shared["dispatcher"]["completed_stages"]`
-- 更新 `shared["dispatcher"]["current_stage"] = 3`
-- 返回 `"dispatch"` 交回 `DispatcherNode`
+- 将 `3` 追加到 `shared["pipeline_state"]["completed_stages"]`
+- 更新 `shared["pipeline_state"]["current_stage"] = 3`
+- 返回 `"default"`，在线性主链中继续进入 `TerminalNode`

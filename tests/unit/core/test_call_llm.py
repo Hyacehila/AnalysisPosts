@@ -84,3 +84,45 @@ def test_call_glm4v_plus_text_only(monkeypatch):
     messages = params["messages"]
     content = messages[0]["content"]
     assert content == [{"type": "text", "text": "prompt only"}]
+
+
+def test_call_glm46_disables_reasoning_when_flag_false(monkeypatch):
+    dummy = _patch_client(monkeypatch)
+
+    response = call_llm.call_glm46("prompt", enable_reasoning=False)
+    assert response == "ok"
+
+    params = dummy.completions.last_params
+    assert params["model"] == "glm-4.6"
+    assert "thinking" not in params
+
+
+def test_call_glm46_passes_timeout(monkeypatch):
+    dummy = _patch_client(monkeypatch)
+
+    response = call_llm.call_glm46("prompt", timeout=120)
+    assert response == "ok"
+
+    params = dummy.completions.last_params
+    assert params["timeout"] == 120
+
+
+def test_call_glm45v_thinking_disables_thinking_when_flag_false(monkeypatch):
+    dummy = _patch_client(monkeypatch)
+
+    response = call_llm.call_glm45v_thinking("prompt", enable_thinking=False)
+    assert response == "ok"
+
+    params = dummy.completions.last_params
+    assert params["model"] == "glm-4.5v"
+    assert "thinking" not in params
+
+
+def test_call_glm45v_thinking_passes_timeout(monkeypatch):
+    dummy = _patch_client(monkeypatch)
+
+    response = call_llm.call_glm45v_thinking("prompt", timeout=120)
+    assert response == "ok"
+
+    params = dummy.completions.last_params
+    assert params["timeout"] == 120

@@ -3,48 +3,35 @@ Status API for dashboard.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Dict
 
 from utils.path_manager import get_report_dir
-from utils.status_store import atomic_write_json
+from utils.status_events import (
+    build_empty_status,
+    derive_current_location,
+    read_status_events,
+    write_status_events,
+)
 
 
 def _default_status() -> Dict[str, Any]:
-    return {
-        "start_time": "",
-        "current_stage": "",
-        "current_node": "",
-        "execution_log": [],
-        "progress_status": {},
-        "error_log": [],
-    }
+    status = build_empty_status()
+    status.update({"current_stage": "", "current_node": ""})
+    return status
 
 
 def read_status(path: str | None = None) -> Dict[str, Any]:
-    """Read status.json if exists; otherwise return empty status structure."""
-    if path is None:
-        path = str(Path(get_report_dir()) / "status.json")
-    status_path = Path(path)
-    if not status_path.exists():
-        return _default_status()
+    """Read status.json if exists; otherwise return empty v2 status structure."""
     try:
-        content = status_path.read_text(encoding="utf-8")
-    except OSError:
+        status = read_status_events(path=path or str(Path(get_report_dir()) / "status.json"))
+    except Exception:
         return _default_status()
-    if not content.strip():
-        return _default_status()
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError:
-        return _default_status()
+
+    status.update(derive_current_location(status))
+    return status
 
 
 def write_status(status: Dict[str, Any], path: str | None = None) -> str:
     """Write status.json and return path."""
-    if path is None:
-        path = str(Path(get_report_dir()) / "status.json")
-    status_path = Path(path)
-    atomic_write_json(status_path, status)
-    return str(status_path)
+    return write_status_events(status, path=path or str(Path(get_report_dir()) / "status.json"))

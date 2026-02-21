@@ -29,9 +29,12 @@
 1. **Stage 1 (Enhancement)**: Load raw posts → enrich with LLM + local NLP → save enhanced data.
 2. **Stage 2 (Analysis)**: Load enhanced data → QuerySearchFlow 外部检索 → DataAgent/SearchAgent 双信源并行 → ForumHost 动态循环（SupplementData / SupplementSearch / VisualAnalysis）→ MergeResults 收敛 → chart gap-fill analysis + insight → save results + trace.
 3. **Stage 3 (Report)**: Load analysis results → PlanOutline → GenerateChaptersBatch → ReviewChapters(loop) → InjectTrace + MethodologyAppendix → Format → RenderHTML → save Markdown/HTML/trace.
-4. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
+4. **Pipeline Entry**: `pipeline.start_stage` 仅支持 `1/2/3`，从指定阶段进入后按线性主链顺序执行到结束。
+   - E2E 可观测性：循环状态统一写入 `trace.loop_status`，关键字段包括 `forum` 与 `stage3_chapter_review`。
+5. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
    - A shared lock file at `report/.pipeline_running.lock` is used for concurrency control, created/cleared by both CLI and dashboard runs.
    - Status file reliability: reads fall back to an empty status when the file is missing/empty/invalid; writes use atomic replace to avoid partial files.
+   - `report/status.json` 使用事件流结构（`version/run_id/events[]`），仅记录节点 `enter/exit`。
 
 ### Stage 2 Chart Coverage & MCP Migration
 
@@ -116,6 +119,7 @@ flowchart TD
 
 ```
 shared = {
+  "pipeline_state": {"start_stage": 1, "current_stage": 0, "completed_stages": []},
   "data": {...},
   "config": {...},
   "search": {...},
@@ -125,8 +129,7 @@ shared = {
   "stage1_results": {...},
   "stage2_results": {...},
   "stage3_results": {...},
-  "trace": {"decisions": [], "executions": [], "reflections": [], "insight_provenance": {}, "loop_status": {}},
-  "monitor": {...}
+  "trace": {"decisions": [], "executions": [], "reflections": [], "insight_provenance": {}, "loop_status": {}}
 }
 ```
 

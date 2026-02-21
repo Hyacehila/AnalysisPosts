@@ -6,6 +6,20 @@ from typing import Any, Dict, List
 
 from nodes.base import AsyncParallelBatchNode
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage3
+
+
+def _coerce_target_words(value: Any, default: int = 300) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        digits = "".join(ch for ch in str(value or "") if ch.isdigit())
+        if digits:
+            try:
+                return int(digits)
+            except ValueError:
+                return default
+        return default
 
 
 class GenerateChaptersBatchNode(AsyncParallelBatchNode):
@@ -20,6 +34,8 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
         charts = stage3_data.get("analysis_data", {}).get("charts", [])
         chart_index = {str(c.get("id", "")): c for c in charts}
         feedback_map = stage3_results.get("chapter_feedback", {}) or {}
+        use_reasoning = reasoning_enabled_stage3(shared)
+        request_timeout_seconds = llm_request_timeout(shared)
 
         chapter_items: List[Dict[str, Any]] = []
         for chapter in chapters:
@@ -31,6 +47,8 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
             item["_feedback"] = str(feedback_map.get(chapter_id, "")).strip()
             item["_relevant_charts"] = relevant_charts
             item["_insights"] = stage3_data.get("insights", {})
+            item["_reasoning_enabled_stage3"] = use_reasoning
+            item["_request_timeout_seconds"] = request_timeout_seconds
             chapter_items.append(item)
 
         return chapter_items
@@ -38,10 +56,12 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
     async def exec_async(self, prep_res: Dict[str, Any]) -> Dict[str, Any]:
         chapter_id = str(prep_res.get("id", "")).strip() or "chapter"
         title = str(prep_res.get("title", chapter_id))
-        target_words = int(prep_res.get("target_words", 300) or 300)
+        target_words = _coerce_target_words(prep_res.get("target_words", 300), default=300)
         key_data = prep_res.get("key_data", [])
         relevant_charts = prep_res.get("_relevant_charts", [])
         feedback = prep_res.get("_feedback", "")
+        use_reasoning = bool(prep_res.get("_reasoning_enabled_stage3", False))
+        request_timeout_seconds = int(prep_res.get("_request_timeout_seconds", 120))
 
         prompt = (
             f"请撰写舆情分析报告章节。\n"
@@ -59,7 +79,13 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
             prompt += f"\n上轮评审反馈（必须修复）：{feedback}\n"
 
         try:
-            content = await asyncio.to_thread(call_glm46, prompt, 0.5)
+            content = await asyncio.to_thread(
+                call_glm46,
+                prompt,
+                0.5,
+                enable_reasoning=use_reasoning,
+                timeout=request_timeout_seconds,
+            )
         except Exception as exc:
             content = f"{title}\n\n章节生成失败，已降级输出。错误: {exc}"
 

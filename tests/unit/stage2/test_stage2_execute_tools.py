@@ -29,7 +29,6 @@ def test_execute_tools_warn_on_empty_charts():
             "tables": [],
             "execution_log": {"tools_executed": []},
         },
-        "monitor": {},
     }
 
     node = ExecuteToolsNode()
@@ -40,8 +39,4 @@ def test_execute_tools_warn_on_empty_charts():
 
     node.post(shared, prep_res, exec_res)
 
-    error_log = shared.get("monitor", {}).get("error_log", [])
-    assert error_log
-    assert error_log[-1]["status"] == "warning"
-    assert "未生成图表" in error_log[-1]["error"]
     assert shared["agent"]["last_tool_result"]["error"] is True

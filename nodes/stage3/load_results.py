@@ -14,7 +14,7 @@ class LoadAnalysisResultsNode(MonitoredNode):
 
     def prep(self, shared: Dict[str, Any]) -> Dict[str, Any]:
         stage2_results = shared.get("stage2_results", {})
-        completed_stages = shared.get("dispatcher", {}).get("completed_stages", [])
+        completed_stages = shared.get("pipeline_state", {}).get("completed_stages", [])
         insights = stage2_results.get("insights", {})
         if isinstance(insights, dict):
             has_insights = any(bool(value) for value in insights.values())
@@ -111,4 +111,18 @@ class LoadAnalysisResultsNode(MonitoredNode):
 
     def post(self, shared: Dict[str, Any], prep_res: Dict[str, Any], exec_res: Dict[str, Any]) -> str:
         shared["stage3_data"] = exec_res
+        loaded_trace = exec_res.get("trace", {})
+        if isinstance(loaded_trace, dict):
+            shared_trace = shared.get("trace", {})
+            if not isinstance(shared_trace, dict) or not shared_trace:
+                shared["trace"] = dict(loaded_trace)
+            else:
+                for key, value in loaded_trace.items():
+                    if key not in shared_trace or shared_trace.get(key) in (None, "", [], {}):
+                        shared_trace[key] = value
+                    elif isinstance(shared_trace.get(key), dict) and isinstance(value, dict):
+                        merged = dict(value)
+                        merged.update(shared_trace[key])
+                        shared_trace[key] = merged
+                shared["trace"] = shared_trace
         return "default"

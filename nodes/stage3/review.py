@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 
 from nodes.base import MonitoredNode
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage3
 
 
 def _safe_json_loads(text: str) -> Dict[str, Any]:
@@ -42,10 +43,13 @@ class ReviewChaptersNode(MonitoredNode):
             "chapter_review_max_rounds": int(review_cfg.get("chapter_review_max_rounds", 2) or 2),
             "min_score": int(review_cfg.get("min_score", 80) or 80),
             "outline_title": stage3_results.get("outline", {}).get("title", "舆情分析统一报告"),
+            "reasoning_enabled_stage3": reasoning_enabled_stage3(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res: Dict[str, Any]) -> Dict[str, Any]:
         min_score = prep_res["min_score"]
+        use_reasoning = bool(prep_res.get("reasoning_enabled_stage3", False))
         reviews: List[Dict[str, Any]] = []
 
         for chapter in prep_res.get("chapters", []):
@@ -60,7 +64,12 @@ class ReviewChaptersNode(MonitoredNode):
                 "仅输出 JSON。"
             )
             try:
-                raw = call_glm46(prompt, temperature=0.3)
+                raw = call_glm46(
+                    prompt,
+                    temperature=0.3,
+                    enable_reasoning=use_reasoning,
+                    timeout=int(prep_res.get("request_timeout_seconds", 120)),
+                )
                 parsed = _safe_json_loads(raw)
                 score = int(parsed.get("score", 0) or 0)
                 feedback = str(parsed.get("feedback", "")).strip()

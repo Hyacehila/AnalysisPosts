@@ -73,3 +73,23 @@ def test_visual_analysis_node_handles_missing_chart_path(monkeypatch):
 
     assert shared["forum"]["visual_analyses"][0]["analysis_status"] == "success"
     assert shared["forum"]["visual_analyses"][0]["chart_id"] == "c1"
+
+
+def test_visual_analysis_node_respects_vision_thinking_switch(monkeypatch, tmp_path):
+    chart_path = tmp_path / "c1.png"
+    chart_path.write_bytes(b"fake")
+    shared = _build_shared(str(chart_path))
+    shared["config"] = {"llm": {"vision_thinking_enabled": False}}
+    captured = {}
+
+    def _fake_call(*args, **kwargs):
+        captured["kwargs"] = kwargs
+        return "ok"
+
+    monkeypatch.setattr(visual_module, "call_glm45v_thinking", _fake_call)
+
+    node = VisualAnalysisNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert captured["kwargs"]["enable_thinking"] is False

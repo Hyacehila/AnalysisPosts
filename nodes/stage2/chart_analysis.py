@@ -7,6 +7,7 @@ import time
 from nodes.base import MonitoredNode
 
 from utils.call_llm import call_glm45v_thinking
+from utils.llm_modes import llm_request_timeout, vision_thinking_enabled
 
 
 class ChartAnalysisNode(MonitoredNode):
@@ -42,10 +43,17 @@ class ChartAnalysisNode(MonitoredNode):
             except ValueError:
                 print(f"[ChartAnalysis] 无效的 CHART_ANALYSIS_LIMIT: {limit_raw}")
         print(f"\n[ChartAnalysis] 视觉已覆盖 {len(covered_ids)} 张图表，待补漏分析 {len(pending)} 张")
-        return {"pending_charts": pending, "visual_analyses": visual_analyses}
+        return {
+            "pending_charts": pending,
+            "visual_analyses": visual_analyses,
+            "vision_thinking_enabled": vision_thinking_enabled(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
+        }
 
     def exec(self, prep_res):
         charts = list(prep_res.get("pending_charts", []) or [])
+        use_thinking = bool(prep_res.get("vision_thinking_enabled", False))
+        request_timeout_seconds = int(prep_res.get("request_timeout_seconds", 120))
         chart_analyses = {}
         success_count = 0
 
@@ -102,7 +110,8 @@ class ChartAnalysisNode(MonitoredNode):
                     image_paths=[chart_path] if chart_path and os.path.exists(chart_path) else None,
                     temperature=0.7,
                     max_tokens=2000,
-                    enable_thinking=True,
+                    enable_thinking=use_thinking,
+                    timeout=request_timeout_seconds,
                 )
 
                 analysis_result = {

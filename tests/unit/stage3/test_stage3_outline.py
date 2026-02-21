@@ -51,3 +51,18 @@ def test_outline_uses_fallback_when_llm_invalid(_mock_llm):
     assert outline["title"]
     assert len(outline["chapters"]) >= 3
     assert outline["chapters"][0]["id"]
+
+
+@patch("nodes.stage3.outline.call_glm46")
+def test_outline_respects_stage3_reasoning_switch(mock_llm):
+    mock_llm.return_value = (
+        '{"title":"测试报告","chapters":[{"id":"ch01","title":"执行摘要","target_words":300}]}'
+    )
+    shared = _shared_for_outline()
+    shared["config"] = {"llm": {"reasoning_enabled_stage3": False}}
+
+    node = PlanOutlineNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert mock_llm.call_args.kwargs["enable_reasoning"] is False

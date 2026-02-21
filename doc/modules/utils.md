@@ -1,7 +1,7 @@
 # 工具函数文档
 
 > **文档状态**: 2026-02-20 更新  
-> **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/monitor.py`, `utils/trace_manager.py`, `utils/web_search.py`, `utils/data_sources/*`, `utils/nlp/*`  
+> **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/status_events.py`, `utils/status_store.py`, `utils/trace_manager.py`, `utils/web_search.py`, `utils/data_sources/*`, `utils/nlp/*`  
 > **上级文档**: [系统设计总览](design.md)
 
 ---
@@ -194,14 +194,40 @@ os.replace(temp_file.name, output_path)  # 原子替换
 
 ---
 
-## 5. 运行监控 `monitor.py`
+## 5. 状态事件追踪 `status_events.py`
 
-节点执行时会记录运行状态到 `report/status.json`，字段包含：
+节点运行状态统一写入 `report/status.json`，仅记录**节点进入/退出事件**（enter/exit）：
 
-- `current_stage` / `current_node`
-- `execution_log` / `error_log`
+```json
+{
+  "version": 2,
+  "run_id": "uuid",
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-02-20T00:00:00Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    }
+  ]
+}
+```
 
-用于 Dashboard 的进度展示与故障定位。
+说明：
+
+- `nodes.base.MonitoredNode / MonitoredAsyncNode` 在节点开始时写 `enter`，结束时写 `exit`（`completed/failed`）。
+- 并行节点通过 `branch_id` 区分分支（例如 `data_agent` / `search_agent`），仍写入同一个 `status.json` 事件流。
+- 事件写入使用 `status_store.atomic_write_json`，保证落盘原子替换。
+
+### 5.1 相关回归测试
+
+- `tests/unit/core/test_status_events.py`
+- `tests/unit/core/test_node_status_events.py`
+- `tests/unit/stage2/test_stage2_parallel_flow.py`（并行分支 `branch_id` 事件）
 
 ---
 

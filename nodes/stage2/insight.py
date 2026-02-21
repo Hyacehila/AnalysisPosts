@@ -6,6 +6,7 @@ import json
 from nodes.base import MonitoredNode
 
 from utils.call_llm import call_glm_45_air, call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage2
 from utils.trace_manager import build_lite_confidence, set_insight_provenance
 
 
@@ -20,12 +21,15 @@ class LLMInsightNode(MonitoredNode):
             "chart_analyses": stage2_results.get("chart_analyses", {}),
             "tables": stage2_results.get("tables", []),
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
+            "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
         chart_analyses = prep_res["chart_analyses"]
         tables = prep_res["tables"]
         data_summary = prep_res["data_summary"]
+        use_reasoning = bool(prep_res.get("reasoning_enabled_stage2", False))
 
         chart_summary = []
         for chart_id, analysis in chart_analyses.items():
@@ -93,7 +97,12 @@ class LLMInsightNode(MonitoredNode):
 
         response = None
         try:
-            response = call_glm46(prompt, temperature=0.7, enable_reasoning=True)
+            response = call_glm46(
+                prompt,
+                temperature=0.7,
+                enable_reasoning=use_reasoning,
+                timeout=int(prep_res.get("request_timeout_seconds", 120)),
+            )
         except Exception as e:
             error_msg = str(e)
             is_recoverable_error = (

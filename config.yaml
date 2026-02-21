@@ -9,10 +9,6 @@ data:
   publisher_decision_path: data/publisher_decision.json
 pipeline:
   start_stage: 1
-  run_stages:
-  - 1
-  - 2
-  - 3
 stage1:
   mode: async
   checkpoint:
@@ -29,12 +25,12 @@ stage2:
   tool_source: mcp
   agent_max_iterations: 30
   search_reflection_max_rounds: 2
-  forum_max_rounds: 5
+  forum_max_rounds: 2
   forum_min_rounds_for_sufficient: 2
   search_provider: tavily
-  search_max_results: 5
-  search_timeout_seconds: 20
-  search_api_key: ""
+  search_max_results: 3
+  search_timeout_seconds: 60
+  search_api_key: "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"
 stage3:
   max_iterations: 5
   min_score: 80
@@ -44,4 +40,9 @@ runtime:
   max_retries: 3
   wait_time: 8
 llm:
-  glm_api_key: ""
+  acceptance_profile: fast
+  reasoning_enabled_stage2: false
+  reasoning_enabled_stage3: false
+  vision_thinking_enabled: false
+  request_timeout_seconds: 120
+  glm_api_key: "fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH"

@@ -20,9 +20,8 @@ from nodes._utils import (
 # ── 基类 ──────────────────────────────────────────────────────
 from nodes.base import AsyncParallelBatchNode
 
-# ── 调度 & 完成节点 ──────────────────────────────────────────
-from nodes.dispatcher import (
-    DispatcherNode,
+# ── 管线状态节点 ──────────────────────────────────────────────
+from nodes.pipeline_state import (
     TerminalNode,
     Stage1CompletionNode,
     Stage2CompletionNode,
@@ -112,8 +111,8 @@ __all__ = [
     "_MANUAL_IMAGE_ALIAS", "_remap_report_images", "_load_analysis_charts",
     # base
     "AsyncParallelBatchNode",
-    # dispatcher
-    "DispatcherNode", "TerminalNode",
+    # pipeline state
+    "TerminalNode",
     "Stage1CompletionNode", "Stage2CompletionNode", "Stage3CompletionNode",
     # stage1
     "DataLoadNode", "SaveEnhancedDataNode", "DataValidationAndOverviewNode",

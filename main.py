@@ -1,8 +1,7 @@
 """
 舆情分析智能体 - 主入口文件
 
-系统采用中央调度模式，只需配置shared字典并启动主Flow即可。
-DispatcherNode会根据配置自动在各节点间流转。
+系统采用线性主链模式，入口由 start_stage 控制。
 
 ================================================================================
 使用说明
@@ -10,7 +9,7 @@ DispatcherNode会根据配置自动在各节点间流转。
 
 1. 在main()函数的配置区域修改参数
 2. 运行 python main.py 启动系统
-3. 系统会自动根据run_stages配置执行对应阶段
+3. 系统会自动从 start_stage 进入并顺序执行剩余阶段
 
 ================================================================================
 """
@@ -25,6 +24,7 @@ from typing import Dict, Any, List
 from flow import create_main_flow
 from config import load_config, validate_config, config_to_shared, apply_glm_api_key
 from utils.run_state import set_running
+from utils.status_events import start_status_run
 
 
 def init_shared(
@@ -36,9 +36,8 @@ def init_shared(
     publisher_objects_path: str = "data/publisher_objects.json",
     belief_system_path: str = "data/believe_system_common.json",
     publisher_decision_path: str = "data/publisher_decision.json",
-    # 调度配置
+    # 管线配置
     start_stage: int = 1,
-    run_stages: List[int] = None,
     # 阶段1配置
     enhancement_mode: str = "async",
     # 阶段2配置
@@ -58,7 +57,7 @@ def init_shared(
     初始化shared字典
     
     shared字典是节点间通信的核心数据结构，包含所有配置和运行时状态。
-    DispatcherNode会根据此配置决定执行路径。
+    主Flow会根据 start_stage 选择入口。
     
     Args:
         input_data_path: 输入博文数据文件路径
@@ -67,7 +66,6 @@ def init_shared(
         sentiment_attributes_path: 情感属性列表文件路径
         publisher_objects_path: 发布者类型列表文件路径
         start_stage: 起始阶段 (1/2/3)
-        run_stages: 需要执行的阶段列表，默认[1, 2]
         enhancement_mode: 阶段1处理模式 ("async")
         analysis_mode: 阶段2分析模式 ("agent")
         tool_source: Agent工具来源 ("mcp")
@@ -82,9 +80,6 @@ def init_shared(
     Returns:
         Dict: 初始化完成的shared字典
     """
-    if run_stages is None:
-        run_stages = [1]  # 默认执行阶段1，2，3
-    
     return {
         # === 数据管理（贯穿三阶段） ===
         "data": {
@@ -102,13 +97,11 @@ def init_shared(
             }
         },
 
-        # === 调度控制（DispatcherNode使用） ===
-        "dispatcher": {
-            "start_stage": start_stage,              # 起始阶段：1 | 2 | 3
-            "run_stages": run_stages,       # 需要执行的阶段列表
+        # === 管线状态（线性主链） ===
+        "pipeline_state": {
+            "start_stage": start_stage,    # 起始阶段：1 | 2 | 3
             "current_stage": 0,            # 当前执行到的阶段（0表示未开始）
             "completed_stages": [],        # 已完成的阶段列表
-            "next_action": "stage1"        # 下一步动作：stage1 | stage2 | stage3 | done
         },
 
         # === 三阶段路径控制（对应需求分析中的三阶段架构） ===
@@ -258,16 +251,6 @@ def init_shared(
             "hallucination_check": {}           # 幻觉检测结果
         },
 
-        # === 系统运行监测（贯穿三阶段） ===
-        "monitor": {
-            "start_time": "",                   # 系统启动时间
-            "current_stage": "",                # 当前执行阶段
-            "current_node": "",                 # 当前执行节点
-            "execution_log": [],                # 执行日志列表
-            "progress_status": {},              # 进度状态信息
-            "error_log": []                     # 错误日志列表
-        },
-
         # === LLM思考过程记录（Stage2和Stage3） ===
         "thinking": {
             "stage2_tool_decisions": [],        # Stage2工具调用决策思考
@@ -283,21 +266,24 @@ def print_banner():
     print("\n" + "=" * 60)
     print("舆情分析智能体系统".center(56))
     print("=" * 60)
-    print("基于PocketFlow框架 | 中央调度模式")
+    print("基于PocketFlow框架 | 线性主链模式")
     print("=" * 60 + "\n")
 
 
 def print_config(shared: Dict[str, Any], concurrent_num: int, max_retries: int, wait_time: int):
     """打印配置信息"""
+    start_stage = shared.get("pipeline_state", {}).get("start_stage", 1)
+    execution_plan = [stage for stage in [1, 2, 3] if stage >= int(start_stage)]
     print("配置信息:")
-    print(f"  ├─ 执行阶段: {shared['dispatcher']['run_stages']}")
+    print(f"  ├─ 起始阶段: {start_stage}")
+    print(f"  ├─ 执行链路: {execution_plan}")
     print(f"  ├─ 增强模式: {shared['config']['enhancement_mode']}")
     print(f"  ├─ 分析模式: {shared['config']['analysis_mode']}")
     stage3_review = shared["config"].get("stage3_review", {})
     print(
         "  ├─ Stage3评审: "
-        f\"max_rounds={stage3_review.get('chapter_review_max_rounds', 2)}, \"
-        f\"min_score={stage3_review.get('min_score', 80)}\"
+        f"max_rounds={stage3_review.get('chapter_review_max_rounds', 2)}, "
+        f"min_score={stage3_review.get('min_score', 80)}"
     )
     print(f"  ├─ 输入路径: {shared['data']['data_paths']['blog_data_path']}")
     print(f"  ├─ 输出路径: {shared['config']['data_source']['enhanced_data_path']}")
@@ -318,7 +304,7 @@ def print_results(shared: Dict[str, Any], elapsed_time: float):
     print("执行摘要".center(56))
     print("=" * 60)
     
-    completed_stages = shared.get("dispatcher", {}).get("completed_stages", [])
+    completed_stages = shared.get("pipeline_state", {}).get("completed_stages", [])
     print(f"\n[OK] 已完成阶段: {completed_stages}")
     
     # 数据保存状态（阶段1结果）
@@ -348,7 +334,7 @@ async def run(
     """
     运行主Flow - 系统唯一入口
     
-    创建主Flow并运行，DispatcherNode会根据shared配置自动流转。
+    创建线性主Flow并运行。
     
     Args:
         shared: 初始化后的shared字典
@@ -368,10 +354,16 @@ async def run(
     
     start_time = time.time()
     print(f"开始时间: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))}\n")
+
+    status_path = shared.get("status_file")
+    status_doc = start_status_run(path=status_path if isinstance(status_path, str) and status_path.strip() else None)
+    shared["status_run_id"] = status_doc.get("run_id", "")
     
     try:
-        # 创建并运行主Flow - DispatcherNode会根据配置自动调度
+        start_stage = int(shared.get("pipeline_state", {}).get("start_stage", 1))
+        # 创建并运行主Flow - 入口由 start_stage 控制
         main_flow = create_main_flow(
+            start_stage=start_stage,
             concurrent_num=concurrent_num,
             max_retries=max_retries,
             wait_time=wait_time
@@ -394,7 +386,7 @@ def main():
     主函数入口
     
     所有配置参数直接在此函数中修改。
-    系统会根据run_stages配置自动执行对应阶段。
+    系统会根据 start_stage 配置自动执行对应阶段。
     """
     config = load_config("config.yaml")
     apply_glm_api_key(config)

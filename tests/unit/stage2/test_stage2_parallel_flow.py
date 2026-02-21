@@ -5,6 +5,7 @@ import asyncio
 
 import nodes.stage2.parallel as parallel_module
 from nodes.stage2.assemble import AssembleStage2ResultsNode
+from utils.status_events import read_status_events, start_status_run
 
 
 def _build_shared():
@@ -68,7 +69,6 @@ def test_parallel_agent_flow_collects_dual_results(monkeypatch):
                     "data_agent": {"current": 2, "max": 2, "termination_reason": "max_iterations_reached"},
                 },
             },
-            "monitor": {"error_log": []},
         },
     )
     monkeypatch.setattr(
@@ -92,6 +92,79 @@ def test_parallel_agent_flow_collects_dual_results(monkeypatch):
     assert len(shared["trace"]["search_agent_analysis"]) == 1
     assert shared["trace"]["loop_status"]["data_agent"]["termination_reason"] == "max_iterations_reached"
 
+
+def test_parallel_agent_flow_raises_when_branch_failed(monkeypatch):
+    shared = _build_shared()
+
+    monkeypatch.setattr(
+        parallel_module,
+        "_run_data_agent_branch_sync",
+        lambda snapshot: (_ for _ in ()).throw(RuntimeError("data branch failed")),
+    )
+    monkeypatch.setattr(
+        parallel_module,
+        "_run_search_agent_branch_sync",
+        lambda snapshot: {
+            "background_context": "",
+            "consistency_points": [],
+            "conflict_points": [],
+            "blind_spots": [],
+            "recommended_followups": [],
+        },
+    )
+
+    flow = parallel_module.create_parallel_agent_flow()
+    try:
+        asyncio.run(flow.run_async(shared))
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("Expected RuntimeError when data branch fails")
+
+
+def test_parallel_agent_flow_writes_branch_enter_exit_events(monkeypatch, tmp_path):
+    shared = _build_shared()
+    status_path = tmp_path / "status.json"
+    start_status_run(path=status_path, run_id="run-parallel")
+    shared["status_file"] = str(status_path)
+
+    monkeypatch.setattr(
+        parallel_module,
+        "_run_data_agent_branch_sync",
+        lambda snapshot: {
+            "charts": [],
+            "tables": [],
+            "execution_log": {"tools_executed": []},
+            "trace": {"decisions": [], "executions": [], "reflections": [], "insight_provenance": {}, "loop_status": {}},
+        },
+    )
+    monkeypatch.setattr(
+        parallel_module,
+        "_run_search_agent_branch_sync",
+        lambda snapshot: {
+            "background_context": "",
+            "consistency_points": [],
+            "conflict_points": [],
+            "blind_spots": [],
+            "recommended_followups": [],
+        },
+    )
+
+    flow = parallel_module.create_parallel_agent_flow()
+    asyncio.run(flow.run_async(shared))
+
+    status = read_status_events(path=status_path)
+    branch_events = [
+        item for item in status["events"]
+        if item.get("node") == "RunParallelAgentBranchNode"
+    ]
+    branch_ids = {item.get("branch_id") for item in branch_events}
+    assert {"data_agent", "search_agent"} <= branch_ids
+
+    for branch in ("data_agent", "search_agent"):
+        events = [item for item in branch_events if item.get("branch_id") == branch]
+        assert any(item.get("event") == "enter" for item in events)
+        assert any(item.get("event") == "exit" and item.get("status") == "completed" for item in events)
 
 def test_assemble_stage2_results_node_merges_dual_sources():
     shared = {

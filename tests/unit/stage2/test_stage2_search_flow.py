@@ -139,3 +139,56 @@ def test_query_search_flow_supports_reflection_loop(monkeypatch):
     assert shared["search_results"]["official_responses"] == ["召开发布会"]
     assert shared["trace"]["loop_status"]["search_reflection"]["current"] == 2
     assert shared["trace"]["loop_status"]["search_reflection"]["max"] == 2
+
+
+def test_query_search_flow_summary_timeout_falls_back(monkeypatch):
+    shared = _build_shared()
+    shared["config"]["llm"] = {"request_timeout_seconds": 120}
+
+    calls = []
+    llm_outputs = [
+        '{"queries": ["北京暴雨 官方回应"]}',
+        '{"is_sufficient": true, "missing": []}',
+    ]
+
+    def fake_llm(*args, **kwargs):
+        calls.append(dict(kwargs))
+        if len(calls) <= len(llm_outputs):
+            return llm_outputs[len(calls) - 1]
+        raise TimeoutError("summary timeout")
+
+    def fake_batch_search(queries, **kwargs):
+        return {
+            "queries": list(queries),
+            "provider": "tavily",
+            "results_by_query": [
+                {
+                    "query": queries[0],
+                    "provider": "tavily",
+                    "results": [
+                        {
+                            "title": "官方通报",
+                            "url": "https://example.com/notice",
+                            "snippet": "启动应急响应",
+                            "date": "2026-02-18",
+                            "source": "example",
+                        }
+                    ],
+                    "error": "",
+                }
+            ],
+            "total_results": 1,
+        }
+
+    monkeypatch.setattr(search_module, "call_glm46", fake_llm)
+    monkeypatch.setattr(search_module, "batch_search", fake_batch_search)
+
+    flow = create_query_search_flow()
+    asyncio.run(flow.run_async(shared))
+
+    # timeout still produces a fallback summary instead of stopping the flow.
+    assert shared["search_results"]["event_timeline"]
+    assert shared["search_results"]["key_actors"]
+
+    # every search-stage LLM call should honor the configured timeout.
+    assert all(call.get("timeout") == 120 for call in calls)

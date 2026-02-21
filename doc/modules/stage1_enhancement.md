@@ -1,6 +1,6 @@
 # 阶段 1：数据增强子系统
 
-> **文档状态**: 2026-02-11 更新  
+> **文档状态**: 2026-02-20 更新  
 > **关联源码**: `nodes/stage1/*`, `nodes/base.py`, `flow.py`  
 > **上级文档**: [系统设计总览](design.md)
 
@@ -348,5 +348,6 @@ post_async(shared, prep_res, exec_res) → 将结果批量写回 shared
 
 | 行为 | 说明 |
 |:---|:---|
-| 将 `1` 追加到 `shared["dispatcher"]["completed_stages"]` | 标记阶段 1 完成 |
-| 返回 `"dispatch"` | 跳转回 `DispatcherNode`，由调度器决定是否继续执行阶段 2 |
+| 将 `1` 追加到 `shared["pipeline_state"]["completed_stages"]` | 标记阶段 1 完成 |
+| 更新 `shared["pipeline_state"]["current_stage"] = 1` | 记录当前阶段 |
+| 返回 `"default"` | 在线性主链中顺序进入阶段 2 |

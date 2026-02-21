@@ -1,14 +1,13 @@
 """
 舆情分析智能体 - Flow 编排定义
 
-系统采用中央调度模式，DispatcherNode 作为唯一入口。
+系统采用线性主链模式，通过 start_stage 选择入口。
 """
 
 from pocketflow import AsyncFlow
 
 from nodes import (
-    # 调度节点
-    DispatcherNode,
+    # 管线状态节点
     TerminalNode,
     Stage1CompletionNode,
     Stage2CompletionNode,
@@ -182,12 +181,15 @@ def _create_unified_report_flow() -> AsyncFlow:
 
 
 def create_main_flow(
+    start_stage: int = 1,
     concurrent_num: int = 60,
     max_retries: int = 3,
     wait_time: int = 8,
 ) -> AsyncFlow:
-    """Create central dispatcher flow."""
-    dispatcher = DispatcherNode()
+    """Create linear Stage1->Stage2->Stage3 flow with selectable start stage."""
+    if start_stage not in {1, 2, 3}:
+        raise ValueError(f"start_stage must be one of [1,2,3], got {start_stage}")
+
     terminal = TerminalNode()
 
     async_enhancement_flow = _create_async_enhancement_flow(
@@ -198,18 +200,16 @@ def create_main_flow(
     agent_analysis_flow = _create_agent_analysis_flow()
     unified_report_flow = _create_unified_report_flow()
 
-    dispatcher - "stage1_async" >> async_enhancement_flow
-    async_enhancement_flow - "dispatch" >> dispatcher
+    async_enhancement_flow >> agent_analysis_flow
+    agent_analysis_flow >> unified_report_flow
+    unified_report_flow >> terminal
 
-    dispatcher - "stage2_agent" >> agent_analysis_flow
-    agent_analysis_flow - "dispatch" >> dispatcher
-
-    dispatcher - "stage3_report" >> unified_report_flow
-    unified_report_flow - "dispatch" >> dispatcher
-
-    dispatcher - "done" >> terminal
-
-    return AsyncFlow(start=dispatcher)
+    entry_by_stage = {
+        1: async_enhancement_flow,
+        2: agent_analysis_flow,
+        3: unified_report_flow,
+    }
+    return AsyncFlow(start=entry_by_stage[start_stage])
 
 
 def create_stage2_only_flow() -> AsyncFlow:

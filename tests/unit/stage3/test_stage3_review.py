@@ -79,3 +79,19 @@ def test_review_forces_satisfied_at_max_rounds(mock_llm):
     assert action == "satisfied"
     loop_status = shared["trace"]["loop_status"]["stage3_chapter_review"]
     assert loop_status["termination_reason"] == "max_iterations_reached"
+
+
+@patch("nodes.stage3.review.call_glm46")
+def test_review_respects_stage3_reasoning_switch(mock_llm):
+    mock_llm.side_effect = [
+        '{"score": 88, "needs_revision": false, "feedback": "ok"}',
+        '{"score": 90, "needs_revision": false, "feedback": "ok"}',
+    ]
+    shared = _shared_for_review(round_no=0, max_rounds=2, min_score=80)
+    shared["config"]["llm"] = {"reasoning_enabled_stage3": False}
+
+    node = ReviewChaptersNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert mock_llm.call_args.kwargs["enable_reasoning"] is False

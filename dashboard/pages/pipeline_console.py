@@ -16,11 +16,13 @@ from dashboard.api.pipeline_api import (
     build_config_dict_from_form,
     list_data_candidates,
     load_config_dict,
+    merge_config_dict,
     save_config_dict,
     validate_config_dict,
     run_pipeline,
 )
 from dashboard.api.status_api import read_status, write_status
+from dashboard.pages.pipeline_console_logic import build_failure_status_payload, validate_pipeline_form
 from utils.run_state import is_running, set_running
 
 
@@ -36,17 +38,13 @@ def _run_pipeline_safe(config_path: str) -> None:
     try:
         run_pipeline(config_path, dry_run=False)
     except Exception as exc:
-        status = read_status()
-        entry = {
-            "time": datetime.utcnow().isoformat(timespec="seconds") + "Z",
-            "stage": status.get("current_stage", ""),
-            "node": "PipelineConsole",
-            "status": "failed",
-            "extra": {},
-            "error": str(exc),
-        }
-        status.setdefault("execution_log", []).append(entry)
-        status.setdefault("error_log", []).append(entry)
+        current_status = read_status()
+        status = build_failure_status_payload(
+            current_status,
+            error_message=str(exc),
+            stage=str(current_status.get("current_stage", "")).strip(),
+            now_utc=datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        )
         try:
             write_status(status)
         except Exception as write_exc:
@@ -143,17 +141,41 @@ with st.form("config_form"):
             [1, 2, 3],
             index=_safe_index([1, 2, 3], config["pipeline"]["start_stage"], fallback=0),
         )
-        run_stages = st.multiselect(
-            "Run stages",
-            [1, 2, 3],
-            default=[s for s in config["pipeline"]["run_stages"] if s in [1, 2, 3]],
-        )
 
         st.markdown("**Stage2**: `agent + mcp` (fixed)")
         st.markdown("**Stage3**: `unified report` (fixed)")
 
     with st.expander("Advanced settings", expanded=False):
         st.markdown("**LLM settings**")
+        acceptance_profile = st.selectbox(
+            "LLM acceptance profile",
+            ["fast", "quality"],
+            index=_safe_index(
+                ["fast", "quality"],
+                str(config.get("llm", {}).get("acceptance_profile", "fast") or "fast"),
+                fallback=0,
+            ),
+            help="fast: disable reasoning/thinking to reduce cost and runtime; quality: enable richer reasoning.",
+        )
+        reasoning_enabled_stage2 = st.checkbox(
+            "LLM reasoning enabled (Stage 2)",
+            value=bool(config.get("llm", {}).get("reasoning_enabled_stage2", False)),
+        )
+        reasoning_enabled_stage3 = st.checkbox(
+            "LLM reasoning enabled (Stage 3)",
+            value=bool(config.get("llm", {}).get("reasoning_enabled_stage3", False)),
+        )
+        vision_thinking_enabled = st.checkbox(
+            "LLM vision thinking enabled (Stage 2 visual)",
+            value=bool(config.get("llm", {}).get("vision_thinking_enabled", False)),
+        )
+        request_timeout_seconds = st.number_input(
+            "LLM request timeout (seconds)",
+            min_value=1,
+            step=1,
+            value=int(config.get("llm", {}).get("request_timeout_seconds", 120)),
+            help="Applied to GLM requests across Stage2/Stage3.",
+        )
         glm_api_key = st.text_input(
             "GLM API Key",
             value=config.get("llm", {}).get("glm_api_key", ""),
@@ -240,6 +262,24 @@ with st.form("config_form"):
             step=1,
             value=int(config["stage2"]["agent_max_iterations"]),
         )
+        search_reflection_max_rounds = st.number_input(
+            "Stage2 search reflection max rounds",
+            min_value=1,
+            step=1,
+            value=int(config["stage2"].get("search_reflection_max_rounds", 2)),
+        )
+        forum_max_rounds = st.number_input(
+            "Stage2 forum max rounds",
+            min_value=1,
+            step=1,
+            value=int(config["stage2"].get("forum_max_rounds", 5)),
+        )
+        forum_min_rounds_for_sufficient = st.number_input(
+            "Stage2 forum min rounds for sufficient",
+            min_value=1,
+            step=1,
+            value=int(config["stage2"].get("forum_min_rounds_for_sufficient", 2)),
+        )
         search_provider = st.selectbox(
             "Stage2 search provider",
             ["tavily"],
@@ -262,6 +302,44 @@ with st.form("config_form"):
             value=config["stage2"].get("search_api_key", ""),
             type="password",
             help="Saved to config.yaml in plaintext. If empty, runtime falls back to TAVILY_API_KEY env.",
+        )
+        chart_missing_policy = st.selectbox(
+            "Stage2 chart missing policy",
+            ["warn", "fail"],
+            index=_safe_index(["warn", "fail"], config["stage2"].get("chart_missing_policy", "warn")),
+            help="warn: continue with warning; fail: stop when chart coverage is missing.",
+        )
+
+        stage2_chart_min = config["stage2"].get("chart_min_per_category", {}) or {}
+        chart_min_sentiment = st.number_input(
+            "Stage2 min sentiment charts",
+            min_value=0,
+            step=1,
+            value=int(stage2_chart_min.get("sentiment", 1)),
+        )
+        chart_min_topic = st.number_input(
+            "Stage2 min topic charts",
+            min_value=0,
+            step=1,
+            value=int(stage2_chart_min.get("topic", 1)),
+        )
+        chart_min_geographic = st.number_input(
+            "Stage2 min geographic charts",
+            min_value=0,
+            step=1,
+            value=int(stage2_chart_min.get("geographic", 1)),
+        )
+        chart_min_interaction = st.number_input(
+            "Stage2 min interaction charts",
+            min_value=0,
+            step=1,
+            value=int(stage2_chart_min.get("interaction", 1)),
+        )
+        chart_min_nlp = st.number_input(
+            "Stage2 min NLP charts",
+            min_value=0,
+            step=1,
+            value=int(stage2_chart_min.get("nlp", 1)),
         )
 
         st.markdown("**Stage 3**")
@@ -301,7 +379,6 @@ flat_config = {
     "data.belief_system_path": belief_system_path,
     "data.publisher_decision_path": publisher_decision_path,
     "pipeline.start_stage": int(start_stage),
-    "pipeline.run_stages": sorted(run_stages),
     "stage1.mode": stage1_mode,
     "stage1.checkpoint.enabled": bool(checkpoint_enabled),
     "stage1.checkpoint.save_every": int(checkpoint_save_every),
@@ -313,37 +390,37 @@ flat_config = {
     "stage2.mode": "agent",
     "stage2.tool_source": "mcp",
     "stage2.agent_max_iterations": int(agent_max_iterations),
+    "stage2.search_reflection_max_rounds": int(search_reflection_max_rounds),
+    "stage2.forum_max_rounds": int(forum_max_rounds),
+    "stage2.forum_min_rounds_for_sufficient": int(forum_min_rounds_for_sufficient),
     "stage2.search_provider": search_provider,
     "stage2.search_max_results": int(search_max_results),
     "stage2.search_timeout_seconds": int(search_timeout_seconds),
     "stage2.search_api_key": search_api_key,
+    "stage2.chart_tool_policy": "coverage_first",
+    "stage2.chart_missing_policy": chart_missing_policy,
+    "stage2.chart_min_per_category.sentiment": int(chart_min_sentiment),
+    "stage2.chart_min_per_category.topic": int(chart_min_topic),
+    "stage2.chart_min_per_category.geographic": int(chart_min_geographic),
+    "stage2.chart_min_per_category.interaction": int(chart_min_interaction),
+    "stage2.chart_min_per_category.nlp": int(chart_min_nlp),
     "stage3.max_iterations": int(report_max_iterations),
     "stage3.min_score": int(report_min_score),
     "stage3.chapter_review_max_rounds": int(chapter_review_max_rounds),
     "runtime.concurrent_num": int(concurrent_num),
     "runtime.max_retries": int(max_retries),
     "runtime.wait_time": int(wait_time),
+    "llm.acceptance_profile": acceptance_profile,
+    "llm.reasoning_enabled_stage2": bool(reasoning_enabled_stage2),
+    "llm.reasoning_enabled_stage3": bool(reasoning_enabled_stage3),
+    "llm.vision_thinking_enabled": bool(vision_thinking_enabled),
+    "llm.request_timeout_seconds": int(request_timeout_seconds),
     "llm.glm_api_key": glm_api_key,
 }
 
-config_dict = build_config_dict_from_form(flat_config)
-
-validation_errors: List[str] = []
-if not run_stages:
-    validation_errors.append("Run stages cannot be empty.")
-if run_stages and start_stage not in run_stages:
-    validation_errors.append("Start stage must be included in run stages.")
-for path_label, value in [
-    ("Input data path", input_path),
-    ("Enhanced data output path", output_path),
-    ("Topics path", topics_path),
-    ("Sentiment attributes path", sentiment_attributes_path),
-    ("Publisher objects path", publisher_objects_path),
-    ("Belief system path", belief_system_path),
-    ("Publisher decision path", publisher_decision_path),
-]:
-    if not value:
-        validation_errors.append(f"{path_label} cannot be empty.")
+config_patch = build_config_dict_from_form(flat_config)
+config_dict = merge_config_dict(raw_config, config_patch)
+validation_errors: List[str] = validate_pipeline_form(flat_config)
 
 if save_clicked or dry_run_clicked or run_clicked:
     if validation_errors:
@@ -392,13 +469,15 @@ with stage_col:
 with node_col:
     st.metric("Current Node", status.get("current_node", ""))
 
-if status.get("execution_log"):
-    st.subheader("Recent Logs")
-    st.dataframe(status.get("execution_log", [])[-20:], width="stretch")
+events = status.get("events", [])
+if events:
+    st.subheader("Recent Events")
+    st.dataframe(events[-50:], width="stretch")
 
-if status.get("error_log"):
-    st.subheader("Errors")
-    st.dataframe(status.get("error_log", [])[-20:], width="stretch")
+failed_events = [item for item in events if item.get("event") == "exit" and item.get("status") == "failed"]
+if failed_events:
+    st.subheader("Failed Exits")
+    st.dataframe(failed_events[-20:], width="stretch")
 
 auto_refresh = st.toggle("Auto refresh", value=True, key="pipeline_auto_refresh")
 if auto_refresh:

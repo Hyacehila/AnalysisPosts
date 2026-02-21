@@ -32,7 +32,6 @@ def test_ensure_charts_adds_missing_category():
             },
             "data_source": {"enhanced_data_path": ""},
         },
-        "monitor": {},
     }
 
     node = EnsureChartsNode()
@@ -84,7 +83,6 @@ def test_ensure_charts_fail_fast_when_missing():
             },
             "data_source": {"enhanced_data_path": ""},
         },
-        "monitor": {},
     }
 
     node = EnsureChartsNode()

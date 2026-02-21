@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 from nodes.base import MonitoredNode
 from utils.call_llm import call_glm45v_thinking
+from utils.llm_modes import llm_request_timeout, vision_thinking_enabled
 
 
 def _collect_all_charts(shared: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -59,11 +60,15 @@ class VisualAnalysisNode(MonitoredNode):
         return {
             "question": str(directive.get("question", "") or "请分析图表中的关键趋势与异常点。"),
             "selected_charts": selected,
+            "vision_thinking_enabled": vision_thinking_enabled(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
         question = prep_res.get("question", "")
         selected = list(prep_res.get("selected_charts", []) or [])
+        use_thinking = bool(prep_res.get("vision_thinking_enabled", False))
+        request_timeout_seconds = int(prep_res.get("request_timeout_seconds", 120))
         results = []
 
         for chart in selected:
@@ -83,7 +88,8 @@ class VisualAnalysisNode(MonitoredNode):
                     image_paths=image_paths,
                     temperature=0.6,
                     max_tokens=1200,
-                    enable_thinking=True,
+                    enable_thinking=use_thinking,
+                    timeout=request_timeout_seconds,
                 )
                 results.append(
                     {

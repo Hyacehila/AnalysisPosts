@@ -17,6 +17,8 @@ $env:TAVILY_API_KEY="your_tavily_key"
 ```
 也可在 `config.yaml` 中设置：
 ```yaml
+pipeline:
+  start_stage: 1  # 1/2/3，线性主链入口
 llm:
   glm_api_key: "your_api_key"
 stage2:
@@ -72,33 +74,39 @@ Stage2 追溯数据输出：
 ## 文档索引
 
 - **[文档总览](doc/README.md)** — `doc/` 目录导航与文档入口
-- **[系统设计总览](doc/design.md)** — 核心文档：系统架构、`shared` 数据结构、中央调度器、Flow 编排、入口配置
+- **[系统架构总览](doc/architecture.md)** — 核心架构：系统流、`shared` 数据结构、线性主链 Flow 编排定义
 - **[Agent 开发指南](AGENTS.md)** — Agentic Coding 规范及核心原则
-- **子系统文档**:
-    - [阶段 1：数据增强子系统](doc/stage1_enhancement.md) — 六维增强、异步并行、断点续传
-    - [阶段 2：深度分析子系统](doc/stage2_analysis.md) — QuerySearchFlow、双信源并行、Forum 动态循环、Merge/GapFill
-    - [阶段 3：报告生成子系统](doc/stage3_report.md) — 统一报告流、章节评审循环、追溯注入与 HTML 渲染
-- **工具与基础设施**:
-    - [分析工具库文档](doc/analysis_tools.md) — 37 个情感/主题/地理/交互/信念分析工具
-    - [工具函数文档](doc/utils.md) — LLM 调用层、数据加载层、辅助脚本
-    - [MCP 协议集成](doc/mcp_integration.md) — MCP 服务端/客户端、工具注册、通信流程
-- **测试**:
-    - [测试工作流指南](doc/testing_workflow.md) — 测试架构、源码↔测试映射、重构工作流
+
+### 子系统模块详解 (`doc/modules/`)
+- [阶段 1：数据增强子系统](doc/modules/stage1_enhancement.md) — 六维增强、异步并行、断点续传
+- [阶段 2：深度分析子系统](doc/modules/stage2_analysis.md) — QuerySearchFlow、双信源并行、Forum 动态循环
+- [阶段 3：报告生成子系统](doc/modules/stage3_report.md) — 统一报告流、章节评审循环、追溯注入
+- [分析工具库文档](doc/modules/analysis_tools.md) — 37 个智能分析工具详解
+- [通用基础设施库](doc/modules/utils.md) — LLM 调用层、数据加载层、路径管理
+
+### MCP 协议集成 (`doc/mcp/`)
+- [MCP 协议集成指南](doc/mcp/mcp_integration.md) — MCP 服务端/客户端通信流程
+- [MCP 工具审计白皮书](doc/mcp/mcp_tool_audit.md) — MCP 协议化映射表
+
+### 测试与质量控制 (`doc/testing/`)
+- [自动化测试工作流指南](doc/testing/testing_workflow.md) — TDD 规范、端到端测试链路与执行手册
 
 ### 测试命令（TDD）
 ```bash
 uv run pytest tests/unit -v
 uv run pytest tests/integration -v
-uv run pytest tests/e2e -v
-uv run pytest tests/ -v
+uv run pytest dashboard/tests -v
+uv run pytest tests dashboard/tests -v
+uv run pytest tests/e2e/cli -v -m "live_api"
+uv run pytest tests/e2e/dashboard_ui -v -m "ui_e2e and live_api"
 ```
 
-> `tests/e2e/` 默认调用真实 API；运行态会把 Stage2 循环上限收敛到平衡档（agent=3/search=2/forum=3）以控制成本。
+> 默认 pytest 配置会跳过 `live_api` 与 `ui_e2e`（节省额度与时长）；仅在手动/夜间执行 live E2E。live 运行态会把 Stage2 循环上限收敛到平衡档（agent=3/search=2/forum=3）以控制成本。
 
 ## 主要特性
 
 - **三阶段流水线**: 数据增强 -> 深度分析 -> 报告生成。
 - **双信源 + 论坛循环**: Stage2 支持 DataAgent/SearchAgent 并行与 ForumHost 动态补充决策。
 - **统一 Stage3 报告**: 单一路由生成 Markdown + HTML，并注入 trace 证据与方法论附录。
-- **灵活调度**: 支持异步并发与 Agent 自主分析等多种模式。
+- **线性主链入口**: `start_stage=1/2/3` 可从任意阶段进入并顺序执行后续阶段。
 - **高性能**: 基于 PocketFlow 框架，轻量且高效。

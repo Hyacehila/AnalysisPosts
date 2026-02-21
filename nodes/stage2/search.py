@@ -10,6 +10,7 @@ from pocketflow import AsyncFlow
 
 from nodes.base import MonitoredNode
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout
 from utils.web_search import batch_search
 
 
@@ -90,6 +91,7 @@ class ExtractQueriesNode(MonitoredNode):
             "round": int(search.get("round", 0)) + 1,
             "last_missing": last_missing,
             "last_hints": last_hints,
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
@@ -111,7 +113,12 @@ class ExtractQueriesNode(MonitoredNode):
 """
         queries: List[str] = []
         try:
-            llm_resp = call_glm46(prompt, temperature=0.3, enable_reasoning=False)
+            llm_resp = call_glm46(
+                prompt,
+                temperature=0.3,
+                enable_reasoning=False,
+                timeout=int(prep_res.get("request_timeout_seconds", 120)),
+            )
             parsed = _parse_json_payload(llm_resp)
             queries = _normalize_queries(parsed.get("queries", []), limit=5)
         except Exception:
@@ -243,6 +250,7 @@ class SearchReflectionNode(MonitoredNode):
             "documents": list(search.get("documents", [])),
             "queries": list(search.get("queries", [])),
             "max_rounds": int(loops_cfg.get("search_reflection_max_rounds", self.MAX_ROUNDS)),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
@@ -263,7 +271,12 @@ class SearchReflectionNode(MonitoredNode):
 """
         parsed: Dict[str, Any] = {}
         try:
-            resp = call_glm46(prompt, temperature=0.2, enable_reasoning=False)
+            resp = call_glm46(
+                prompt,
+                temperature=0.2,
+                enable_reasoning=False,
+                timeout=int(prep_res.get("request_timeout_seconds", 120)),
+            )
             parsed = _parse_json_payload(resp)
         except Exception:
             parsed = {}
@@ -333,10 +346,12 @@ class SearchSummaryNode(MonitoredNode):
         return {
             "documents": list(search.get("documents", [])),
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
         docs = prep_res.get("documents", [])
+        request_timeout_seconds = int(prep_res.get("request_timeout_seconds", 120))
         prompt = f"""基于搜索文档生成结构化背景摘要。
 
 数据概况:
@@ -355,9 +370,18 @@ class SearchSummaryNode(MonitoredNode):
 }}
 """
         try:
-            llm_resp = call_glm46(prompt, temperature=0.3, enable_reasoning=False)
+            llm_resp = call_glm46(
+                prompt,
+                temperature=0.3,
+                enable_reasoning=False,
+                timeout=request_timeout_seconds,
+            )
             parsed = _parse_json_payload(llm_resp)
-        except Exception:
+        except TimeoutError as exc:
+            _ = exc
+            parsed = {}
+        except Exception as exc:
+            _ = exc
             parsed = {}
 
         if not parsed:

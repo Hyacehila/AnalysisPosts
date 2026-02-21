@@ -17,7 +17,7 @@ from nodes import (
 
 class TestLoadAnalysisResultsNode:
     def test_exec_prefers_memory_and_keeps_trace(self, minimal_shared):
-        minimal_shared["dispatcher"]["completed_stages"] = [1, 2]
+        minimal_shared["pipeline_state"]["completed_stages"] = [1, 2]
         minimal_shared["stage2_results"] = {
             "charts": [{"id": "c1"}],
             "tables": [{"id": "t1"}],
@@ -49,6 +49,34 @@ class TestLoadAnalysisResultsNode:
         node = LoadAnalysisResultsNode()
         with pytest.raises(FileNotFoundError):
             node.prep(minimal_shared)
+
+    def test_post_merges_loaded_trace_into_shared_trace(self, minimal_shared):
+        node = LoadAnalysisResultsNode()
+        minimal_shared["trace"] = {
+            "decisions": [],
+            "executions": [],
+            "reflections": [],
+            "insight_provenance": {},
+            "loop_status": {},
+        }
+        exec_res = {
+            "analysis_data": {"charts": [], "tables": [], "execution_log": {}, "search_context": {}},
+            "chart_analyses": {},
+            "insights": {"summary": "ok"},
+            "trace": {
+                "decisions": [{"id": "d1"}],
+                "executions": [],
+                "reflections": [],
+                "insight_provenance": {},
+                "loop_status": {"forum": {"current": 1, "max": 3, "termination_reason": "seeded"}},
+            },
+            "sample_blogs": [],
+            "images_dir": "report/images",
+        }
+
+        node.post(minimal_shared, {}, exec_res)
+
+        assert minimal_shared["trace"]["loop_status"]["forum"]["current"] == 1
 
 
 class TestFormatReportNode:
@@ -140,6 +168,6 @@ class TestStage3CompletionNode:
         }
         action = node.post(minimal_shared, prep_res, True)
 
-        assert action == "dispatch"
-        assert 3 in minimal_shared["dispatcher"]["completed_stages"]
-        assert minimal_shared["dispatcher"]["current_stage"] == 3
+        assert action == "default"
+        assert 3 in minimal_shared["pipeline_state"]["completed_stages"]
+        assert minimal_shared["pipeline_state"]["current_stage"] == 3

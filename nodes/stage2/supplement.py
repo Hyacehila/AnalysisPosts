@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 from nodes.base import MonitoredNode
 from nodes.stage2.agent import _normalize_tool_result
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage2
 from utils.mcp_client.mcp_client import call_tool, list_tools
 from utils.web_search import batch_search
 
@@ -191,6 +192,8 @@ class SupplementSearchNode(MonitoredNode):
             "timeout_seconds": int(web_search.get("timeout_seconds", 20)),
             "api_key": str(web_search.get("api_key", "") or ""),
             "current_search_agent": dict(shared.get("agent_results", {}).get("search_agent", {}) or {}),
+            "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
@@ -243,7 +246,12 @@ class SupplementSearchNode(MonitoredNode):
 
         parsed: Dict[str, Any] = {}
         try:
-            resp = call_glm46(prompt, temperature=0.4, enable_reasoning=True)
+            resp = call_glm46(
+                prompt,
+                temperature=0.4,
+                enable_reasoning=bool(prep_res.get("reasoning_enabled_stage2", False)),
+                timeout=int(prep_res.get("request_timeout_seconds", 120)),
+            )
             parsed = _parse_json_payload(resp)
         except Exception:
             parsed = {}

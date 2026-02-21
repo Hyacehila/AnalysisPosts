@@ -4,13 +4,13 @@ Stage 2 agent nodes.
 import importlib
 import json
 import os
-import time
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 from nodes.base import MonitoredNode
 
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage2
 from utils.trace_manager import append_decision, append_execution, append_reflection
 
 
@@ -332,6 +332,8 @@ class DecisionToolsNode(MonitoredNode):
             "execution_history": agent.get("execution_history", []),
             "current_iteration": agent.get("current_iteration", 0),
             "max_iterations": agent.get("max_iterations", 10),
+            "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
@@ -340,6 +342,7 @@ class DecisionToolsNode(MonitoredNode):
         execution_history = prep_res["execution_history"]
         current_iteration = prep_res["current_iteration"]
         max_iterations = prep_res["max_iterations"]
+        use_reasoning = bool(prep_res.get("reasoning_enabled_stage2", False))
 
         tools_description = []
         for tool in available_tools:
@@ -428,7 +431,12 @@ class DecisionToolsNode(MonitoredNode):
 
 **建议**：优先选择未执行过的工具以获得更全面的分析结果。"""
 
-        response = call_glm46(prompt, temperature=0.6, enable_reasoning=True)
+        response = call_glm46(
+            prompt,
+            temperature=0.6,
+            enable_reasoning=use_reasoning,
+            timeout=int(prep_res.get("request_timeout_seconds", 120)),
+        )
 
         try:
             if "```json" in response:
@@ -617,15 +625,6 @@ class ExecuteToolsNode(MonitoredNode):
                 "has_data": False,
                 "error": True,
             }
-            error_log = shared.setdefault("monitor", {}).setdefault("error_log", [])
-            error_log.append({
-                "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "stage": "stage2",
-                "node": "ExecuteToolsNode",
-                "status": "failed",
-                "extra": {"tool_name": tool_name},
-                "error": result_payload["error"],
-            })
             tool_stats[tool_name] = {"charts": 0, "data": 0, "error": True}
             execution_id = append_execution(
                 shared,
@@ -677,15 +676,6 @@ class ExecuteToolsNode(MonitoredNode):
             error_msg = f"图表工具 {tool_name} 未生成图表"
             if is_no_data:
                 error_msg = f"{error_msg}（无数据）"
-            error_log = shared.setdefault("monitor", {}).setdefault("error_log", [])
-            error_log.append({
-                "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "stage": "stage2",
-                "node": "ExecuteToolsNode",
-                "status": "warning",
-                "extra": {"tool_name": tool_name},
-                "error": error_msg,
-            })
             tool_stats[tool_name] = {
                 "charts": 0,
                 "data": data_count,
@@ -927,15 +917,6 @@ class EnsureChartsNode(MonitoredNode):
                     "has_data": False,
                     "error": True,
                 })
-                error_log = shared.setdefault("monitor", {}).setdefault("error_log", [])
-                error_log.append({
-                    "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "stage": "stage2",
-                    "node": "EnsureChartsNode",
-                    "status": "failed",
-                    "extra": {"tool_name": tool_name},
-                    "error": result_payload["error"],
-                })
                 continue
 
             if result_payload.get("charts"):
@@ -968,34 +949,12 @@ class EnsureChartsNode(MonitoredNode):
         exec_log["total_charts"] = len(shared["stage2_results"].get("charts", []))
         exec_log["total_tables"] = len(shared["stage2_results"].get("tables", []))
 
-        if exec_res.get("errors"):
-            error_log = shared.setdefault("monitor", {}).setdefault("error_log", [])
-            for err in exec_res["errors"]:
-                error_log.append({
-                    "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "stage": "stage2",
-                    "node": "EnsureChartsNode",
-                    "status": "failed",
-                    "extra": {"dimension": err.get("dimension"), "tool_name": err.get("tool_name", "")},
-                    "error": err.get("error", ""),
-                })
-
         missing_policy = prep_res.get("missing_policy", "warn")
         remaining_missing = _missing_chart_dimensions(
             shared["stage2_results"].get("charts", []),
             prep_res.get("available_tools", []),
             prep_res.get("min_per_category", {}),
         )
-        if remaining_missing:
-            error_log = shared.setdefault("monitor", {}).setdefault("error_log", [])
-            error_log.append({
-                "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "stage": "stage2",
-                "node": "EnsureChartsNode",
-                "status": "failed",
-                "extra": {"missing_dimensions": remaining_missing},
-                "error": "图表覆盖仍不足",
-            })
 
         missing = exec_res.get("missing_dims", [])
         print(f"[EnsureCharts] 补图完成，缺失维度: {', '.join(missing) if missing else '无'}")

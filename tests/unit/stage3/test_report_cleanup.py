@@ -5,6 +5,7 @@ from pathlib import Path
 
 from nodes import ClearReportDirNode, ClearStage3OutputsNode
 from utils.path_manager import PathManager
+from utils.status_events import read_status_events, start_status_run
 
 
 def test_clear_report_dir_node_recreates_images(tmp_path, monkeypatch):
@@ -48,6 +49,29 @@ def test_clear_stage3_outputs_node_preserves_stage2_outputs(tmp_path, monkeypatc
 
     assert not report_md.exists()
     assert not report_html.exists()
-    assert not status_json.exists()
+    assert status_json.exists()
     assert analysis_data.exists()
     assert images_dir.exists()
+
+
+def test_clear_stage3_outputs_node_records_enter_exit_events(tmp_path, monkeypatch):
+    report_dir = tmp_path / "report"
+    report_dir.mkdir()
+    (report_dir / "report.md").write_text("report", encoding="utf-8")
+    status_path = report_dir / "status.json"
+    start_status_run(path=status_path, run_id="run-stage3-cleanup")
+
+    monkeypatch.setattr(PathManager, "report_dir", lambda self: report_dir)
+    monkeypatch.chdir(tmp_path)
+
+    shared = {"status_file": str(status_path)}
+
+    node = ClearStage3OutputsNode()
+    node._run(shared)
+
+    status = read_status_events(path=status_path)
+    node_events = [item for item in status["events"] if item.get("node") == "ClearStage3OutputsNode"]
+    assert len(node_events) == 2
+    assert node_events[0]["event"] == "enter"
+    assert node_events[1]["event"] == "exit"
+    assert node_events[1]["status"] == "completed"

@@ -1,16 +1,21 @@
 # Documentation Index
 
-> **Last Updated**: 2026-02-20
+> **Last Updated**: 2026-02-21
+> **Structure version**: v1.1 (Consolidated)
 
-- [System Design Overview](design.md)
-- [Full Design Notes](design_full.md)
-- [Stage 1 Enhancement](stage1_enhancement.md)
-- [Stage 2 Analysis](stage2_analysis.md)
-- [Stage 3 Report](stage3_report.md)
-- [Analysis Tools](analysis_tools.md)
-- [Utilities](utils.md)
-- [MCP Integration](mcp_integration.md)
-- [MCP Tool Audit](mcp_tool_audit.md)
-- [Testing Workflow](testing_workflow.md)
+## Architecture
+- [System Architecture](architecture.md) — Core system architecture, Agent flows, shared state schema, and node definitions.
 
-> 注：Stage2 已完成 B1~B9；Stage3 已完成 Track C（统一报告流：大纲规划→并行章节→章节评审循环→trace 注入→方法论附录→MD/HTML 输出）。
+## Modules & Processing Detail
+- [Stage 1 Enhancement](modules/stage1_enhancement.md) — Six-dimensional expansion, parallel NLP, and asynchronous operations.
+- [Stage 2 Analysis](modules/stage2_analysis.md) — Agent decision loops, query search flow, ForumHost debate cycles.
+- [Stage 3 Report](modules/stage3_report.md) — Document outline planning, chapter parallel generation, and traceback evidence details injection.
+- [Analysis Tools](modules/analysis_tools.md) — Technical details of the 37 available tools (categorization, purpose).
+- [Utilities](modules/utils.md) — Prompt wrapper, LLM retry wrapper, File IO.
+
+## Testing & Quality Assurance
+- [Testing Workflow](testing/testing_workflow.md) — Test-Driven Development workflow and execution environments.
+
+## Model Context Protocol (MCP)
+- [MCP Integration Overview](mcp/mcp_integration.md)
+- [MCP Tool Audit List](mcp/mcp_tool_audit.md)

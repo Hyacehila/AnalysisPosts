@@ -6,7 +6,7 @@ Uses a YAML file as the single source of truth for runtime settings.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Optional
 import os
 
 import yaml
@@ -27,7 +27,6 @@ class DataConfig:
 @dataclass
 class PipelineConfig:
     start_stage: int = 1
-    run_stages: List[int] = field(default_factory=lambda: [1, 2, 3])
 
 
 @dataclass
@@ -93,6 +92,11 @@ class RuntimeConfig:
 @dataclass
 class LLMConfig:
     glm_api_key: str = ""
+    acceptance_profile: str = "fast"
+    reasoning_enabled_stage2: Optional[bool] = None
+    reasoning_enabled_stage3: Optional[bool] = None
+    vision_thinking_enabled: Optional[bool] = None
+    request_timeout_seconds: int = 120
 
 
 @dataclass
@@ -130,6 +134,9 @@ def load_config(path: str) -> AppConfig:
     stage3 = Stage3Config(**(raw.get("stage3", {}) or {}))
     runtime = RuntimeConfig(**(raw.get("runtime", {}) or {}))
     llm = LLMConfig(**(raw.get("llm", {}) or {}))
+    env_profile = os.environ.get("ACCEPTANCE_PROFILE", "").strip().lower()
+    if env_profile:
+        llm.acceptance_profile = env_profile
 
     return AppConfig(
         data=data,
@@ -143,9 +150,38 @@ def load_config(path: str) -> AppConfig:
 
 
 def _derive_data_source_type(pipeline: PipelineConfig) -> str:
-    if 1 in pipeline.run_stages and pipeline.start_stage == 1:
+    if pipeline.start_stage == 1:
         return "original"
     return "enhanced"
+
+
+def _resolve_llm_controls(llm: LLMConfig) -> Dict[str, object]:
+    profile = str(llm.acceptance_profile or "fast").strip().lower()
+    if profile == "quality":
+        defaults = {
+            "reasoning_enabled_stage2": True,
+            "reasoning_enabled_stage3": True,
+            "vision_thinking_enabled": True,
+        }
+    else:
+        defaults = {
+            "reasoning_enabled_stage2": False,
+            "reasoning_enabled_stage3": False,
+            "vision_thinking_enabled": False,
+        }
+
+    def _pick(value: Optional[bool], default: bool) -> bool:
+        if value is None:
+            return default
+        return bool(value)
+
+    return {
+        "acceptance_profile": profile,
+        "reasoning_enabled_stage2": _pick(llm.reasoning_enabled_stage2, defaults["reasoning_enabled_stage2"]),
+        "reasoning_enabled_stage3": _pick(llm.reasoning_enabled_stage3, defaults["reasoning_enabled_stage3"]),
+        "vision_thinking_enabled": _pick(llm.vision_thinking_enabled, defaults["vision_thinking_enabled"]),
+        "request_timeout_seconds": max(1, int(llm.request_timeout_seconds or 120)),
+    }
 
 
 def validate_config(config: AppConfig) -> None:
@@ -171,18 +207,15 @@ def validate_config(config: AppConfig) -> None:
             "GLM API key is required (set env GLM_API_KEY or llm.glm_api_key in YAML)."
         )
 
-    run_stages = config.pipeline.run_stages
     start_stage = config.pipeline.start_stage
-    if not set(run_stages).issubset({1, 2, 3}):
-        raise ValueError(f"run_stages must be subset of [1,2,3], got {run_stages}")
-    if start_stage not in run_stages:
-        raise ValueError(f"start_stage must be in run_stages, got {start_stage} not in {run_stages}")
+    if start_stage not in {1, 2, 3}:
+        raise ValueError(f"start_stage must be one of [1,2,3], got {start_stage}")
 
-    needs_stage2_output = 2 in run_stages and (1 not in run_stages or start_stage > 1)
+    needs_stage2_output = start_stage > 1
     if needs_stage2_output and not os.path.exists(config.data.output_path):
         raise FileNotFoundError(f"Stage2 requires enhanced data file: {config.data.output_path}")
 
-    needs_stage3_output = 3 in run_stages and (2 not in run_stages or start_stage > 2)
+    needs_stage3_output = start_stage > 2
     if needs_stage3_output:
         required_files = [
             "report/analysis_data.json",
@@ -196,6 +229,20 @@ def validate_config(config: AppConfig) -> None:
     if config.stage2.mode == "agent" and config.stage2.tool_source == "mcp":
         if not os.environ.get("ENHANCED_DATA_PATH"):
             raise EnvironmentError("ENHANCED_DATA_PATH must be set for agent+mcp mode")
+
+    llm_profile = str(config.llm.acceptance_profile or "fast").strip().lower()
+    if llm_profile not in {"fast", "quality"}:
+        raise ValueError("llm.acceptance_profile must be one of ['fast', 'quality']")
+    for field_name in (
+        "reasoning_enabled_stage2",
+        "reasoning_enabled_stage3",
+        "vision_thinking_enabled",
+    ):
+        value = getattr(config.llm, field_name)
+        if value is not None and not isinstance(value, bool):
+            raise ValueError(f"llm.{field_name} must be bool or null")
+    if int(config.llm.request_timeout_seconds) <= 0:
+        raise ValueError("llm.request_timeout_seconds must be >= 1")
 
     if config.stage2.chart_tool_policy not in {"coverage_first"}:
         raise ValueError(f"Invalid stage2 chart_tool_policy: {config.stage2.chart_tool_policy}")
@@ -237,6 +284,7 @@ def validate_config(config: AppConfig) -> None:
 def config_to_shared(config: AppConfig) -> dict:
     """Convert AppConfig into the shared store structure used by nodes."""
     data_source_type = _derive_data_source_type(config.pipeline)
+    llm_controls = _resolve_llm_controls(config.llm)
 
     shared = {
         "data": {
@@ -253,12 +301,10 @@ def config_to_shared(config: AppConfig) -> dict:
                 "publisher_decision_path": config.data.publisher_decision_path,
             },
         },
-        "dispatcher": {
+        "pipeline_state": {
             "start_stage": config.pipeline.start_stage,
-            "run_stages": config.pipeline.run_stages,
             "current_stage": 0,
             "completed_stages": [],
-            "next_action": None,
         },
         "config": {
             "enhancement_mode": config.stage1.mode,
@@ -304,6 +350,7 @@ def config_to_shared(config: AppConfig) -> dict:
                 "chapter_review_max_rounds": int(config.stage3.chapter_review_max_rounds),
                 "min_score": int(config.stage3.min_score),
             },
+            "llm": llm_controls,
             "data_source": {
                 "type": data_source_type,
                 "resume_if_exists": config.data.resume_if_exists,
@@ -424,14 +471,6 @@ def config_to_shared(config: AppConfig) -> dict:
             "reflections": [],
             "insight_provenance": {},
             "loop_status": {},
-        },
-        "monitor": {
-            "start_time": "",
-            "current_stage": "",
-            "current_node": "",
-            "execution_log": [],
-            "progress_status": {},
-            "error_log": [],
         },
         "thinking": {
             "stage2_tool_decisions": [],

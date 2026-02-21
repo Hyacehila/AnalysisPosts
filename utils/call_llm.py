@@ -139,7 +139,7 @@ def call_glm4v_plus(prompt: str, image_paths: Optional[List[str]] = None,
 def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None, 
                         image_data: Optional[List[bytes]] = None, 
                         temperature: float = 0.7, max_tokens: Optional[int] = None, 
-                        enable_thinking: bool = True) -> str:
+                        enable_thinking: bool = True, timeout: int = 120) -> str:
     """
     调用glm4.5v思考模式模型 - 用于视觉理解的思考模型，作为glm4.6模型的配套来辅助最终的智能分析与报告生成
     
@@ -150,6 +150,7 @@ def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None,
         temperature: 温度参数，控制随机性
         max_tokens: 最大生成token数
         enable_thinking: 是否开启思考模式
+        timeout: 请求超时时间（秒），默认120秒
         
     Returns:
         模型生成的文本响应
@@ -195,7 +196,8 @@ def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None,
         "model": "glm-4.5v",
         "messages": messages,
         "temperature": temperature,
-        "stream": False
+        "stream": False,
+        "timeout": timeout,
     }
 
     if max_tokens:
@@ -212,7 +214,7 @@ def call_glm45v_thinking(prompt: str, image_paths: Optional[List[str]] = None,
 @llm_retry(max_retries=3, retry_delay=5.0, backoff="linear")
 def call_glm46(prompt: str, temperature: float = 0.8, 
                max_tokens: Optional[int] = None, enable_reasoning: bool = True,
-               max_retries: int = 3, retry_delay: int = 5) -> str:
+               max_retries: int = 3, retry_delay: int = 5, timeout: int = 120) -> str:
     """
     调用glm4.6智能体推理模型
     
@@ -223,6 +225,7 @@ def call_glm46(prompt: str, temperature: float = 0.8,
         enable_reasoning: 是否开启推理模式
         max_retries: 保留参数（由 llm_retry 统一重试策略）
         retry_delay: 保留参数（由 llm_retry 统一重试策略）
+        timeout: 请求超时时间（秒），默认120秒
         
     Returns:
         模型生成的文本响应
@@ -237,7 +240,8 @@ def call_glm46(prompt: str, temperature: float = 0.8,
         "model": "glm-4.6",
         "messages": messages,
         "temperature": temperature,
-        "stream": False
+        "stream": False,
+        "timeout": timeout,
     }
 
     if max_tokens:

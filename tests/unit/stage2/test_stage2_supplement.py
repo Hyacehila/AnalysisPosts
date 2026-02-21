@@ -156,3 +156,45 @@ def test_supplement_search_node_appends_followup_search(monkeypatch):
     assert search_agent["background_context"] == "新增官方回应背景"
     assert search_agent["supplements"][0]["queries"] == ["事件 官方回应"]
     assert len(shared["trace"]["search_supplements"]) == 1
+
+
+def test_supplement_search_respects_stage2_reasoning_switch(monkeypatch):
+    shared = _build_shared()
+    shared["config"]["llm"] = {"reasoning_enabled_stage2": False}
+    shared["forum"]["current_directive"] = {
+        "queries": ["事件 官方回应"],
+        "reason": "补齐官方口径",
+    }
+    captured = {}
+
+    monkeypatch.setattr(
+        supplement_module,
+        "batch_search",
+        lambda queries, **kwargs: {
+            "queries": list(queries),
+            "provider": "tavily",
+            "results_by_query": [],
+            "total_results": 0,
+        },
+    )
+
+    def _fake_llm(*args, **kwargs):
+        captured["kwargs"] = kwargs
+        return json.dumps(
+            {
+                "background_context": "新增官方回应背景",
+                "consistency_points": [],
+                "conflict_points": [],
+                "blind_spots": [],
+                "recommended_followups": [],
+            },
+            ensure_ascii=False,
+        )
+
+    monkeypatch.setattr(supplement_module, "call_glm46", _fake_llm)
+
+    node = SupplementSearchNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert captured["kwargs"]["enable_reasoning"] is False

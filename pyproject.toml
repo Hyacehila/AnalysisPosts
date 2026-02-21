@@ -25,8 +25,8 @@ dependencies = [
 analysis = "main:main"
 
 [tool.pytest.ini_options]
-addopts = "--basetemp=.pytest_tmp"
-testpaths = ["tests"]
+addopts = "--basetemp=.pytest_tmp -m \"not live_api and not ui_e2e\""
+testpaths = ["tests", "dashboard/tests"]
 python_files = ["test_*.py"]
 pythonpath = ["."]
 markers = [
@@ -34,7 +34,11 @@ markers = [
     "integration: integration tests across modules and IO",
     "e2e: end-to-end tests through CLI and system flows",
     "live_api: tests that call real external APIs",
+    "ui_e2e: end-to-end tests that drive dashboard UI with a real browser",
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.0"]
+dev = [
+    "pytest>=8.0",
+    "playwright>=1.52.0",
+]

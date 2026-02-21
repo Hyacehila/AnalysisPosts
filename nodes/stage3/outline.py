@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 
 from nodes.base import MonitoredNode
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage3
 
 
 def _safe_json_loads(text: str) -> Dict[str, Any]:
@@ -67,6 +68,8 @@ class PlanOutlineNode(MonitoredNode):
             "insights": insights,
             "forum_rounds": forum_rounds,
             "data_summary": shared.get("agent", {}).get("data_summary", {}),
+            "reasoning_enabled_stage3": reasoning_enabled_stage3(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res: Dict[str, Any]) -> Dict[str, Any]:
@@ -83,7 +86,12 @@ class PlanOutlineNode(MonitoredNode):
         )
 
         try:
-            raw = call_glm46(prompt, temperature=0.3)
+            raw = call_glm46(
+                prompt,
+                temperature=0.3,
+                enable_reasoning=bool(prep_res.get("reasoning_enabled_stage3", False)),
+                timeout=int(prep_res.get("request_timeout_seconds", 120)),
+            )
             parsed = _safe_json_loads(raw)
             chapters = parsed.get("chapters")
             if not isinstance(chapters, list) or not chapters:

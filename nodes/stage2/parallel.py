@@ -63,9 +63,6 @@ def _build_data_agent_shared(snapshot: Dict[str, Any]) -> Dict[str, Any]:
             "insight_provenance": {},
             "loop_status": {},
         },
-        "monitor": {
-            "error_log": [],
-        },
     }
 
 
@@ -111,7 +108,6 @@ def _run_data_agent_branch_sync(snapshot: Dict[str, Any]) -> Dict[str, Any]:
         "tables": copy.deepcopy(local_shared.get("stage2_results", {}).get("tables", [])),
         "execution_log": copy.deepcopy(local_shared.get("stage2_results", {}).get("execution_log", {})),
         "trace": copy.deepcopy(local_shared.get("trace", {})),
-        "monitor": copy.deepcopy(local_shared.get("monitor", {})),
     }
 
 
@@ -170,11 +166,6 @@ class RunParallelAgentBranchNode(MonitoredAsyncNode):
                 trace["insight_provenance"] = copy.deepcopy(data_trace.get("insight_provenance", {}))
             if isinstance(data_trace.get("loop_status"), dict):
                 trace.setdefault("loop_status", {}).update(copy.deepcopy(data_trace.get("loop_status", {})))
-
-            monitor = shared.setdefault("monitor", {})
-            monitor.setdefault("error_log", []).extend(
-                copy.deepcopy(result.get("monitor", {}).get("error_log", []))
-            )
         else:
             agent_results["search_agent"] = copy.deepcopy(result)
             trace = shared.setdefault("trace", {})

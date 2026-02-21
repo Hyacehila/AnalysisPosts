@@ -64,3 +64,24 @@ def test_search_agent_fallback_when_llm_json_invalid(monkeypatch):
 
     assert shared["agent_results"]["search_agent"]["background_context"] != ""
     assert isinstance(shared["agent_results"]["search_agent"]["blind_spots"], list)
+
+
+def test_search_agent_respects_stage2_reasoning_switch(monkeypatch):
+    shared = _build_shared()
+    shared["config"] = {"llm": {"reasoning_enabled_stage2": False}}
+    captured = {}
+
+    def _fake_llm(*args, **kwargs):
+        captured["kwargs"] = kwargs
+        return (
+            '{"background_context":"背景补充",'
+            '"consistency_points":[],"conflict_points":[],"blind_spots":[],"recommended_followups":[]}'
+        )
+
+    monkeypatch.setattr(search_agent_module, "call_glm46", _fake_llm)
+
+    node = SearchAgentNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert captured["kwargs"]["enable_reasoning"] is False

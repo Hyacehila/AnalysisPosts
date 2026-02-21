@@ -30,6 +30,7 @@ from config import (
 )
 from flow import create_main_flow
 from utils.mcp_client import set_mcp_mode
+from utils.status_events import start_status_run
 
 
 def load_config_dict(path: str = "config.yaml") -> Dict[str, Any]:
@@ -73,6 +74,21 @@ def apply_defaults(raw: Dict[str, Any]) -> Dict[str, Any]:
                 _merge(dst[key], value)
 
     _merge(merged, defaults)
+    return merged
+
+
+def merge_config_dict(base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
+    """Deep merge config updates into a base config dict."""
+    merged = copy.deepcopy(base or {})
+
+    def _merge(dst: Dict[str, Any], src: Dict[str, Any]) -> None:
+        for key, value in (src or {}).items():
+            if isinstance(value, dict) and isinstance(dst.get(key), dict):
+                _merge(dst[key], value)
+            else:
+                dst[key] = copy.deepcopy(value)
+
+    _merge(merged, updates or {})
     return merged
 
 
@@ -151,7 +167,12 @@ def run_pipeline(path: str = "config.yaml", dry_run: bool = False) -> Dict[str, 
     if dry_run:
         return shared
 
+    status_path = shared.get("status_file")
+    status_doc = start_status_run(path=status_path if isinstance(status_path, str) and status_path.strip() else None)
+    shared["status_run_id"] = status_doc.get("run_id", "")
+
     flow = create_main_flow(
+        start_stage=cfg.pipeline.start_stage,
         concurrent_num=cfg.runtime.concurrent_num,
         max_retries=cfg.runtime.max_retries,
         wait_time=cfg.runtime.wait_time,

@@ -22,7 +22,9 @@ from config import (
 )
 
 
-def test_load_config_from_yaml(tmp_path):
+def test_load_config_from_yaml(tmp_path, monkeypatch):
+    # Ensure external acceptance profile override does not leak into YAML-load assertions.
+    monkeypatch.delenv("ACCEPTANCE_PROFILE", raising=False)
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         "\n".join(
@@ -32,9 +34,13 @@ def test_load_config_from_yaml(tmp_path):
                 "  resume_if_exists: false",
                 "llm:",
                 "  glm_api_key: \"yaml-key\"",
+                "  acceptance_profile: \"quality\"",
+                "  reasoning_enabled_stage2: true",
+                "  reasoning_enabled_stage3: false",
+                "  vision_thinking_enabled: true",
+                "  request_timeout_seconds: 120",
                 "pipeline:",
-                "  start_stage: 1",
-                "  run_stages: [1, 2]",
+                "  start_stage: 2",
                 "stage1:",
                 "  mode: \"async\"",
                 "stage2:",
@@ -58,9 +64,14 @@ def test_load_config_from_yaml(tmp_path):
     config = load_config(str(config_path))
     assert config.data.input_path == "data/posts.json"
     assert config.data.resume_if_exists is False
-    assert config.pipeline.run_stages == [1, 2]
+    assert config.pipeline.start_stage == 2
     assert config.runtime.concurrent_num == 10
     assert config.llm.glm_api_key == "yaml-key"
+    assert config.llm.acceptance_profile == "quality"
+    assert config.llm.reasoning_enabled_stage2 is True
+    assert config.llm.reasoning_enabled_stage3 is False
+    assert config.llm.vision_thinking_enabled is True
+    assert config.llm.request_timeout_seconds == 120
     assert config.stage2.search_provider == "tavily"
     assert config.stage2.search_max_results == 7
     assert config.stage2.search_timeout_seconds == 30
@@ -68,6 +79,23 @@ def test_load_config_from_yaml(tmp_path):
     assert config.stage3.max_iterations == 3
     assert config.stage3.min_score == 85
     assert config.stage3.chapter_review_max_rounds == 2
+
+
+def test_load_config_rejects_legacy_run_stages(tmp_path):
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "pipeline:",
+                "  start_stage: 1",
+                "  run_stages: [1, 2, 3]",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(TypeError):
+        load_config(str(config_path))
 
 
 def test_load_config_rejects_legacy_stage3_mode(tmp_path):
@@ -91,12 +119,26 @@ def test_load_config_rejects_legacy_stage3_mode(tmp_path):
 def test_validate_config_rejects_bad_stage2_mode():
     config = AppConfig(
         data=DataConfig(),
-        pipeline=PipelineConfig(start_stage=1, run_stages=[1]),
+        pipeline=PipelineConfig(start_stage=1),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(mode="bad_mode"),
         stage3=Stage3Config(),
         runtime=RuntimeConfig(),
         llm=LLMConfig(glm_api_key="test-key"),
+    )
+    with pytest.raises(ValueError):
+        validate_config(config)
+
+
+def test_validate_config_rejects_invalid_start_stage(monkeypatch):
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
+    config = AppConfig(
+        data=DataConfig(),
+        pipeline=PipelineConfig(start_stage=4),
+        stage1=Stage1Config(mode="async"),
+        stage2=Stage2Config(mode="agent", tool_source="mcp"),
+        stage3=Stage3Config(),
+        runtime=RuntimeConfig(),
     )
     with pytest.raises(ValueError):
         validate_config(config)
@@ -110,13 +152,32 @@ def test_validate_config_requires_stage2_output(tmp_path, monkeypatch):
 
     config = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(mode="agent", tool_source="mcp"),
         stage3=Stage3Config(),
         runtime=RuntimeConfig(),
     )
     validate_config(config)
+
+
+def test_validate_config_requires_stage3_outputs(tmp_path, monkeypatch):
+    output_path = tmp_path / "enhanced.json"
+    output_path.write_text("[]", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("ENHANCED_DATA_PATH", str(output_path))
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
+
+    config = AppConfig(
+        data=DataConfig(output_path=str(output_path)),
+        pipeline=PipelineConfig(start_stage=3),
+        stage1=Stage1Config(mode="async"),
+        stage2=Stage2Config(mode="agent", tool_source="mcp"),
+        stage3=Stage3Config(),
+        runtime=RuntimeConfig(),
+    )
+    with pytest.raises(FileNotFoundError):
+        validate_config(config)
 
 
 def test_validate_config_rejects_bad_search_provider(tmp_path, monkeypatch):
@@ -127,7 +188,7 @@ def test_validate_config_rejects_bad_search_provider(tmp_path, monkeypatch):
 
     config = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(mode="agent", tool_source="mcp", search_provider="bad"),
         stage3=Stage3Config(),
@@ -146,7 +207,7 @@ def test_validate_config_rejects_non_positive_search_limits(tmp_path, monkeypatc
 
     bad_results_cfg = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(
             mode="agent",
@@ -163,7 +224,7 @@ def test_validate_config_rejects_non_positive_search_limits(tmp_path, monkeypatc
 
     bad_timeout_cfg = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(
             mode="agent",
@@ -187,7 +248,7 @@ def test_validate_config_rejects_non_positive_stage2_loop_limits(tmp_path, monke
 
     bad_search_loop = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(
             mode="agent",
@@ -205,7 +266,7 @@ def test_validate_config_rejects_non_positive_stage2_loop_limits(tmp_path, monke
 
     bad_forum_loop = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(
             mode="agent",
@@ -230,7 +291,7 @@ def test_validate_config_rejects_forum_min_rounds_over_max(tmp_path, monkeypatch
 
     bad_relation_cfg = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(
             mode="agent",
@@ -257,11 +318,31 @@ def test_validate_config_rejects_invalid_stage3_review_rounds(tmp_path, monkeypa
 
     bad_cfg = AppConfig(
         data=DataConfig(output_path=str(output_path)),
-        pipeline=PipelineConfig(start_stage=2, run_stages=[2]),
+        pipeline=PipelineConfig(start_stage=2),
         stage1=Stage1Config(mode="async"),
         stage2=Stage2Config(mode="agent", tool_source="mcp"),
         stage3=Stage3Config(chapter_review_max_rounds=0),
         runtime=RuntimeConfig(),
+    )
+
+    with pytest.raises(ValueError):
+        validate_config(bad_cfg)
+
+
+def test_validate_config_rejects_invalid_llm_acceptance_profile(tmp_path, monkeypatch):
+    output_path = tmp_path / "enhanced.json"
+    output_path.write_text("[]", encoding="utf-8")
+    monkeypatch.setenv("ENHANCED_DATA_PATH", str(output_path))
+    monkeypatch.setenv("GLM_API_KEY", "test-key")
+
+    bad_cfg = AppConfig(
+        data=DataConfig(output_path=str(output_path)),
+        pipeline=PipelineConfig(start_stage=2),
+        stage1=Stage1Config(mode="async"),
+        stage2=Stage2Config(mode="agent", tool_source="mcp"),
+        stage3=Stage3Config(),
+        runtime=RuntimeConfig(),
+        llm=LLMConfig(acceptance_profile="fastest"),
     )
 
     with pytest.raises(ValueError):
@@ -283,7 +364,7 @@ def test_config_to_shared_contains_required_keys():
 
     assert "data" in shared
     assert "config" in shared
-    assert "dispatcher" in shared
+    assert "pipeline_state" in shared
     assert "stage1_results" in shared
     assert "stage2_results" in shared
     assert "stage3_results" in shared
@@ -291,6 +372,11 @@ def test_config_to_shared_contains_required_keys():
     assert "search" in shared
     assert "search_results" in shared
     assert "agent_results" in shared
+    assert shared["pipeline_state"] == {
+        "start_stage": 1,
+        "current_stage": 0,
+        "completed_stages": [],
+    }
     assert shared["config"]["data_source"]["resume_if_exists"] is True
     assert shared["config"]["web_search"] == {
         "provider": "tavily",
@@ -324,4 +410,35 @@ def test_config_to_shared_contains_required_keys():
     assert shared["agent_results"] == {
         "data_agent": {},
         "search_agent": {},
+    }
+
+
+def test_config_to_shared_defaults_llm_controls_to_fast_profile():
+    config = AppConfig(llm=LLMConfig(glm_api_key="test-key"))
+    shared = config_to_shared(config)
+
+    assert shared["config"]["llm"] == {
+        "acceptance_profile": "fast",
+        "reasoning_enabled_stage2": False,
+        "reasoning_enabled_stage3": False,
+        "vision_thinking_enabled": False,
+        "request_timeout_seconds": 120,
+    }
+
+
+def test_config_to_shared_quality_profile_enables_reasoning_and_thinking():
+    config = AppConfig(
+        llm=LLMConfig(
+            glm_api_key="test-key",
+            acceptance_profile="quality",
+        )
+    )
+    shared = config_to_shared(config)
+
+    assert shared["config"]["llm"] == {
+        "acceptance_profile": "quality",
+        "reasoning_enabled_stage2": True,
+        "reasoning_enabled_stage3": True,
+        "vision_thinking_enabled": True,
+        "request_timeout_seconds": 120,
     }

@@ -4,7 +4,7 @@ test_stage2_agent.py — Stage 2 Agent 路径节点单元测试
 覆盖范围:
   - CollectToolsNode: MCP 工具收集（mocked）
   - DecisionToolsNode: LLM 决策解析 & action 路由
-  - Stage2CompletionNode: 阶段完成标记（已在 test_dispatcher.py 测试）
+  - Stage2CompletionNode: 阶段完成标记（已在 test_pipeline_state.py 测试）
 """
 import sys
 import json
@@ -186,6 +186,25 @@ class TestDecisionToolsNode:
         assert result["action"] == "execute"
         assert result["tool_name"] == "topic_frequency_stats"
 
+    @patch("nodes.stage2.agent.call_glm46")
+    def test_exec_respects_stage2_reasoning_switch(self, mock_llm, minimal_shared):
+        mock_llm.return_value = json.dumps(
+            {
+                "action": "execute",
+                "tool_name": "sentiment_distribution_stats",
+                "reason": "test",
+            }
+        )
+        shared = self._make_agent_shared(minimal_shared)
+        shared["config"]["llm"] = {"reasoning_enabled_stage2": False}
+        node = DecisionToolsNode()
+
+        prep_res = node.prep(shared)
+        result = node.exec(prep_res)
+
+        assert result["action"] == "execute"
+        assert mock_llm.call_args.kwargs["enable_reasoning"] is False
+
     def test_post_execute_action(self, minimal_shared):
         """action=execute → 设置 next_tool"""
         shared = self._make_agent_shared(minimal_shared)
@@ -287,7 +306,6 @@ class TestExecuteToolsNodeTrace:
                 "current_iteration": 2,
                 "last_trace_decision_id": "d_0003",
             },
-            "monitor": {},
             "trace": {
                 "decisions": [{"id": "d_0003"}],
                 "executions": [],
@@ -333,7 +351,6 @@ class TestExecuteToolsNodeTrace:
                 "current_iteration": 1,
                 "last_trace_decision_id": "d_0001",
             },
-            "monitor": {},
             "trace": {
                 "decisions": [{"id": "d_0001"}],
                 "executions": [],

@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 from pocketflow import AsyncNode, BatchNode, Node
 
 from utils.data_loader import save_enhanced_blog_data
-from utils.monitor import update_status
+from utils.status_events import append_status_event
 
 
 def _infer_stage(node: Node) -> str:
@@ -22,49 +22,138 @@ def _infer_stage(node: Node) -> str:
         return "stage2"
     if ".stage3." in module:
         return "stage3"
-    if "dispatcher" in module:
-        return "dispatcher"
+    if ".pipeline_state" in module:
+        return "pipeline"
     return "system"
 
 
+def _status_warning(node_name: str, action: str, exc: Exception) -> None:
+    print(f"[StatusWarning] {node_name} {action} failed: {exc}")
+
+
+def _status_path_from_shared(shared: Dict[str, Any]) -> str | None:
+    path = shared.get("status_file")
+    if isinstance(path, str) and path.strip():
+        return path.strip()
+    return None
+
+
+def _status_run_id_from_shared(shared: Dict[str, Any]) -> str | None:
+    run_id = shared.get("status_run_id")
+    if isinstance(run_id, str) and run_id.strip():
+        return run_id.strip()
+    return None
+
+
+def _status_branch_id(node: Node) -> str:
+    params = getattr(node, "params", None)
+    if isinstance(params, dict):
+        branch_id = str(params.get("branch_id", "")).strip()
+        if branch_id:
+            return branch_id
+        agent_name = str(params.get("agent_name", "")).strip()
+        if agent_name:
+            return agent_name
+    return "main"
+
+
+def _emit_status_event(
+    shared: Dict[str, Any],
+    *,
+    node_name: str,
+    stage: str,
+    event: str,
+    status: str = "",
+    error: str = "",
+    branch_id: str = "main",
+) -> None:
+    try:
+        append_status_event(
+            node_name=node_name,
+            stage=stage,
+            event=event,
+            status=status,
+            error=error,
+            branch_id=branch_id,
+            run_id=_status_run_id_from_shared(shared),
+            path=_status_path_from_shared(shared),
+        )
+    except Exception as exc:
+        _status_warning(node_name, f"append_status_event({event})", exc)
+
+
 class MonitoredNode(Node):
-    """Node with execution monitoring."""
+    """Node with status enter/exit event recording."""
 
     def _run(self, shared):
         stage = _infer_stage(self)
-        update_status(shared, node_name=self.__class__.__name__, status="running", stage=stage)
+        node_name = self.__class__.__name__
+        branch_id = _status_branch_id(self)
+        _emit_status_event(
+            shared,
+            node_name=node_name,
+            stage=stage,
+            event="enter",
+            branch_id=branch_id,
+        )
         try:
             result = super()._run(shared)
-            update_status(shared, node_name=self.__class__.__name__, status="completed", stage=stage)
+            _emit_status_event(
+                shared,
+                node_name=node_name,
+                stage=stage,
+                event="exit",
+                status="completed",
+                branch_id=branch_id,
+            )
             return result
         except Exception as exc:
-            update_status(
+            _emit_status_event(
                 shared,
-                node_name=self.__class__.__name__,
-                status="failed",
+                node_name=node_name,
                 stage=stage,
+                event="exit",
+                status="failed",
                 error=str(exc),
+                branch_id=branch_id,
             )
             raise
 
 
 class MonitoredAsyncNode(AsyncNode):
-    """AsyncNode with execution monitoring."""
+    """AsyncNode with status enter/exit event recording."""
 
     async def _run_async(self, shared):
         stage = _infer_stage(self)
-        update_status(shared, node_name=self.__class__.__name__, status="running", stage=stage)
+        node_name = self.__class__.__name__
+        branch_id = _status_branch_id(self)
+        _emit_status_event(
+            shared,
+            node_name=node_name,
+            stage=stage,
+            event="enter",
+            branch_id=branch_id,
+        )
         try:
             result = await super()._run_async(shared)
-            update_status(shared, node_name=self.__class__.__name__, status="completed", stage=stage)
+            _emit_status_event(
+                shared,
+                node_name=node_name,
+                stage=stage,
+                event="exit",
+                status="completed",
+                branch_id=branch_id,
+            )
             return result
         except Exception as exc:
-            update_status(
+            _emit_status_event(
                 shared,
-                node_name=self.__class__.__name__,
-                status="failed",
+                node_name=node_name,
                 stage=stage,
+                event="exit",
+                status="failed",
                 error=str(exc),
+                branch_id=branch_id,
             )
             raise
 

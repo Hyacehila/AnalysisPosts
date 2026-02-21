@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 from nodes.base import MonitoredNode
 from utils.call_llm import call_glm46
+from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage2
 
 
 _VALID_DECISIONS = {
@@ -129,6 +130,8 @@ class ForumHostNode(MonitoredNode):
             "visual_analyses": list(forum.get("visual_analyses", []) or []),
             "previous_rounds": list(forum.get("rounds", []) or []),
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
+            "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
+            "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
@@ -157,7 +160,12 @@ SearchAgent结果：
 }}"""
 
         try:
-            resp = call_glm46(prompt, temperature=0.4, enable_reasoning=True)
+            resp = call_glm46(
+                prompt,
+                temperature=0.4,
+                enable_reasoning=bool(prep_res.get("reasoning_enabled_stage2", False)),
+                timeout=int(prep_res.get("request_timeout_seconds", 120)),
+            )
             parsed = _parse_json_payload(resp)
         except Exception:
             parsed = {}
