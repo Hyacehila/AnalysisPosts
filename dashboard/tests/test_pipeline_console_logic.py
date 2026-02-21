@@ -2,7 +2,7 @@
 Tests for Pipeline Console page-side validation helpers.
 """
 
-from dashboard.pages.pipeline_console_logic import build_failure_status_payload, validate_pipeline_form
+from dashboard.logic.pipeline_console_logic import build_failure_status_payload, validate_pipeline_form
 
 
 def _valid_flat_config():

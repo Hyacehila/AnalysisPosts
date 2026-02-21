@@ -55,7 +55,7 @@ flowchart LR
 | `InjectTraceNode` | 追加“参考资料与证据索引”精简附录（正文证据说明为主，附录用于审计） |
 | `MethodologyAppendixNode` | 追加方法论附录（工具调用、循环状态、局限性） |
 | `FormatReportNode` | 执行摘要注入、目录生成、图片路径归一化、图表附录兜底 |
-| `RenderHTMLNode` | Markdown 渲染为交互 HTML（图片放大预览 + `<details>` 保留） |
+| `RenderHTMLNode` | Markdown 渲染为交互 HTML（图片放大预览 + `<details>` 保留 + 标题锚点/Markdown 链接可点击） |
 | `SaveReportNode` | 保存 MD/HTML/trace 三类产物 |
 
 ---

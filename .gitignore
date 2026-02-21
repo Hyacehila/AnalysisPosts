@@ -28,3 +28,6 @@ report/images/
 # Development process docs
 /dev_progress.md
 /development_plan.md
+
+# Playwright Browsers
+.playwright-browsers/

@@ -22,7 +22,7 @@ from dashboard.api.pipeline_api import (
     run_pipeline,
 )
 from dashboard.api.status_api import read_status, write_status
-from dashboard.pages.pipeline_console_logic import build_failure_status_payload, validate_pipeline_form
+from dashboard.logic.pipeline_console_logic import build_failure_status_payload, validate_pipeline_form
 from utils.run_state import is_running, set_running
 
 

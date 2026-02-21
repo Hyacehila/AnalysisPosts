@@ -38,6 +38,7 @@ dependencies = [
     { name = "networkx" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "playwright" },
     { name = "pocketflow" },
     { name = "pydantic" },
     { name = "pyyaml" },
@@ -49,7 +50,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "playwright" },
     { name = "pytest" },
 ]
 
@@ -62,6 +62,7 @@ requires-dist = [
     { name = "networkx", specifier = ">=3.3" },
     { name = "numpy", specifier = ">=2.3.5" },
     { name = "pandas", specifier = ">=2.2.0" },
+    { name = "playwright", specifier = ">=1.52.0" },
     { name = "pocketflow", specifier = ">=0.0.3" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
@@ -72,10 +73,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [
-    { name = "playwright", specifier = ">=1.52.0" },
-    { name = "pytest", specifier = ">=8.0" },
-]
+dev = [{ name = "pytest", specifier = ">=8.0" }]
 
 [[package]]
 name = "annotated-types"

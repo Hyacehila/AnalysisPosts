@@ -121,6 +121,10 @@ powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1 -BaseTe
 | Dashboard 人工链路 UI live smoke | `tests/e2e/dashboard_ui/test_dashboard_human_flow_e2e.py` |
 | Dashboard 配置读写/默认合并 | `dashboard/tests/test_pipeline_api.py` |
 | Dashboard 页面配置校验逻辑 | `dashboard/tests/test_pipeline_console_logic.py` |
+| Dashboard Results Viewer 来源分区聚合与证据链回溯 | `dashboard/tests/test_results_viewer_logic.py` |
+| Dashboard 报告预览（HTML 优先 + MD 回退 + 本地图片内联） | `dashboard/tests/test_report_preview_logic.py` |
+| Dashboard PDF 导出工具链（worker 子进程协议 + 结构化报错 + 临时文件清理） | `dashboard/tests/test_pdf_generator.py` |
+| Dashboard Streamlit 页面发现约束（避免暴露 *_logic helper 页签） | `dashboard/tests/test_streamlit_pages.py` |
 
 ## 5. 重构中的测试流程（Red-Green-Refactor）
 

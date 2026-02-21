@@ -36,7 +36,15 @@
    - E2E 可观测性：循环状态统一写入 `trace.loop_status`，关键字段包括 `forum` 与 `stage3_chapter_review`。
 5. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
    - Pipeline Console supports `pipeline.user_analysis_instruction` input and persists it to `config.yaml`.
-   - Report Preview supports both Markdown and HTML report download/preview (`report.md` + `report.html`).
+   - Results Viewer uses source-partitioned tabs (images / tables / forum debate / search summary / evidence chain / JSON files) for full run traceability.
+   - Results Viewer reads a fixed JSON set (`analysis_data/chart_analyses/insights/trace/status`) and supports file-level metadata, parse-error tolerance, raw preview, and download.
+   - Results Viewer evidence view starts from each insight and backtracks to supporting evidence, matched executions, and matched decisions.
+   - Report Preview keeps a single preview panel (HTML-first, markdown fallback) and a single export path (PDF download only).
+   - PDF generation is user-triggered (`Generate PDF`) and only then exposes the download button, avoiding page-load failures.
+   - Dashboard 调用 `dashboard.utils.pdf_worker` 子进程进行 Playwright 渲染，隔离 Streamlit 主进程事件循环，规避 Windows `NotImplementedError`。
+   - PDF runtime diagnostics are exposed by `Run PDF Preflight`; failures are structured and written to `report/pdf_error.log`.
+   - For iframe rendering stability, preview inlines local `report/images/*` assets so chart images display correctly in the dashboard.
+   - Streamlit page discovery is limited to real pages in `dashboard/pages/`; page helper logic is stored in `dashboard/logic/` to avoid extra sidebar tabs.
    - A shared lock file at `report/.pipeline_running.lock` is used for concurrency control, created/cleared by both CLI and dashboard runs.
    - Status file reliability: reads fall back to an empty status when the file is missing/empty/invalid; writes use atomic replace to avoid partial files.
    - `report/status.json` 使用事件流结构（`version/run_id/events[]`），仅记录节点 `enter/exit`。

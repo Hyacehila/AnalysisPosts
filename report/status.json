@@ -2821,6 +2821,3846 @@
       "branch_id": "main",
       "status": "completed",
       "error": ""
+    },
+    {
+      "seq": 283,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 284,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 285,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 286,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 287,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 288,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 289,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 290,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 291,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 292,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 293,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 294,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 295,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 296,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 297,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 298,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 299,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 300,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 301,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 302,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 303,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 304,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 305,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 306,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 307,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 308,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 309,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 310,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 311,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 312,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 313,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 314,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 315,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 316,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 317,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 318,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 319,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 320,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 321,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 322,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 323,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 324,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 325,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 326,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 327,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 328,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 329,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 330,
+      "ts": "2026-02-21T12:26:20Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 331,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 332,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 333,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 334,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 335,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 336,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 337,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 338,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 339,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 340,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 341,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 342,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 343,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 344,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 345,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 346,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 347,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 348,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 349,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 350,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 351,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 352,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 353,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 354,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 355,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 356,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 357,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 358,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 359,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 360,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 361,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 362,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 363,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 364,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 365,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 366,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 367,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 368,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 369,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 370,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 371,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 372,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 373,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 374,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 375,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 376,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 377,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 378,
+      "ts": "2026-02-21T12:27:26Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 379,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 380,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 381,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 382,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 383,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 384,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 385,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 386,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 387,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 388,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 389,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 390,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 391,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 392,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 393,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 394,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 395,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 396,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 397,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 398,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 399,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 400,
+      "ts": "2026-02-21T12:38:03Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 401,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 402,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 403,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 404,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 405,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 406,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 407,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 408,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 409,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 410,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 411,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 412,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 413,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 414,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 415,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 416,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 417,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 418,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 419,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 420,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 421,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 422,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 423,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 424,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 425,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 426,
+      "ts": "2026-02-21T12:38:04Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 427,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 428,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 429,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 430,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 431,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 432,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 433,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 434,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 435,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 436,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 437,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 438,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 439,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 440,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 441,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 442,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 443,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 444,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 445,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 446,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 447,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 448,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 449,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 450,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 451,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 452,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 453,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 454,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 455,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 456,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 457,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 458,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 459,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 460,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 461,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 462,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 463,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 464,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 465,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 466,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 467,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 468,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 469,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 470,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 471,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 472,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 473,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 474,
+      "ts": "2026-02-21T12:42:02Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 475,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 476,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 477,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 478,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 479,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 480,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 481,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 482,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 483,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 484,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 485,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 486,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 487,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 488,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 489,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 490,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 491,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 492,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 493,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 494,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 495,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 496,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 497,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 498,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 499,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 500,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 501,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 502,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 503,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 504,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 505,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 506,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 507,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 508,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 509,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 510,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 511,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 512,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 513,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 514,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 515,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 516,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 517,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 518,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 519,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 520,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 521,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 522,
+      "ts": "2026-02-21T12:56:27Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 523,
+      "ts": "2026-02-21T13:09:42Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 524,
+      "ts": "2026-02-21T13:09:42Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 525,
+      "ts": "2026-02-21T13:09:42Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 526,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 527,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 528,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 529,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 530,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 531,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 532,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 533,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 534,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 535,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 536,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 537,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 538,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 539,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 540,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 541,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 542,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 543,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 544,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 545,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 546,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 547,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 548,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 549,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 550,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 551,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 552,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 553,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 554,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 555,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 556,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 557,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 558,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 559,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 560,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 561,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 562,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 563,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 564,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 565,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 566,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 567,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 568,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 569,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 570,
+      "ts": "2026-02-21T13:09:43Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 571,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 572,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 573,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 574,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 575,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 576,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 577,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 578,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 579,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 580,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 581,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 582,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 583,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 584,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 585,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 586,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 587,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 588,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 589,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 590,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 591,
+      "ts": "2026-02-21T13:26:48Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 592,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 593,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 594,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 595,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 596,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 597,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 598,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 599,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 600,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 601,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 602,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 603,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 604,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 605,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 606,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 607,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 608,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 609,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 610,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 611,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 612,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 613,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 614,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 615,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 616,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 617,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 618,
+      "ts": "2026-02-21T13:26:49Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 619,
+      "ts": "2026-02-21T13:30:16Z",
+      "event": "enter",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 620,
+      "ts": "2026-02-21T13:30:16Z",
+      "event": "exit",
+      "stage": "stage1",
+      "node": "NLPEnrichmentNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 621,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 622,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 623,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 624,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 625,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 626,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 627,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "data_agent",
+      "status": "failed",
+      "error": "data branch failed"
+    },
+    {
+      "seq": 628,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "RunParallelAgentBranchNode",
+      "branch_id": "search_agent",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 629,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 630,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 631,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 632,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 633,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 634,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 635,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 636,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 637,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 638,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 639,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 640,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 641,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 642,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 643,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 644,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 645,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 646,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 647,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 648,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 649,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 650,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 651,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 652,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 653,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 654,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 655,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 656,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 657,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 658,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "ExtractQueriesNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 659,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 660,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "WebSearchNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 661,
+      "ts": "2026-02-21T13:30:17Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 662,
+      "ts": "2026-02-21T13:30:18Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchProcessNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 663,
+      "ts": "2026-02-21T13:30:18Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 664,
+      "ts": "2026-02-21T13:30:18Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchReflectionNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
+    },
+    {
+      "seq": 665,
+      "ts": "2026-02-21T13:30:18Z",
+      "event": "enter",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "",
+      "error": ""
+    },
+    {
+      "seq": 666,
+      "ts": "2026-02-21T13:30:18Z",
+      "event": "exit",
+      "stage": "stage2",
+      "node": "SearchSummaryNode",
+      "branch_id": "main",
+      "status": "completed",
+      "error": ""
     }
   ]
 }

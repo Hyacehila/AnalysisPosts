@@ -49,6 +49,13 @@ $env:PYTHONPATH = (Resolve-Path .)
 .\.venv\Scripts\streamlit.exe run dashboard/app.py
 ```
 
+Report Preview 页面行为：
+- 只保留一个预览面板（优先 `report/report.html`，缺失时回退 `report/report.md` 渲染）
+- 只保留一个下载逻辑（`report.pdf`，先点击 `Generate PDF` 再下载）
+- 预览中本地图表会内联，确保 `report/images/*` 在页面中可见
+- 支持 `Run PDF Preflight` 运行时自检；若导出失败会写入 `report/pdf_error.log` 便于定位问题
+- PDF 渲染在隔离 worker 子进程中执行（`dashboard.utils.pdf_worker`），避免 Windows + Streamlit 事件循环冲突导致 `NotImplementedError`
+
 ### 样本数据运行（30 条）
 默认 `config.yaml` 已指向：
 - `data/posts_sample_30.json`
@@ -58,6 +65,7 @@ $env:PYTHONPATH = (Resolve-Path .)
 Stage3 输出：
 - `report/report.md`
 - `report/report.html`
+- Dashboard 导出：`report.pdf`（从单预览链路生成）
 
 Stage2 追溯数据输出：
 - `report/trace.json`
