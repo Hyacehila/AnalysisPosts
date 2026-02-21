@@ -38,7 +38,7 @@ def test_build_shared_from_config(tmp_path, monkeypatch):
         "pipeline": {"start_stage": 1},
         "stage1": {"mode": "async", "checkpoint": {"enabled": False}},
         "stage2": {"mode": "agent", "tool_source": "mcp", "agent_max_iterations": 1},
-        "stage3": {"max_iterations": 1, "min_score": 80, "chapter_review_max_rounds": 1},
+        "stage3": {"max_iterations": 1, "chapter_review_max_rounds": 1},
         "runtime": {"concurrent_num": 1, "max_retries": 1, "wait_time": 1},
     }
     path = tmp_path / "config.yaml"
@@ -65,7 +65,7 @@ def test_run_pipeline_dry_run(tmp_path, monkeypatch):
         "pipeline": {"start_stage": 1},
         "stage1": {"mode": "async", "checkpoint": {"enabled": False}},
         "stage2": {"mode": "agent", "tool_source": "mcp", "agent_max_iterations": 1},
-        "stage3": {"max_iterations": 1, "min_score": 80, "chapter_review_max_rounds": 1},
+        "stage3": {"max_iterations": 1, "chapter_review_max_rounds": 1},
         "runtime": {"concurrent_num": 1, "max_retries": 1, "wait_time": 1},
     }
     path = tmp_path / "config.yaml"
@@ -129,6 +129,12 @@ def test_apply_defaults_includes_llm_acceptance_profile_defaults():
     assert llm["reasoning_enabled_stage3"] is None
     assert llm["vision_thinking_enabled"] is None
     assert llm["request_timeout_seconds"] == 120
+
+
+def test_apply_defaults_stage3_does_not_include_min_score():
+    merged = apply_defaults({})
+
+    assert "min_score" not in merged["stage3"]
 
 
 def test_build_config_dict_from_form_supports_nested_chart_min_category():

@@ -87,7 +87,6 @@ def minimal_shared(sample_blog_data, sample_topics, sample_sentiment_attrs, samp
             "tool_source": "mcp",
             "stage3_review": {
                 "chapter_review_max_rounds": 2,
-                "min_score": 80,
             },
             "data_source": {
                 "type": "original",

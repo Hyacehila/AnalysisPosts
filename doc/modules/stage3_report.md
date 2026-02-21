@@ -1,8 +1,8 @@
 # 阶段 3：报告生成子系统
 
-> **文档状态**: 2026-02-20 更新  
+> **文档状态**: 2026-02-21 更新  
 > **关联源码**: `nodes/stage3/*`, `flow.py`, `config.py`  
-> **上级文档**: [系统设计总览](design.md)
+> **上级文档**: [系统设计总览](../architecture.md)
 
 ---
 
@@ -49,9 +49,9 @@ flowchart LR
 |:---|:---|
 | `ClearStage3OutputsNode` | 清理 `report.md/report.html`，保留 Stage2 产物、`images/` 与 `status.json` |
 | `LoadAnalysisResultsNode` | 内存优先读取 Stage2 结果，文件回退加载 JSON 与 trace |
-| `PlanOutlineNode` | LLM 规划报告大纲（失败时回退默认大纲） |
-| `GenerateChaptersBatchNode` | 并行逐章生成内容（支持反馈驱动重生成） |
-| `ReviewChaptersNode` | 章节级评审循环，输出 `needs_revision/satisfied` 路由 |
+| `PlanOutlineNode` | LLM 规划报告大纲（失败时回退默认大纲）；提示词注入洞察摘要、事件关键词、时间线并禁止占位符 |
+| `GenerateChaptersBatchNode` | 并行逐章生成内容（支持反馈驱动重生成）；提示词注入图表分析正文、洞察摘要、搜索背景并禁止占位符 |
+| `ReviewChaptersNode` | 章节级评审循环，输出 `needs_revision/satisfied` 路由；占位符命中为硬失败并强制修订 |
 | `InjectTraceNode` | 注入 `<details>` 证据追溯块 |
 | `MethodologyAppendixNode` | 追加方法论附录（工具调用、循环状态、局限性） |
 | `FormatReportNode` | 执行摘要注入、目录生成、图片路径归一化、图表附录兜底 |
@@ -67,19 +67,17 @@ flowchart LR
 ```yaml
 stage3:
   max_iterations: 5
-  min_score: 80
   chapter_review_max_rounds: 2
 ```
 
 运行时映射到 `shared["config"]["stage3_review"]`：
 
 - `chapter_review_max_rounds`
-- `min_score`
 
 说明：
 
 - `chapter_review_max_rounds` 控制 `ReviewChaptersNode` 的循环上限。
-- `min_score` 是章节评审通过阈值。
+- Stage3 已移除 `min_score` 阈值，是否修订由评审输出与硬性质量规则共同决定。
 
 ---
 
@@ -137,7 +135,10 @@ stage3:
 
 ### 5.3 Trace 追溯块
 
-`InjectTraceNode` 将 `trace.insight_provenance` 以 `<details>` 折叠块形式注入报告。
+`InjectTraceNode` 将 `trace.insight_provenance` 以 `<details>` 折叠块形式注入报告，并兼容两种证据结构：
+
+- 旧结构：`insight_key -> [ {source,evidence,...}, ... ]`
+- 新结构：`insight_key -> {text, supporting_evidence:[...], confidence,...}`
 
 ---
 

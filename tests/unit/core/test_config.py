@@ -52,7 +52,6 @@ def test_load_config_from_yaml(tmp_path, monkeypatch):
                 "  search_api_key: \"tavily-yaml-key\"",
                 "stage3:",
                 "  max_iterations: 3",
-                "  min_score: 85",
                 "  chapter_review_max_rounds: 2",
                 "runtime:",
                 "  concurrent_num: 10",
@@ -77,7 +76,6 @@ def test_load_config_from_yaml(tmp_path, monkeypatch):
     assert config.stage2.search_timeout_seconds == 30
     assert config.stage2.search_api_key == "tavily-yaml-key"
     assert config.stage3.max_iterations == 3
-    assert config.stage3.min_score == 85
     assert config.stage3.chapter_review_max_rounds == 2
 
 
@@ -106,7 +104,6 @@ def test_load_config_rejects_legacy_stage3_mode(tmp_path):
                 "stage3:",
                 "  mode: template",
                 "  max_iterations: 3",
-                "  min_score: 80",
             ]
         ),
         encoding="utf-8",
@@ -392,7 +389,6 @@ def test_config_to_shared_contains_required_keys():
     }
     assert shared["config"]["stage3_review"] == {
         "chapter_review_max_rounds": 2,
-        "min_score": 80,
     }
     assert shared["forum"] == {
         "current_round": 0,
@@ -442,3 +438,25 @@ def test_config_to_shared_quality_profile_enables_reasoning_and_thinking():
         "vision_thinking_enabled": True,
         "request_timeout_seconds": 120,
     }
+
+
+def test_load_config_ignores_legacy_stage3_min_score(tmp_path, monkeypatch):
+    monkeypatch.delenv("ACCEPTANCE_PROFILE", raising=False)
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        "\n".join(
+            [
+                "llm:",
+                "  glm_api_key: test-key",
+                "stage3:",
+                "  max_iterations: 3",
+                "  chapter_review_max_rounds: 2",
+                "  min_score: 75",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    config = load_config(str(config_path))
+    assert config.stage3.max_iterations == 3
+    assert config.stage3.chapter_review_max_rounds == 2

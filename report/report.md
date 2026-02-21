@@ -1,217 +1,412 @@
 ## 目录
 
-- [共享单车夜骑舆情分析报告](#共享单车夜骑舆情分析报告)
-  - [报告摘要](#报告摘要)
-  - [舆情事件发展脉络](#舆情事件发展脉络)
-  - [舆情总体趋势分析](#舆情总体趋势分析)
-    - [情感趋势分析](#情感趋势分析)
-    - [主题趋势分析](#主题趋势分析)
-  - [焦点窗口专项分析](#焦点窗口专项分析)
-  - [传播场景分析](#传播场景分析)
-    - [地域分布分析](#地域分布分析)
-    - [发布者行为分析](#发布者行为分析)
-  - [舆论内容结构分析](#舆论内容结构分析)
-    - [主题网络分析](#主题网络分析)
-    - [关键词分析](#关键词分析)
-    - [文本聚类分析](#文本聚类分析)
-  - [信念系统分析](#信念系统分析)
-  - [区域与空间认知差异](#区域与空间认知差异)
-  - [舆情风险研判](#舆情风险研判)
-  - [应对建议](#应对建议)
-    - [短期应对措施](#短期应对措施)
-    - [中长期发展策略](#中长期发展策略)
-  - [附录](#附录)
-    - [数据范围与方法说明](#数据范围与方法说明)
-    - [指标说明](#指标说明)
-    - [数据来源与限制](#数据来源与限制)
-    - [图表索引](#图表索引)
+  - [运行执行摘要](#运行执行摘要)
+- [2024年8月下旬京鄂交通及北京城市骑行热点舆情分析报告](#2024年8月下旬京鄂交通及北京城市骑行热点舆情分析报告)
+  - [舆情总览与核心洞察](#舆情总览与核心洞察)
+    - [ch01 舆情总览与核心洞察](#ch01-舆情总览与核心洞察)
+  - [情感倾向分析：整体中性主导，个人用户情绪更多元](#情感倾向分析：整体中性主导，个人用户情绪更多元)
+    - [情感倾向分析：整体中性主导，个人用户情绪更多元](#情感倾向分析：整体中性主导，个人用户情绪更多元)
+  - [核心议题与内容演化：社会民生与交通运输成焦点](#核心议题与内容演化：社会民生与交通运输成焦点)
+  - [地域传播与差异分析：北京、湖北为舆情主要发生地](#地域传播与差异分析：北京、湖北为舆情主要发生地)
+  - [传播主体与关键实体：个人用户为传播主力](#传播主体与关键实体：个人用户为传播主力)
+    - [5. 传播主体与关键实体：个人用户为传播主力](#5.-传播主体与关键实体：个人用户为传播主力)
+  - [证据追溯](#证据追溯)
+    - [insight_sentiment_summary](#insight_sentiment_summary)
+    - [insight_topic_distribution](#insight_topic_distribution)
+    - [insight_geographic_distribution](#insight_geographic_distribution)
+    - [insight_publisher_behavior](#insight_publisher_behavior)
+    - [insight_overall_summary](#insight_overall_summary)
+  - [附录：分析方法论](#附录：分析方法论)
+    - [数据局限性声明](#数据局限性声明)
 
+## 运行执行摘要
 
+- search_reflection: 2/2 (max_rounds_reached)
+- data_agent: 30/30 (max_iterations_reached)
+- forum: 2/2 (max_rounds_reached)
+- stage3_chapter_review: 2/2 (max_iterations_reached)
 
-# 共享单车夜骑舆情分析报告
+# 2024年8月下旬京鄂交通及北京城市骑行热点舆情分析报告
 
-## 报告摘要
-
-本报告基于2024年8月16日至8月31日期间收集的30篇博文数据，对共享单车夜骑相关舆情进行全面分析。**情感分布以中性为主**，其中21篇博文被判定为中性情感，占比70%；8篇为正面情感，占比约26.7%；1篇为负面情感，占比约3.3%。**主题分布**上，"社会民生"是讨论度最高的主题，占比20.0%，其次是"交通运输"（13.33%）和"民众反应"（6.67%）。**地域分布**显示，30%的博文未提供地理位置信息，在有明确位置信息的博文中，北京（16.67%）和湖北（10.0%）最为突出。**发布者类型**多样化，个人用户占比最高（53.33%），其次是官方新闻媒体、自媒体和政府机构（各占10.0%）。**互动行为**上，评论是最主要的互动形式（79次），其次是点赞（66次）和转发（10次）。整体而言，共享单车夜骑舆情呈现中性态势，讨论焦点集中在社会民生和交通安全领域，用户参与度较高但互动深度有限。
-
-## 舆情事件发展脉络
-
-根据sentiment_time_series数据，共享单车夜骑相关舆情在2024年8月16日至8月31日期间呈现出明显的波动特征。**舆情起始阶段**（8月16日-8月18日）以中性讨论为主，平均情感极性值为3.0，主要围绕首都骑游文明公约的发布展开讨论。**发展阶段**（8月19日-8月24日）情感极性出现波动，8月19日7时达到首个高峰（情感极性值4.0），随后在8月21日23时再次上升至3.5。**高峰期**（8月24日22时）出现明显的情感波动异常，发帖量达到3篇（偏离3.7个标准差），平均情感极性值为3.67，正面情感占比66.67%。**衰退期**（8月25日-8月31日）舆情热度逐渐下降，但在8月31日22时出现情感极性异常，降至2.0（偏离2.5个标准差），是整个监测期内唯一的负面情感高峰。
-
-![情感趋势变化图](./images/sentiment_trend_20260213_105145.png)
-
-从转折点分析来看，共识别出16个情感转折点，其中最显著的包括：
-- 8月19日7时：情感极性从3.0上升至4.0（上升幅度0.333）
-- 8月21日23时：情感极性从3.0上升至3.5（上升幅度0.5）
-- 8月24日22时：情感极性从3.0上升至3.67（上升幅度0.557）
-- 8月31日22时：情感极性从3.0下降至2.0（下降幅度0.333）
-
-这些转折点多与具体事件相关，如首都骑游文明公约的发布、明星夜骑行为引发的关注等。
-
-## 舆情总体趋势分析
-
-### 情感趋势分析
-
-根据sentiment_distribution_stats数据，共享单车夜骑相关舆情整体呈现**中性偏正面**的态势。在30篇博文中，中性情感占主导地位（70%），正面情感占比26.67%，负面情感仅占3.33%。平均情感极性值为3.23（以5分制计算），整体情感倾向为中性。从时间序列来看，情感极性在监测期内呈现"下降"趋势，但波动幅度较大，特别是在8月下旬出现了多次情感极性上升的转折点。
-
-![情感分布饼图](./images/sentiment_pie_20260213_104858.png)
-
-情感属性分析显示，"支持"是出现频率最高的情感属性，在多个时间点均有体现；其次是"期待"和"欣慰"。值得注意的是，在8月24日22时，"支持"和"赞赏"属性出现显著增长（变化量均为2.0），反映出对共享单车夜骑行为的积极认可。
-
-### 主题趋势分析
-
-根据topic_time_evolution数据，共享单车夜骑相关讨论的主题呈现明显演化特征。**社会民生**主题呈现上升趋势，从初期的平均0.33上升到后期的0.67（增长100%）；**交通运输**主题则呈现下降趋势，从初期的1.0下降至后期的0.33（下降66.67%）。**民众反应**和**经济影响**作为新兴主题，在监测后期开始受到关注。
-
-![主题热度时序演化](./images/topic_evolution_20260213_105103.png)
-
-主题分布数据显示，在30篇博文中，仅有11篇（36.67%）被明确标注了主题信息。这表明大部分博文内容较为分散，主题聚焦度不高。从具体主题来看，"社会民生>居民生活"和"交通运输>出行安全"是最受关注的主题组合，各占13.33%。
-
-## 焦点窗口专项分析
-
-根据topic_focus_distribution_chart数据，焦点窗口设定为2024年8月17日至8月30日。在此期间，**社会民生**主题呈现持续关注态势，特别是在8月24日达到峰值（2篇博文）；**交通运输**主题主要集中在8月17日和8月19日；**民众反应**和**经济影响**主题则在监测末期（8月28-29日）开始出现。
-
-![焦点窗口主题发布趋势](./images/topic_focus_distribution_20260213_105203.png)
-
-情感方面，焦点窗口内的平均情感极性值为3.23，与整体监测期一致。但情感波动更为明显，8月24日22时出现情感极性高峰（3.67），8月25日19时达到最高值（4.0）。发布者类型分析显示，个人用户在焦点窗口内最为活跃（占比53.33%），其次是政府机构、官方新闻媒体和自媒体（各占10.0%）。
-
-焦点窗口内的关键词分析显示，"首都骑游文明公约"是讨论的核心内容，在8月17日至19日期间持续受到关注。8月21日，"星星"成为新的关键词，可能与特定事件或话题相关。
-
-## 传播场景分析
-
-### 地域分布分析
-
-根据geographic_distribution_stats数据，共享单车夜骑相关讨论的地域分布呈现**集中化**特征。在30篇博文中，30%未提供地理位置信息，表明大部分发布者倾向于隐藏位置或平台未采集到位置数据。在有明确位置信息的博文中，北京（16.67%）和湖北（10.0%）是最活跃的地区，其次是上海、四川和江苏（各占6.67%）。
-
-![Top15 地区分布图](./images/geographic_bar_20260213_105001.png)
-
-地理热点检测显示，"无位置信息"和"北京"是两个热点区域，分别占比30.0%和16.67%，热点集中度为46.67%。地理情感分析表明，北京地区的平均情感极性值（3.4）略高于无位置信息区域（3.22），正面情感比例也更高（40.0% vs 22.22%）。
-
-![地区舆情热力图](./images/geographic_heatmap_20260213_104705.png)
-
-### 发布者行为分析
-
-根据publisher_distribution_stats数据，共享单车夜骑相关讨论的发布者类型呈现**多元化**特征。个人用户是最主要的发布群体，占比53.33%（16篇博文），平均情感极性值为3.19，总互动量达102次。官方新闻媒体、自媒体和政府机构各占10.0%，情感极性值分别为3.33、3.67和3.0。
-
-![发布者话题偏好分布](./images/publisher_topic_distribution_20260213_104730.png)
-
-互动行为分析显示，个人用户的平均评论数（3.69）和点赞数（2.56）最高，表明其内容更能引发用户互动。政府机构的平均转发数（2.33）最高，反映其内容更具传播价值。旅游博主的平均评论数（8.0）和点赞数（8.0）虽高，但仅有1篇博文，样本量有限。
-
-![发布者情绪桶分布](./images/publisher_sentiment_bucket_20260213_104754.png)
-
-交叉维度分析（cross_dimension_matrix）显示，个人用户的内容情感分布最为多元，包括中性（68.75%）、乐观（25.0%）和悲观（6.25%）；自媒体的内容最为正面，乐观情感占比66.67%；政府机构和旅游部门的内容全部为中性情感。
-
-![发布者类型 × 情感极性 热力图](./images/interaction_heatmap_20260213_105255.png)
-
-## 舆论内容结构分析
-
-### 主题网络分析
-
-根据topic_frequency_stats数据，共享单车夜骑相关讨论的主题结构呈现**分散化**特征。在30篇博文中，仅有11篇（36.67%）被明确标注了主题信息，表明大部分博文内容较为分散，主题聚焦度不高。从父主题来看，"社会民生"（6篇，20.0%）和"交通运输"（4篇，13.33%）是最受关注的主题；从子主题来看，"出行安全"和"居民生活"（各4篇，13.33%）是最受关注的细分领域。
-
-![地区话题差异热力图](./images/geographic_topic_heatmap_20260213_105024.png)
-
-主题共现分析（topic_cooccurrence_analysis）显示，在最小支持度为2的情况下，未发现明显的主题共现组合，表明不同主题之间的关联性较弱，讨论内容较为分散。
-
-### 关键词分析
-
-根据keyword_wordcloud数据，共享单车夜骑相关讨论的关键词呈现**高度集中**特征。"单车"（21次）、"夜骑"（13次）和"共享"（11次）是最核心的关键词，反映出讨论内容紧密围绕共享单车夜骑这一核心主题。"骑行"（9次）、"骑游"（7次）、"避免"（7次）、"文明"（7次）和"公约"（7次）也是高频词，反映出对骑行安全和文明行为的关注。
-
-![关键词频次分布](./images/keyword_wordcloud.png)
-
-实体共现网络（entity_cooccurrence_network）显示，"首都骑游文明公约"与"文旅北京"之间存在强关联（权重为5），反映出官方发布的公约内容受到广泛关注。"张艺兴夜骑主动停车捡垃圾"与多个相关实体（如"张艺兴2024世界巡演"、"原创音乐制作人张艺兴"等）形成关联网络，反映出明星效应对话题传播的影响。
-
-![实体共现热力图](./images/entity_cooccurrence.png)
-
-### 文本聚类分析
-
-根据text_cluster_analysis数据，共享单车夜骑相关讨论的文本内容呈现出**一定程度的相似性**。在聚类分析中，编号为"20"的聚类包含了7篇博文，是最大的聚类，表明这些博文在内容表达上具有较高的相似性。这可能反映了某些特定表达方式或观点在社交媒体上的传播和模仿。
-
-## 信念系统分析
-
-根据sentiment_time_series中的attribute_trend数据，共享单车夜骑相关讨论的信念系统呈现出**多元但偏向支持**的特征。在情感属性中，"支持"是出现频率最高的属性，在多个时间点均有体现，反映出用户对共享单车夜骑行为的普遍认可。"期待"和"欣慰"也是高频属性，表明用户对共享单车夜骑的未来发展持积极态度。
-
-值得注意的是，在8月24日22时，"支持"和"赞赏"属性出现显著增长（变化量均为2.0），反映出对共享单车夜骑行为的积极认可。与此同时，"期待"属性在8月18日19时出现显著下降（变化量为-2.0），可能与某些具体事件或政策发布有关。
-
-从发布者类型来看，个人用户的信念系统最为多元，包含支持、期待、无奈等多种情感属性；政府机构和官方新闻媒体的信念系统相对单一，主要表现为"支持"和"满意"；自媒体的信念系统偏向"赞赏"和"高兴"，反映出对共享单车夜骑的积极态度。
-
-## 区域与空间认知差异
-
-根据geographic_sentiment_analysis数据，共享单车夜骑相关讨论的区域情感差异**不显著**。在有足够样本量的地区中（发帖量≥5），无位置信息区域的平均情感极性值为3.22，正面情感比例为22.22%；北京地区的平均情感极性值为3.4，正面情感比例为40.0%，略高于无位置信息区域。
-
-![地区时间差异热力图](./images/geographic_temporal_heatmap_20260213_105129.png)
-
-从时间分布来看，共享单车夜骑相关讨论在22时最为活跃（6篇博文），其次是19时和23时（各3篇博文），反映出夜间是讨论的高峰时段。这种时间分布特征与夜骑活动本身的时间特性高度吻合，表明讨论内容与实际行为存在紧密关联。
-
-区域认知差异主要体现在对共享单车夜骑的态度上：北京地区用户更倾向于表达正面情感，可能与当地共享单车基础设施完善、骑行文化发达有关；无位置信息区域用户的态度更为中性，可能反映了更广泛的用户群体对共享单车夜骑的一般性看法。
-
-## 舆情风险研判
-
-基于sentiment_anomaly_detection数据，共享单车夜骑相关舆情存在**中等风险**。监测期内识别出两个情感异常点：
-
-1. 2024年8月24日22时：发帖量异常（偏离3.7个标准差），平均情感极性值为3.67，正面情感占比66.67%。这一异常可能与特定事件（如明星夜骑行为）引发的关注激增有关。
-
-2. 2024年8月31日22时：情感极性异常（偏离2.5个标准差），平均情感极性值为2.0，是整个监测期内唯一的负面情感高峰。这一异常可能反映了用户对共享单车夜骑的某些负面体验或担忧。
-
-从主题风险来看，"交通运输>出行安全"和"社会民生>居民生活"是风险较高的主题，涉及用户人身安全和日常生活影响。从发布者风险来看，个人用户发布的内容情感波动较大，可能成为舆情风险的主要来源。
-
-根据correlation_analysis数据，情感极性与主题数量呈正相关（相关系数0.544），与图片数量呈负相关（相关系数-0.459），表明主题越多的内容情感越正面，而包含图片的内容情感越负面。评论数与点赞数呈强正相关（相关系数0.945），表明用户互动行为具有一致性。
-
-## 应对建议
-
-### 短期应对措施
-
-1. **针对负面情感高峰**：针对8月31日22时出现的负面情感高峰，及时收集和分析用户负面反馈，特别是关于安全问题和用户体验的抱怨，快速响应并解决具体问题。
-
-2. **强化正面引导**：利用8月24日22时的正面情感高峰，放大正面声音，特别是明星夜骑捡垃圾等积极行为，形成示范效应。
-
-3. **加强夜间时段管理**：针对22时左右的讨论高峰期，加强共享单车的夜间调度和维护，确保用户有良好的夜骑体验。
-
-### 中长期发展策略
-
-1. **完善安全规范**：基于"交通运输>出行安全"主题的高关注度，进一步完善共享单车夜骑的安全规范，如强化夜间灯光设备要求、提供安全骑行指南等。
-
-2. **优化用户体验**：针对"社会民生>居民生活"主题的讨论，改善共享单车的舒适性和便利性，特别是夜间使用的特殊需求。
-
-3. **建立用户反馈机制**：建立快速响应的用户反馈机制，及时收集和处理用户关于共享单车夜骑的意见和建议，防止负面情绪积累。
-
-4. **多渠道宣传引导**：通过政府机构、官方媒体等多渠道发布共享单车夜骑的正面信息和使用规范，形成全方位的舆论引导格局。
-
-5. **区域差异化策略**：针对不同地区的用户态度差异，制定差异化的运营和宣传策略，特别是在北京等正面情感较高的地区加强推广，在其他地区加强引导。
-
-## 附录
-
-### 数据范围与方法说明
-
-本报告基于2024年8月16日至8月31日期间收集的30篇博文数据，采用自然语言处理、情感分析、主题建模、网络分析等多种方法，对共享单车夜骑相关舆情进行全面分析。数据来源于社交媒体平台，经过清洗和预处理后，形成结构化数据集。
-
-### 指标说明
-
-1. **情感极性**：采用5分制评分，1分为极度悲观，2分为悲观，3分为中性，4分为乐观，5分为极度乐观。
-
-2. **主题分类**：采用两级分类体系，包括父主题和子主题。父主题包括社会民生、交通运输、民众反应、媒体传播、经济影响、公共事业、应急管理和自然灾害。
-
-3. **发布者类型**：包括个人用户、学生、官方新闻媒体、自媒体、旅游博主、旅游部门、宣传部门和政府机构。
-
-4. **互动指标**：包括转发数、评论数和点赞数，用于衡量用户参与度和内容影响力。
-
-5. **情感属性**：包括兴奋、失望、支持、无奈、期待、欣慰、沮丧、满意、赞赏和高兴，用于细化情感分析。
-
-### 数据来源与限制
-
-本报告数据来源于公开社交媒体平台，仅代表部分用户观点，可能存在样本偏差。分析结果仅供参考，不构成决策依据。在实际应用中，应结合更多数据源和实地调研结果进行综合判断。
-
-### 图表索引
-
-1. ![情感趋势变化图](./images/sentiment_trend_20260213_105145.png)
-2. ![情感分布饼图](./images/sentiment_pie_20260213_104858.png)
-3. ![主题热度时序演化](./images/topic_evolution_20260213_105103.png)
-4. ![焦点窗口主题发布趋势](./images/topic_focus_distribution_20260213_105203.png)
-5. ![Top15 地区分布图](./images/geographic_bar_20260213_105001.png)
-6. ![地区舆情热力图](./images/geographic_heatmap_20260213_104705.png)
-7. ![发布者话题偏好分布](./images/publisher_topic_distribution_20260213_104730.png)
-8. ![发布者情绪桶分布](./images/publisher_sentiment_bucket_20260213_104754.png)
-9. ![发布者类型 × 情感极性 热力图](./images/interaction_heatmap_20260213_105255.png)
-10. ![地区话题差异热力图](./images/geographic_topic_heatmap_20260213_105024.png)
-11. ![关键词频次分布](./images/keyword_wordcloud.png)
-12. ![实体共现热力图](./images/entity_cooccurrence.png)
-13. ![地区时间差异热力图](./images/geographic_temporal_heatmap_20260213_105129.png)
+## 舆情总览与核心洞察
+
+### ch01 舆情总览与核心洞察
+
+监测周期内（2024-08-16至2024-08-31），共捕获相关博文30篇。情感分布以中性为主，占比70.0%（21条），乐观情绪占比26.7%（8条），整体舆情态势中性偏乐观。核心议题聚焦于社会民生（6篇，占比20.0%）与交通运输（4篇，占比13.33%）。关键词频次分布显示，“单车”（21次）、“夜骑”（13次）热度突出。
+
+地域分布上，无位置信息博文最多（9篇），北京（5篇）与湖北为主要讨论区域，其中北京地区正面情感占比达40.0%。
+![Top15 地区分布图](./images/geographic_bar_20260221_154810.png)
+发布者类型以个人用户为主，贡献博文10篇，是舆情发展的主要推动力量；政府机构与自媒体亦有参与，分别贡献中性博文3篇及中性、正面博文3篇。实体共现分析显示，“首都骑游文明公约”与“文旅北京”关联强度最高，揭示了议题的核心关联。
+
+互动层面，累计参与人数从1人增长至30人，
+![参与人数演化趋势](./images/participant_trend_20260221_155212.png)
+互动总量（转发+评论+点赞）为155次，其中评论79次、点赞66次、转发10次，显示较高的用户参与意愿。文本相似聚类分布显示，一个核心聚类包含7条帖子，
+![文本相似聚类分布](./images/text_cluster_analysis.png)
+表明讨论焦点相对集中。
+
+## 情感倾向分析：整体中性主导，个人用户情绪更多元
+
+### 情感倾向分析：整体中性主导，个人用户情绪更多元
+
+本次舆情监测周期内，整体情感分布呈现以中性为主导的格局。数据显示，中性情感占比高达70.0%（21条），乐观情绪占比26.7%（8条），悲观情绪仅占3.3%（1条），反映出舆论场整体基调相对平稳。
+
+![情感极性分布](./images/sentiment_pie_20260221_154742.png)
+
+从发布者类型维度分析，不同主体的情感表达存在显著差异。个人用户是本次舆情中情绪表达最为多元的群体，其发布的16条博文涵盖了悲观、中性与乐观三种情感。其中，悲观情绪（1条）为个人用户所独有，中性（11条）与乐观（4条）情绪也占据相当比例。与之相对，政府机构发布的内容情感倾向单一，均为中性；自媒体则表现出中性偏乐观的特征。
+
+![发布者情绪桶分布](./images/publisher_sentiment_bucket_20260221_155132.png)
+
+综上，舆情整体基调平稳中性，但个人用户作为核心参与方，其情绪的多元性与负面情绪的集中出现，构成了当前舆论场中需要关注的重要细节。
+
+## 核心议题与内容演化：社会民生与交通运输成焦点
+
+本阶段舆情核心议题聚焦于社会民生与交通运输两大领域。数据显示，社会民生是热度最高的主题，博文数达6篇，占比20.0%；交通运输次之，博文数为4篇，占比13.33%。具体热度分布可见图 ![Top10 主题热度排行](./images/topic_ranking_20260221_154853.png)。
+
+在内容层面，关键词分析揭示了讨论的具体指向。“单车”出现频次最高，约21次，“夜骑”（13次）和“共享”（11次）紧随其后，共同指向城市骑行这一核心议题。
+
+从热度演化来看，整体讨论在8月24日达到峰值，该峰值主要由社会民生议题驱动。如图 ![主题热度时序演化](./images/topic_evolution_20260221_154823.png) 所示，社会民生主题的博文数量在该日达到最高点，成为推动舆论热度上升的主要动力。
+
+## 地域传播与差异分析：北京、湖北为舆情主要发生地
+
+地域传播与差异分析：无位置信息博文为主，北京、湖北为明确来源主要地区
+
+本次舆情监测显示，地域分布呈现显著特征。无位置信息博文数量最多，共9篇，是本次舆情的主要构成部分。在有明确地理位置信息的博文中，北京与湖北为舆情主要发生地。其中，北京以5篇博文位居首位，湖北紧随其后。![Top15 地区分布图](./images/geographic_bar_20260221_154810.png)
+
+地域情感倾向存在差异。北京地区舆情正面占比较高，达40.0%，平均情感极性为3.40，显示出较强的正面倾向。![地区舆情热力图](./images/geographic_heatmap_20260221_154754.png) 地域话题关联性亦表现明显。湖北地区与“民众反应”议题关联紧密（2篇），而北京地区则更多讨论“社会民生”（2篇），反映了不同地区的关注焦点。![地区话题差异热力图](./images/geographic_topic_heatmap_20260221_154948.png)
+
+从时间维度看，无位置信息区域的舆情热度在8月18日接近峰值，表明该时期匿名或未标明地域的讨论尤为活跃。![地区时间差异热力图](./images/geographic_temporal_heatmap_20260221_155019.png)
+
+## 传播主体与关键实体：个人用户为传播主力
+
+### 5. 传播主体与关键实体：个人用户为传播主力
+
+本次舆情中，传播主体呈现显著的“个人化”特征。数据显示，个人用户是绝对的传播主力，贡献了10篇博文，其关注点高度集中于社会民生与交通运输领域，各占3篇（如图表1所示）。![发布者话题偏好分布](./images/publisher_topic_distribution_20260221_154402.png) 与此同时，个人用户也主导了舆论的情感走向，贡献了全部1条悲观情绪与大部分4条乐观情绪，呈现出复杂的情感结构。相比之下，政府机构发布内容较少（3篇），且均为中性。
+
+在关键实体层面，共现分析揭示了官方议题的传播路径。如图表2所示，![实体共现热力图](./images/entity_cooccurrence.png) “首都骑游文明公约”与“文旅北京”关联最为紧密，共现强度接近5。这表明官方倡导的文明行为与城市文旅推广策略结合紧密，成功转化为公众讨论的焦点，形成了有效的议题联动效应。
+
+## 证据追溯
+
+### insight_sentiment_summary
+
+<details>
+<summary>insight_sentiment_summary 证据（15条）</summary>
+
+- source: sentiment_distribution_stats
+  - evidence: 共分析30条博文，平均情感极性3.23，主导情感为「中性」
+  - confidence: high
+- source: publisher_distribution_stats
+  - evidence: 共8种发布者类型，「个人用户」占比最高
+  - confidence: high
+- source: sentiment_time_series
+  - evidence: 时间范围内共25个时间点，情感趋势整体下降；核心高峰: 2024-08-24 22:00 (3条)；检测到1个发布量激增点
+  - confidence: high
+- source: geographic_distribution_stats
+  - evidence: 地理信息覆盖率100.0%，最热门地区「无位置信息」共9条
+  - confidence: high
+- source: geographic_sentiment_analysis
+  - evidence: 最正面地区「北京」(3.4)，最负面地区「无位置信息」(3.22)
+  - confidence: high
+- source: publisher_topic_distribution
+  - evidence: 已生成发布者主题分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_topic_distribution_20260221_154402.png
+  - confidence: high
+- source: sentiment_anomaly_detection
+  - evidence: 检测到2个异常时间点，发现1个发布量爆点
+  - confidence: high
+- source: generate_sentiment_pie_chart
+  - evidence: 已生成情感分布饼图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_pie_20260221_154742.png
+  - confidence: high
+- source: generate_geographic_heatmap
+  - evidence: 已生成地区舆情热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_heatmap_20260221_154754.png
+  - confidence: high
+- source: generate_geographic_bar_chart
+  - evidence: 已生成地区分布柱状图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_bar_20260221_154810.png
+  - confidence: high
+- source: geographic_hotspot_detection
+  - evidence: 识别出2个热点区域，占总量的46.67%
+  - confidence: high
+- source: geographic_topic_heatmap
+  - evidence: 已生成地区话题热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_topic_heatmap_20260221_154948.png
+  - confidence: high
+- source: geographic_temporal_heatmap_tool
+  - evidence: 已生成地区时间热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_temporal_heatmap_20260221_155019.png
+  - confidence: high
+- source: publisher_sentiment_bucket_chart
+  - evidence: 已生成发布者情绪桶分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_sentiment_bucket_20260221_155132.png
+  - confidence: high
+- source: generate_sentiment_trend_chart
+  - evidence: 已生成情感趋势图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_trend_20260221_155251.png
+  - confidence: high
+
+</details>
+
+### insight_topic_distribution
+
+<details>
+<summary>insight_topic_distribution 证据（15条）</summary>
+
+- source: topic_frequency_stats
+  - evidence: 主题覆盖率36.67%，最热门父主题「社会民生」
+  - confidence: high
+- source: publisher_distribution_stats
+  - evidence: 共8种发布者类型，「个人用户」占比最高
+  - confidence: high
+- source: geographic_distribution_stats
+  - evidence: 地理信息覆盖率100.0%，最热门地区「无位置信息」共9条
+  - confidence: high
+- source: topic_time_evolution
+  - evidence: 分析Top5主题演化，上升趋势主题: 社会民生
+  - confidence: high
+- source: geographic_sentiment_analysis
+  - evidence: 最正面地区「北京」(3.4)，最负面地区「无位置信息」(3.22)
+  - confidence: high
+- source: topic_cooccurrence_analysis
+  - evidence: 发现0对显著共现主题（阈值≥2）
+  - confidence: high
+- source: publisher_topic_distribution
+  - evidence: 已生成发布者主题分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_topic_distribution_20260221_154402.png
+  - confidence: high
+- source: generate_geographic_heatmap
+  - evidence: 已生成地区舆情热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_heatmap_20260221_154754.png
+  - confidence: high
+- source: generate_geographic_bar_chart
+  - evidence: 已生成地区分布柱状图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_bar_20260221_154810.png
+  - confidence: high
+- source: generate_topic_evolution_chart
+  - evidence: 已生成主题演化时序图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_evolution_20260221_154823.png
+  - confidence: high
+- source: generate_topic_ranking_chart
+  - evidence: 已生成主题热度排行图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_ranking_20260221_154853.png
+  - confidence: high
+- source: geographic_hotspot_detection
+  - evidence: 识别出2个热点区域，占总量的46.67%
+  - confidence: high
+- source: geographic_topic_heatmap
+  - evidence: 已生成地区话题热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_topic_heatmap_20260221_154948.png
+  - confidence: high
+- source: geographic_temporal_heatmap_tool
+  - evidence: 已生成地区时间热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_temporal_heatmap_20260221_155019.png
+  - confidence: high
+- source: publisher_sentiment_bucket_chart
+  - evidence: 已生成发布者情绪桶分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_sentiment_bucket_20260221_155132.png
+  - confidence: high
+
+</details>
+
+### insight_geographic_distribution
+
+<details>
+<summary>insight_geographic_distribution 证据（19条）</summary>
+
+- source: sentiment_distribution_stats
+  - evidence: 共分析30条博文，平均情感极性3.23，主导情感为「中性」
+  - confidence: high
+- source: topic_frequency_stats
+  - evidence: 主题覆盖率36.67%，最热门父主题「社会民生」
+  - confidence: high
+- source: sentiment_time_series
+  - evidence: 时间范围内共25个时间点，情感趋势整体下降；核心高峰: 2024-08-24 22:00 (3条)；检测到1个发布量激增点
+  - confidence: high
+- source: geographic_distribution_stats
+  - evidence: 地理信息覆盖率100.0%，最热门地区「无位置信息」共9条
+  - confidence: high
+- source: topic_time_evolution
+  - evidence: 分析Top5主题演化，上升趋势主题: 社会民生
+  - confidence: high
+- source: geographic_sentiment_analysis
+  - evidence: 最正面地区「北京」(3.4)，最负面地区「无位置信息」(3.22)
+  - confidence: high
+- source: topic_cooccurrence_analysis
+  - evidence: 发现0对显著共现主题（阈值≥2）
+  - confidence: high
+- source: publisher_topic_distribution
+  - evidence: 已生成发布者主题分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_topic_distribution_20260221_154402.png
+  - confidence: high
+- source: sentiment_anomaly_detection
+  - evidence: 检测到2个异常时间点，发现1个发布量爆点
+  - confidence: high
+- source: generate_sentiment_pie_chart
+  - evidence: 已生成情感分布饼图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_pie_20260221_154742.png
+  - confidence: high
+- source: generate_geographic_heatmap
+  - evidence: 已生成地区舆情热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_heatmap_20260221_154754.png
+  - confidence: high
+- source: generate_geographic_bar_chart
+  - evidence: 已生成地区分布柱状图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_bar_20260221_154810.png
+  - confidence: high
+- source: generate_topic_evolution_chart
+  - evidence: 已生成主题演化时序图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_evolution_20260221_154823.png
+  - confidence: high
+- source: generate_topic_ranking_chart
+  - evidence: 已生成主题热度排行图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_ranking_20260221_154853.png
+  - confidence: high
+- source: geographic_hotspot_detection
+  - evidence: 识别出2个热点区域，占总量的46.67%
+  - confidence: high
+- source: geographic_topic_heatmap
+  - evidence: 已生成地区话题热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_topic_heatmap_20260221_154948.png
+  - confidence: high
+- source: geographic_temporal_heatmap_tool
+  - evidence: 已生成地区时间热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_temporal_heatmap_20260221_155019.png
+  - confidence: high
+- source: publisher_sentiment_bucket_chart
+  - evidence: 已生成发布者情绪桶分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_sentiment_bucket_20260221_155132.png
+  - confidence: high
+- source: generate_sentiment_trend_chart
+  - evidence: 已生成情感趋势图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_trend_20260221_155251.png
+  - confidence: high
+
+</details>
+
+### insight_publisher_behavior
+
+<details>
+<summary>insight_publisher_behavior 证据（20条）</summary>
+
+- source: sentiment_distribution_stats
+  - evidence: 共分析30条博文，平均情感极性3.23，主导情感为「中性」
+  - confidence: high
+- source: topic_frequency_stats
+  - evidence: 主题覆盖率36.67%，最热门父主题「社会民生」
+  - confidence: high
+- source: publisher_distribution_stats
+  - evidence: 共8种发布者类型，「个人用户」占比最高
+  - confidence: high
+- source: sentiment_time_series
+  - evidence: 时间范围内共25个时间点，情感趋势整体下降；核心高峰: 2024-08-24 22:00 (3条)；检测到1个发布量激增点
+  - confidence: high
+- source: geographic_distribution_stats
+  - evidence: 地理信息覆盖率100.0%，最热门地区「无位置信息」共9条
+  - confidence: high
+- source: topic_time_evolution
+  - evidence: 分析Top5主题演化，上升趋势主题: 社会民生
+  - confidence: high
+- source: geographic_sentiment_analysis
+  - evidence: 最正面地区「北京」(3.4)，最负面地区「无位置信息」(3.22)
+  - confidence: high
+- source: topic_cooccurrence_analysis
+  - evidence: 发现0对显著共现主题（阈值≥2）
+  - confidence: high
+- source: publisher_topic_distribution
+  - evidence: 已生成发布者主题分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_topic_distribution_20260221_154402.png
+  - confidence: high
+- source: sentiment_anomaly_detection
+  - evidence: 检测到2个异常时间点，发现1个发布量爆点
+  - confidence: high
+- source: generate_sentiment_pie_chart
+  - evidence: 已生成情感分布饼图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_pie_20260221_154742.png
+  - confidence: high
+- source: generate_geographic_heatmap
+  - evidence: 已生成地区舆情热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_heatmap_20260221_154754.png
+  - confidence: high
+- source: generate_geographic_bar_chart
+  - evidence: 已生成地区分布柱状图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_bar_20260221_154810.png
+  - confidence: high
+- source: generate_topic_evolution_chart
+  - evidence: 已生成主题演化时序图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_evolution_20260221_154823.png
+  - confidence: high
+- source: generate_topic_ranking_chart
+  - evidence: 已生成主题热度排行图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_ranking_20260221_154853.png
+  - confidence: high
+- source: geographic_hotspot_detection
+  - evidence: 识别出2个热点区域，占总量的46.67%
+  - confidence: high
+- source: geographic_topic_heatmap
+  - evidence: 已生成地区话题热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_topic_heatmap_20260221_154948.png
+  - confidence: high
+- source: geographic_temporal_heatmap_tool
+  - evidence: 已生成地区时间热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_temporal_heatmap_20260221_155019.png
+  - confidence: high
+- source: publisher_sentiment_bucket_chart
+  - evidence: 已生成发布者情绪桶分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_sentiment_bucket_20260221_155132.png
+  - confidence: high
+- source: generate_sentiment_trend_chart
+  - evidence: 已生成情感趋势图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_trend_20260221_155251.png
+  - confidence: high
+
+</details>
+
+### insight_overall_summary
+
+<details>
+<summary>insight_overall_summary 证据（21条）</summary>
+
+- source: sentiment_distribution_stats
+  - evidence: 共分析30条博文，平均情感极性3.23，主导情感为「中性」
+  - confidence: high
+- source: topic_frequency_stats
+  - evidence: 主题覆盖率36.67%，最热门父主题「社会民生」
+  - confidence: high
+- source: publisher_distribution_stats
+  - evidence: 共8种发布者类型，「个人用户」占比最高
+  - confidence: high
+- source: sentiment_time_series
+  - evidence: 时间范围内共25个时间点，情感趋势整体下降；核心高峰: 2024-08-24 22:00 (3条)；检测到1个发布量激增点
+  - confidence: high
+- source: geographic_distribution_stats
+  - evidence: 地理信息覆盖率100.0%，最热门地区「无位置信息」共9条
+  - confidence: high
+- source: topic_time_evolution
+  - evidence: 分析Top5主题演化，上升趋势主题: 社会民生
+  - confidence: high
+- source: geographic_sentiment_analysis
+  - evidence: 最正面地区「北京」(3.4)，最负面地区「无位置信息」(3.22)
+  - confidence: high
+- source: topic_cooccurrence_analysis
+  - evidence: 发现0对显著共现主题（阈值≥2）
+  - confidence: high
+- source: publisher_topic_distribution
+  - evidence: 已生成发布者主题分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_topic_distribution_20260221_154402.png
+  - confidence: high
+- source: sentiment_anomaly_detection
+  - evidence: 检测到2个异常时间点，发现1个发布量爆点
+  - confidence: high
+- source: generate_sentiment_pie_chart
+  - evidence: 已生成情感分布饼图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_pie_20260221_154742.png
+  - confidence: high
+- source: generate_geographic_heatmap
+  - evidence: 已生成地区舆情热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_heatmap_20260221_154754.png
+  - confidence: high
+- source: generate_geographic_bar_chart
+  - evidence: 已生成地区分布柱状图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_bar_20260221_154810.png
+  - confidence: high
+- source: generate_topic_evolution_chart
+  - evidence: 已生成主题演化时序图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_evolution_20260221_154823.png
+  - confidence: high
+- source: generate_topic_ranking_chart
+  - evidence: 已生成主题热度排行图，保存至 D:\PythonProject\AnalysisPosts\./images/topic_ranking_20260221_154853.png
+  - confidence: high
+- source: geographic_hotspot_detection
+  - evidence: 识别出2个热点区域，占总量的46.67%
+  - confidence: high
+- source: geographic_topic_heatmap
+  - evidence: 已生成地区话题热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_topic_heatmap_20260221_154948.png
+  - confidence: high
+- source: geographic_temporal_heatmap_tool
+  - evidence: 已生成地区时间热力图，保存至 D:\PythonProject\AnalysisPosts\./images/geographic_temporal_heatmap_20260221_155019.png
+  - confidence: high
+- source: publisher_sentiment_bucket_chart
+  - evidence: 已生成发布者情绪桶分布图，保存至 D:\PythonProject\AnalysisPosts\./images/publisher_sentiment_bucket_20260221_155132.png
+  - confidence: high
+- source: generate_interaction_heatmap
+  - evidence: 已生成交互热力图，保存至 D:\PythonProject\AnalysisPosts\./images/interaction_heatmap_20260221_155237.png
+  - confidence: high
+- source: generate_sentiment_trend_chart
+  - evidence: 已生成情感趋势图，保存至 D:\PythonProject\AnalysisPosts\./images/sentiment_trend_20260221_155251.png
+  - confidence: high
+
+</details>
+
+---
+## 附录：分析方法论
+
+- 工具调用次数: 30
+- 论坛轮次: 2
+- 循环治理状态:
+  - search_reflection: 2/2 (max_rounds_reached)
+  - data_agent: 30/30 (max_iterations_reached)
+  - forum: 2/2 (max_rounds_reached)
+  - stage3_chapter_review: 2/2 (max_iterations_reached)
+
+### 数据局限性声明
+- 外部搜索结果可能存在时效性与样本偏差。
+- 图表分析与文本结论依赖模型输出，建议结合人工复核。

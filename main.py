@@ -49,7 +49,6 @@ def init_shared(
     chart_tool_allowlist: List[str] | None = None,
     # 阶段3配置
     report_max_iterations: int = 5,
-    report_min_score: int = 80,
     # 数据源配置
     data_source_type: str = "original",
 ) -> Dict[str, Any]:
@@ -74,7 +73,6 @@ def init_shared(
         chart_tool_policy: 图表覆盖策略
         chart_tool_allowlist: 图表工具白名单（可选）
         report_max_iterations: Stage3 章节评审最大轮次
-        report_min_score: Stage3 章节评审最低分阈值
 
     
     Returns:
@@ -136,7 +134,6 @@ def init_shared(
             # 阶段3: 统一报告评审配置
             "stage3_review": {
                 "chapter_review_max_rounds": report_max_iterations,
-                "min_score": report_min_score,
             },
 
             # 阶段2 Agent配置
@@ -282,8 +279,7 @@ def print_config(shared: Dict[str, Any], concurrent_num: int, max_retries: int, 
     stage3_review = shared["config"].get("stage3_review", {})
     print(
         "  ├─ Stage3评审: "
-        f"max_rounds={stage3_review.get('chapter_review_max_rounds', 2)}, "
-        f"min_score={stage3_review.get('min_score', 80)}"
+        f"max_rounds={stage3_review.get('chapter_review_max_rounds', 2)}"
     )
     print(f"  ├─ 输入路径: {shared['data']['data_paths']['blog_data_path']}")
     print(f"  ├─ 输出路径: {shared['config']['data_source']['enhanced_data_path']}")
@@ -379,6 +375,7 @@ async def run(
         print(f"[T] 运行时间: {elapsed_time:.2f} 秒")
         import traceback
         traceback.print_exc()
+        raise
 
 
 def main():

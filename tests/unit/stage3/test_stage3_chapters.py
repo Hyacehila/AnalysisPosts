@@ -122,3 +122,34 @@ def test_chapter_generation_respects_stage3_reasoning_switch(mock_llm):
     run_async(node.exec_async(chapter_input))
 
     assert mock_llm.call_args.kwargs["enable_reasoning"] is False
+
+
+@patch("nodes.stage3.chapters.call_glm46", return_value="章节内容")
+def test_chapter_prompt_includes_chart_analysis_insights_and_placeholder_guard(mock_llm):
+    node = GenerateChaptersBatchNode(max_concurrent=2)
+    chapter_input = {
+        "id": "ch03",
+        "title": "关键趋势",
+        "target_words": 400,
+        "key_data": ["sentiment_summary"],
+        "_relevant_charts": [
+            {
+                "id": "c9",
+                "title": "情感分布饼图",
+                "analysis_content": "中性占比70.0%，乐观占比26.7%。",
+            }
+        ],
+        "_insights": {
+            "overall_summary": "8月16日至8月31日讨论集中于共享单车夜骑治理。",
+        },
+        "_search_context": {
+            "event_timeline": ["2024-08-21 声量峰值"],
+        },
+    }
+
+    run_async(node.exec_async(chapter_input))
+
+    prompt = mock_llm.call_args.args[0]
+    assert "中性占比70.0%，乐观占比26.7%" in prompt
+    assert "8月16日至8月31日讨论集中于共享单车夜骑治理" in prompt
+    assert "占位符" in prompt

@@ -4,6 +4,7 @@ Stage2 query-search flow (B1).
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Dict, List
 
 from pocketflow import AsyncFlow
@@ -73,6 +74,17 @@ def _default_summary(raw_docs: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+def _extract_event_keywords(data_summary: str, *, limit: int = 6) -> List[str]:
+    stopwords = {"分析", "数据", "事件", "舆情", "讨论", "结果", "相关", "官方"}
+    counts: Dict[str, int] = {}
+    for token in re.findall(r"[\u4e00-\u9fff]{2,10}", str(data_summary or "")):
+        if token in stopwords:
+            continue
+        counts[token] = counts.get(token, 0) + 1
+    sorted_tokens = sorted(counts.items(), key=lambda item: (-item[1], -len(item[0]), item[0]))
+    return [token for token, _ in sorted_tokens[:limit]]
+
+
 class ExtractQueriesNode(MonitoredNode):
     """Extract search queries from data summary and previous gaps."""
 
@@ -91,6 +103,7 @@ class ExtractQueriesNode(MonitoredNode):
             "round": int(search.get("round", 0)) + 1,
             "last_missing": last_missing,
             "last_hints": last_hints,
+            "event_keywords": _extract_event_keywords(shared.get("agent", {}).get("data_summary", "")),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
 
@@ -99,6 +112,9 @@ class ExtractQueriesNode(MonitoredNode):
 
 ## 数据概况
 {prep_res.get("data_summary", "")}
+
+## 事件关键词
+{prep_res.get("event_keywords", [])}
 
 ## 上一轮缺口
 {prep_res.get("last_missing", [])}
@@ -125,12 +141,19 @@ class ExtractQueriesNode(MonitoredNode):
             queries = []
 
         if not queries:
-            base = str(prep_res.get("data_summary", "")).strip()[:24]
-            fallback = [
-                f"{base} 官方回应".strip(),
-                f"{base} 事件进展".strip(),
-                f"{base} 舆情评论".strip(),
-            ]
+            keyword_base = prep_res.get("event_keywords", [])
+            if keyword_base:
+                fallback = [
+                    f"{keyword_base[0]} 官方回应",
+                    f"{keyword_base[0]} 最新进展",
+                    f"{keyword_base[0]} 争议焦点",
+                ]
+            else:
+                fallback = [
+                    "事件 官方回应",
+                    "事件 最新进展",
+                    "事件 舆情评论",
+                ]
             queries = _normalize_queries(fallback, limit=5)
         return {"queries": queries}
 
@@ -257,10 +280,22 @@ class SearchReflectionNode(MonitoredNode):
         docs = prep_res.get("documents", [])
         round_num = int(prep_res.get("round", 1))
         max_rounds = max(1, int(prep_res.get("max_rounds", self.MAX_ROUNDS)))
+        doc_preview = []
+        for doc in docs[:3]:
+            if not isinstance(doc, dict):
+                continue
+            doc_preview.append(
+                {
+                    "title": doc.get("title", ""),
+                    "snippet": doc.get("snippet", ""),
+                    "source": doc.get("source", ""),
+                }
+            )
         prompt = f"""请评估搜索结果覆盖度。
 
 - 查询词: {prep_res.get("queries", [])}
 - 文档数量: {len(docs)}
+- 文档样本: {json.dumps(doc_preview, ensure_ascii=False)}
 
 输出 JSON：
 {{

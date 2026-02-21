@@ -33,7 +33,6 @@ stage2:
   search_api_key: "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"
 stage3:
   max_iterations: 5
-  min_score: 80
   chapter_review_max_rounds: 2
 runtime:
   concurrent_num: 60

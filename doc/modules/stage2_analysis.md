@@ -1,8 +1,8 @@
 # 阶段 2：深度分析子系统
 
-> **文档状态**: 2026-02-20 更新  
+> **文档状态**: 2026-02-21 更新  
 > **关联源码**: `nodes/stage2/*`, `flow.py`, `config.py`, `utils/web_search.py`  
-> **上级文档**: [系统设计总览](design.md)
+> **上级文档**: [系统设计总览](../architecture.md)
 
 ---
 
@@ -51,10 +51,10 @@ flowchart LR
 
 文件：`nodes/stage2/search.py`
 
-- `ExtractQueriesNode`：基于 `data_summary` 与上一轮缺口提取查询词
+- `ExtractQueriesNode`：基于 `data_summary`、事件关键词与上一轮缺口提取查询词（无结果时使用事件关键词兜底）
 - `WebSearchNode`：通过 `utils.web_search.batch_search` 调用 Tavily
 - `SearchProcessNode`：去重/规整外部文档
-- `SearchReflectionNode`：判断 `need_more/sufficient`
+- `SearchReflectionNode`：判断 `need_more/sufficient`（评估提示词包含文档样本 snippet）
 - `SearchSummaryNode`：生成 `shared["search_results"]`
 
 循环治理：
@@ -86,6 +86,7 @@ flowchart LR
 - `SupplementSearchNode`：追加搜索并刷新 SearchAgent 结论
 - `VisualAnalysisNode`：按需调用 GLM4.5V 解析图表
 - `MergeResultsNode`：合并 Data/Search/Forum 产物，回填兼容 `stage2_results`
+- `ForumHostNode` 提示词显式注入“事件关键词”上下文，避免无焦点补充检索。
 
 循环治理：
 
@@ -110,6 +111,15 @@ flowchart LR
 
 - 洞察节点读取图表分析内容时，优先使用 `analysis_content`
 - 同时兼容历史字段 `analysis`，避免旧数据结构导致洞察提示词丢失
+- 洞察证据匹配从“英文工具名分词”升级为“中文语义关键词映射”，降低 `supporting_evidence` 为空的概率。
+
+### 3.6 报告目录清理策略（稳定性修复）
+
+文件：`nodes/stage2/cleanup.py`
+
+- `ClearReportDirNode` 不再整目录 `rmtree(report/)`。
+- 清理策略改为“选择性删除”：保留 `report/status.json`、`report/acceptance/`、`report/images/`，仅删除 Stage2 可再生产物。
+- 该策略避免验收日志与运行状态在 Stage2 重跑时被误删。 
 
 ---
 

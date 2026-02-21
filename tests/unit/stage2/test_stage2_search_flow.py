@@ -5,6 +5,7 @@ import asyncio
 
 from nodes.stage2.search import create_query_search_flow
 import nodes.stage2.search as search_module
+from nodes.stage2.search import SearchReflectionNode
 
 
 def _build_shared():
@@ -192,3 +193,32 @@ def test_query_search_flow_summary_timeout_falls_back(monkeypatch):
 
     # every search-stage LLM call should honor the configured timeout.
     assert all(call.get("timeout") == 120 for call in calls)
+
+
+def test_search_reflection_prompt_includes_document_snippets(monkeypatch):
+    captured = {}
+
+    def fake_llm(prompt, *args, **kwargs):
+        captured["prompt"] = prompt
+        return '{"is_sufficient": true, "missing": []}'
+
+    monkeypatch.setattr(search_module, "call_glm46", fake_llm)
+
+    node = SearchReflectionNode()
+    prep_res = {
+        "round": 1,
+        "documents": [
+            {
+                "title": "官方回应",
+                "snippet": "启动应急响应并公布救援进展",
+                "url": "https://example.com/notice",
+            }
+        ],
+        "queries": ["北京暴雨 官方回应"],
+        "max_rounds": 2,
+        "request_timeout_seconds": 120,
+    }
+
+    node.exec(prep_res)
+
+    assert "启动应急响应并公布救援进展" in captured["prompt"]

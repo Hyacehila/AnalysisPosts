@@ -10,12 +10,11 @@ from nodes import ReviewChaptersNode
 pytestmark = pytest.mark.integration
 
 
-def _shared(max_rounds=2, min_score=80):
+def _shared(max_rounds=2):
     return {
         "config": {
             "stage3_review": {
                 "chapter_review_max_rounds": max_rounds,
-                "min_score": min_score,
             }
         },
         "stage3_results": {
@@ -37,7 +36,7 @@ def test_review_loop_two_rounds_then_converges(mock_llm):
         '{"score": 88, "needs_revision": false, "feedback": "ok"}',
         '{"score": 90, "needs_revision": false, "feedback": "ok"}',
     ]
-    shared = _shared(max_rounds=2, min_score=80)
+    shared = _shared(max_rounds=2)
 
     node = ReviewChaptersNode()
 

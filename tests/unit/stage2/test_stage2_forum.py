@@ -197,3 +197,32 @@ def test_forum_host_respects_stage2_reasoning_switch(monkeypatch):
     node.exec(prep_res)
 
     assert captured["kwargs"]["enable_reasoning"] is False
+
+
+def test_forum_prompt_contains_explicit_event_keyword_context(monkeypatch):
+    shared = _build_shared()
+    shared["agent"]["data_summary"] = (
+        "首都骑游文明公约发布后，张艺兴夜骑话题在共享单车讨论中升温。"
+    )
+    captured = {}
+
+    def _fake_call(*args, **kwargs):
+        captured["prompt"] = args[0]
+        return json.dumps(
+            {
+                "cross_analysis": {"agreement": []},
+                "gaps": [],
+                "decision": "sufficient",
+                "directive": {},
+                "synthesized_conclusions": [],
+            },
+            ensure_ascii=False,
+        )
+
+    monkeypatch.setattr(forum_module, "call_glm46", _fake_call)
+
+    node = ForumHostNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    assert "事件关键词" in captured["prompt"]

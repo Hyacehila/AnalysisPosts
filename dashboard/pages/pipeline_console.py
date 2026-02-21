@@ -349,13 +349,6 @@ with st.form("config_form"):
             step=1,
             value=int(config["stage3"]["max_iterations"]),
         )
-        report_min_score = st.number_input(
-            "Stage3 report min score",
-            min_value=0,
-            max_value=100,
-            step=1,
-            value=int(config["stage3"]["min_score"]),
-        )
         chapter_review_max_rounds = st.number_input(
             "Stage3 chapter review max rounds",
             min_value=1,
@@ -405,7 +398,6 @@ flat_config = {
     "stage2.chart_min_per_category.interaction": int(chart_min_interaction),
     "stage2.chart_min_per_category.nlp": int(chart_min_nlp),
     "stage3.max_iterations": int(report_max_iterations),
-    "stage3.min_score": int(report_min_score),
     "stage3.chapter_review_max_rounds": int(chapter_review_max_rounds),
     "runtime.concurrent_num": int(concurrent_num),
     "runtime.max_retries": int(max_retries),

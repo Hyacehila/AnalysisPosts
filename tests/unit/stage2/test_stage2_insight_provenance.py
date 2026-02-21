@@ -90,3 +90,26 @@ def test_post_sets_low_confidence_when_no_evidence():
     insight = next(iter(provenance.values()))
     assert insight["confidence"] == "low"
     assert insight["supporting_evidence"] == []
+
+
+def test_match_evidence_supports_chinese_semantic_keywords():
+    trace_executions = [
+        {
+            "id": "e_0001",
+            "tool_name": "sentiment_trend_chart",
+            "summary": "sentiment trend generated",
+            "status": "success",
+        },
+        {
+            "id": "e_0002",
+            "tool_name": "topic_frequency_stats",
+            "summary": "topic stats generated",
+            "status": "success",
+        },
+    ]
+
+    matched = LLMInsightNode._match_evidence("情感分布以中性为主，悲观占比很低。", trace_executions)
+    matched_tools = {item["tool_name"] for item in matched}
+
+    assert "sentiment_trend_chart" in matched_tools
+    assert "topic_frequency_stats" not in matched_tools

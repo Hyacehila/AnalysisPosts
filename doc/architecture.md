@@ -1,7 +1,7 @@
 # Design Doc: AnalysisPosts v1.0 (Phase 1–3)
 
 > Please DON'T remove notes for AI
-> Last Updated: 2026-02-20
+> Last Updated: 2026-02-21
 
 ## Requirements
 
@@ -29,6 +29,8 @@
 1. **Stage 1 (Enhancement)**: Load raw posts → enrich with LLM + local NLP → save enhanced data.
 2. **Stage 2 (Analysis)**: Load enhanced data → QuerySearchFlow 外部检索 → DataAgent/SearchAgent 双信源并行 → ForumHost 动态循环（SupplementData / SupplementSearch / VisualAnalysis）→ MergeResults 收敛 → chart gap-fill analysis + insight → save results + trace.
 3. **Stage 3 (Report)**: Load analysis results → PlanOutline → GenerateChaptersBatch → ReviewChapters(loop) → InjectTrace + MethodologyAppendix → Format → RenderHTML → save Markdown/HTML/trace.
+   - Quality gate: Stage3 prompts must use real insights/chart analyses/search context and explicitly prohibit placeholder text (`[议题A]` etc.).
+   - Review gate: chapter revision is controlled by model review + hard checks (placeholder hit => forced revision); no `min_score` threshold.
 4. **Pipeline Entry**: `pipeline.start_stage` 仅支持 `1/2/3`，从指定阶段进入后按线性主链顺序执行到结束。
    - E2E 可观测性：循环状态统一写入 `trace.loop_status`，关键字段包括 `forum` 与 `stage3_chapter_review`。
 5. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
@@ -47,6 +49,7 @@
 - **MCP Auto-Enable + Parsing**: MCP 客户端在 tool_source=mcp 时自动启用；解析优先级为 `content.data` > `content.text`，避免图表结构丢失。
 - **Chart Missing Policy**: `stage2.chart_missing_policy` 控制图表覆盖不足时行为（`warn` 继续 / `fail` 终止）。
 - **Loop Governance**: `stage2.search_reflection_max_rounds`、`stage2.forum_max_rounds`、`stage2.forum_min_rounds_for_sufficient` + `stage2.agent_max_iterations` 统一收敛 Stage2 自主循环。
+- **Report Dir Cleanup Safety**: `ClearReportDirNode` 使用选择性清理，保留 `report/status.json` 与 `report/acceptance/`，避免重跑时丢失状态与验收日志。
 
 ### Stage 3 Report Image Fallback
 

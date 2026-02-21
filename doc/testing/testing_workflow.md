@@ -1,8 +1,8 @@
 # 测试工作流指南
 
-> **Last Updated**: 2026-02-20  
+> **Last Updated**: 2026-02-21  
 > **关联源码**: `tests/` 目录  
-> **上级文档**: [系统设计总览](design.md)
+> **上级文档**: [系统设计总览](../architecture.md)
 
 本文档定义当前项目的 TDD 测试分层、执行方式与重构规则。所有代码重构应遵循本指南与 `AGENTS.md`。
 
@@ -56,6 +56,8 @@ powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1
 powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1 -BaseTempRoot "$env:TEMP\\analysisposts_pytest"
 ```
 
+> 验收门禁说明：`whitelist_security_key_check` 为白名单信息检查步骤，允许失败但不会阻塞最终验收结论。
+
 ## 3. E2E 与外部依赖策略
 
 - `tests/e2e/` 仅保留真实用户链路的最小 live smoke 集。
@@ -86,6 +88,7 @@ powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1 -BaseTe
 | 关注模块 | 当前测试文件 |
 |---|---|
 | 配置加载/校验 + A3 搜索配置映射 | `tests/unit/core/test_config.py` |
+| Stage3 配置兼容（移除 `min_score` + 兼容旧键） | `tests/unit/core/test_config.py`, `dashboard/tests/test_pipeline_api.py` |
 | 仓库配置安全（禁止真实 key 入仓） | `tests/unit/core/test_no_real_secrets.py`, `tests/unit/core/test_e2e_config_runtime_keys.py` |
 | A3 搜索封装（Tavily） | `tests/unit/core/test_web_search.py` |
 | 线性主链入口与阶段状态（StageD） | `tests/unit/core/test_flow_entrypoint.py`, `tests/unit/core/test_pipeline_state.py` |

@@ -2,6 +2,7 @@
 Unified Stage3 chapter review node.
 """
 import json
+import re
 from typing import Any, Dict, List
 
 from nodes.base import MonitoredNode
@@ -31,6 +32,69 @@ def _assemble_chapters(title: str, chapters: List[Dict[str, Any]]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
+def _build_reference_context(shared: Dict[str, Any]) -> str:
+    stage3_data = shared.get("stage3_data", {}) or {}
+    insights = stage3_data.get("insights", {}) or {}
+    analysis_data = stage3_data.get("analysis_data", {}) or {}
+    search_context = analysis_data.get("search_context", {}) or {}
+    chart_analyses = stage3_data.get("chart_analyses", {}) or {}
+
+    insight_lines = []
+    if isinstance(insights, dict):
+        for key, value in list(insights.items())[:6]:
+            text = str(value or "").strip()
+            if text:
+                insight_lines.append(f"- {key}: {text[:260]}")
+
+    chart_lines = []
+    if isinstance(chart_analyses, dict):
+        for _, item in list(chart_analyses.items())[:4]:
+            if not isinstance(item, dict):
+                continue
+            title = str(item.get("chart_title") or item.get("chart_id") or "chart").strip()
+            analysis = str(item.get("analysis_content") or item.get("analysis") or "").strip()
+            if analysis:
+                chart_lines.append(f"- {title}: {analysis[:220]}")
+
+    search_lines = []
+    if isinstance(search_context, dict):
+        for key in ("event_timeline", "key_actors", "official_responses"):
+            value = search_context.get(key)
+            if value:
+                search_lines.append(f"- {key}: {str(value)[:220]}")
+
+    sections: List[str] = []
+    if insight_lines:
+        sections.append("洞察摘要:\n" + "\n".join(insight_lines))
+    if chart_lines:
+        sections.append("图表分析摘要:\n" + "\n".join(chart_lines))
+    if search_lines:
+        sections.append("外部搜索摘要:\n" + "\n".join(search_lines))
+    return "\n\n".join(sections).strip()
+
+
+_PLACEHOLDER_KEYWORDS = (
+    "议题",
+    "争议",
+    "媒体",
+    "地区",
+    "关键事件",
+    "人物a",
+    "事件a",
+)
+
+
+def _find_placeholder(text: str) -> str:
+    if not text:
+        return ""
+    for match in re.finditer(r"\[([^\]\n]{1,24})\](?!\()", text):
+        token = str(match.group(1) or "").strip()
+        token_lower = token.lower()
+        if any(keyword in token_lower for keyword in _PLACEHOLDER_KEYWORDS):
+            return token
+    return ""
+
+
 class ReviewChaptersNode(MonitoredNode):
     """Review generated chapters and control revision loop."""
 
@@ -41,15 +105,15 @@ class ReviewChaptersNode(MonitoredNode):
             "chapters": list(stage3_results.get("chapters", []) or []),
             "review_round": int(stage3_results.get("review_round", 0) or 0),
             "chapter_review_max_rounds": int(review_cfg.get("chapter_review_max_rounds", 2) or 2),
-            "min_score": int(review_cfg.get("min_score", 80) or 80),
             "outline_title": stage3_results.get("outline", {}).get("title", "舆情分析统一报告"),
+            "reference_context": _build_reference_context(shared),
             "reasoning_enabled_stage3": reasoning_enabled_stage3(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res: Dict[str, Any]) -> Dict[str, Any]:
-        min_score = prep_res["min_score"]
         use_reasoning = bool(prep_res.get("reasoning_enabled_stage3", False))
+        reference_context = str(prep_res.get("reference_context", "") or "")
         reviews: List[Dict[str, Any]] = []
 
         for chapter in prep_res.get("chapters", []):
@@ -57,10 +121,15 @@ class ReviewChaptersNode(MonitoredNode):
             chapter_title = chapter.get("title")
             chapter_text = str(chapter.get("content", ""))
             prompt = (
-                "请评审以下报告章节，返回 JSON。\n"
+                "请评审以下舆情报告章节，返回 JSON。\n"
                 "字段: score(0-100), needs_revision(bool), feedback(str)。\n"
                 f"章节标题: {chapter_title}\n"
+                f"参考数据:\n{reference_context[:1800] if reference_context else '无'}\n"
                 f"章节内容:\n{chapter_text[:2500]}\n"
+                "评审要求:\n"
+                "1. 发现[议题X]/[争议点]/[媒体A]等占位符必须判定 needs_revision=true。\n"
+                "2. 数据、人物、事件名称需与参考数据一致。\n"
+                "3. 反馈需指出具体缺失点（证据、数字、逻辑）。\n"
                 "仅输出 JSON。"
             )
             try:
@@ -79,7 +148,14 @@ class ReviewChaptersNode(MonitoredNode):
                 feedback = "评审输出解析失败，建议补充数据支撑并精简结论。"
                 model_flag = True
 
-            needs_revision = model_flag or (score < min_score)
+            needs_revision = bool(model_flag)
+            placeholder = _find_placeholder(chapter_text)
+            if placeholder:
+                needs_revision = True
+                score = min(score, 35)
+                addition = f"检测到占位符[{placeholder}]，必须替换为真实事件信息。"
+                feedback = f"{feedback} {addition}".strip() if feedback else addition
+
             reviews.append(
                 {
                     "id": chapter_id,

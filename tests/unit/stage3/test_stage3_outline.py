@@ -66,3 +66,22 @@ def test_outline_respects_stage3_reasoning_switch(mock_llm):
     node.exec(prep_res)
 
     assert mock_llm.call_args.kwargs["enable_reasoning"] is False
+
+
+@patch("nodes.stage3.outline.call_glm46")
+def test_outline_prompt_contains_real_insight_context_and_placeholder_guard(mock_llm):
+    mock_llm.return_value = (
+        '{"title":"测试报告","chapters":[{"id":"ch01","title":"执行摘要","target_words":300}]}'
+    )
+    shared = _shared_for_outline()
+    shared["stage3_data"]["insights"] = {
+        "overall_summary": "首都骑游文明公约与张艺兴夜骑在8月21日出现峰值。"
+    }
+
+    node = PlanOutlineNode()
+    prep_res = node.prep(shared)
+    node.exec(prep_res)
+
+    prompt = mock_llm.call_args.args[0]
+    assert "首都骑游文明公约与张艺兴夜骑在8月21日出现峰值" in prompt
+    assert "占位符" in prompt

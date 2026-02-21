@@ -68,3 +68,11 @@ def test_acceptance_runner_reports_aborted_and_failed_labels() -> None:
     )
     assert "ABORTED" in script
     assert "FAILED" in script
+
+
+def test_acceptance_runner_treats_whitelist_check_as_non_blocking() -> None:
+    script = (Path(__file__).resolve().parents[3] / "scripts" / "run_full_acceptance.ps1").read_text(
+        encoding="utf-8"
+    )
+    assert "whitelist_security_key_check" in script
+    assert "-ExpectFailure $true" not in script

@@ -6,12 +6,11 @@ from unittest.mock import patch
 from nodes import ReviewChaptersNode
 
 
-def _shared_for_review(round_no=0, max_rounds=2, min_score=80):
+def _shared_for_review(round_no=0, max_rounds=2):
     return {
         "config": {
             "stage3_review": {
                 "chapter_review_max_rounds": max_rounds,
-                "min_score": min_score,
             }
         },
         "stage3_results": {
@@ -26,12 +25,12 @@ def _shared_for_review(round_no=0, max_rounds=2, min_score=80):
 
 
 @patch("nodes.stage3.review.call_glm46")
-def test_review_needs_revision_when_score_below_threshold(mock_llm):
+def test_review_needs_revision_when_model_flags_revision(mock_llm):
     mock_llm.side_effect = [
         '{"score": 75, "needs_revision": true, "feedback": "补充证据"}',
         '{"score": 86, "needs_revision": false, "feedback": "ok"}',
     ]
-    shared = _shared_for_review(round_no=0, max_rounds=2, min_score=80)
+    shared = _shared_for_review(round_no=0, max_rounds=2)
 
     node = ReviewChaptersNode()
     prep_res = node.prep(shared)
@@ -51,7 +50,7 @@ def test_review_satisfied_when_all_scores_pass(mock_llm):
         '{"score": 88, "needs_revision": false, "feedback": "ok"}',
         '{"score": 90, "needs_revision": false, "feedback": "ok"}',
     ]
-    shared = _shared_for_review(round_no=0, max_rounds=2, min_score=80)
+    shared = _shared_for_review(round_no=0, max_rounds=2)
 
     node = ReviewChaptersNode()
     prep_res = node.prep(shared)
@@ -69,7 +68,7 @@ def test_review_forces_satisfied_at_max_rounds(mock_llm):
         '{"score": 60, "needs_revision": true, "feedback": "继续"}',
         '{"score": 65, "needs_revision": true, "feedback": "继续"}',
     ]
-    shared = _shared_for_review(round_no=2, max_rounds=2, min_score=80)
+    shared = _shared_for_review(round_no=2, max_rounds=2)
 
     node = ReviewChaptersNode()
     prep_res = node.prep(shared)
@@ -87,7 +86,7 @@ def test_review_respects_stage3_reasoning_switch(mock_llm):
         '{"score": 88, "needs_revision": false, "feedback": "ok"}',
         '{"score": 90, "needs_revision": false, "feedback": "ok"}',
     ]
-    shared = _shared_for_review(round_no=0, max_rounds=2, min_score=80)
+    shared = _shared_for_review(round_no=0, max_rounds=2)
     shared["config"]["llm"] = {"reasoning_enabled_stage3": False}
 
     node = ReviewChaptersNode()
@@ -95,3 +94,22 @@ def test_review_respects_stage3_reasoning_switch(mock_llm):
     node.exec(prep_res)
 
     assert mock_llm.call_args.kwargs["enable_reasoning"] is False
+
+
+@patch("nodes.stage3.review.call_glm46")
+def test_review_flags_placeholder_as_hard_failure(mock_llm):
+    mock_llm.side_effect = [
+        '{"score": 95, "needs_revision": false, "feedback": "ok"}',
+        '{"score": 90, "needs_revision": false, "feedback": "ok"}',
+    ]
+    shared = _shared_for_review(round_no=0, max_rounds=2)
+    shared["stage3_results"]["chapters"][0]["content"] = "核心观点：[议题A] 继续发酵。"
+
+    node = ReviewChaptersNode()
+    prep_res = node.prep(shared)
+    exec_res = node.exec(prep_res)
+
+    assert exec_res["needs_revision"] is True
+    first_review = exec_res["reviews"][0]
+    assert first_review["needs_revision"] is True
+    assert "占位符" in first_review["feedback"]

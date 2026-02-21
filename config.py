@@ -78,7 +78,6 @@ class Stage2Config:
 @dataclass
 class Stage3Config:
     max_iterations: int = 5
-    min_score: int = 80
     chapter_review_max_rounds: int = 2
 
 
@@ -131,7 +130,9 @@ def load_config(path: str) -> AppConfig:
     )
 
     stage2 = Stage2Config(**(raw.get("stage2", {}) or {}))
-    stage3 = Stage3Config(**(raw.get("stage3", {}) or {}))
+    stage3_raw = dict(raw.get("stage3", {}) or {})
+    stage3_raw.pop("min_score", None)  # backward compatibility for legacy configs
+    stage3 = Stage3Config(**stage3_raw)
     runtime = RuntimeConfig(**(raw.get("runtime", {}) or {}))
     llm = LLMConfig(**(raw.get("llm", {}) or {}))
     env_profile = os.environ.get("ACCEPTANCE_PROFILE", "").strip().lower()
@@ -267,8 +268,6 @@ def validate_config(config: AppConfig) -> None:
         raise ValueError("stage3.max_iterations must be >= 1")
     if int(config.stage3.chapter_review_max_rounds) <= 0:
         raise ValueError("stage3.chapter_review_max_rounds must be >= 1")
-    if int(config.stage3.min_score) < 0 or int(config.stage3.min_score) > 100:
-        raise ValueError("stage3.min_score must be in [0, 100]")
 
     if not isinstance(config.stage2.chart_min_per_category, dict):
         raise ValueError("stage2.chart_min_per_category must be a dict")
@@ -348,7 +347,6 @@ def config_to_shared(config: AppConfig) -> dict:
             },
             "stage3_review": {
                 "chapter_review_max_rounds": int(config.stage3.chapter_review_max_rounds),
-                "min_score": int(config.stage3.min_score),
             },
             "llm": llm_controls,
             "data_source": {

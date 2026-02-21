@@ -6,6 +6,22 @@ from typing import Any, Dict, List
 from nodes.base import MonitoredNode
 
 
+def _normalize_provenance_items(entry: Any) -> List[Dict[str, Any]]:
+    if isinstance(entry, list):
+        return [item for item in entry if isinstance(item, dict)]
+    if isinstance(entry, dict):
+        evidence = entry.get("supporting_evidence", [])
+        if isinstance(evidence, list):
+            return [item for item in evidence if isinstance(item, dict)]
+    return []
+
+
+def _entry_confidence(entry: Any) -> Any:
+    if isinstance(entry, dict):
+        return entry.get("confidence", "")
+    return ""
+
+
 class InjectTraceNode(MonitoredNode):
     """Inject provenance details blocks into report markdown."""
 
@@ -29,8 +45,8 @@ class InjectTraceNode(MonitoredNode):
             return report_text
 
         lines: List[str] = [report_text.rstrip(), "", "## 证据追溯", ""]
-        for insight_key, evidence_list in provenance.items():
-            safe_items = evidence_list if isinstance(evidence_list, list) else []
+        for insight_key, evidence_entry in provenance.items():
+            safe_items = _normalize_provenance_items(evidence_entry)
             lines.append(f"### {insight_key}")
             lines.append("")
             lines.append("<details>")
@@ -39,9 +55,21 @@ class InjectTraceNode(MonitoredNode):
             if not safe_items:
                 lines.append("- 无可用证据")
             for item in safe_items:
-                source = item.get("source", "unknown") if isinstance(item, dict) else "unknown"
-                evidence = item.get("evidence", "") if isinstance(item, dict) else str(item)
-                confidence = item.get("confidence", "") if isinstance(item, dict) else ""
+                source = (
+                    item.get("source")
+                    or item.get("tool")
+                    or item.get("type")
+                    or "unknown"
+                )
+                evidence = (
+                    item.get("evidence")
+                    or item.get("summary")
+                    or item.get("ref")
+                    or ""
+                )
+                confidence = item.get("confidence", "")
+                if confidence == "":
+                    confidence = _entry_confidence(evidence_entry)
                 lines.append(f"- source: {source}")
                 if evidence:
                     lines.append(f"  - evidence: {evidence}")

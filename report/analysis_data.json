@@ -1,52 +1,76 @@
 {
   "charts": [
     {
-      "id": "geographic_heatmap_20260213_104705",
-      "type": "heatmap",
-      "title": "地区舆情热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_heatmap_20260213_104705.png",
-      "source_tool": "geographic_heatmap",
-      "description": "展示各地区在不同舆情指标上的表现差异"
-    },
-    {
-      "id": "publisher_topic_distribution_20260213_104730",
+      "id": "publisher_topic_distribution_20260221_154402",
       "type": "bar_chart",
       "title": "发布者话题偏好分布",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_topic_distribution_20260213_104730.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_topic_distribution_20260221_154402.png",
       "source_tool": "publisher_topic_distribution_chart",
       "description": "堆叠展示不同发布者的主题偏好差异"
     },
     {
-      "id": "publisher_sentiment_bucket_20260213_104754",
-      "type": "bar_chart",
-      "title": "发布者情绪桶分布",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_sentiment_bucket_20260213_104754.png",
-      "source_tool": "publisher_sentiment_bucket_chart",
-      "description": "按发布者对比正/中/负面占比，突出情绪差异"
-    },
-    {
-      "id": "participant_trend_20260213_104815",
-      "type": "line_chart",
-      "title": "参与人数演化趋势",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\participant_trend_20260213_104815.png",
-      "source_tool": "participant_trend_chart",
-      "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
-    },
-    {
-      "id": "sentiment_pie_20260213_104858",
+      "id": "sentiment_pie_20260221_154742",
       "type": "pie_chart",
       "title": "情感分布饼图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_pie_20260213_104858.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_pie_20260221_154742.png",
       "source_tool": "sentiment_pie_chart",
       "description": "展示博文情感极性的整体分布情况"
     },
     {
-      "id": "topic_keyword_trend_20260213_104922",
+      "id": "geographic_heatmap_20260221_154754",
+      "type": "heatmap",
+      "title": "地区舆情热力图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_heatmap_20260221_154754.png",
+      "source_tool": "geographic_heatmap",
+      "description": "展示各地区在不同舆情指标上的表现差异"
+    },
+    {
+      "id": "geographic_bar_20260221_154810",
+      "type": "bar_chart",
+      "title": "Top15 地区分布图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_bar_20260221_154810.png",
+      "source_tool": "geographic_bar_chart",
+      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
+    },
+    {
+      "id": "topic_evolution_20260221_154823",
       "type": "line_chart",
-      "title": "焦点关键词热度趋势",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_keyword_trend_20260213_104922.png",
-      "source_tool": "topic_keyword_trend_chart",
-      "description": "按时间粒度展示焦点关键词热度，支持地理与主题差异解读"
+      "title": "主题热度时序演化",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_evolution_20260221_154823.png",
+      "source_tool": "topic_evolution_chart",
+      "description": "展示Top5主题随时间的热度变化趋势"
+    },
+    {
+      "id": "topic_ranking_20260221_154853",
+      "type": "bar_chart",
+      "title": "Top10 主题热度排行",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_ranking_20260221_154853.png",
+      "source_tool": "topic_ranking_chart",
+      "description": "展示热度最高的10个主题及其博文数量"
+    },
+    {
+      "id": "geographic_topic_heatmap_20260221_154948",
+      "type": "heatmap",
+      "title": "地区话题差异热力图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_topic_heatmap_20260221_154948.png",
+      "source_tool": "geographic_topic_heatmap",
+      "description": "地区 × 主题的热度差异，支持地理可视化叙事"
+    },
+    {
+      "id": "geographic_temporal_heatmap_20260221_155019",
+      "type": "heatmap",
+      "title": "地区时间差异热力图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_temporal_heatmap_20260221_155019.png",
+      "source_tool": "geographic_temporal_heatmap",
+      "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
+    },
+    {
+      "id": "publisher_sentiment_bucket_20260221_155132",
+      "type": "bar_chart",
+      "title": "发布者情绪桶分布",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\publisher_sentiment_bucket_20260221_155132.png",
+      "source_tool": "publisher_sentiment_bucket_chart",
+      "description": "按发布者对比正/中/负面占比，突出情绪差异"
     },
     {
       "id": "entity_cooccurrence_network",
@@ -58,62 +82,12 @@
       "source_tool": "entity_cooccurrence_network"
     },
     {
-      "id": "geographic_bar_20260213_105001",
-      "type": "bar_chart",
-      "title": "Top15 地区分布图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_bar_20260213_105001.png",
-      "source_tool": "geographic_bar_chart",
-      "description": "展示博文数量最多的地区分布，颜色表示情感倾向"
-    },
-    {
-      "id": "geographic_topic_heatmap_20260213_105024",
-      "type": "heatmap",
-      "title": "地区话题差异热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_topic_heatmap_20260213_105024.png",
-      "source_tool": "geographic_topic_heatmap",
-      "description": "地区 × 主题的热度差异，支持地理可视化叙事"
-    },
-    {
-      "id": "topic_evolution_20260213_105103",
+      "id": "participant_trend_20260221_155212",
       "type": "line_chart",
-      "title": "主题热度时序演化",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_evolution_20260213_105103.png",
-      "source_tool": "topic_evolution_chart",
-      "description": "展示Top5主题随时间的热度变化趋势"
-    },
-    {
-      "id": "keyword_wordcloud",
-      "title": "关键词频次分布",
-      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
-      "type": "bar",
-      "description": "Top keywords frequency bar chart",
-      "source_tool": "keyword_wordcloud"
-    },
-    {
-      "id": "geographic_temporal_heatmap_20260213_105129",
-      "type": "heatmap",
-      "title": "地区时间差异热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\geographic_temporal_heatmap_20260213_105129.png",
-      "source_tool": "geographic_temporal_heatmap",
-      "description": "地区在不同时间粒度的发帖量对比，识别高峰与地区差异"
-    },
-    {
-      "id": "sentiment_trend_20260213_105145",
-      "type": "line_chart",
-      "title": "情感趋势变化图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_trend_20260213_105145.png",
-      "source_tool": "sentiment_trend_chart",
-      "description": "展示情感极性随时间的变化趋势及正负面占比"
-    },
-    {
-      "id": "topic_focus_distribution_20260213_105203",
-      "title": "焦点窗口主题发布趋势",
-      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_focus_distribution_20260213_105203.png",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\topic_focus_distribution_20260213_105203.png",
-      "type": "line_chart",
-      "description": "焦点窗口内 Top5 父主题的发布趋势",
-      "source_tool": "topic_focus_distribution_chart"
+      "title": "参与人数演化趋势",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\participant_trend_20260221_155212.png",
+      "source_tool": "participant_trend_chart",
+      "description": "按时间粒度统计新增与累计参与用户，定位参与规模变化"
     },
     {
       "id": "text_cluster_analysis",
@@ -125,12 +99,47 @@
       "source_tool": "text_cluster_analysis"
     },
     {
-      "id": "interaction_heatmap_20260213_105255",
+      "id": "interaction_heatmap_20260221_155237",
       "type": "heatmap",
       "title": "发布者类型 × 情感极性 热力图",
-      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\interaction_heatmap_20260213_105255.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\interaction_heatmap_20260221_155237.png",
       "source_tool": "interaction_heatmap",
       "description": "展示发布者类型与情感极性的交叉分布"
+    },
+    {
+      "id": "sentiment_trend_20260221_155251",
+      "type": "line_chart",
+      "title": "情感趋势变化图",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\sentiment_trend_20260221_155251.png",
+      "source_tool": "sentiment_trend_chart",
+      "description": "展示情感极性随时间的变化趋势及正负面占比"
+    },
+    {
+      "id": "temporal_keyword_heatmap",
+      "title": "关键词时间热力图",
+      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\temporal_keyword_heatmap.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\temporal_keyword_heatmap.png",
+      "type": "heatmap",
+      "description": "Keyword temporal heatmap",
+      "source_tool": "temporal_keyword_heatmap"
+    },
+    {
+      "id": "belief_network_20260221_155351",
+      "title": "信念网络图（belief_network）",
+      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\belief_network_20260221_155351.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\belief_network_20260221_155351.png",
+      "type": "network",
+      "description": "信念子类的共现关系与强度",
+      "source_tool": "belief_network_chart"
+    },
+    {
+      "id": "keyword_wordcloud",
+      "title": "关键词频次分布",
+      "path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
+      "file_path": "D:\\PythonProject\\AnalysisPosts\\report\\images\\keyword_wordcloud.png",
+      "type": "bar",
+      "description": "Top keywords frequency bar chart",
+      "source_tool": "keyword_wordcloud"
     }
   ],
   "tables": [
@@ -306,121 +315,473 @@
       "source_type": "mcp"
     },
     {
-      "id": "geographic_distribution_stats",
-      "title": "地理分布分析 - geographic_distribution_stats",
+      "id": "publisher_distribution_stats",
+      "title": "多维交互分析 - publisher_distribution_stats",
       "data": {
         "distribution": {
-          "无位置信息": {
-            "count": 9,
-            "percentage": 30.0
+          "个人用户": {
+            "count": 16,
+            "percentage": 53.33,
+            "avg_reposts": 0.12,
+            "avg_comments": 3.69,
+            "avg_likes": 2.56,
+            "avg_sentiment": 3.19,
+            "total_engagement": 102
           },
-          "北京": {
-            "count": 5,
-            "percentage": 16.67
-          },
-          "湖北": {
+          "官方新闻媒体": {
             "count": 3,
-            "percentage": 10.0
+            "percentage": 10.0,
+            "avg_reposts": 0.33,
+            "avg_comments": 1.33,
+            "avg_likes": 1.67,
+            "avg_sentiment": 3.33,
+            "total_engagement": 10
           },
-          "上海": {
+          "自媒体": {
+            "count": 3,
+            "percentage": 10.0,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.67,
+            "avg_likes": 0.67,
+            "avg_sentiment": 3.67,
+            "total_engagement": 4
+          },
+          "政府机构": {
+            "count": 3,
+            "percentage": 10.0,
+            "avg_reposts": 2.33,
+            "avg_comments": 1.67,
+            "avg_likes": 3.0,
+            "avg_sentiment": 3.0,
+            "total_engagement": 21
+          },
+          "旅游部门": {
             "count": 2,
-            "percentage": 6.67
+            "percentage": 6.67,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.5,
+            "avg_likes": 0.5,
+            "avg_sentiment": 3.0,
+            "total_engagement": 2
           },
-          "四川": {
-            "count": 2,
-            "percentage": 6.67
-          },
-          "江苏": {
-            "count": 2,
-            "percentage": 6.67
-          },
-          "云南": {
+          "学生": {
             "count": 1,
-            "percentage": 3.33
+            "percentage": 3.33,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.0,
+            "avg_likes": 0.0,
+            "avg_sentiment": 3.0,
+            "total_engagement": 0
           },
-          "辽宁": {
+          "旅游博主": {
             "count": 1,
-            "percentage": 3.33
+            "percentage": 3.33,
+            "avg_reposts": 0.0,
+            "avg_comments": 8.0,
+            "avg_likes": 8.0,
+            "avg_sentiment": 3.0,
+            "total_engagement": 16
           },
-          "重庆": {
+          "宣传部门": {
             "count": 1,
-            "percentage": 3.33
-          },
-          "浙江": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "吉林": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "山东": {
-            "count": 1,
-            "percentage": 3.33
-          },
-          "河南": {
-            "count": 1,
-            "percentage": 3.33
+            "percentage": 3.33,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.0,
+            "avg_likes": 0.0,
+            "avg_sentiment": 4.0,
+            "total_engagement": 0
           }
         },
         "total_posts": 30,
-        "posts_with_location": 30,
-        "coverage_percentage": 100.0,
-        "unique_locations": 13,
-        "top_locations": [
+        "publisher_types": 8,
+        "top_publishers": [
           {
-            "location": "无位置信息",
-            "count": 9,
-            "percentage": 30.0
+            "publisher": "个人用户",
+            "count": 16,
+            "percentage": 53.33,
+            "avg_reposts": 0.12,
+            "avg_comments": 3.69,
+            "avg_likes": 2.56,
+            "avg_sentiment": 3.19,
+            "total_engagement": 102
           },
           {
-            "location": "北京",
-            "count": 5,
-            "percentage": 16.67
-          },
-          {
-            "location": "湖北",
+            "publisher": "官方新闻媒体",
             "count": 3,
-            "percentage": 10.0
+            "percentage": 10.0,
+            "avg_reposts": 0.33,
+            "avg_comments": 1.33,
+            "avg_likes": 1.67,
+            "avg_sentiment": 3.33,
+            "total_engagement": 10
           },
           {
-            "location": "上海",
+            "publisher": "自媒体",
+            "count": 3,
+            "percentage": 10.0,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.67,
+            "avg_likes": 0.67,
+            "avg_sentiment": 3.67,
+            "total_engagement": 4
+          },
+          {
+            "publisher": "政府机构",
+            "count": 3,
+            "percentage": 10.0,
+            "avg_reposts": 2.33,
+            "avg_comments": 1.67,
+            "avg_likes": 3.0,
+            "avg_sentiment": 3.0,
+            "total_engagement": 21
+          },
+          {
+            "publisher": "旅游部门",
             "count": 2,
-            "percentage": 6.67
+            "percentage": 6.67,
+            "avg_reposts": 0.0,
+            "avg_comments": 0.5,
+            "avg_likes": 0.5,
+            "avg_sentiment": 3.0,
+            "total_engagement": 2
+          }
+        ],
+        "top_accounts": [
+          {
+            "username": "EVA-hangzhou",
+            "publisher": "个人用户",
+            "engagement": 48,
+            "followers_count": null
           },
           {
-            "location": "四川",
-            "count": 2,
-            "percentage": 6.67
+            "username": "脆弱小丢",
+            "publisher": "个人用户",
+            "engagement": 20,
+            "followers_count": null
           },
           {
-            "location": "江苏",
-            "count": 2,
-            "percentage": 6.67
+            "username": "V妮佳沙",
+            "publisher": "旅游博主",
+            "engagement": 16,
+            "followers_count": null
           },
           {
-            "location": "云南",
-            "count": 1,
-            "percentage": 3.33
+            "username": "北京发布",
+            "publisher": "政府机构",
+            "engagement": 13,
+            "followers_count": null
           },
           {
-            "location": "辽宁",
-            "count": 1,
-            "percentage": 3.33
+            "username": "风闻社区",
+            "publisher": "官方新闻媒体",
+            "engagement": 9,
+            "followers_count": null
           },
           {
-            "location": "重庆",
-            "count": 1,
-            "percentage": 3.33
+            "username": "山水怀柔",
+            "publisher": "政府机构",
+            "engagement": 8,
+            "followers_count": null
           },
           {
-            "location": "浙江",
-            "count": 1,
-            "percentage": 3.33
+            "username": "重生之我是狄仁杰的侄女",
+            "publisher": "个人用户",
+            "engagement": 7,
+            "followers_count": null
+          },
+          {
+            "username": "小七请早睡",
+            "publisher": "个人用户",
+            "engagement": 5,
+            "followers_count": null
+          },
+          {
+            "username": "元气满满在逃公主椰",
+            "publisher": "自媒体",
+            "engagement": 4,
+            "followers_count": null
+          },
+          {
+            "username": "KA_khoo",
+            "publisher": "个人用户",
+            "engagement": 4,
+            "followers_count": null
+          },
+          {
+            "username": "乡村刘三好",
+            "publisher": "个人用户",
+            "engagement": 4,
+            "followers_count": null
+          },
+          {
+            "username": "艾斯的人间日常",
+            "publisher": "个人用户",
+            "engagement": 4,
+            "followers_count": null
+          },
+          {
+            "username": "今天你胖了没鸭",
+            "publisher": "个人用户",
+            "engagement": 3,
+            "followers_count": null
+          },
+          {
+            "username": "天使鮟鱇",
+            "publisher": "个人用户",
+            "engagement": 2,
+            "followers_count": null
+          },
+          {
+            "username": "徐志摩在第二乐章里说",
+            "publisher": "个人用户",
+            "engagement": 2,
+            "followers_count": null
+          },
+          {
+            "username": "gluewoodpecker",
+            "publisher": "个人用户",
+            "engagement": 2,
+            "followers_count": null
+          },
+          {
+            "username": "文旅北京",
+            "publisher": "旅游部门",
+            "engagement": 2,
+            "followers_count": null
+          },
+          {
+            "username": "观海融媒",
+            "publisher": "官方新闻媒体",
+            "engagement": 1,
+            "followers_count": null
+          },
+          {
+            "username": "沈夏夏的后花园",
+            "publisher": "个人用户",
+            "engagement": 1,
+            "followers_count": null
+          },
+          {
+            "username": "剃头发电热爱唱歌",
+            "publisher": "学生",
+            "engagement": 0,
+            "followers_count": null
+          }
+        ],
+        "representative_posts": [
+          {
+            "username": "EVA-hangzhou",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-25 19:52:00",
+            "engagement": 48,
+            "content": "#张艺兴夜骑主动停车捡垃圾# zyx#张艺兴2024世界巡演# 🈲️快～转，会降双方权重🙏 “夜”上海Vlog city walk city ride 骑上共享单车逛一逛 随手捡一捡公园地上的空瓶子 再顺便打个拳 热个身 “夜”生活也很丰富 #原创音乐制作人张艺兴# [抱一抱]@张艺兴 lay zix 原创 beatmaker krump 舞台 pd jw 舞蹈 rp 粉丝 ljj bot 莲 LIT 宇舶 M-POP zyxgzs 演员 雪碧 施洛华 zhangyixing 🌟 http://t.cn/A6RqOLzZ ​"
+          },
+          {
+            "username": "脆弱小丢",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-18 19:33:00",
+            "engagement": 20,
+            "content": "感觉大家都在旅游看con 最近漫无目的没有什么激情的生活be like： 偶尔出门去喝点特调低度数酒 不痒不红就行 重装了wzry然后打一些打了一会儿等于没打的游戏 上好多班然后睡一些碎片觉 偶尔出去吃个饭 觉得夜里气温很舒服甚至夜骑了一下共享单车 最后的感想是在清吧里凭什么草莓冰沙加点酒精能卖到68[微笑][微笑]"
+          },
+          {
+            "username": "V妮佳沙",
+            "publisher": "旅游博主",
+            "publish_time": "2024-08-23 21:33:00",
+            "engagement": 16,
+            "content": "#此沙[超话]# 很久没上环城绿道，今天心血来潮下班后蹬个共享单车就去了。晚上去比我想象中有意思很多，🚴没有白天那么多，有很多散步、跑步、夜骑的人也不少，有人气但不拥挤。要不是忘记带充电宝，我能骑完一圈再回家。 欢迎沙粒们有机会来骑一下成都的环城绿道，一圈一百公里，不同季节有不一样的风景。"
+          },
+          {
+            "username": "北京发布",
+            "publisher": "政府机构",
+            "publish_time": "2024-08-18 15:00:00",
+            "engagement": 13,
+            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京"
+          },
+          {
+            "username": "风闻社区",
+            "publisher": "官方新闻媒体",
+            "publish_time": "2024-08-29 14:58:00",
+            "engagement": 9,
+            "content": "【“青少年骑行热”乱象调查：儿童骑行上路，车比人大隐患重重】有孩子在绿灯亮起那一刻立即加速冲出骑行道，在人流与车流间横冲直撞，把家长甩到了“九霄云外”；也有孩子骑着尺寸比自己小小的身板大出不少的自行车，摇摇晃晃、吃力地蹬着前行；还有孩子和身旁的伙伴玩起了“竞速”…… 这是《法治日报》记者近日在北京晚高峰时段的十字路口观察到的一幕。 近年来，骑行运动热度不断攀升，骑行爱好者队伍日渐壮大，其中不乏青少年的身影。然而，根据道路交通安全法实施条例规定，驾驶自行车、三轮车必须年满12周岁。未满12周岁的儿童不允许上路骑行。 然而，记者调查发现，实践中，上路骑行的年龄“红线”在一些人和机构眼中形同虚设。不少家长带着不满12周岁的孩子约伴上路骑行甚至跨省长途骑行。此外，一些骑行社团、户外组织等机构专门开设“亲子骑行营”，还有成人骑行营对儿童“来者不拒”。值得注意的是，一些有低龄儿童参与的骑行活动，并没有配备充分的安全保障装备。 对此，资深骑行者和业内专家指出，12周岁以下儿童不论在生理上还是心智上均不具备上路骑行的能力，监护人或家长不能将他们等同于成年人对待，“会骑车不等于就能骑车上路”。在“青少年骑行热”之下，需要引导青少年养成足够的安全骑行意识，同时应当选购合适的装备、在合适的地点科学安全锻炼。家长和孩子都应当保持理智平和的心态，对规则及骑行运动保有敬畏心。 500 低龄儿童骑行上路 少有佩戴安全装备 8月中旬，记者在北京市西城区西便门桥至广安门桥区域进行了近一周的观察，时间点主要集中在晚上八点左右和周末的下午时段。 一个工作日的晚上7时许，仍是下班晚高峰，马路上车流混杂着人流，十字路口被堵得水泄不通。伴随阵阵不耐催促的汽笛声和嘈杂的人声，不时有骑行者从空隙间穿梭而过。在其中，记者看到了一个“小不点儿”——一个小男孩在临近路口的路边停了下来，骑的山地车比他个头还大。因为车座太高，他刹车时向前趔趄了一下，脚勉强够到地撑了一下才稳住身体。男孩父亲骑了一辆普通自行车跟在后面。 “这么小的孩子，骑山地车上路太危险了吧。”在二人休整间隙，记者上前询问。孩子父亲称，孩子今年10岁，“车是觉得帅闹着要买的。在路上我们家长跟着，别骑太快就行”。 稍事休息后，这对父子又踏上了骑行之路，孩子骑着明显比自己还大的车，站起来猛蹬了几下，迅速蹿了出去，很快消失在记者视线中。 在记者观察的几个十字路口，以20分钟为限，有数名低龄儿童在家长的带领下骑着自行车上路。在这些低龄儿童中，没有人穿着骑行服，几天下来记者只看到一名儿童佩戴了头盔。 记者观察发现，特别是周末，有不少青少年在马路上骑共享单车，或和家长一起或独自骑行。这些孩子普遍看上去较年幼。有的孩子由于身高不够，骑行时还需要站起来蹬几下；有的孩子骑车时脚够不到地面，停车时需要整个人从车上跳下来；有的孩子车技并不熟练，颤颤巍巍地前行，骑几米的距离车把七扭八歪的。跟在一旁的家长，看到孩子没骑稳时，有的会直接骑到共享单车侧后方，扶着车座给孩子助力，完全没意识到自己已经挡住了后面的骑行者，甚至已经串行到了机动车道。 这些骑行儿童中，不少人有在机动车道骑行或闯红灯的交通违法行为。 观察过程中，记者还看到组团的低龄骑行者，有的是各自家长带领，有的是四五个孩子由一两名成人骑行者带领。 来自上海的骑行运动博主一瓦告诉记者，随着骑行运动在近年来热度的攀升，在上海部分热门骑行路段有骑行者“低龄化”的趋势。“我了解到有一些自发的骑友群聊，还会相约带着孩子一起骑行。” 记者检索社交媒体注意到，在全国各个地区，均有这样的“骑行群”存在，群聊里的家长大多是骑行爱好者，在周末、假期时会带着孩子一同组队上路骑行。 “很多家长出于自己的爱好带着年幼的孩子骑行上路，但实际上，低龄儿童骑行的危险系数是很高的。”定居浙江杭州的24年资深骑行者齐海亮告诉记者，城市路况相对复杂，而骑行运动要求骑行者对于交通规则、路况有较高的把握能力以及快速反应能力，这是低龄儿童难以做到的。 齐海亮说，他常能看到低龄儿童骑行的危险动作。“有一天晚上我正在开车，有个妈妈带着小女孩骑车，绿灯亮了之后女孩控制不好车把一直晃悠，一下就拐到我车前了。如果不是我及时刹车，肯定就撞上了。” 并非所有孩子都能如此幸运“逃过一劫”。一瓦告诉记者，她在上海热门骑行路段苗江路骑行时，就曾经目睹一场意外。“那是一个夏天的晚上，我夜骑的时候遇到了一个年幼的小男孩。因为那段路比较黑，夜骑视线也不好，那个孩子和拉货的三轮车撞上了，车和人都倒在地上。”最后，警方和医护人员到场处理了这起意外。 骑行团只限制身高 活动安全保障不足 记者调查发现，除了城市骑行，部分家长会利用暑期带着孩子进行长途骑行甚至公路骑行。有家长带着自己11岁的孩子，驮着行李从上海一路骑行至北京。途中，父子二人骑过不少国道，经历了“雨骑”，也经历了车轮爆胎的意外。 “在城市里骑车可能容易发生‘小磕小碰’，但如果在国道上，大车多、车速快的情况下，一旦发生意外就是严重事故。”齐海亮曾经带着女儿“六一”进行长达一年的环中国骑行，他坦言，即使在自己有20余年的骑行经验、女儿已满12周岁且有较好的反应能力，同时有安全保障车跟随的情况下，他们还是难免碰上意外情况。“当时我们骑车爬坡，坡上有水，有一辆轿车超车时后轮打滑，把‘六一’撞到了沟里。车摔坏了，人住院一个礼拜。” 除了家长自发带着孩子骑行，记者还发现，在暑假期间，一些旅行社、骑行俱乐部等开办了“亲子骑行营”。这些“骑行营”招募亲子组合，或由儿童“独立”参与骑游，在社交平台、短视频平台、公众号等多个渠道都能看到相关招募信息。 在招募信息中，记者注意到了一则“儿童骑行营”的宣传——“驭风骑行，做一个追风少年，挥洒肆意的年华”。该骑行营对于报名儿童的年龄并无限制，“身高1.2米以上，熟练骑自行车”则可独立参加。 记者浏览上述骑行营客服发送的往期活动视频发现，参加该骑行营活动的均为低龄儿童，且骑行路线包括崎岖的沙路、仅有单条车道的乡野道路及夜间闹市公路，甚至在下雨天仍然坚持骑行。其间，跟队的仅有一两个骑行领队，没有任何安全保障车辆。 有部分成人骑行营亦标注了“可亲子”。记者随机查看了一个户外机构组织的“青海湖骑行360KM”项目。活动介绍显示，该项目在高原进行骑行，是“无保姆式服务的半自助游”。项目共有5日行程，骑行包含公路路段，其中日骑行最长距离为110KM。 当记者问及是否可以带孩子同行时，客服仅简单回复“身高够一米二，有经验的那没问题”，但对于报名儿童的年龄以及怎么算“有经验”，并没有进一步说明。 在长白山某骑行驿站组织的骑行活动中，记者查看文字介绍发现，单项骑行活动包含了镇内骑行、村庄骑行、森林骑行等，这类活动的报名费用并不包含相应的意外险，亦不提供安全保障车服务。当记者询问客服“小朋友是否可以报名”时，客服并未确认小孩的任何信息就回复“可以报名”。 “小孩是一定不能跟着成人的骑行团一起骑的。”齐海亮说，在成人骑行团中，大部分骑行者骑的是公路车，而公路车的轮胎较细，且把横更短，对于儿童来说更加难以操控。同时，公路车对于路况要求较高，在跟队过程中哪怕“压到两厘米的小石子”，对于孩子来说都是难以控制的。 “公路车冲起来非常快，而且户外的团队骑行有时追求‘破风效果’，速度会飙到很高，且骑手之间会跟得非常近，一旦摔车或突然刹车，后果不堪设想。”齐海亮说。 加强交通安全教育 打造儿童骑行公园 前不久，河北省保定市容城县贾光乡发生了一起令人扼腕的交通事故。一名11岁小男孩跟着父亲以及自行车队在双向公路上骑行，结果在接近中线时不小心摔倒进入对面车道。男孩被对面车道上正在行驶的一辆小汽车辗轧身亡。 公安部道路交通安全研究中心去年发布的一组数据表明，暑期少年儿童单独或结伴出行的情况增加，骑自行车、电动自行车的事故风险也有上升。近年来不满12周岁的孩子骑自行车（包括共享单车）发生交通事故的占骑行事故总量的7.5%；2022年自主驾车死亡的儿童中，骑自行车的占总死亡人数的3.8%。 根据近些年对行业的观察，齐海亮发现，骑行对于大多数青少年来说具有“竞速”的魅力。“现在很多小孩骑车是有攀比心的，他们对于交通安全没有成熟的认知，但对于速度却有追求。尤其是公路车让不少青少年觉得‘帅’‘炫酷’，但它能达到极快的速度，对于没有足够把控意识和能力的孩子来说非常危险”。 一瓦认为，会骑车不等于能骑车上路。在“青少年骑行热”之下，一些安全问题并没有引起足够的重视，青少年儿童的骑行安全需要多方共同保障。“有一些青少年可能看到专业的新型车手或是博主觉得很帅，所以跟风去骑。一些家长也觉得骑行能够锻炼身体，放任青少年上路。表面上看这些孩子们好像会骑车，但实际上必要的安全意识和措施并没有跟上。” 北京市律师协会交通管理与运输法律专业委员会主任黄海波介绍，由于12周岁以下的少年儿童发育尚未成熟，如平衡能力、反应速度等无法达到骑自行车的最低要求，因此，相关规定明确，12周岁以下的少年儿童不得在道路上骑自行车。这一规定不仅是对少年儿童自身安全的保护，也是对其他交通参与者负责。由于少年儿童骑行技术不熟练，缺乏应对紧急情况的能力，很容易引发交通事故，给自己和他人带来伤害。因此，家长和社会各界需要共同努力，加强对少年儿童骑行安全的教育和监管，确保他们遵守交通规则，远离危险。 北京市京都律师事务所高级合伙人赵岐龙告诉记者，根据民法典第1198条规定了群众性活动的组织者的安全保障义务。由于不满12周岁儿童不符合骑行条件，如果骑行活动的组织者明知其不符合骑行条件，还让不满12周岁儿童参与具有一定危险的骑行活动，造成骑行者损害的，组织者应承担一定的赔偿责任。 “首先要明确的是12周岁以下的儿童是不允许骑行上路的，另一个是即使到了可以上路的年龄，也要匹配一系列安全教育和措施。”一瓦说，骑行活动应当由特定的专业组织进行准备，尤其是针对青少年的活动，应当提前做好道路科学规划。同时，一些保障装备也必不可少，例如头盔、定位装置、对讲机、补给物品等。 一瓦还提到，家长和孩子最好能够在骑车前接受一些基础的启蒙培训，而非贸然购入公路车等有驾驭难度的车辆骑行。“在购车时，不论家长还是车店老板，都应当帮助儿童选购合适尺寸的车，选择专业的头盔、手套以及骑行服，同时装好前灯、尾灯。如果夜骑的话，还建议穿好反光背心或佩戴反光标志，这样可以有效地规避一些风险。” 受访的业内人士和专家一致认为，针对“低龄儿童骑行上路”的问题，在法律限制低龄儿童骑车上路之外，更应该在增强儿童的骑行安全意识上下功夫，比如可以借鉴一些其他国家和地区的经验，打造更多更适合儿童认知的骑行公园。公园内除了能提供安全的骑行道路外，还可以模拟城市交通环境，比如红绿灯、斑马线、路口等设置，让孩子们在练习骑行的同时，也能够了解并掌握必要的骑行安全常识。 “包括青少年在内的广大骑行爱好者都应当理智对待骑行，不要抱有侥幸心理，更不要挑战规则。”一瓦说，要对骑行运动保持敬畏心。（法治日报）"
+          },
+          {
+            "username": "山水怀柔",
+            "publisher": "政府机构",
+            "publish_time": "2024-08-18 15:21:00",
+            "engagement": 8,
+            "content": "#小柔提醒# 【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，北京市文化和旅游局制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。（via.@文旅北京）"
+          },
+          {
+            "username": "重生之我是狄仁杰的侄女",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-23 04:23:00",
+            "engagement": 7,
+            "content": "夜骑好爽，没有专业设备，就是随手扫的共享单车慢慢吹晚风好舒服 http://t.cn/A6R4r1rP ​​​"
+          },
+          {
+            "username": "小七请早睡",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-24 22:19:00",
+            "engagement": 5,
+            "content": "夜骑长安街，最难的是找到一辆共享单车[笑cry] ❤️北京+1 收获力量！！！ ​​​"
+          },
+          {
+            "username": "元气满满在逃公主椰",
+            "publisher": "自媒体",
+            "publish_time": "2024-08-26 12:51:00",
+            "engagement": 4,
+            "content": "解锁共享单车夜骑新体验之—— 再也不夜骑了🙃 11点半出发 历时7+小时 骑行60公里 人已废在工位 ​​​"
+          },
+          {
+            "username": "KA_khoo",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-24 21:45:00",
+            "engagement": 4,
+            "content": "第二盘儿用共享单车跟到去夜骑 主打一个各耍各[裂开] 今天运动达标＋昨天做饭达标 ​​​"
+          },
+          {
+            "username": "乡村刘三好",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-23 11:45:00",
+            "engagement": 4,
+            "content": "共享单车夜骑🚴哈哈哈 ​​​"
+          },
+          {
+            "username": "艾斯的人间日常",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-21 23:25:00",
+            "engagement": 4,
+            "content": "今日和H小姐夜骑30km的 共享单车 这周运动量足够了[晕] ​​​"
+          },
+          {
+            "username": "今天你胖了没鸭",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-17 01:30:00",
+            "engagement": 3,
+            "content": "拖鞋 共享单车 夜骑 什么实力 ​​​"
+          },
+          {
+            "username": "天使鮟鱇",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-31 22:02:00",
+            "engagement": 2,
+            "content": "太烦躁了所以在公园夜骑共享单车一段没有路灯的盲骑好像没有骑单车不能忘记的烦 ​​​"
+          },
+          {
+            "username": "徐志摩在第二乐章里说",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-31 01:49:00",
+            "engagement": 2,
+            "content": "学校旁就是海。 将一切刚好赶到的日落、恰如其分的小雨、泥泞渔村的小路、八里长街上久违的夜骑、公路上放肆高唱的艳阳天、天气中未差半毫的湿度与温度——通通归功于四辆半的共享电单车。 ​​​"
+          },
+          {
+            "username": "gluewoodpecker",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-30 14:50:00",
+            "engagement": 2,
+            "content": "翻相册翻到月初一个人在天津解放北路夜骑共享单车，不在乎时间像没有明天一样地活着。好幸福，欢迎收看我的私生活，余虹在天津的时候。 ​​​"
+          },
+          {
+            "username": "文旅北京",
+            "publisher": "旅游部门",
+            "publish_time": "2024-08-17 23:01:00",
+            "engagement": 2,
+            "content": "#月光骑遇季# 【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。"
+          },
+          {
+            "username": "观海融媒",
+            "publisher": "官方新闻媒体",
+            "publish_time": "2024-08-21 23:56:00",
+            "engagement": 1,
+            "content": "【珠海人关注的热点新闻 尽在观海热闻榜】 [星星]点赞！珠海“宝妈”实现“家门口的就业” http://t.cn/A6RykuGh [星星]#全红婵陈艺文等被记大功# 广东省委省政府关于给予我省参加第33届夏季奥运会获奖运动员及其教练员和有关单位奖励的通报 http://t.cn/A6RykuGP http://t.cn/A6Ryk5nM [星星]7大区域“视听味”俱全！周五起，来斗门喝啤酒品美食赏非遗 http://t.cn/A6RykuGZ [星星]事关学生票，铁路12306推出新功能 http://t.cn/A6Rykubk #12306回应男子把卧铺让给妹妹被拒# [星星]高校新生谨防五类入学骗局，珠海网警发布安全提醒→ http://t.cn/A6RykubF [星星]香洲区暑期共享单车夜骑爆火，运维人员连夜“清淤” http://t.cn/A6RykuGw [星星]广东已启动防汛Ⅲ级响应，全省提前转移超75000人 http://t.cn/A6RykuGv [星星]来自澳门的他，在珠海海岛打造了一个“山谷营地” http://t.cn/A6Rykubs [星星]2024年天威慈善助学金发放 42名困难学子圆大学梦 http://t.cn/A6RykuG7 更多珠海人关注的热点新闻→#观海热闻榜##珠海[超话]# http://t.cn/A6pj9eoQ"
+          },
+          {
+            "username": "沈夏夏的后花园",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-19 12:39:00",
+            "engagement": 1,
+            "content": "最近花了一整年的时间，把熬夜这件事戒掉了，虽然偶尔还是会晚睡，但这种情况从日常变成了偶尔。 最近还养成了夜骑+夜跑的习惯。比起单纯去跑步，这种方式最适合我。 出门骑行四公里到湖边，然后从一个门跑步到另外一个门，接着再找一辆共享单车骑回家。前后运动一小时，大约十公里。 运动以容易坚持为主，在养成习惯后，再做变化和精进。 开始接受自己偶尔的情绪性进食，并且有意识地在不需要情绪性进食的时候控制饮食量和品质。 工作上决策变得更谨慎，一旦决策行动比之前更迅猛。 待人更亲切，也更懂得如何与他人合作。 特别喜欢那一句“我已经见过足够多的世面，一切皆可抛弃。剩下的就是持之以恒，秘而不宣的努力。” 这也是我近几年来的想法、体验和结论。"
+          },
+          {
+            "username": "剃头发电热爱唱歌",
+            "publisher": "学生",
+            "publish_time": "2024-08-30 22:52:00",
+            "engagement": 0,
+            "content": "表现叛逆的方式，是在没有共享单车的城市的校园里，疯狂骑行，真的很爱夜骑，闷闷热热的空气因为脚蹬车的速度加快而变得凉爽，感受大腿肌肉一点点变酸，第一张骑行卡，毕业 ​​​"
+          },
+          {
+            "username": "滴di滴叭ba叭呜皮啊",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-29 00:15:00",
+            "engagement": 0,
+            "content": "好想买自行车🚲 好纠结，买了没地方放，骑的次数也不算多 想夜骑了不如扫个共享单车 可是还是想买啊哈哈哈哈哈哈哈哈 ​​​"
+          },
+          {
+            "username": "卡通胶片笑声",
+            "publisher": "自媒体",
+            "publish_time": "2024-08-28 22:10:00",
+            "engagement": 0,
+            "content": "#每一场夜骑终点都是夜宵摊# 🌟夜晚不再寂寞！随着暑热来袭，&quot;夜骑&quot;一族悄然兴起，北京、上海、成都...各大城市的夜空下，共享單車成为最靓的风景線🌈 在北京，18-22时的夜騎時長飆升15%，而簋街、牛街更是成為美食探險家们的聚集地🍴。那些熟悉的老字号周围，單車來回穿梭不停歇。 不仅如此，&quot;夜骑&quot;还带🔥红了一众深夜食堂，从烤串🍢到小龙虾🦞，每一份美味都承载着骑士们对生活的热爱❤️。 让我们一起跟随這股潮流，感受城市夜晚的独特魅力吧！🌃"
+          },
+          {
+            "username": "偶像音乐潮流地",
+            "publisher": "自媒体",
+            "publish_time": "2024-08-24 22:23:00",
+            "engagement": 0,
+            "content": "#张艺兴夜骑主动停车捡垃圾# 张艺兴实在太可爱了！在上海江边夜骑共享单车，看到垃圾赶紧停车去捡起。细节处见人品，张艺兴一直都做的很好啊！http://t.cn/A6RqOLzZ ​​​"
+          },
+          {
+            "username": "爱张哥的人生易如反掌",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-24 22:21:00",
+            "engagement": 0,
+            "content": "#张艺兴夜骑主动停车捡垃圾#一个环保的要坐地铁骑共享单车的张哥 ​​​"
+          },
+          {
+            "username": "没有碳酸不能活",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-22 00:36:00",
+            "engagement": 0,
+            "content": "虽然骑的是共享单车，但夜骑真的很快乐🚴 ​​​"
+          },
+          {
+            "username": "北京平谷",
+            "publisher": "旅游部门",
+            "publish_time": "2024-08-19 10:00:00",
+            "engagement": 0,
+            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京"
+          },
+          {
+            "username": "北京音乐广播",
+            "publisher": "官方新闻媒体",
+            "publish_time": "2024-08-19 09:35:00",
+            "engagement": 0,
+            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京收"
+          },
+          {
+            "username": "海淀宣传",
+            "publisher": "宣传部门",
+            "publish_time": "2024-08-19 07:12:00",
+            "engagement": 0,
+            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。（@文旅北京 ）#海小宣提示#"
+          },
+          {
+            "username": "北京市石景山",
+            "publisher": "政府机构",
+            "publish_time": "2024-08-18 19:50:00",
+            "engagement": 0,
+            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京"
+          },
+          {
+            "username": "用户6884768548",
+            "publisher": "个人用户",
+            "publish_time": "2024-08-16 10:15:00",
+            "engagement": 0,
+            "content": "#河财纯净版[超话]#开封夜骑 找搭子（共享单车） 男女不限 qq2788512930 ​​​"
           }
         ]
       },
-      "source_tool": "geographic_distribution_stats",
+      "source_tool": "publisher_distribution_stats",
       "source_type": "mcp"
     },
     {
@@ -1665,6 +2026,124 @@
       "source_type": "mcp"
     },
     {
+      "id": "geographic_distribution_stats",
+      "title": "地理分布分析 - geographic_distribution_stats",
+      "data": {
+        "distribution": {
+          "无位置信息": {
+            "count": 9,
+            "percentage": 30.0
+          },
+          "北京": {
+            "count": 5,
+            "percentage": 16.67
+          },
+          "湖北": {
+            "count": 3,
+            "percentage": 10.0
+          },
+          "上海": {
+            "count": 2,
+            "percentage": 6.67
+          },
+          "四川": {
+            "count": 2,
+            "percentage": 6.67
+          },
+          "江苏": {
+            "count": 2,
+            "percentage": 6.67
+          },
+          "云南": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "辽宁": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "重庆": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "浙江": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "吉林": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "山东": {
+            "count": 1,
+            "percentage": 3.33
+          },
+          "河南": {
+            "count": 1,
+            "percentage": 3.33
+          }
+        },
+        "total_posts": 30,
+        "posts_with_location": 30,
+        "coverage_percentage": 100.0,
+        "unique_locations": 13,
+        "top_locations": [
+          {
+            "location": "无位置信息",
+            "count": 9,
+            "percentage": 30.0
+          },
+          {
+            "location": "北京",
+            "count": 5,
+            "percentage": 16.67
+          },
+          {
+            "location": "湖北",
+            "count": 3,
+            "percentage": 10.0
+          },
+          {
+            "location": "上海",
+            "count": 2,
+            "percentage": 6.67
+          },
+          {
+            "location": "四川",
+            "count": 2,
+            "percentage": 6.67
+          },
+          {
+            "location": "江苏",
+            "count": 2,
+            "percentage": 6.67
+          },
+          {
+            "location": "云南",
+            "count": 1,
+            "percentage": 3.33
+          },
+          {
+            "location": "辽宁",
+            "count": 1,
+            "percentage": 3.33
+          },
+          {
+            "location": "重庆",
+            "count": 1,
+            "percentage": 3.33
+          },
+          {
+            "location": "浙江",
+            "count": 1,
+            "percentage": 3.33
+          }
+        ]
+      },
+      "source_tool": "geographic_distribution_stats",
+      "source_type": "mcp"
+    },
+    {
       "id": "topic_time_evolution",
       "title": "主题演化分析 - topic_time_evolution",
       "data": {
@@ -1892,693 +2371,6 @@
       "source_type": "mcp"
     },
     {
-      "id": "publisher_distribution_stats",
-      "title": "多维交互分析 - publisher_distribution_stats",
-      "data": {
-        "distribution": {
-          "个人用户": {
-            "count": 16,
-            "percentage": 53.33,
-            "avg_reposts": 0.12,
-            "avg_comments": 3.69,
-            "avg_likes": 2.56,
-            "avg_sentiment": 3.19,
-            "total_engagement": 102
-          },
-          "官方新闻媒体": {
-            "count": 3,
-            "percentage": 10.0,
-            "avg_reposts": 0.33,
-            "avg_comments": 1.33,
-            "avg_likes": 1.67,
-            "avg_sentiment": 3.33,
-            "total_engagement": 10
-          },
-          "自媒体": {
-            "count": 3,
-            "percentage": 10.0,
-            "avg_reposts": 0.0,
-            "avg_comments": 0.67,
-            "avg_likes": 0.67,
-            "avg_sentiment": 3.67,
-            "total_engagement": 4
-          },
-          "政府机构": {
-            "count": 3,
-            "percentage": 10.0,
-            "avg_reposts": 2.33,
-            "avg_comments": 1.67,
-            "avg_likes": 3.0,
-            "avg_sentiment": 3.0,
-            "total_engagement": 21
-          },
-          "旅游部门": {
-            "count": 2,
-            "percentage": 6.67,
-            "avg_reposts": 0.0,
-            "avg_comments": 0.5,
-            "avg_likes": 0.5,
-            "avg_sentiment": 3.0,
-            "total_engagement": 2
-          },
-          "学生": {
-            "count": 1,
-            "percentage": 3.33,
-            "avg_reposts": 0.0,
-            "avg_comments": 0.0,
-            "avg_likes": 0.0,
-            "avg_sentiment": 3.0,
-            "total_engagement": 0
-          },
-          "旅游博主": {
-            "count": 1,
-            "percentage": 3.33,
-            "avg_reposts": 0.0,
-            "avg_comments": 8.0,
-            "avg_likes": 8.0,
-            "avg_sentiment": 3.0,
-            "total_engagement": 16
-          },
-          "宣传部门": {
-            "count": 1,
-            "percentage": 3.33,
-            "avg_reposts": 0.0,
-            "avg_comments": 0.0,
-            "avg_likes": 0.0,
-            "avg_sentiment": 4.0,
-            "total_engagement": 0
-          }
-        },
-        "total_posts": 30,
-        "publisher_types": 8,
-        "top_publishers": [
-          {
-            "publisher": "个人用户",
-            "count": 16,
-            "percentage": 53.33,
-            "avg_reposts": 0.12,
-            "avg_comments": 3.69,
-            "avg_likes": 2.56,
-            "avg_sentiment": 3.19,
-            "total_engagement": 102
-          },
-          {
-            "publisher": "官方新闻媒体",
-            "count": 3,
-            "percentage": 10.0,
-            "avg_reposts": 0.33,
-            "avg_comments": 1.33,
-            "avg_likes": 1.67,
-            "avg_sentiment": 3.33,
-            "total_engagement": 10
-          },
-          {
-            "publisher": "自媒体",
-            "count": 3,
-            "percentage": 10.0,
-            "avg_reposts": 0.0,
-            "avg_comments": 0.67,
-            "avg_likes": 0.67,
-            "avg_sentiment": 3.67,
-            "total_engagement": 4
-          },
-          {
-            "publisher": "政府机构",
-            "count": 3,
-            "percentage": 10.0,
-            "avg_reposts": 2.33,
-            "avg_comments": 1.67,
-            "avg_likes": 3.0,
-            "avg_sentiment": 3.0,
-            "total_engagement": 21
-          },
-          {
-            "publisher": "旅游部门",
-            "count": 2,
-            "percentage": 6.67,
-            "avg_reposts": 0.0,
-            "avg_comments": 0.5,
-            "avg_likes": 0.5,
-            "avg_sentiment": 3.0,
-            "total_engagement": 2
-          }
-        ],
-        "top_accounts": [
-          {
-            "username": "EVA-hangzhou",
-            "publisher": "个人用户",
-            "engagement": 48,
-            "followers_count": null
-          },
-          {
-            "username": "脆弱小丢",
-            "publisher": "个人用户",
-            "engagement": 20,
-            "followers_count": null
-          },
-          {
-            "username": "V妮佳沙",
-            "publisher": "旅游博主",
-            "engagement": 16,
-            "followers_count": null
-          },
-          {
-            "username": "北京发布",
-            "publisher": "政府机构",
-            "engagement": 13,
-            "followers_count": null
-          },
-          {
-            "username": "风闻社区",
-            "publisher": "官方新闻媒体",
-            "engagement": 9,
-            "followers_count": null
-          },
-          {
-            "username": "山水怀柔",
-            "publisher": "政府机构",
-            "engagement": 8,
-            "followers_count": null
-          },
-          {
-            "username": "重生之我是狄仁杰的侄女",
-            "publisher": "个人用户",
-            "engagement": 7,
-            "followers_count": null
-          },
-          {
-            "username": "小七请早睡",
-            "publisher": "个人用户",
-            "engagement": 5,
-            "followers_count": null
-          },
-          {
-            "username": "元气满满在逃公主椰",
-            "publisher": "自媒体",
-            "engagement": 4,
-            "followers_count": null
-          },
-          {
-            "username": "KA_khoo",
-            "publisher": "个人用户",
-            "engagement": 4,
-            "followers_count": null
-          },
-          {
-            "username": "乡村刘三好",
-            "publisher": "个人用户",
-            "engagement": 4,
-            "followers_count": null
-          },
-          {
-            "username": "艾斯的人间日常",
-            "publisher": "个人用户",
-            "engagement": 4,
-            "followers_count": null
-          },
-          {
-            "username": "今天你胖了没鸭",
-            "publisher": "个人用户",
-            "engagement": 3,
-            "followers_count": null
-          },
-          {
-            "username": "天使鮟鱇",
-            "publisher": "个人用户",
-            "engagement": 2,
-            "followers_count": null
-          },
-          {
-            "username": "徐志摩在第二乐章里说",
-            "publisher": "个人用户",
-            "engagement": 2,
-            "followers_count": null
-          },
-          {
-            "username": "gluewoodpecker",
-            "publisher": "个人用户",
-            "engagement": 2,
-            "followers_count": null
-          },
-          {
-            "username": "文旅北京",
-            "publisher": "旅游部门",
-            "engagement": 2,
-            "followers_count": null
-          },
-          {
-            "username": "观海融媒",
-            "publisher": "官方新闻媒体",
-            "engagement": 1,
-            "followers_count": null
-          },
-          {
-            "username": "沈夏夏的后花园",
-            "publisher": "个人用户",
-            "engagement": 1,
-            "followers_count": null
-          },
-          {
-            "username": "剃头发电热爱唱歌",
-            "publisher": "学生",
-            "engagement": 0,
-            "followers_count": null
-          }
-        ],
-        "representative_posts": [
-          {
-            "username": "EVA-hangzhou",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-25 19:52:00",
-            "engagement": 48,
-            "content": "#张艺兴夜骑主动停车捡垃圾# zyx#张艺兴2024世界巡演# 🈲️快～转，会降双方权重🙏 “夜”上海Vlog city walk city ride 骑上共享单车逛一逛 随手捡一捡公园地上的空瓶子 再顺便打个拳 热个身 “夜”生活也很丰富 #原创音乐制作人张艺兴# [抱一抱]@张艺兴 lay zix 原创 beatmaker krump 舞台 pd jw 舞蹈 rp 粉丝 ljj bot 莲 LIT 宇舶 M-POP zyxgzs 演员 雪碧 施洛华 zhangyixing 🌟 http://t.cn/A6RqOLzZ ​"
-          },
-          {
-            "username": "脆弱小丢",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-18 19:33:00",
-            "engagement": 20,
-            "content": "感觉大家都在旅游看con 最近漫无目的没有什么激情的生活be like： 偶尔出门去喝点特调低度数酒 不痒不红就行 重装了wzry然后打一些打了一会儿等于没打的游戏 上好多班然后睡一些碎片觉 偶尔出去吃个饭 觉得夜里气温很舒服甚至夜骑了一下共享单车 最后的感想是在清吧里凭什么草莓冰沙加点酒精能卖到68[微笑][微笑]"
-          },
-          {
-            "username": "V妮佳沙",
-            "publisher": "旅游博主",
-            "publish_time": "2024-08-23 21:33:00",
-            "engagement": 16,
-            "content": "#此沙[超话]# 很久没上环城绿道，今天心血来潮下班后蹬个共享单车就去了。晚上去比我想象中有意思很多，🚴没有白天那么多，有很多散步、跑步、夜骑的人也不少，有人气但不拥挤。要不是忘记带充电宝，我能骑完一圈再回家。 欢迎沙粒们有机会来骑一下成都的环城绿道，一圈一百公里，不同季节有不一样的风景。"
-          },
-          {
-            "username": "北京发布",
-            "publisher": "政府机构",
-            "publish_time": "2024-08-18 15:00:00",
-            "engagement": 13,
-            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京"
-          },
-          {
-            "username": "风闻社区",
-            "publisher": "官方新闻媒体",
-            "publish_time": "2024-08-29 14:58:00",
-            "engagement": 9,
-            "content": "【“青少年骑行热”乱象调查：儿童骑行上路，车比人大隐患重重】有孩子在绿灯亮起那一刻立即加速冲出骑行道，在人流与车流间横冲直撞，把家长甩到了“九霄云外”；也有孩子骑着尺寸比自己小小的身板大出不少的自行车，摇摇晃晃、吃力地蹬着前行；还有孩子和身旁的伙伴玩起了“竞速”…… 这是《法治日报》记者近日在北京晚高峰时段的十字路口观察到的一幕。 近年来，骑行运动热度不断攀升，骑行爱好者队伍日渐壮大，其中不乏青少年的身影。然而，根据道路交通安全法实施条例规定，驾驶自行车、三轮车必须年满12周岁。未满12周岁的儿童不允许上路骑行。 然而，记者调查发现，实践中，上路骑行的年龄“红线”在一些人和机构眼中形同虚设。不少家长带着不满12周岁的孩子约伴上路骑行甚至跨省长途骑行。此外，一些骑行社团、户外组织等机构专门开设“亲子骑行营”，还有成人骑行营对儿童“来者不拒”。值得注意的是，一些有低龄儿童参与的骑行活动，并没有配备充分的安全保障装备。 对此，资深骑行者和业内专家指出，12周岁以下儿童不论在生理上还是心智上均不具备上路骑行的能力，监护人或家长不能将他们等同于成年人对待，“会骑车不等于就能骑车上路”。在“青少年骑行热”之下，需要引导青少年养成足够的安全骑行意识，同时应当选购合适的装备、在合适的地点科学安全锻炼。家长和孩子都应当保持理智平和的心态，对规则及骑行运动保有敬畏心。 500 低龄儿童骑行上路 少有佩戴安全装备 8月中旬，记者在北京市西城区西便门桥至广安门桥区域进行了近一周的观察，时间点主要集中在晚上八点左右和周末的下午时段。 一个工作日的晚上7时许，仍是下班晚高峰，马路上车流混杂着人流，十字路口被堵得水泄不通。伴随阵阵不耐催促的汽笛声和嘈杂的人声，不时有骑行者从空隙间穿梭而过。在其中，记者看到了一个“小不点儿”——一个小男孩在临近路口的路边停了下来，骑的山地车比他个头还大。因为车座太高，他刹车时向前趔趄了一下，脚勉强够到地撑了一下才稳住身体。男孩父亲骑了一辆普通自行车跟在后面。 “这么小的孩子，骑山地车上路太危险了吧。”在二人休整间隙，记者上前询问。孩子父亲称，孩子今年10岁，“车是觉得帅闹着要买的。在路上我们家长跟着，别骑太快就行”。 稍事休息后，这对父子又踏上了骑行之路，孩子骑着明显比自己还大的车，站起来猛蹬了几下，迅速蹿了出去，很快消失在记者视线中。 在记者观察的几个十字路口，以20分钟为限，有数名低龄儿童在家长的带领下骑着自行车上路。在这些低龄儿童中，没有人穿着骑行服，几天下来记者只看到一名儿童佩戴了头盔。 记者观察发现，特别是周末，有不少青少年在马路上骑共享单车，或和家长一起或独自骑行。这些孩子普遍看上去较年幼。有的孩子由于身高不够，骑行时还需要站起来蹬几下；有的孩子骑车时脚够不到地面，停车时需要整个人从车上跳下来；有的孩子车技并不熟练，颤颤巍巍地前行，骑几米的距离车把七扭八歪的。跟在一旁的家长，看到孩子没骑稳时，有的会直接骑到共享单车侧后方，扶着车座给孩子助力，完全没意识到自己已经挡住了后面的骑行者，甚至已经串行到了机动车道。 这些骑行儿童中，不少人有在机动车道骑行或闯红灯的交通违法行为。 观察过程中，记者还看到组团的低龄骑行者，有的是各自家长带领，有的是四五个孩子由一两名成人骑行者带领。 来自上海的骑行运动博主一瓦告诉记者，随着骑行运动在近年来热度的攀升，在上海部分热门骑行路段有骑行者“低龄化”的趋势。“我了解到有一些自发的骑友群聊，还会相约带着孩子一起骑行。” 记者检索社交媒体注意到，在全国各个地区，均有这样的“骑行群”存在，群聊里的家长大多是骑行爱好者，在周末、假期时会带着孩子一同组队上路骑行。 “很多家长出于自己的爱好带着年幼的孩子骑行上路，但实际上，低龄儿童骑行的危险系数是很高的。”定居浙江杭州的24年资深骑行者齐海亮告诉记者，城市路况相对复杂，而骑行运动要求骑行者对于交通规则、路况有较高的把握能力以及快速反应能力，这是低龄儿童难以做到的。 齐海亮说，他常能看到低龄儿童骑行的危险动作。“有一天晚上我正在开车，有个妈妈带着小女孩骑车，绿灯亮了之后女孩控制不好车把一直晃悠，一下就拐到我车前了。如果不是我及时刹车，肯定就撞上了。” 并非所有孩子都能如此幸运“逃过一劫”。一瓦告诉记者，她在上海热门骑行路段苗江路骑行时，就曾经目睹一场意外。“那是一个夏天的晚上，我夜骑的时候遇到了一个年幼的小男孩。因为那段路比较黑，夜骑视线也不好，那个孩子和拉货的三轮车撞上了，车和人都倒在地上。”最后，警方和医护人员到场处理了这起意外。 骑行团只限制身高 活动安全保障不足 记者调查发现，除了城市骑行，部分家长会利用暑期带着孩子进行长途骑行甚至公路骑行。有家长带着自己11岁的孩子，驮着行李从上海一路骑行至北京。途中，父子二人骑过不少国道，经历了“雨骑”，也经历了车轮爆胎的意外。 “在城市里骑车可能容易发生‘小磕小碰’，但如果在国道上，大车多、车速快的情况下，一旦发生意外就是严重事故。”齐海亮曾经带着女儿“六一”进行长达一年的环中国骑行，他坦言，即使在自己有20余年的骑行经验、女儿已满12周岁且有较好的反应能力，同时有安全保障车跟随的情况下，他们还是难免碰上意外情况。“当时我们骑车爬坡，坡上有水，有一辆轿车超车时后轮打滑，把‘六一’撞到了沟里。车摔坏了，人住院一个礼拜。” 除了家长自发带着孩子骑行，记者还发现，在暑假期间，一些旅行社、骑行俱乐部等开办了“亲子骑行营”。这些“骑行营”招募亲子组合，或由儿童“独立”参与骑游，在社交平台、短视频平台、公众号等多个渠道都能看到相关招募信息。 在招募信息中，记者注意到了一则“儿童骑行营”的宣传——“驭风骑行，做一个追风少年，挥洒肆意的年华”。该骑行营对于报名儿童的年龄并无限制，“身高1.2米以上，熟练骑自行车”则可独立参加。 记者浏览上述骑行营客服发送的往期活动视频发现，参加该骑行营活动的均为低龄儿童，且骑行路线包括崎岖的沙路、仅有单条车道的乡野道路及夜间闹市公路，甚至在下雨天仍然坚持骑行。其间，跟队的仅有一两个骑行领队，没有任何安全保障车辆。 有部分成人骑行营亦标注了“可亲子”。记者随机查看了一个户外机构组织的“青海湖骑行360KM”项目。活动介绍显示，该项目在高原进行骑行，是“无保姆式服务的半自助游”。项目共有5日行程，骑行包含公路路段，其中日骑行最长距离为110KM。 当记者问及是否可以带孩子同行时，客服仅简单回复“身高够一米二，有经验的那没问题”，但对于报名儿童的年龄以及怎么算“有经验”，并没有进一步说明。 在长白山某骑行驿站组织的骑行活动中，记者查看文字介绍发现，单项骑行活动包含了镇内骑行、村庄骑行、森林骑行等，这类活动的报名费用并不包含相应的意外险，亦不提供安全保障车服务。当记者询问客服“小朋友是否可以报名”时，客服并未确认小孩的任何信息就回复“可以报名”。 “小孩是一定不能跟着成人的骑行团一起骑的。”齐海亮说，在成人骑行团中，大部分骑行者骑的是公路车，而公路车的轮胎较细，且把横更短，对于儿童来说更加难以操控。同时，公路车对于路况要求较高，在跟队过程中哪怕“压到两厘米的小石子”，对于孩子来说都是难以控制的。 “公路车冲起来非常快，而且户外的团队骑行有时追求‘破风效果’，速度会飙到很高，且骑手之间会跟得非常近，一旦摔车或突然刹车，后果不堪设想。”齐海亮说。 加强交通安全教育 打造儿童骑行公园 前不久，河北省保定市容城县贾光乡发生了一起令人扼腕的交通事故。一名11岁小男孩跟着父亲以及自行车队在双向公路上骑行，结果在接近中线时不小心摔倒进入对面车道。男孩被对面车道上正在行驶的一辆小汽车辗轧身亡。 公安部道路交通安全研究中心去年发布的一组数据表明，暑期少年儿童单独或结伴出行的情况增加，骑自行车、电动自行车的事故风险也有上升。近年来不满12周岁的孩子骑自行车（包括共享单车）发生交通事故的占骑行事故总量的7.5%；2022年自主驾车死亡的儿童中，骑自行车的占总死亡人数的3.8%。 根据近些年对行业的观察，齐海亮发现，骑行对于大多数青少年来说具有“竞速”的魅力。“现在很多小孩骑车是有攀比心的，他们对于交通安全没有成熟的认知，但对于速度却有追求。尤其是公路车让不少青少年觉得‘帅’‘炫酷’，但它能达到极快的速度，对于没有足够把控意识和能力的孩子来说非常危险”。 一瓦认为，会骑车不等于能骑车上路。在“青少年骑行热”之下，一些安全问题并没有引起足够的重视，青少年儿童的骑行安全需要多方共同保障。“有一些青少年可能看到专业的新型车手或是博主觉得很帅，所以跟风去骑。一些家长也觉得骑行能够锻炼身体，放任青少年上路。表面上看这些孩子们好像会骑车，但实际上必要的安全意识和措施并没有跟上。” 北京市律师协会交通管理与运输法律专业委员会主任黄海波介绍，由于12周岁以下的少年儿童发育尚未成熟，如平衡能力、反应速度等无法达到骑自行车的最低要求，因此，相关规定明确，12周岁以下的少年儿童不得在道路上骑自行车。这一规定不仅是对少年儿童自身安全的保护，也是对其他交通参与者负责。由于少年儿童骑行技术不熟练，缺乏应对紧急情况的能力，很容易引发交通事故，给自己和他人带来伤害。因此，家长和社会各界需要共同努力，加强对少年儿童骑行安全的教育和监管，确保他们遵守交通规则，远离危险。 北京市京都律师事务所高级合伙人赵岐龙告诉记者，根据民法典第1198条规定了群众性活动的组织者的安全保障义务。由于不满12周岁儿童不符合骑行条件，如果骑行活动的组织者明知其不符合骑行条件，还让不满12周岁儿童参与具有一定危险的骑行活动，造成骑行者损害的，组织者应承担一定的赔偿责任。 “首先要明确的是12周岁以下的儿童是不允许骑行上路的，另一个是即使到了可以上路的年龄，也要匹配一系列安全教育和措施。”一瓦说，骑行活动应当由特定的专业组织进行准备，尤其是针对青少年的活动，应当提前做好道路科学规划。同时，一些保障装备也必不可少，例如头盔、定位装置、对讲机、补给物品等。 一瓦还提到，家长和孩子最好能够在骑车前接受一些基础的启蒙培训，而非贸然购入公路车等有驾驭难度的车辆骑行。“在购车时，不论家长还是车店老板，都应当帮助儿童选购合适尺寸的车，选择专业的头盔、手套以及骑行服，同时装好前灯、尾灯。如果夜骑的话，还建议穿好反光背心或佩戴反光标志，这样可以有效地规避一些风险。” 受访的业内人士和专家一致认为，针对“低龄儿童骑行上路”的问题，在法律限制低龄儿童骑车上路之外，更应该在增强儿童的骑行安全意识上下功夫，比如可以借鉴一些其他国家和地区的经验，打造更多更适合儿童认知的骑行公园。公园内除了能提供安全的骑行道路外，还可以模拟城市交通环境，比如红绿灯、斑马线、路口等设置，让孩子们在练习骑行的同时，也能够了解并掌握必要的骑行安全常识。 “包括青少年在内的广大骑行爱好者都应当理智对待骑行，不要抱有侥幸心理，更不要挑战规则。”一瓦说，要对骑行运动保持敬畏心。（法治日报）"
-          },
-          {
-            "username": "山水怀柔",
-            "publisher": "政府机构",
-            "publish_time": "2024-08-18 15:21:00",
-            "engagement": 8,
-            "content": "#小柔提醒# 【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，北京市文化和旅游局制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。（via.@文旅北京）"
-          },
-          {
-            "username": "重生之我是狄仁杰的侄女",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-23 04:23:00",
-            "engagement": 7,
-            "content": "夜骑好爽，没有专业设备，就是随手扫的共享单车慢慢吹晚风好舒服 http://t.cn/A6R4r1rP ​​​"
-          },
-          {
-            "username": "小七请早睡",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-24 22:19:00",
-            "engagement": 5,
-            "content": "夜骑长安街，最难的是找到一辆共享单车[笑cry] ❤️北京+1 收获力量！！！ ​​​"
-          },
-          {
-            "username": "元气满满在逃公主椰",
-            "publisher": "自媒体",
-            "publish_time": "2024-08-26 12:51:00",
-            "engagement": 4,
-            "content": "解锁共享单车夜骑新体验之—— 再也不夜骑了🙃 11点半出发 历时7+小时 骑行60公里 人已废在工位 ​​​"
-          },
-          {
-            "username": "KA_khoo",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-24 21:45:00",
-            "engagement": 4,
-            "content": "第二盘儿用共享单车跟到去夜骑 主打一个各耍各[裂开] 今天运动达标＋昨天做饭达标 ​​​"
-          },
-          {
-            "username": "乡村刘三好",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-23 11:45:00",
-            "engagement": 4,
-            "content": "共享单车夜骑🚴哈哈哈 ​​​"
-          },
-          {
-            "username": "艾斯的人间日常",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-21 23:25:00",
-            "engagement": 4,
-            "content": "今日和H小姐夜骑30km的 共享单车 这周运动量足够了[晕] ​​​"
-          },
-          {
-            "username": "今天你胖了没鸭",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-17 01:30:00",
-            "engagement": 3,
-            "content": "拖鞋 共享单车 夜骑 什么实力 ​​​"
-          },
-          {
-            "username": "天使鮟鱇",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-31 22:02:00",
-            "engagement": 2,
-            "content": "太烦躁了所以在公园夜骑共享单车一段没有路灯的盲骑好像没有骑单车不能忘记的烦 ​​​"
-          },
-          {
-            "username": "徐志摩在第二乐章里说",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-31 01:49:00",
-            "engagement": 2,
-            "content": "学校旁就是海。 将一切刚好赶到的日落、恰如其分的小雨、泥泞渔村的小路、八里长街上久违的夜骑、公路上放肆高唱的艳阳天、天气中未差半毫的湿度与温度——通通归功于四辆半的共享电单车。 ​​​"
-          },
-          {
-            "username": "gluewoodpecker",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-30 14:50:00",
-            "engagement": 2,
-            "content": "翻相册翻到月初一个人在天津解放北路夜骑共享单车，不在乎时间像没有明天一样地活着。好幸福，欢迎收看我的私生活，余虹在天津的时候。 ​​​"
-          },
-          {
-            "username": "文旅北京",
-            "publisher": "旅游部门",
-            "publish_time": "2024-08-17 23:01:00",
-            "engagement": 2,
-            "content": "#月光骑遇季# 【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。"
-          },
-          {
-            "username": "观海融媒",
-            "publisher": "官方新闻媒体",
-            "publish_time": "2024-08-21 23:56:00",
-            "engagement": 1,
-            "content": "【珠海人关注的热点新闻 尽在观海热闻榜】 [星星]点赞！珠海“宝妈”实现“家门口的就业” http://t.cn/A6RykuGh [星星]#全红婵陈艺文等被记大功# 广东省委省政府关于给予我省参加第33届夏季奥运会获奖运动员及其教练员和有关单位奖励的通报 http://t.cn/A6RykuGP http://t.cn/A6Ryk5nM [星星]7大区域“视听味”俱全！周五起，来斗门喝啤酒品美食赏非遗 http://t.cn/A6RykuGZ [星星]事关学生票，铁路12306推出新功能 http://t.cn/A6Rykubk #12306回应男子把卧铺让给妹妹被拒# [星星]高校新生谨防五类入学骗局，珠海网警发布安全提醒→ http://t.cn/A6RykubF [星星]香洲区暑期共享单车夜骑爆火，运维人员连夜“清淤” http://t.cn/A6RykuGw [星星]广东已启动防汛Ⅲ级响应，全省提前转移超75000人 http://t.cn/A6RykuGv [星星]来自澳门的他，在珠海海岛打造了一个“山谷营地” http://t.cn/A6Rykubs [星星]2024年天威慈善助学金发放 42名困难学子圆大学梦 http://t.cn/A6RykuG7 更多珠海人关注的热点新闻→#观海热闻榜##珠海[超话]# http://t.cn/A6pj9eoQ"
-          },
-          {
-            "username": "沈夏夏的后花园",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-19 12:39:00",
-            "engagement": 1,
-            "content": "最近花了一整年的时间，把熬夜这件事戒掉了，虽然偶尔还是会晚睡，但这种情况从日常变成了偶尔。 最近还养成了夜骑+夜跑的习惯。比起单纯去跑步，这种方式最适合我。 出门骑行四公里到湖边，然后从一个门跑步到另外一个门，接着再找一辆共享单车骑回家。前后运动一小时，大约十公里。 运动以容易坚持为主，在养成习惯后，再做变化和精进。 开始接受自己偶尔的情绪性进食，并且有意识地在不需要情绪性进食的时候控制饮食量和品质。 工作上决策变得更谨慎，一旦决策行动比之前更迅猛。 待人更亲切，也更懂得如何与他人合作。 特别喜欢那一句“我已经见过足够多的世面，一切皆可抛弃。剩下的就是持之以恒，秘而不宣的努力。” 这也是我近几年来的想法、体验和结论。"
-          },
-          {
-            "username": "剃头发电热爱唱歌",
-            "publisher": "学生",
-            "publish_time": "2024-08-30 22:52:00",
-            "engagement": 0,
-            "content": "表现叛逆的方式，是在没有共享单车的城市的校园里，疯狂骑行，真的很爱夜骑，闷闷热热的空气因为脚蹬车的速度加快而变得凉爽，感受大腿肌肉一点点变酸，第一张骑行卡，毕业 ​​​"
-          },
-          {
-            "username": "滴di滴叭ba叭呜皮啊",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-29 00:15:00",
-            "engagement": 0,
-            "content": "好想买自行车🚲 好纠结，买了没地方放，骑的次数也不算多 想夜骑了不如扫个共享单车 可是还是想买啊哈哈哈哈哈哈哈哈 ​​​"
-          },
-          {
-            "username": "卡通胶片笑声",
-            "publisher": "自媒体",
-            "publish_time": "2024-08-28 22:10:00",
-            "engagement": 0,
-            "content": "#每一场夜骑终点都是夜宵摊# 🌟夜晚不再寂寞！随着暑热来袭，&quot;夜骑&quot;一族悄然兴起，北京、上海、成都...各大城市的夜空下，共享單車成为最靓的风景線🌈 在北京，18-22时的夜騎時長飆升15%，而簋街、牛街更是成為美食探險家们的聚集地🍴。那些熟悉的老字号周围，單車來回穿梭不停歇。 不仅如此，&quot;夜骑&quot;还带🔥红了一众深夜食堂，从烤串🍢到小龙虾🦞，每一份美味都承载着骑士们对生活的热爱❤️。 让我们一起跟随這股潮流，感受城市夜晚的独特魅力吧！🌃"
-          },
-          {
-            "username": "偶像音乐潮流地",
-            "publisher": "自媒体",
-            "publish_time": "2024-08-24 22:23:00",
-            "engagement": 0,
-            "content": "#张艺兴夜骑主动停车捡垃圾# 张艺兴实在太可爱了！在上海江边夜骑共享单车，看到垃圾赶紧停车去捡起。细节处见人品，张艺兴一直都做的很好啊！http://t.cn/A6RqOLzZ ​​​"
-          },
-          {
-            "username": "爱张哥的人生易如反掌",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-24 22:21:00",
-            "engagement": 0,
-            "content": "#张艺兴夜骑主动停车捡垃圾#一个环保的要坐地铁骑共享单车的张哥 ​​​"
-          },
-          {
-            "username": "没有碳酸不能活",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-22 00:36:00",
-            "engagement": 0,
-            "content": "虽然骑的是共享单车，但夜骑真的很快乐🚴 ​​​"
-          },
-          {
-            "username": "北京平谷",
-            "publisher": "旅游部门",
-            "publish_time": "2024-08-19 10:00:00",
-            "engagement": 0,
-            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京"
-          },
-          {
-            "username": "北京音乐广播",
-            "publisher": "官方新闻媒体",
-            "publish_time": "2024-08-19 09:35:00",
-            "engagement": 0,
-            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京收"
-          },
-          {
-            "username": "海淀宣传",
-            "publisher": "宣传部门",
-            "publish_time": "2024-08-19 07:12:00",
-            "engagement": 0,
-            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。（@文旅北京 ）#海小宣提示#"
-          },
-          {
-            "username": "北京市石景山",
-            "publisher": "政府机构",
-            "publish_time": "2024-08-18 19:50:00",
-            "engagement": 0,
-            "content": "【#首都骑游文明公约#出炉，7条公约保安全——】为了最大限度保证骑游者的人身安全和愉悦体验，为了最大限度的保证骑游不影响道路交通和居民日常生活，为了营造安全、和谐、文明的骑游环境，制定如下首都骑游文明公约： 1、出发前仔细检查装备，确保头盔、刹车、轮胎和灯光等都处于良好状态，提前了解天气情况并做好防护措施。穿着紧身或反光衣物，夜骑时打开车灯。 2、严格遵守交通规则，沿道路右侧骑游，不随意占用机动车道或人行道，不逆行、不闯灯。不在道路上追逐打闹，保持适当车距，多人不并排骑行，避免发生事故。 3、合理规划骑游线路，尽量避开居民区内的狭窄道路，选择安全、宽阔的骑游线路。时刻注意控制骑游车速，避免急转弯、急刹车等危险行为，避免骑游时接打电话、拍照等行为，注意避让行人和儿童。 4、在居民区附近骑游时，保持安静，尽量降低骑游速度，避免大声喧哗，避免使用高分贝的铃铛或其他配件及装备，减少噪音对居民的干扰。避免车灯直射他人眼睛，减少光污染。 5、骑游过程中产生的垃圾，随身携带并妥善处理，避免随地吐痰、乱扔杂物等不文明行为，保持环境整洁，维护城市清洁和美丽。 6、在骑游公园等公共场所过程中，不要随意损坏或占用公共设施，以免影响市民游客的正常使用或造成安全隐患。 7、使用共享单车时，应爱护车辆，不涂抹二维码、不加装个人锁具等，发现损坏及时报修。骑行结束后，将单车停放至指定区域。@文旅北京"
-          },
-          {
-            "username": "用户6884768548",
-            "publisher": "个人用户",
-            "publish_time": "2024-08-16 10:15:00",
-            "engagement": 0,
-            "content": "#河财纯净版[超话]#开封夜骑 找搭子（共享单车） 男女不限 qq2788512930 ​​​"
-          }
-        ]
-      },
-      "source_tool": "publisher_distribution_stats",
-      "source_type": "mcp"
-    },
-    {
-      "id": "cross_dimension_matrix",
-      "title": "多维交互分析 - cross_dimension_matrix",
-      "data": {
-        "matrix": {
-          "个人用户": {
-            "中性": {
-              "count": 11,
-              "row_percentage": 68.75,
-              "col_percentage": 52.38
-            },
-            "乐观": {
-              "count": 4,
-              "row_percentage": 25.0,
-              "col_percentage": 50.0
-            },
-            "悲观": {
-              "count": 1,
-              "row_percentage": 6.25,
-              "col_percentage": 100.0
-            }
-          },
-          "官方新闻媒体": {
-            "中性": {
-              "count": 2,
-              "row_percentage": 66.67,
-              "col_percentage": 9.52
-            },
-            "乐观": {
-              "count": 1,
-              "row_percentage": 33.33,
-              "col_percentage": 12.5
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "自媒体": {
-            "中性": {
-              "count": 1,
-              "row_percentage": 33.33,
-              "col_percentage": 4.76
-            },
-            "乐观": {
-              "count": 2,
-              "row_percentage": 66.67,
-              "col_percentage": 25.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "政府机构": {
-            "中性": {
-              "count": 3,
-              "row_percentage": 100.0,
-              "col_percentage": 14.29
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "旅游部门": {
-            "中性": {
-              "count": 2,
-              "row_percentage": 100.0,
-              "col_percentage": 9.52
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "学生": {
-            "中性": {
-              "count": 1,
-              "row_percentage": 100.0,
-              "col_percentage": 4.76
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "旅游博主": {
-            "中性": {
-              "count": 1,
-              "row_percentage": 100.0,
-              "col_percentage": 4.76
-            },
-            "乐观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          },
-          "宣传部门": {
-            "中性": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            },
-            "乐观": {
-              "count": 1,
-              "row_percentage": 100.0,
-              "col_percentage": 12.5
-            },
-            "悲观": {
-              "count": 0,
-              "row_percentage": 0.0,
-              "col_percentage": 0.0
-            }
-          }
-        },
-        "dimensions": {
-          "dim1": "publisher",
-          "dim2": "sentiment_polarity"
-        },
-        "dim1_values": [
-          "个人用户",
-          "官方新闻媒体",
-          "自媒体",
-          "政府机构",
-          "旅游部门",
-          "学生",
-          "旅游博主",
-          "宣传部门"
-        ],
-        "dim2_values": [
-          "中性",
-          "乐观",
-          "悲观"
-        ],
-        "dim1_totals": {
-          "个人用户": 16,
-          "官方新闻媒体": 3,
-          "自媒体": 3,
-          "政府机构": 3,
-          "旅游部门": 2,
-          "学生": 1,
-          "旅游博主": 1,
-          "宣传部门": 1
-        },
-        "dim2_totals": {
-          "中性": 21,
-          "乐观": 8,
-          "悲观": 1
-        }
-      },
-      "source_tool": "cross_dimension_matrix",
-      "source_type": "mcp"
-    },
-    {
-      "id": "topic_cooccurrence_analysis",
-      "title": "主题演化分析 - topic_cooccurrence_analysis",
-      "data": {
-        "cooccurrence_pairs": [],
-        "association_matrix": {},
-        "min_support": 2,
-        "total_pairs_analyzed": 7
-      },
-      "source_tool": "topic_cooccurrence_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "geographic_hotspot_detection",
-      "title": "地理分布分析 - geographic_hotspot_detection",
-      "data": {
-        "hotspots": [
-          {
-            "location": "无位置信息",
-            "count": 9,
-            "percentage": 30.0,
-            "is_hotspot": true
-          },
-          {
-            "location": "北京",
-            "count": 5,
-            "percentage": 16.67,
-            "is_hotspot": true
-          }
-        ],
-        "threshold": 4.6,
-        "threshold_percentile": 90,
-        "hotspot_concentration": 46.67
-      },
-      "source_tool": "geographic_hotspot_detection",
-      "source_type": "mcp"
-    },
-    {
       "id": "geographic_sentiment_analysis",
       "title": "地理分布分析 - geographic_sentiment_analysis",
       "data": {
@@ -2602,6 +2394,18 @@
         "regions_analyzed": 2
       },
       "source_tool": "geographic_sentiment_analysis",
+      "source_type": "mcp"
+    },
+    {
+      "id": "topic_cooccurrence_analysis",
+      "title": "主题演化分析 - topic_cooccurrence_analysis",
+      "data": {
+        "cooccurrence_pairs": [],
+        "association_matrix": {},
+        "min_support": 2,
+        "total_pairs_analyzed": 7
+      },
+      "source_tool": "topic_cooccurrence_analysis",
       "source_type": "mcp"
     },
     {
@@ -2893,6 +2697,251 @@
       "source_type": "mcp"
     },
     {
+      "id": "sentiment_anomaly_detection",
+      "title": "情感趋势分析 - sentiment_anomaly_detection",
+      "data": {
+        "anomalies": [
+          {
+            "time": "2024-08-24 22:00",
+            "avg_polarity": 3.67,
+            "count": 3,
+            "reasons": [
+              "发帖量异常(偏离3.7个标准差)"
+            ]
+          },
+          {
+            "time": "2024-08-31 22:00",
+            "avg_polarity": 2.0,
+            "count": 1,
+            "reasons": [
+              "情感极性异常(偏离2.5个标准差)"
+            ]
+          }
+        ],
+        "volume_spikes": [
+          {
+            "time": "2024-08-24 22:00",
+            "count": 3,
+            "zscore": 3.67
+          }
+        ],
+        "threshold": 2.0,
+        "baseline": {
+          "mean_polarity": 3.21,
+          "std_polarity": 0.47,
+          "mean_count": 1.2,
+          "std_count": 0.49
+        }
+      },
+      "source_tool": "sentiment_anomaly_detection",
+      "source_type": "mcp"
+    },
+    {
+      "id": "geographic_hotspot_detection",
+      "title": "地理分布分析 - geographic_hotspot_detection",
+      "data": {
+        "hotspots": [
+          {
+            "location": "无位置信息",
+            "count": 9,
+            "percentage": 30.0,
+            "is_hotspot": true
+          },
+          {
+            "location": "北京",
+            "count": 5,
+            "percentage": 16.67,
+            "is_hotspot": true
+          }
+        ],
+        "threshold": 4.6,
+        "threshold_percentile": 90,
+        "hotspot_concentration": 46.67
+      },
+      "source_tool": "geographic_hotspot_detection",
+      "source_type": "mcp"
+    },
+    {
+      "id": "cross_dimension_matrix",
+      "title": "多维交互分析 - cross_dimension_matrix",
+      "data": {
+        "matrix": {
+          "个人用户": {
+            "中性": {
+              "count": 11,
+              "row_percentage": 68.75,
+              "col_percentage": 52.38
+            },
+            "乐观": {
+              "count": 4,
+              "row_percentage": 25.0,
+              "col_percentage": 50.0
+            },
+            "悲观": {
+              "count": 1,
+              "row_percentage": 6.25,
+              "col_percentage": 100.0
+            }
+          },
+          "官方新闻媒体": {
+            "中性": {
+              "count": 2,
+              "row_percentage": 66.67,
+              "col_percentage": 9.52
+            },
+            "乐观": {
+              "count": 1,
+              "row_percentage": 33.33,
+              "col_percentage": 12.5
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "自媒体": {
+            "中性": {
+              "count": 1,
+              "row_percentage": 33.33,
+              "col_percentage": 4.76
+            },
+            "乐观": {
+              "count": 2,
+              "row_percentage": 66.67,
+              "col_percentage": 25.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "政府机构": {
+            "中性": {
+              "count": 3,
+              "row_percentage": 100.0,
+              "col_percentage": 14.29
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "旅游部门": {
+            "中性": {
+              "count": 2,
+              "row_percentage": 100.0,
+              "col_percentage": 9.52
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "学生": {
+            "中性": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 4.76
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "旅游博主": {
+            "中性": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 4.76
+            },
+            "乐观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          },
+          "宣传部门": {
+            "中性": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            },
+            "乐观": {
+              "count": 1,
+              "row_percentage": 100.0,
+              "col_percentage": 12.5
+            },
+            "悲观": {
+              "count": 0,
+              "row_percentage": 0.0,
+              "col_percentage": 0.0
+            }
+          }
+        },
+        "dimensions": {
+          "dim1": "publisher",
+          "dim2": "sentiment_polarity"
+        },
+        "dim1_values": [
+          "个人用户",
+          "官方新闻媒体",
+          "自媒体",
+          "政府机构",
+          "旅游部门",
+          "学生",
+          "旅游博主",
+          "宣传部门"
+        ],
+        "dim2_values": [
+          "中性",
+          "乐观",
+          "悲观"
+        ],
+        "dim1_totals": {
+          "个人用户": 16,
+          "官方新闻媒体": 3,
+          "自媒体": 3,
+          "政府机构": 3,
+          "旅游部门": 2,
+          "学生": 1,
+          "旅游博主": 1,
+          "宣传部门": 1
+        },
+        "dim2_totals": {
+          "中性": 21,
+          "乐观": 8,
+          "悲观": 1
+        }
+      },
+      "source_tool": "cross_dimension_matrix",
+      "source_type": "mcp"
+    },
+    {
       "id": "entity_cooccurrence_network",
       "title": "NLP增强分析 - entity_cooccurrence_network",
       "data": {
@@ -3010,43 +3059,301 @@
       "source_type": "mcp"
     },
     {
-      "id": "sentiment_anomaly_detection",
-      "title": "情感趋势分析 - sentiment_anomaly_detection",
+      "id": "text_cluster_analysis",
+      "title": "NLP增强分析 - text_cluster_analysis",
       "data": {
-        "anomalies": [
-          {
-            "time": "2024-08-24 22:00",
-            "avg_polarity": 3.67,
-            "count": 3,
-            "reasons": [
-              "发帖量异常(偏离3.7个标准差)"
-            ]
-          },
-          {
-            "time": "2024-08-31 22:00",
-            "avg_polarity": 2.0,
-            "count": 1,
-            "reasons": [
-              "情感极性异常(偏离2.5个标准差)"
-            ]
-          }
-        ],
-        "volume_spikes": [
-          {
-            "time": "2024-08-24 22:00",
-            "count": 3,
-            "zscore": 3.67
-          }
-        ],
-        "threshold": 2.0,
-        "baseline": {
-          "mean_polarity": 3.21,
-          "std_polarity": 0.47,
-          "mean_count": 1.2,
-          "std_count": 0.49
+        "clusters": {
+          "20": 7
         }
       },
-      "source_tool": "sentiment_anomaly_detection",
+      "source_tool": "text_cluster_analysis",
+      "source_type": "mcp"
+    },
+    {
+      "id": "temporal_keyword_heatmap",
+      "title": "NLP增强分析 - temporal_keyword_heatmap",
+      "data": {
+        "matrix": {},
+        "time_keys": [
+          "2024-08-16",
+          "2024-08-17",
+          "2024-08-18",
+          "2024-08-19",
+          "2024-08-21",
+          "2024-08-22",
+          "2024-08-23",
+          "2024-08-24",
+          "2024-08-26",
+          "2024-08-28",
+          "2024-08-29",
+          "2024-08-30",
+          "2024-08-31"
+        ],
+        "keywords": []
+      },
+      "source_tool": "temporal_keyword_heatmap",
+      "source_type": "mcp"
+    },
+    {
+      "id": "belief_network_chart",
+      "title": "信念系统分析 - belief_network_chart",
+      "data": {
+        "nodes": [
+          {
+            "ID": "担心自身安全",
+            "Category": "风险感知类",
+            "Co-Occurrence-Weight": 10.021270588192511
+          },
+          {
+            "ID": "改善相关行业或系统",
+            "Category": "行动/政策类",
+            "Co-Occurrence-Weight": 14.939221880687398
+          },
+          {
+            "ID": "加强公众教育和培训",
+            "Category": "行动/政策类",
+            "Co-Occurrence-Weight": 13.818630685300514
+          },
+          {
+            "ID": "支持政策改进",
+            "Category": "行动/政策类",
+            "Co-Occurrence-Weight": 10.266393046225495
+          },
+          {
+            "ID": "管理不到位",
+            "Category": "归因信念类",
+            "Co-Occurrence-Weight": 6.222576268071368
+          },
+          {
+            "ID": "技术手段不足",
+            "Category": "归因信念类",
+            "Co-Occurrence-Weight": 2.6390573296152584
+          },
+          {
+            "ID": "担心公共安全",
+            "Category": "风险感知类",
+            "Co-Occurrence-Weight": 6.437751649736401
+          },
+          {
+            "ID": "政府应加强监管",
+            "Category": "行动/政策类",
+            "Co-Occurrence-Weight": 2.70805020110221
+          },
+          {
+            "ID": "企业/机构责任缺位",
+            "Category": "归因信念类",
+            "Co-Occurrence-Weight": 3.58351893845611
+          }
+        ],
+        "edges": [
+          {
+            "Source": "担心自身安全",
+            "Target": "担心自身安全",
+            "Weight": 4.143134726391533,
+            "Type": "Loop"
+          },
+          {
+            "Source": "担心自身安全",
+            "Target": "担心公共安全",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "担心自身安全",
+            "Target": "支持政策改进",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "担心自身安全",
+            "Target": "加强公众教育和培训",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "担心自身安全",
+            "Target": "改善相关行业或系统",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "担心自身安全",
+            "Target": "管理不到位",
+            "Weight": 1.791759469228055,
+            "Type": "Regular"
+          },
+          {
+            "Source": "担心自身安全",
+            "Target": "企业/机构责任缺位",
+            "Weight": 1.791759469228055,
+            "Type": "Regular"
+          },
+          {
+            "Source": "改善相关行业或系统",
+            "Target": "加强公众教育和培训",
+            "Weight": 6.282266746896006,
+            "Type": "Regular"
+          },
+          {
+            "Source": "改善相关行业或系统",
+            "Target": "支持政策改进",
+            "Weight": 5.438079308923196,
+            "Type": "Regular"
+          },
+          {
+            "Source": "改善相关行业或系统",
+            "Target": "担心公共安全",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "加强公众教育和培训",
+            "Target": "支持政策改进",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "加强公众教育和培训",
+            "Target": "担心公共安全",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "加强公众教育和培训",
+            "Target": "政府应加强监管",
+            "Weight": 2.70805020110221,
+            "Type": "Regular"
+          },
+          {
+            "Source": "支持政策改进",
+            "Target": "担心公共安全",
+            "Weight": 1.6094379124341003,
+            "Type": "Regular"
+          },
+          {
+            "Source": "管理不到位",
+            "Target": "技术手段不足",
+            "Weight": 2.6390573296152584,
+            "Type": "Regular"
+          },
+          {
+            "Source": "管理不到位",
+            "Target": "企业/机构责任缺位",
+            "Weight": 1.791759469228055,
+            "Type": "Regular"
+          }
+        ]
+      },
+      "source_tool": "belief_network_chart",
+      "source_type": "mcp"
+    },
+    {
+      "id": "correlation_analysis",
+      "title": "多维交互分析 - correlation_analysis",
+      "data": {
+        "correlation_matrix": {
+          "sentiment_polarity": {
+            "sentiment_polarity": 1.0,
+            "repost_count": -0.176,
+            "comment_count": 0.19,
+            "like_count": 0.098,
+            "content_length": -0.06,
+            "image_count": -0.459,
+            "topic_count": 0.544
+          },
+          "repost_count": {
+            "sentiment_polarity": -0.176,
+            "repost_count": 1.0,
+            "comment_count": 0.008,
+            "like_count": 0.137,
+            "content_length": 0.167,
+            "image_count": 0.008,
+            "topic_count": -0.125
+          },
+          "comment_count": {
+            "sentiment_polarity": 0.19,
+            "repost_count": 0.008,
+            "comment_count": 1.0,
+            "like_count": 0.945,
+            "content_length": -0.002,
+            "image_count": 0.109,
+            "topic_count": -0.082
+          },
+          "like_count": {
+            "sentiment_polarity": 0.098,
+            "repost_count": 0.137,
+            "comment_count": 0.945,
+            "like_count": 1.0,
+            "content_length": 0.134,
+            "image_count": 0.092,
+            "topic_count": -0.141
+          },
+          "content_length": {
+            "sentiment_polarity": -0.06,
+            "repost_count": 0.167,
+            "comment_count": -0.002,
+            "like_count": 0.134,
+            "content_length": 1.0,
+            "image_count": -0.053,
+            "topic_count": -0.149
+          },
+          "image_count": {
+            "sentiment_polarity": -0.459,
+            "repost_count": 0.008,
+            "comment_count": 0.109,
+            "like_count": 0.092,
+            "content_length": -0.053,
+            "image_count": 1.0,
+            "topic_count": -0.696
+          },
+          "topic_count": {
+            "sentiment_polarity": 0.544,
+            "repost_count": -0.125,
+            "comment_count": -0.082,
+            "like_count": -0.141,
+            "content_length": -0.149,
+            "image_count": -0.696,
+            "topic_count": 1.0
+          }
+        },
+        "feature_names": [
+          "sentiment_polarity",
+          "repost_count",
+          "comment_count",
+          "like_count",
+          "content_length",
+          "image_count",
+          "topic_count"
+        ],
+        "significant_correlations": [
+          {
+            "feature1": "comment_count",
+            "feature2": "like_count",
+            "correlation": 0.945,
+            "strength": "强"
+          },
+          {
+            "feature1": "image_count",
+            "feature2": "topic_count",
+            "correlation": -0.696,
+            "strength": "中"
+          },
+          {
+            "feature1": "sentiment_polarity",
+            "feature2": "topic_count",
+            "correlation": 0.544,
+            "strength": "中"
+          },
+          {
+            "feature1": "image_count",
+            "feature2": "sentiment_polarity",
+            "correlation": -0.459,
+            "strength": "弱"
+          }
+        ],
+        "sample_size": 30
+      },
+      "source_tool": "correlation_analysis",
       "source_type": "mcp"
     },
     {
@@ -3178,287 +3485,50 @@
       },
       "source_tool": "keyword_wordcloud",
       "source_type": "mcp"
-    },
-    {
-      "id": "topic_focus_distribution_chart",
-      "title": "焦点窗口分析 - topic_focus_distribution_chart",
-      "data": {
-        "focus_window": {
-          "start": "2024-08-17",
-          "end": "2024-08-30"
-        },
-        "series": [
-          {
-            "time": "2024-08-17",
-            "社会民生": 0,
-            "交通运输": 1,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-18",
-            "社会民生": 0,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-19",
-            "社会民生": 1,
-            "交通运输": 1,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-21",
-            "社会民生": 0,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-22",
-            "社会民生": 0,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-23",
-            "社会民生": 1,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-24",
-            "社会民生": 2,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-25",
-            "社会民生": 0,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 1
-          },
-          {
-            "time": "2024-08-26",
-            "社会民生": 0,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-28",
-            "社会民生": 1,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 1,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-29",
-            "社会民生": 1,
-            "交通运输": 0,
-            "民众反应": 1,
-            "经济影响": 0,
-            "媒体传播": 0
-          },
-          {
-            "time": "2024-08-30",
-            "社会民生": 0,
-            "交通运输": 0,
-            "民众反应": 0,
-            "经济影响": 0,
-            "媒体传播": 0
-          }
-        ],
-        "top_topics": [
-          "社会民生",
-          "交通运输",
-          "民众反应",
-          "经济影响",
-          "媒体传播"
-        ]
-      },
-      "source_tool": "topic_focus_distribution_chart",
-      "source_type": "mcp"
-    },
-    {
-      "id": "correlation_analysis",
-      "title": "多维交互分析 - correlation_analysis",
-      "data": {
-        "correlation_matrix": {
-          "sentiment_polarity": {
-            "sentiment_polarity": 1.0,
-            "repost_count": -0.176,
-            "comment_count": 0.19,
-            "like_count": 0.098,
-            "content_length": -0.06,
-            "image_count": -0.459,
-            "topic_count": 0.544
-          },
-          "repost_count": {
-            "sentiment_polarity": -0.176,
-            "repost_count": 1.0,
-            "comment_count": 0.008,
-            "like_count": 0.137,
-            "content_length": 0.167,
-            "image_count": 0.008,
-            "topic_count": -0.125
-          },
-          "comment_count": {
-            "sentiment_polarity": 0.19,
-            "repost_count": 0.008,
-            "comment_count": 1.0,
-            "like_count": 0.945,
-            "content_length": -0.002,
-            "image_count": 0.109,
-            "topic_count": -0.082
-          },
-          "like_count": {
-            "sentiment_polarity": 0.098,
-            "repost_count": 0.137,
-            "comment_count": 0.945,
-            "like_count": 1.0,
-            "content_length": 0.134,
-            "image_count": 0.092,
-            "topic_count": -0.141
-          },
-          "content_length": {
-            "sentiment_polarity": -0.06,
-            "repost_count": 0.167,
-            "comment_count": -0.002,
-            "like_count": 0.134,
-            "content_length": 1.0,
-            "image_count": -0.053,
-            "topic_count": -0.149
-          },
-          "image_count": {
-            "sentiment_polarity": -0.459,
-            "repost_count": 0.008,
-            "comment_count": 0.109,
-            "like_count": 0.092,
-            "content_length": -0.053,
-            "image_count": 1.0,
-            "topic_count": -0.696
-          },
-          "topic_count": {
-            "sentiment_polarity": 0.544,
-            "repost_count": -0.125,
-            "comment_count": -0.082,
-            "like_count": -0.141,
-            "content_length": -0.149,
-            "image_count": -0.696,
-            "topic_count": 1.0
-          }
-        },
-        "feature_names": [
-          "sentiment_polarity",
-          "repost_count",
-          "comment_count",
-          "like_count",
-          "content_length",
-          "image_count",
-          "topic_count"
-        ],
-        "significant_correlations": [
-          {
-            "feature1": "comment_count",
-            "feature2": "like_count",
-            "correlation": 0.945,
-            "strength": "强"
-          },
-          {
-            "feature1": "image_count",
-            "feature2": "topic_count",
-            "correlation": -0.696,
-            "strength": "中"
-          },
-          {
-            "feature1": "sentiment_polarity",
-            "feature2": "topic_count",
-            "correlation": 0.544,
-            "strength": "中"
-          },
-          {
-            "feature1": "image_count",
-            "feature2": "sentiment_polarity",
-            "correlation": -0.459,
-            "strength": "弱"
-          }
-        ],
-        "sample_size": 30
-      },
-      "source_tool": "correlation_analysis",
-      "source_type": "mcp"
-    },
-    {
-      "id": "text_cluster_analysis",
-      "title": "NLP增强分析 - text_cluster_analysis",
-      "data": {
-        "clusters": {
-          "20": 7
-        }
-      },
-      "source_tool": "text_cluster_analysis",
-      "source_type": "mcp"
     }
   ],
   "execution_log": {
     "tools_executed": [
       "sentiment_distribution_stats",
       "topic_frequency_stats",
-      "geographic_distribution_stats",
-      "sentiment_time_series",
-      "topic_time_evolution",
       "publisher_distribution_stats",
-      "cross_dimension_matrix",
-      "topic_cooccurrence_analysis",
-      "geographic_hotspot_detection",
+      "sentiment_time_series",
+      "geographic_distribution_stats",
+      "topic_time_evolution",
       "geographic_sentiment_analysis",
+      "topic_cooccurrence_analysis",
+      "publisher_topic_distribution",
       "influence_analysis",
-      "geographic_heatmap",
-      "publisher_topic_distribution_chart",
-      "publisher_sentiment_bucket_chart",
-      "participant_trend",
-      "generate_topic_network_chart",
-      "sentiment_pie_chart",
-      "topic_keyword_trend_chart",
-      "entity_cooccurrence_network",
-      "geographic_bar_chart",
-      "geographic_topic_heatmap",
       "sentiment_anomaly_detection",
+      "generate_sentiment_pie_chart",
+      "generate_geographic_heatmap",
+      "generate_geographic_bar_chart",
       "generate_topic_evolution_chart",
-      "keyword_wordcloud",
+      "generate_topic_ranking_chart",
+      "geographic_hotspot_detection",
+      "geographic_topic_heatmap",
+      "cross_dimension_matrix",
       "geographic_temporal_heatmap_tool",
-      "sentiment_trend_chart",
-      "topic_focus_distribution_chart",
-      "correlation_analysis",
+      "publisher_sentiment_bucket_chart",
+      "entity_cooccurrence_network",
+      "participant_trend",
       "text_cluster_analysis",
-      "generate_interaction_heatmap"
+      "generate_interaction_heatmap",
+      "generate_sentiment_trend_chart",
+      "temporal_keyword_heatmap",
+      "belief_network_chart",
+      "correlation_analysis",
+      "keyword_wordcloud"
     ],
-    "total_charts": 16,
-    "total_tables": 17,
+    "total_charts": 17,
+    "total_tables": 18,
     "execution_time": 0.0,
     "charts_by_category": {
-      "geographic": 4,
       "interaction": 4,
       "sentiment": 2,
+      "geographic": 4,
       "topic": 3,
-      "nlp": 3
+      "nlp": 4
     },
     "tool_stats": {
       "sentiment_distribution_stats": {
@@ -3473,7 +3543,7 @@
         "error": false,
         "empty_chart": false
       },
-      "geographic_distribution_stats": {
+      "publisher_distribution_stats": {
         "charts": 0,
         "data": 1,
         "error": false,
@@ -3485,31 +3555,13 @@
         "error": false,
         "empty_chart": false
       },
+      "geographic_distribution_stats": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
       "topic_time_evolution": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "publisher_distribution_stats": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "cross_dimension_matrix": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "topic_cooccurrence_analysis": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "geographic_hotspot_detection": {
         "charts": 0,
         "data": 1,
         "error": false,
@@ -3521,19 +3573,79 @@
         "error": false,
         "empty_chart": false
       },
+      "topic_cooccurrence_analysis": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "publisher_topic_distribution": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
       "influence_analysis": {
         "charts": 0,
         "data": 1,
         "error": false,
         "empty_chart": false
       },
-      "geographic_heatmap": {
+      "sentiment_anomaly_detection": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "generate_sentiment_pie_chart": {
         "charts": 1,
         "data": 0,
         "error": false,
         "empty_chart": false
       },
-      "publisher_topic_distribution_chart": {
+      "generate_geographic_heatmap": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "generate_geographic_bar_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "generate_topic_evolution_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "generate_topic_ranking_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "geographic_hotspot_detection": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "geographic_topic_heatmap": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "cross_dimension_matrix": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "geographic_temporal_heatmap_tool": {
         "charts": 1,
         "data": 0,
         "error": false,
@@ -3545,87 +3657,15 @@
         "error": false,
         "empty_chart": false
       },
-      "participant_trend": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "generate_topic_network_chart": {
-        "charts": 0,
-        "data": 0,
-        "error": true,
-        "empty_chart": true
-      },
-      "sentiment_pie_chart": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "topic_keyword_trend_chart": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
       "entity_cooccurrence_network": {
         "charts": 1,
         "data": 1,
         "error": false,
         "empty_chart": false
       },
-      "geographic_bar_chart": {
+      "participant_trend": {
         "charts": 1,
         "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "geographic_topic_heatmap": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "sentiment_anomaly_detection": {
-        "charts": 0,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "generate_topic_evolution_chart": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "keyword_wordcloud": {
-        "charts": 1,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "geographic_temporal_heatmap_tool": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "sentiment_trend_chart": {
-        "charts": 1,
-        "data": 0,
-        "error": false,
-        "empty_chart": false
-      },
-      "topic_focus_distribution_chart": {
-        "charts": 1,
-        "data": 1,
-        "error": false,
-        "empty_chart": false
-      },
-      "correlation_analysis": {
-        "charts": 0,
-        "data": 1,
         "error": false,
         "empty_chart": false
       },
@@ -3640,13 +3680,87 @@
         "data": 0,
         "error": false,
         "empty_chart": false
+      },
+      "generate_sentiment_trend_chart": {
+        "charts": 1,
+        "data": 0,
+        "error": false,
+        "empty_chart": false
+      },
+      "temporal_keyword_heatmap": {
+        "charts": 1,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "belief_network_chart": {
+        "charts": 1,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "correlation_analysis": {
+        "charts": 0,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
+      },
+      "keyword_wordcloud": {
+        "charts": 1,
+        "data": 1,
+        "error": false,
+        "empty_chart": false
       }
     },
+    "forum_rounds": 2,
     "chart_analysis": {
-      "total_charts": 16,
-      "success_count": 16,
+      "total_charts": 17,
+      "success_count": 17,
       "success_rate": 1.0,
-      "analysis_timestamp": 404.20081543922424
+      "analysis_timestamp": 459.43205761909485
     }
+  },
+  "search_context": {
+    "background_context": "2024年8月16日至31日期间，社交媒体上关于京鄂交通的讨论达到一个高峰。这并非孤立事件，而是自2020年新冠疫情以来，两地交通逐步恢复与政策持续优化的延续。从2020年初的离鄂通道解禁、航班复航，到2021年进返京政策的简化，再到湖北省“十四五”规划对交通枢纽的长期布局，京鄂交通问题始终是连接两地民生与经济的关键议题。当前的讨论聚焦于后疫情时代下的出行便利性、具体政策执行细节以及基础设施升级带来的实际体验，反映了公众对恢复正常、高效跨区域流动的高度关注。",
+    "consistency_points": [
+      "主题高度一致：数据摘要中的热门主题“交通运输”与“社会民生”与搜索结果中描述的政策调整（如核酸检测要求变化）、交通恢复（航班复航）和基础设施升级（火车站地铁接驳）等官方响应完全吻合。",
+      "地理焦点明确：数据摘要中的主要地区“北京”和“湖北”与搜索结果揭示的“京鄂交通”核心议题及其关键行动者（北京市政府、湖北省政府）精准对应。",
+      "情感反应吻合：数据摘要显示情感分布以中性（21/30）和积极（8/30）为主，这与搜索结果中“公众反应总体中性偏积极”的总结一致。积极反应体现在对交通恢复便利性的认可（如赏花季满座），而中性反应则与对政策细节的关注相符。",
+      "时间点匹配：数据摘要的时间范围（2024-08-16 to 2024-08-31）被搜索结果的事件时间线明确标识为“博文讨论高峰期”，证实了数据捕捉到了舆论的关键节点。"
+    ],
+    "conflict_points": [
+      "历史包袱与当前情绪的张力：数据摘要显示当前消极情绪极少（1/30），但搜索结果指出，公众的消极反应“可能与疫情期间的严格管控相关”。这暗示当前的积极或中性情绪可能建立在一段负面经历之上，存在一种“谨慎乐观”或“对比式满意”的潜在张力，而非纯粹的正面评价。",
+      "官方叙事与个体体验的潜在差距：数据摘要的发布者类型多样，包含官方与个人。搜索结果详细列出了官方的积极举措（如政策简化、基建升级），但数据摘要中的高评论量（79）可能暗示个体用户在具体执行层面仍遇到问题或有更细致的诉求，这些可能与官方的宏观叙事存在细微差距。"
+    ],
+    "blind_spots": [
+      "历史脉络缺失：数据摘要仅提供了两周的快照，完全缺失了自2020年以来京鄂交通政策演变的关键历史背景（如离鄂解禁、航班复航、政策放宽等），使得无法理解当前讨论的深层原因和公众情绪的演变轨迹。本次补充搜索未能找到相关的官方政策文件或历史回顾来填补此空白。",
+      "具体政策细节不明：数据摘要主题宽泛（“交通运输”），但未涉及具体是哪些政策引发了讨论。搜索结果揭示了健康登记、核酸检测、交通规划等具体内容，这些是理解舆论焦点的关键信息，但在数据摘要中无法体现。本次补充搜索针对“健康宝”、“核酸要求”等关键词的官方回应查询，未返回有效结果，此盲点依然存在。",
+      "关键行动者角色模糊：数据摘要将“政府机构”列为发布者之一，但无法区分是中央部委（如交通运输部）还是地方政府（如北京市政府）。搜索结果则明确了不同行动者的具体职责，这对于分析舆论的针对性和影响力至关重要。本次补充搜索未提供关于不同层级政府在京鄂交通议题上具体分工的新信息。",
+      "经济驱动因素被忽略：搜索结果提到交通恢复“促进区域经济恢复”和“赏花季”等经济活动，但数据摘要的“社会民生”主题较为笼统，未能揭示出经济因素在驱动民众出行和舆论讨论中的重要作用。本次补充搜索未找到能直接关联交通政策与经济数据的官方分析报告。"
+    ],
+    "recommended_followups": [
+      "进行历史舆情回溯分析：搜集2020年至2024年间关于“京鄂交通”、“进返京政策”等关键词的社交媒体数据，绘制公众情感与关键政策节点的关联图，以理解当前舆论格局的形成过程。",
+      "开展细粒度主题挖掘：对30篇博文进行更深度的文本分析，提取具体讨论的政策点（如“健康宝”、“核酸证明”、“高铁换乘”等），量化不同子话题的讨论热度，识别民众最关心的具体问题。",
+      "实施多维度发布者对比分析：分别研究官方媒体、政府机构、个人用户等不同类型发布者的言论框架、情感倾向和互动模式，探究官方叙事与民间舆论的异同点及互动关系。",
+      "关联经济与交通数据：尝试将社交媒体讨论热度与同期京鄂间的航班、铁路客流量以及湖北省的旅游收入等公开数据进行关联分析，验证交通恢复对经济和民生的实际影响，并寻找舆论背后的经济动因。"
+    ],
+    "supplements": [
+      {
+        "queries": [
+          "历史脉络缺失：当前数据仅为两周快照，完全缺失了自2020年以来京鄂交通政策演变的关键背景，无法理解当前舆论的成因。 官方回应",
+          "政策细节模糊：数据摘要中的'交通运输'主题过于宽泛，未能识别出引发讨论的具体政策点（如健康宝、核酸要求等），而这些是理解民众关切的核心。 官方回应"
+        ],
+        "reason": "补齐外部公开信源。",
+        "documents_count": 6
+      }
+    ],
+    "forum_conclusions": [
+      "本轮分析确认，舆论核心是关于'京鄂交通'在后疫情时代的恢复与优化，公众情绪总体中性偏积极，但背后可能隐藏着基于历史负面经历的'谨慎乐观'。",
+      "一个关键的潜在张力存在于官方发布的宏观利好政策与个人用户在微观执行层面的具体体验之间。高评论量也暗示了民众有较强的表达和反馈意愿。",
+      "当前分析的最大短板是缺乏历史背景和具体政策细节，导致对舆论的理解停留在表面。同时，视觉分析的缺失严重阻碍了对数据可视化潜力的挖掘，无法完成对DataAgent结果的交叉验证。",
+      "下一步最紧迫的任务是补充视觉分析，以充分利用现有图表，深入探究已识别的冲突点和叙事差距，为后续的深度搜索或数据补充提供更精确的方向。"
+    ],
+    "forum_rounds": 2,
+    "visual_analyses": []
   }
 }

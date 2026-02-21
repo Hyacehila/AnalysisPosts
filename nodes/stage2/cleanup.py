@@ -4,9 +4,20 @@ Stage 2 report directory cleanup node.
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 
 from nodes.base import MonitoredNode
 from utils.path_manager import PathManager
+
+
+_PRESERVED_FILES = {"status.json"}
+_PRESERVED_DIRS = {"acceptance", "images"}
+
+
+def _should_preserve(path: Path) -> bool:
+    if path.is_dir():
+        return path.name in _PRESERVED_DIRS
+    return path.name in _PRESERVED_FILES
 
 
 class ClearReportDirNode(MonitoredNode):
@@ -22,11 +33,18 @@ class ClearReportDirNode(MonitoredNode):
         report_dir = manager.report_dir()
 
         if report_dir.exists():
-            shutil.rmtree(report_dir)
+            for child in report_dir.iterdir():
+                if _should_preserve(child):
+                    continue
+                if child.is_dir():
+                    shutil.rmtree(child, ignore_errors=False)
+                else:
+                    child.unlink()
 
-        # 重新创建 report/ 与 report/images/，确保后续写入正常
+        # 保留状态文件与验收目录，同时确保 report/images/ 可写。
         manager.ensure_dir(report_dir)
         manager.ensure_dir(manager.images_dir())
+        manager.ensure_dir(report_dir / "acceptance")
 
         return str(report_dir)
 

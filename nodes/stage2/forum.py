@@ -4,6 +4,7 @@ Stage2 forum host node (B5).
 from __future__ import annotations
 
 import json
+import re
 import time
 from typing import Any, Dict, List
 
@@ -70,6 +71,17 @@ def _fallback_result(prep_res: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _extract_event_keywords(data_summary: str, *, limit: int = 6) -> List[str]:
+    stopwords = {"分析", "数据", "事件", "舆情", "讨论", "结果", "相关", "话题"}
+    counts: Dict[str, int] = {}
+    for token in re.findall(r"[\u4e00-\u9fff]{2,10}", str(data_summary or "")):
+        if token in stopwords:
+            continue
+        counts[token] = counts.get(token, 0) + 1
+    sorted_tokens = sorted(counts.items(), key=lambda item: (-item[1], -len(item[0]), item[0]))
+    return [token for token, _ in sorted_tokens[:limit]]
+
+
 def _normalize_directive(decision: str, directive: Dict[str, Any], gaps: List[str]) -> Dict[str, Any]:
     directive = dict(directive or {})
     if decision == "supplement_data":
@@ -130,6 +142,7 @@ class ForumHostNode(MonitoredNode):
             "visual_analyses": list(forum.get("visual_analyses", []) or []),
             "previous_rounds": list(forum.get("rounds", []) or []),
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
+            "event_keywords": _extract_event_keywords(shared.get("agent", {}).get("data_summary", "")),
             "reasoning_enabled_stage2": reasoning_enabled_stage2(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
@@ -140,6 +153,9 @@ class ForumHostNode(MonitoredNode):
 
 数据摘要：
 {prep_res.get("data_summary", "")}
+
+事件关键词：
+{prep_res.get("event_keywords", [])}
 
 DataAgent结果：
 {json.dumps(prep_res.get("data_agent_results", {}), ensure_ascii=False)[:2500]}

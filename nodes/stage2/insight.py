@@ -177,11 +177,29 @@ class LLMInsightNode(MonitoredNode):
 
     @staticmethod
     def _match_evidence(insight_text, trace_executions):
+        semantic_keyword_map = {
+            "sentiment": ["情感", "极性", "正面", "负面", "中性"],
+            "topic": ["主题", "话题", "议题", "热度", "关键词"],
+            "geographic": ["地区", "地域", "地理", "分布", "北京", "上海"],
+            "publisher": ["发布者", "用户", "媒体", "机构", "账号"],
+            "interaction": ["互动", "转发", "评论", "点赞", "传播"],
+        }
+
         text_lower = insight_text.lower()
         matches = []
         for execution in trace_executions:
             tool_name = str(execution.get("tool_name", "")).lower()
             summary = str(execution.get("summary", "")).lower()
+
+            semantic_matched = False
+            for domain, keywords in semantic_keyword_map.items():
+                if domain in tool_name and any(keyword in insight_text for keyword in keywords):
+                    semantic_matched = True
+                    break
+            if semantic_matched:
+                matches.append(execution)
+                continue
+
             if tool_name and tool_name in text_lower:
                 matches.append(execution)
                 continue

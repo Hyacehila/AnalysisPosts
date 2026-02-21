@@ -43,8 +43,7 @@ function Invoke-PytestStep {
     param(
         [string]$Name,
         [string[]]$PytestArgs,
-        [bool]$AllowFailure = $false,
-        [bool]$ExpectFailure = $false
+        [bool]$AllowFailure = $false
     )
 
     Write-Host ""
@@ -54,14 +53,7 @@ function Invoke-PytestStep {
     $exitCode = $LASTEXITCODE
 
     $status = "PASSED"
-    if ($ExpectFailure) {
-        if ($exitCode -eq 0) {
-            $status = "UNEXPECTED_PASS"
-            $script:blockingFailed = $true
-        } else {
-            $status = "EXPECTED_FAIL"
-        }
-    } elseif ($exitCode -ne 0) {
+    if ($exitCode -ne 0) {
         if ($AllowFailure) {
             $status = "ALLOWED_FAIL"
         } else {
@@ -154,7 +146,7 @@ try {
         "-v",
         "-p", "no:cacheprovider",
         "--basetemp=$baseTemp\\whitelist"
-    ) -ExpectFailure $true
+    ) -AllowFailure $true
 } catch {
     $script:blockingFailed = $true
     $script:capturedError = $_
@@ -178,7 +170,7 @@ $lines += ("- Date: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss K"))
 $lines += ("- Run ID: " + $RunId)
 $lines += ("- Acceptance Profile: " + $Profile)
 $lines += ("- Final Outcome: " + $script:finalState)
-$lines += "- Final Gate: all steps pass except approved whitelist exemption."
+$lines += "- Final Gate: all blocking steps must pass; whitelist key check is informational."
 $lines += "- Whitelist exemption: tests/unit/core/test_no_real_secrets.py"
 $lines += ""
 $lines += "## Step Results"

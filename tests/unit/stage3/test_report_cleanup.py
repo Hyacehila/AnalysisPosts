@@ -26,6 +26,32 @@ def test_clear_report_dir_node_recreates_images(tmp_path, monkeypatch):
     assert not old_file.exists()
 
 
+def test_clear_report_dir_node_preserves_status_and_acceptance(tmp_path, monkeypatch):
+    report_dir = tmp_path / "report"
+    images_dir = report_dir / "images"
+    acceptance_dir = report_dir / "acceptance"
+    report_dir.mkdir()
+    images_dir.mkdir()
+    acceptance_dir.mkdir()
+    status_path = report_dir / "status.json"
+    status_path.write_text('{"version":2,"events":[]}', encoding="utf-8")
+    acceptance_log = acceptance_dir / "full_acceptance_demo.md"
+    acceptance_log.write_text("# acceptance", encoding="utf-8")
+    stage2_json = report_dir / "analysis_data.json"
+    stage2_json.write_text("{}", encoding="utf-8")
+
+    monkeypatch.setattr(PathManager, "report_dir", lambda self: report_dir)
+
+    node = ClearReportDirNode()
+    node.exec(None)
+
+    assert report_dir.exists()
+    assert images_dir.exists()
+    assert status_path.exists()
+    assert acceptance_log.exists()
+    assert not stage2_json.exists()
+
+
 def test_clear_stage3_outputs_node_preserves_stage2_outputs(tmp_path, monkeypatch):
     report_dir = tmp_path / "report"
     images_dir = report_dir / "images"

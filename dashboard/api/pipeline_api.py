@@ -129,7 +129,9 @@ def _config_from_dict(raw: Dict[str, Any]) -> AppConfig:
     )
 
     stage2 = Stage2Config(**(raw.get("stage2", {}) or {}))
-    stage3 = Stage3Config(**(raw.get("stage3", {}) or {}))
+    stage3_raw = dict(raw.get("stage3", {}) or {})
+    stage3_raw.pop("min_score", None)  # backward compatibility for legacy configs
+    stage3 = Stage3Config(**stage3_raw)
     runtime = RuntimeConfig(**(raw.get("runtime", {}) or {}))
     llm = LLMConfig(**(raw.get("llm", {}) or {}))
 
