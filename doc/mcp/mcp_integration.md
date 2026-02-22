@@ -1,6 +1,6 @@
 # MCP 协议集成文档
 
-> **文档状态**: 2026-02-10 创建  
+> **文档状态**: 2026-02-22 更新  
 > **关联源码**: `utils/mcp_server.py`, `utils/mcp_client/mcp_client.py`  
 > **上级文档**: [系统设计总览](design.md)
 
@@ -47,7 +47,7 @@ flowchart LR
 |:---|:---|
 | **框架** | `FastMCP`（from `fastmcp`） |
 | **服务器名称** | `"Opinion Analysis Server"` |
-| **启动方式** | `python utils/mcp_server.py`（作为子进程） |
+| **启动方式** | 主进程通过 `sys.executable` 启动 `utils/mcp_server.py` 子进程 |
 | **通信协议** | stdio transport（标准输入/输出） |
 
 ### 2.2 数据加载策略
@@ -159,6 +159,17 @@ def sentiment_distribution() -> Dict[str, Any]:
 
 > **命名冲突处理**：部分 `analysis_tools` 函数名与 MCP 工具名冲突（如 `influence_analysis`），在导入时使用别名（`as influence_analysis_tool`）。
 
+### 2.5 返回契约（本轮修复）
+
+- 图表类工具统一返回：`{"charts": [...], "summary": "..."}`  
+- 不再返回大体量 `data` 明细，避免 MCP 序列化体积过大导致阻塞或截断。  
+- 下列原数据工具已重定向为图表输出：  
+  - `sentiment_distribution_stats` / `sentiment_time_series`  
+  - `topic_frequency_stats` / `topic_time_evolution` / `topic_cooccurrence_analysis`  
+  - `geographic_distribution_stats` / `geographic_hotspot_detection` / `geographic_sentiment_analysis`  
+  - `publisher_distribution_stats` / `cross_dimension_matrix`  
+- 例外：`influence_analysis` 仍返回 `data`，但已严格截断为 Top5。
+
 ---
 
 ## 3. MCP 客户端 `mcp_client/mcp_client.py`
@@ -196,7 +207,7 @@ def set_mcp_mode(use_mcp: bool):
 sequenceDiagram
     participant C as Client
     participant S as Server (子进程)
-    C->>S: 启动子进程 (python mcp_server.py)
+    C->>S: 启动子进程 (sys.executable + mcp_server.py)
     C->>S: session.initialize()
     C->>S: session.list_tools()
     S-->>C: tools_response
@@ -210,7 +221,7 @@ sequenceDiagram
 sequenceDiagram
     participant C as Client
     participant S as Server (子进程)
-    C->>S: 启动子进程 (python mcp_server.py)
+    C->>S: 启动子进程 (sys.executable + mcp_server.py)
     C->>S: session.initialize()
     C->>S: session.call_tool(tool_name, arguments)
     S->>S: get_blog_data() (懒加载)
@@ -223,8 +234,10 @@ sequenceDiagram
 ### 3.4 子进程参数配置
 
 ```python
+import sys
+
 server_params = StdioServerParameters(
-    command="python",
+    command=sys.executable,
     args=[server_script_path],
     env=_build_mcp_env()  # 注入 ENHANCED_DATA_PATH
 )

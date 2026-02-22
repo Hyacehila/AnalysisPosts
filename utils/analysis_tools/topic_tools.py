@@ -83,18 +83,22 @@ def topic_frequency_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     Returns:
         包含data、summary的标准字典结构
     """
+    return topic_ranking_chart(blog_data)
+
+
+def _build_topic_frequency_data(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     total = len(blog_data)
     if total == 0:
         return {
             "data": {},
-            "summary": "没有可分析的博文数据"
+            "summary": "没有可分析的博文数据",
         }
-    
+
     parent_topic_counts = Counter()
     sub_topic_counts = Counter()
-    topic_pairs = Counter()  # 父-子主题组合
+    topic_pairs = Counter()
     posts_with_topics = 0
-    
+
     for post in blog_data:
         topics = post.get("topics") or []
         if not isinstance(topics, list):
@@ -112,34 +116,23 @@ def topic_frequency_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
                     sub_topic_counts[sub] += 1
                 if parent and sub:
                     topic_pairs[f"{parent} > {sub}"] += 1
-    
-    # 构建父主题分布
-    parent_distribution = {}
-    for topic, count in parent_topic_counts.most_common():
-        parent_distribution[topic] = {
-            "count": count,
-            "percentage": round(count / total * 100, 2)
-        }
-    
-    # 构建子主题分布（按父主题分组）
-    sub_distribution = {}
-    for topic, count in sub_topic_counts.most_common():
-        sub_distribution[topic] = {
-            "count": count,
-            "percentage": round(count / total * 100, 2)
-        }
-    
-    # 热门主题组合
+
+    parent_distribution = {
+        topic: {"count": count, "percentage": round(count / total * 100, 2)}
+        for topic, count in parent_topic_counts.most_common()
+    }
+    sub_distribution = {
+        topic: {"count": count, "percentage": round(count / total * 100, 2)}
+        for topic, count in sub_topic_counts.most_common()
+    }
     top_pairs = [
         {"topic": pair, "count": count, "percentage": round(count / total * 100, 2)}
         for pair, count in topic_pairs.most_common(10)
     ]
-    
+
     coverage = round(posts_with_topics / total * 100, 2) if total > 0 else 0
     top_parent = parent_topic_counts.most_common(1)[0][0] if parent_topic_counts else "无"
-    
     summary = f"主题覆盖率{coverage}%，最热门父主题「{top_parent}」"
-    
     return {
         "data": {
             "parent_topics": parent_distribution,
@@ -148,10 +141,10 @@ def topic_frequency_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
             "coverage": {
                 "posts_with_topics": posts_with_topics,
                 "total_posts": total,
-                "percentage": coverage
-            }
+                "percentage": coverage,
+            },
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -171,14 +164,18 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
     Returns:
         包含data、summary的标准字典结构
     """
+    return topic_evolution_chart(blog_data, granularity=granularity, top_n=top_n)
+
+
+def _build_topic_time_evolution_data(
+    blog_data: List[Dict[str, Any]],
+    granularity: str = "day",
+    top_n: int = 5,
+) -> Dict[str, Any]:
     if not blog_data:
-        return {
-            "data": {},
-            "summary": "没有可分析的博文数据"
-        }
+        return {"data": {}, "summary": "没有可分析的博文数据"}
 
     df_norm = _normalize_topic_df(blog_data)
-    # 首先获取最热门的父主题
     parent_topic_counts = Counter()
     for post in blog_data:
         topics = post.get("topics") or []
@@ -190,26 +187,18 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
             parent = topic.get("parent_topic", "")
             if parent:
                 parent_topic_counts[parent] += 1
-    
+
     top_topics = [t[0] for t in parent_topic_counts.most_common(top_n)]
-    
-    # 按时间分组统计每个主题的出现次数
     time_topic_counts = defaultdict(lambda: defaultdict(int))
-    
+
     for post in blog_data:
         publish_time = post.get("publish_time", "")
         topics = post.get("topics") or []
-        
         if not publish_time:
             continue
-        
         try:
             dt = datetime.strptime(publish_time, "%Y-%m-%d %H:%M:%S")
-            if granularity == "hour":
-                time_key = dt.strftime("%Y-%m-%d %H:00")
-            else:
-                time_key = dt.strftime("%Y-%m-%d")
-            
+            time_key = dt.strftime("%Y-%m-%d %H:00") if granularity == "hour" else dt.strftime("%Y-%m-%d")
             if isinstance(topics, list):
                 for topic in topics:
                     if not isinstance(topic, dict):
@@ -219,40 +208,32 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
                         time_topic_counts[time_key][parent] += 1
         except ValueError:
             continue
-    
-    # 构建时序数据
-    time_series = {}
-    for time_key in sorted(time_topic_counts.keys()):
-        time_series[time_key] = dict(time_topic_counts[time_key])
-    
-    # 计算每个主题的增长趋势
+
+    time_series = {time_key: dict(time_topic_counts[time_key]) for time_key in sorted(time_topic_counts.keys())}
     trends = {}
     time_keys = sorted(time_topic_counts.keys())
     if len(time_keys) >= 2:
-        first_period = time_keys[:len(time_keys)//3] if len(time_keys) >= 3 else [time_keys[0]]
-        last_period = time_keys[-len(time_keys)//3:] if len(time_keys) >= 3 else [time_keys[-1]]
-        
+        first_period = time_keys[: len(time_keys) // 3] if len(time_keys) >= 3 else [time_keys[0]]
+        last_period = time_keys[-len(time_keys) // 3 :] if len(time_keys) >= 3 else [time_keys[-1]]
         for topic in top_topics:
             first_avg = sum(time_topic_counts[t].get(topic, 0) for t in first_period) / len(first_period)
             last_avg = sum(time_topic_counts[t].get(topic, 0) for t in last_period) / len(last_period)
-            
             if first_avg > 0:
                 change = (last_avg - first_avg) / first_avg * 100
                 trends[topic] = {
                     "first_period_avg": round(first_avg, 2),
                     "last_period_avg": round(last_avg, 2),
                     "change_percentage": round(change, 2),
-                    "trend": "上升" if change > 10 else ("下降" if change < -10 else "平稳")
+                    "trend": "上升" if change > 10 else ("下降" if change < -10 else "平稳"),
                 }
             else:
                 trends[topic] = {
                     "first_period_avg": 0,
                     "last_period_avg": round(last_avg, 2),
                     "change_percentage": 0,
-                    "trend": "新兴" if last_avg > 0 else "平稳"
+                    "trend": "新兴" if last_avg > 0 else "平稳",
                 }
-    
-    # 焦点窗口（按滚动14天）与焦点期关键词/趋势
+
     focus = _detect_focus_window(df_norm[["publish_time"]], window_days=14)
     focus_trend = []
     focus_keywords = {}
@@ -307,7 +288,6 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
 
     rising_topics = [t for t, v in trends.items() if v.get("trend") == "上升"]
     summary = f"分析Top{top_n}主题演化，上升趋势主题: {', '.join(rising_topics) if rising_topics else '无'}"
-    
     return {
         "data": {
             "time_series": time_series,
@@ -316,13 +296,13 @@ def topic_time_evolution(blog_data: List[Dict[str, Any]],
             "granularity": granularity,
             "time_range": {
                 "start": min(time_topic_counts.keys()) if time_topic_counts else None,
-                "end": max(time_topic_counts.keys()) if time_topic_counts else None
+                "end": max(time_topic_counts.keys()) if time_topic_counts else None,
             },
             "focus_window": {"start": str(focus["start"].date()), "end": str(focus["end"].date())} if focus else {},
             "focus_trend": focus_trend,
             "focus_keywords": focus_keywords,
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -340,13 +320,13 @@ def topic_cooccurrence_analysis(blog_data: List[Dict[str, Any]],
     Returns:
         包含data、summary的标准字典结构
     """
+    return topic_network_chart(blog_data, min_support=min_support)
+
+
+def _build_topic_cooccurrence_data(blog_data: List[Dict[str, Any]], min_support: int = 2) -> Dict[str, Any]:
     if not blog_data:
-        return {
-            "data": {},
-            "summary": "没有可分析的博文数据"
-        }
-    
-    # 收集每篇博文的父主题集合
+        return {"data": {}, "summary": "没有可分析的博文数据"}
+
     post_topics = []
     for post in blog_data:
         topics = post.get("topics") or []
@@ -360,30 +340,23 @@ def topic_cooccurrence_analysis(blog_data: List[Dict[str, Any]],
                     parent_topics.add(parent)
         if len(parent_topics) >= 2:
             post_topics.append(parent_topics)
-    
-    # 统计主题对共现次数
+
     cooccurrence_counts = Counter()
     for topics in post_topics:
         for pair in combinations(sorted(topics), 2):
             cooccurrence_counts[pair] += 1
-    
-    # 过滤低于阈值的共现对
+
     significant_pairs = [
-        {
-            "topic_pair": list(pair),
-            "count": count,
-            "support": round(count / len(blog_data) * 100, 2)
-        }
+        {"topic_pair": list(pair), "count": count, "support": round(count / len(blog_data) * 100, 2)}
         for pair, count in cooccurrence_counts.most_common()
         if count >= min_support
     ]
-    
-    # 构建关联矩阵
+
     all_topics = set()
     for pair, count in cooccurrence_counts.items():
         if count >= min_support:
             all_topics.update(pair)
-    
+
     association_matrix = {}
     for topic1 in all_topics:
         association_matrix[topic1] = {}
@@ -391,17 +364,16 @@ def topic_cooccurrence_analysis(blog_data: List[Dict[str, Any]],
             if topic1 != topic2:
                 pair = tuple(sorted([topic1, topic2]))
                 association_matrix[topic1][topic2] = cooccurrence_counts.get(pair, 0)
-    
+
     summary = f"发现{len(significant_pairs)}对显著共现主题（阈值≥{min_support}）"
-    
     return {
         "data": {
-            "cooccurrence_pairs": significant_pairs[:20],  # 取Top20
+            "cooccurrence_pairs": significant_pairs[:20],
             "association_matrix": association_matrix,
             "min_support": min_support,
-            "total_pairs_analyzed": len(cooccurrence_counts)
+            "total_pairs_analyzed": len(cooccurrence_counts),
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -420,7 +392,7 @@ def topic_ranking_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取主题统计
-    freq_result = topic_frequency_stats(blog_data)
+    freq_result = _build_topic_frequency_data(blog_data)
     parent_topics = freq_result["data"].get("parent_topics", {})
     
     if not parent_topics:
@@ -495,7 +467,7 @@ def topic_evolution_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取时序演化数据
-    evolution_result = topic_time_evolution(blog_data, granularity, top_n)
+    evolution_result = _build_topic_time_evolution_data(blog_data, granularity, top_n)
     time_series = evolution_result["data"].get("time_series", {})
     top_topics = evolution_result["data"].get("top_topics", [])
     
@@ -636,13 +608,6 @@ def topic_focus_distribution_chart(blog_data: List[Dict[str, Any]],
     plt.savefig(file_path, dpi=150, bbox_inches="tight")
     plt.close()
 
-    data_rows = []
-    for i, d in enumerate(dates):
-        row = {"time": d}
-        for p in top_parents:
-            row[p] = series[p][i]
-        data_rows.append(row)
-
     return {
         "charts": [{
             "id": f"topic_focus_distribution_{timestamp}",
@@ -652,11 +617,6 @@ def topic_focus_distribution_chart(blog_data: List[Dict[str, Any]],
             "source_tool": "topic_focus_distribution_chart",
             "description": f"焦点窗口内 Top{top_n} 父主题的发布趋势"
         }],
-        "data": {
-            "focus_window": {"start": str(start.date()), "end": str(focus["end"].date())},
-            "series": data_rows,
-            "top_topics": top_parents
-        },
         "summary": f"焦点窗口（{start.date()}~{focus['end'].date()}）内 Top{top_n} 主题的发布趋势。"
     }
 
@@ -676,7 +636,7 @@ def topic_network_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取共现分析数据
-    cooccurrence_result = topic_cooccurrence_analysis(blog_data, min_support)
+    cooccurrence_result = _build_topic_cooccurrence_data(blog_data, min_support)
     pairs = cooccurrence_result["data"].get("cooccurrence_pairs", [])
     
     if not pairs:
@@ -773,7 +733,7 @@ def topic_focus_evolution_chart(blog_data: List[Dict[str, Any]],
     """
     结合热点窗口高亮的主题演化趋势图，方便在报告中标注关键阶段。
     """
-    evo_result = topic_time_evolution(blog_data, granularity, top_n)
+    evo_result = _build_topic_time_evolution_data(blog_data, granularity, top_n)
     time_series = evo_result["data"].get("time_series", {})
     top_topics = evo_result["data"].get("top_topics", [])
     if not time_series or not top_topics:

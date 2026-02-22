@@ -143,6 +143,14 @@ flowchart LR
   - 最近两轮无新增洞察或执行工具数达到阈值时，必须优先考虑收敛；
 - 该策略用于减少“仅因惯性而继续调用工具”的长尾循环，降低 live 运行耗时和 API 成本。
 
+### 3.8 LoadData 遗留缓存清理（防污染修复）
+
+文件：`nodes/stage2/load_data.py`
+
+- `LoadEnhancedDataNode.prep()` 在读取增强数据前执行 `_clean_legacy_reports(report_dir)`。
+- 当前会删除 `report/chart_analyses.json`（若存在），避免复用上次运行残留的图表分析结果。
+- 该清理逻辑为幂等操作，不影响 `report/images/` 与其他运行时目录。
+
 ---
 
 ## 4. Shared 契约（Stage2 新增/稳定字段）

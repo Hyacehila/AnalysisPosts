@@ -1,6 +1,8 @@
 """
 Unit tests for lightweight NLP utilities.
 """
+import re
+
 from utils.nlp import (
     clean_text,
     tokenize,
@@ -39,3 +41,12 @@ def test_cluster_similar_texts():
     groups = cluster_similar_texts(texts, threshold=0.2, min_cluster_size=2)
     assert groups[0] == groups[1]
     assert groups[2] in (-1, groups[0]) or isinstance(groups[2], int)
+
+
+def test_tokenize_regex_fallback_keeps_multi_char_chinese_tokens(monkeypatch):
+    from utils.nlp import tokenizer as tokenizer_module
+
+    monkeypatch.setattr(tokenizer_module, "jieba", None)
+    tokens = tokenizer_module.tokenize("今天天气很好我们去公园")
+    chinese_tokens = [token for token in tokens if re.search(r"[\u4e00-\u9fff]", token)]
+    assert any(len(token) > 1 for token in chinese_tokens)

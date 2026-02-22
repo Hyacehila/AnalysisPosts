@@ -136,48 +136,46 @@ def sentiment_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
     Returns:
         包含data、summary的标准字典结构
     """
+    return sentiment_pie_chart(blog_data)
+
+
+def _build_sentiment_distribution_data(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     total = len(blog_data)
     if total == 0:
         return {
             "data": {},
-            "summary": "没有可分析的博文数据"
+            "summary": "没有可分析的博文数据",
         }
-    
-    # 统计各极性数量
+
     polarity_counts = Counter()
     for post in blog_data:
         polarity = post.get("sentiment_polarity")
         if polarity is not None:
             polarity_counts[polarity] += 1
-    
-    # 计算占比
+
     distribution = {}
     for polarity in range(1, 6):
         count = polarity_counts.get(polarity, 0)
         distribution[POLARITY_LABELS[polarity]] = {
             "count": count,
             "percentage": round(count / total * 100, 2) if total > 0 else 0,
-            "polarity_value": polarity
+            "polarity_value": polarity,
         }
-    
-    # 计算平均情感极性
+
     valid_polarities = [p.get("sentiment_polarity") for p in blog_data if p.get("sentiment_polarity") is not None]
     avg_polarity = sum(valid_polarities) / len(valid_polarities) if valid_polarities else 3
-    
-    # 确定主导情感
     dominant_polarity = max(polarity_counts.items(), key=lambda x: x[1])[0] if polarity_counts else 3
-    
+
     summary = f"共分析{total}条博文，平均情感极性{avg_polarity:.2f}，主导情感为「{POLARITY_LABELS[dominant_polarity]}」"
-    
     return {
         "data": {
             "distribution": distribution,
             "total_count": total,
             "valid_count": len(valid_polarities),
             "avg_polarity": round(avg_polarity, 2),
-            "dominant_polarity": POLARITY_LABELS[dominant_polarity]
+            "dominant_polarity": POLARITY_LABELS[dominant_polarity],
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -195,6 +193,13 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
     Returns:
         包含data、summary的标准字典结构
     """
+    return sentiment_trend_chart(blog_data, granularity=granularity)
+
+
+def _build_sentiment_time_series_data(
+    blog_data: List[Dict[str, Any]],
+    granularity: str = "hour",
+) -> Dict[str, Any]:
     df = _normalize_blog_df(blog_data)
     if df.empty or "publish_time" not in df.columns or "sentiment_polarity" not in df.columns:
         return {"data": {}, "summary": "没有可分析的博文数据"}
@@ -216,7 +221,6 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
         )
     time_series = sorted(time_series, key=lambda x: x["time"])
 
-    # 情感桶趋势
     bucket_counts = df.groupby(["time_key", "sentiment_bucket"]).size().unstack(fill_value=0)
     bucket_trend = []
     for idx, row in bucket_counts.sort_index().iterrows():
@@ -224,7 +228,6 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
         entry.update(row.to_dict())
         bucket_trend.append(entry)
 
-    # 焦点窗口
     focus = _detect_focus_window(df[["publish_time"]], window_days=14)
     focus_bucket_trend = []
     focus_numeric_trend = []
@@ -277,7 +280,6 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
                     }
                 )
 
-    # 情感属性趋势（Top10）
     attribute_trend = []
     if "sentiment_attribute" in df.columns:
         exploded = df.explode("sentiment_attribute")
@@ -298,7 +300,6 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
         last_avg = time_series[-1]["avg_polarity"]
         trend_desc = "上升" if last_avg > first_avg else ("下降" if last_avg < first_avg else "平稳")
 
-    # 高峰时间段与突发点
     peak_periods = sorted(time_series, key=lambda x: x["count"], reverse=True)[:3]
     counts_only = [row["count"] for row in time_series]
     volume_spikes = []
@@ -309,11 +310,7 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
             if std_count > 0:
                 z = (row["count"] - mean_count) / std_count
                 if z >= 2:
-                    volume_spikes.append({
-                        "time": row["time"],
-                        "count": row["count"],
-                        "zscore": round(float(z), 2)
-                    })
+                    volume_spikes.append({"time": row["time"], "count": row["count"], "zscore": round(float(z), 2)})
             row["growth_rate_vs_prev"] = None
         for i in range(1, len(time_series)):
             prev = time_series[i - 1]["count"]
@@ -323,7 +320,7 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
     turning_points = _detect_turning_points(
         time_series,
         field="avg_polarity",
-        min_change=0.05 if granularity == "hour" else 0.1
+        min_change=0.05 if granularity == "hour" else 0.1,
     )
 
     attribute_turning_points: List[Dict[str, Any]] = []
@@ -333,21 +330,15 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
         for col in [c for c in attr_df.columns if c != "time"]:
             if col not in diff_df.columns:
                 continue
-            # 检查列是否有有效数据（至少需要两行数据才能计算diff）
             abs_values = diff_df[col].abs()
             if abs_values.empty or abs_values.isna().all():
                 continue
-            # 使用 skipna=True 避免 FutureWarning，并检查结果是否为 NaN
             max_idx = abs_values.idxmax(skipna=True)
             if pd.isna(max_idx):
                 continue
             change = diff_df.loc[max_idx, col]
             if not pd.isna(change) and abs(change) >= 1:
-                attribute_turning_points.append({
-                    "attribute": col,
-                    "time": max_idx,
-                    "change": round(float(change), 2)
-                })
+                attribute_turning_points.append({"attribute": col, "time": max_idx, "change": round(float(change), 2)})
         attribute_turning_points = sorted(attribute_turning_points, key=lambda x: -abs(x["change"]))[:5]
 
     hourly_distribution = {}
@@ -357,9 +348,7 @@ def sentiment_time_series(blog_data: List[Dict[str, Any]],
         hourly_distribution = {int(h): int(c) for h, c in hour_counts.items()}
         peak_hours = sorted(hourly_distribution.items(), key=lambda x: -x[1])[:3]
 
-    summary_parts = [
-        f"时间范围内共{len(time_series)}个时间点，情感趋势整体{trend_desc}"
-    ]
+    summary_parts = [f"时间范围内共{len(time_series)}个时间点，情感趋势整体{trend_desc}"]
     if peak_periods:
         summary_parts.append(f"核心高峰: {peak_periods[0]['time']} ({peak_periods[0]['count']}条)")
     if volume_spikes:
@@ -408,7 +397,7 @@ def sentiment_anomaly_detection(blog_data: List[Dict[str, Any]],
         包含data、summary的标准字典结构
     """
     # 首先进行时序分析
-    time_series_result = sentiment_time_series(blog_data, "hour")
+    time_series_result = _build_sentiment_time_series_data(blog_data, "hour")
     time_series = time_series_result["data"].get("time_series", {})
     volume_spikes = time_series_result["data"].get("volume_spikes", [])
     
@@ -480,7 +469,7 @@ def sentiment_bucket_trend_chart(blog_data: List[Dict[str, Any]],
     """
     将正/负/中性情绪桶的时序变化以堆叠面积图展示，便于比对阶段差异和峰值。
     """
-    ts_result = sentiment_time_series(blog_data, granularity)
+    ts_result = _build_sentiment_time_series_data(blog_data, granularity)
     bucket_trend = ts_result.get("data", {}).get("bucket_trend", [])
     if not bucket_trend:
         return {"charts": [], "summary": "没有可绘制的情绪桶数据"}
@@ -543,7 +532,7 @@ def sentiment_attribute_trend_chart(blog_data: List[Dict[str, Any]],
     """
     把最活跃的情绪属性随时间的变化绘制成折线，兼容日/小时粒度。
     """
-    ts_result = sentiment_time_series(blog_data, granularity)
+    ts_result = _build_sentiment_time_series_data(blog_data, granularity)
     attribute_trend = ts_result.get("data", {}).get("attribute_trend", [])
     if not attribute_trend:
         return {"charts": [], "summary": "没有可绘制的情绪属性趋势数据"}
@@ -615,7 +604,7 @@ def sentiment_trend_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取时序数据
-    time_series_result = sentiment_time_series(blog_data, granularity)
+    time_series_result = _build_sentiment_time_series_data(blog_data, granularity)
     time_series = time_series_result["data"].get("time_series", {})
     turning_points = time_series_result["data"].get("turning_points", [])
     volume_spikes = time_series_result["data"].get("volume_spikes", [])
@@ -781,11 +770,6 @@ def sentiment_focus_window_chart(blog_data: List[Dict[str, Any]],
             "source_tool": "sentiment_focus_window_chart",
             "description": f"焦点窗口（{start.date()}~{focus['end'].date()}）内的极性均值与三分类趋势"
         }],
-        "data": {
-            "focus_window": {"start": str(start.date()), "end": str(focus["end"].date())},
-            "daily_avg": daily_avg.to_dict(),
-            "bucket_trend": bucket_counts.reset_index().to_dict(orient="records"),
-        },
         "summary": f"焦点窗口：{start.date()}~{focus['end'].date()}，平均极性趋势与三分类发布量趋势。"
     }
 
@@ -838,10 +822,6 @@ def sentiment_focus_publisher_chart(blog_data: List[Dict[str, Any]],
             "source_tool": "sentiment_focus_publisher_chart",
             "description": f"焦点窗口内 Top{top_n} 发布者的情感均值趋势"
         }],
-        "data": {
-            "focus_window": {"start": str(start.date()), "end": str(focus["end"].date())},
-            "publisher_mean": pivot.reset_index().to_dict(orient="records")
-        },
         "summary": f"焦点窗口 Top{top_n} 发布者的情感均值变化。"
     }
 
@@ -859,7 +839,7 @@ def sentiment_pie_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取分布统计
-    dist_result = sentiment_distribution_stats(blog_data)
+    dist_result = _build_sentiment_distribution_data(blog_data)
     distribution = dist_result["data"].get("distribution", {})
     
     if not distribution:

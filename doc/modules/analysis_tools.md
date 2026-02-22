@@ -1,6 +1,6 @@
 # 分析工具库文档
 
-> **文档状态**: 2026-02-11 更新  
+> **文档状态**: 2026-02-22 更新  
 > **关联源码**: `utils/analysis_tools/` 目录（6 个模块 + 注册表）  
 > **上级文档**: [系统设计总览](design.md)
 
@@ -30,12 +30,13 @@ utils/analysis_tools/
 
 | 工具类型 | 输出 | 返回结构 |
 |:---|:---|:---|
-| **Data 类** (`*_stats`, `*_analysis`, `*_series`) | 内存数据 | `{"data": {...}, "summary": "..."}` |
-| **Chart 类** (`*_chart`, `*_heatmap`) | PNG 图表文件 | `{"charts": [{id, title, path, type, ...}], "data": {...}}` |
+| **Chart 优先类**（`*_chart`, `*_heatmap` + 重定向后的 `*_stats/*_series`） | PNG 图表文件 | `{"charts": [{id, title, path, type, ...}], "summary": "..."}` |
+| **Data 保留类**（少量摘要/诊断工具） | 内存数据 | `{"data": {...}, "summary": "..."}` |
 
 - 所有图表默认输出到 `report/images/`，路径由 `PathManager` 统一管理
 - 文件名格式：`{tool_name}_{timestamp}.png`（时间戳避免覆盖）
 - 可视化使用 matplotlib，中文字体配置为 `SimHei` / `Microsoft YaHei`
+- `influence_analysis` 保留 `data` 但严格截断为 Top5，避免 MCP 大包返回
 
 ### 1.4 使用方式
 
@@ -139,15 +140,15 @@ result = execute_tool("sentiment_trend_chart", blog_data, granularity="day")
 
 | # | 工具名称 | 类型 | 说明 | 关键参数 |
 |:---|:---|:---|:---|:---|
-| 1 | `sentiment_distribution_stats` | Data | 各极性档位的数量和占比 | — |
-| 2 | `sentiment_time_series` | Data | 按时间聚合的情感趋势 + 峰值/拐点 | `granularity` (hour/day) |
+| 1 | `sentiment_distribution_stats` | Chart | 统计请求自动重定向为情感分布饼图 | — |
+| 2 | `sentiment_time_series` | Chart | 统计请求自动重定向为情感趋势图 | `granularity` (hour/day) |
 | 3 | `sentiment_anomaly_detection` | Data | 情感极性突变和峰值时刻 | `threshold` (默认 2.0) |
 | 4 | `sentiment_trend_chart` | Chart | 情感趋势折线/面积图 | `granularity` |
 | 5 | `sentiment_pie_chart` | Chart | 情感极性饼图 | — |
 | 6 | `sentiment_bucket_trend_chart` | Chart | 正/负/中性堆叠面积图 | `granularity` |
 | 7 | `sentiment_attribute_trend_chart` | Chart | Top N 情感属性热度折线 | `granularity`, `top_n` (默认 6) |
-| 8 | `sentiment_focus_window_chart` | Chart+Data | 焦点窗口内极性均值 + 三分类趋势 | `window_days` (默认 14) |
-| 9 | `sentiment_focus_publisher_chart` | Chart+Data | 焦点窗口内 Top N 发布者情感均值 | `window_days`, `top_n` (默认 5) |
+| 8 | `sentiment_focus_window_chart` | Chart | 焦点窗口内极性均值 + 三分类趋势 | `window_days` (默认 14) |
+| 9 | `sentiment_focus_publisher_chart` | Chart | 焦点窗口内 Top N 发布者情感均值 | `window_days`, `top_n` (默认 5) |
 
 ### 4.2 常量定义
 
@@ -158,11 +159,12 @@ POLARITY_COLORS = {1: "#d32f2f", 2: "#f57c00", 3: "#9e9e9e", 4: "#4caf50", 5: "#
 
 ### 4.3 关键实现细节
 
-**`sentiment_time_series`**（最复杂的数据工具，~210 行）：
+**`sentiment_time_series`**（重定向）：
 - 输出包含：`time_series[]`、`peak_periods[]`、`peak_hours[]`、`turning_points[]`、`volume_spikes[]`
 - 峰值检测：发帖量超过均值 + 1.5 倍标准差
 - 转折点检测：调用 `_detect_turning_points()`
 - 量涌检测：相邻时间段增幅超过 200%
+- 对外通过 `sentiment_trend_chart` 返回图表与 summary，不再向 MCP 返回大 `data`。
 
 **`sentiment_trend_chart`**（~110 行）：
 - 双子图：上方折线图（极性均值随时间变化），下方面积图（发帖量）
@@ -176,22 +178,22 @@ POLARITY_COLORS = {1: "#d32f2f", 2: "#f57c00", 3: "#9e9e9e", 4: "#4caf50", 5: "#
 
 | # | 工具名称 | 类型 | 说明 | 关键参数 |
 |:---|:---|:---|:---|:---|
-| 1 | `topic_frequency_stats` | Data | 父/子主题频次和占比 | — |
-| 2 | `topic_time_evolution` | Data | 主题热度随时间变化趋势 | `granularity`, `top_n` (默认 5) |
-| 3 | `topic_cooccurrence_analysis` | Data | 主题间共现关系和强度 | `min_support` (默认 2) |
+| 1 | `topic_frequency_stats` | Chart | 统计请求自动重定向为主题排行图 | — |
+| 2 | `topic_time_evolution` | Chart | 统计请求自动重定向为主题演化图 | `granularity`, `top_n` (默认 5) |
+| 3 | `topic_cooccurrence_analysis` | Chart | 统计请求自动重定向为主题网络图 | `min_support` (默认 2) |
 | 4 | `topic_ranking_chart` | Chart | 主题频次水平柱状图 | `top_n` (默认 10) |
 | 5 | `topic_evolution_chart` | Chart | 主题演化时序折线图 | `granularity`, `top_n` (默认 5) |
 | 6 | `topic_focus_evolution_chart` | Chart | 带焦点窗口高亮的主题演化 | `granularity`, `top_n` (默认 5) |
-| 7 | `topic_focus_distribution_chart` | Chart+Data | 焦点窗口内主题占比趋势 | `window_days`, `top_n` (默认 5) |
+| 7 | `topic_focus_distribution_chart` | Chart | 焦点窗口内主题占比趋势 | `window_days`, `top_n` (默认 5) |
 | 8 | `topic_keyword_trend_chart` | Chart | 内容关键词热度趋势 | `granularity`, `top_n` (默认 8) |
 | 9 | `topic_network_chart` | Chart | 主题共现网络图 | `min_support` (默认 3) |
 
 ### 5.2 关键实现细节
 
-**`topic_cooccurrence_analysis`**：
+**`topic_cooccurrence_analysis`**（重定向）：
 - 对每条博文的多个主题取两两组合
 - 统计共现频次，过滤低于 `min_support` 的关系
-- 输出共现矩阵和排序后的共现对列表
+- 内部仍计算共现矩阵和排序后的共现对列表，但对外只返回 `topic_network_chart` 图表结果
 
 **`topic_network_chart`**：
 - 使用 `networkx` 构建共现网络图
@@ -212,9 +214,9 @@ POLARITY_COLORS = {1: "#d32f2f", 2: "#f57c00", 3: "#9e9e9e", 4: "#4caf50", 5: "#
 
 | # | 工具名称 | 类型 | 说明 | 关键参数 |
 |:---|:---|:---|:---|:---|
-| 1 | `geographic_distribution_stats` | Data | 地区发帖量分布 | — |
-| 2 | `geographic_hotspot_detection` | Data | 高密度热点区域 | `threshold_percentile` (默认 90) |
-| 3 | `geographic_sentiment_analysis` | Data | 各地区情感倾向差异 | `min_posts` (默认 5) |
+| 1 | `geographic_distribution_stats` | Chart | 统计请求自动重定向为地区柱状图 | — |
+| 2 | `geographic_hotspot_detection` | Chart | 统计请求自动重定向为地区热力图 | `threshold_percentile` (默认 90) |
+| 3 | `geographic_sentiment_analysis` | Chart | 统计请求自动重定向为地区情绪对比图 | `min_posts` (默认 5) |
 | 4 | `geographic_heatmap` | Chart | 情感×地区交叉热力图 | — |
 | 5 | `geographic_bar_chart` | Chart | 地区发帖量柱状图 | `top_n` (默认 15) |
 | 6 | `geographic_sentiment_bar_chart` | Chart | 地区正负面占比对比 | `top_n` (默认 12) |
@@ -229,10 +231,10 @@ POLARITY_COLORS = {1: "#d32f2f", 2: "#f57c00", 3: "#9e9e9e", 4: "#4caf50", 5: "#
 - 由于缺少真实经纬度数据，使用**情感-地区交叉矩阵热力图**代替传统地图热力图
 - 使用 `seaborn` 风格的 `imshow` 展示
 
-**`geographic_hotspot_detection`**：
+**`geographic_hotspot_detection`**（重定向）：
 - 将发帖量排序后，以 `threshold_percentile`（默认第 90 百分位）为阈值
 - 超过阈值的地区标记为热点区域
-- 输出热点列表和详细的发帖量-情感统计
+- 内部保留热点计算逻辑，对外返回 `geographic_heatmap` 图表结果
 
 ---
 
@@ -242,8 +244,8 @@ POLARITY_COLORS = {1: "#d32f2f", 2: "#f57c00", 3: "#9e9e9e", 4: "#4caf50", 5: "#
 
 | # | 工具名称 | 类型 | 说明 | 关键参数 |
 |:---|:---|:---|:---|:---|
-| 1 | `publisher_distribution_stats` | Data | 发布者类型分布和互动量 | — |
-| 2 | `cross_dimension_matrix` | Data | 两维度交叉分析矩阵 | `dim1`, `dim2` |
+| 1 | `publisher_distribution_stats` | Chart | 统计请求自动重定向为发布者柱状图 | — |
+| 2 | `cross_dimension_matrix` | Chart | 统计请求自动重定向为交叉热力图 | `dim1`, `dim2` |
 | 3 | `influence_analysis` | Data | 博文互动量和传播力排行 | `top_n` (默认 20) |
 | 4 | `correlation_analysis` | Data | 维度间相关性系数 | — |
 | 5 | `interaction_heatmap` | Chart | 交叉维度热力图 | `dim1`, `dim2` |
@@ -251,19 +253,19 @@ POLARITY_COLORS = {1: "#d32f2f", 2: "#f57c00", 3: "#9e9e9e", 4: "#4caf50", 5: "#
 | 7 | `publisher_sentiment_bucket_chart` | Chart | 发布者×情绪桶堆叠图 | `top_n` (默认 10) |
 | 8 | `publisher_topic_distribution_chart` | Chart | 发布者×主题堆叠图 | `top_publishers` (8), `top_topics` (8) |
 | 9 | `participant_trend_chart` | Chart | 累计参与用户趋势 | `granularity` |
-| 10 | `publisher_focus_distribution_chart` | Chart+Data | 焦点窗口发布者类型趋势 | `window_days`, `top_n` (默认 5) |
+| 10 | `publisher_focus_distribution_chart` | Chart | 焦点窗口发布者类型趋势 | `window_days`, `top_n` (默认 5) |
 
 ### 7.2 关键实现细节
 
-**`publisher_distribution_stats`**（~110 行）：
+**`publisher_distribution_stats`**（重定向）：
 - 每种发布者类型统计：发帖数、占比、平均互动量
 - 互动量计算：`_engagement(post) = repost_count + comment_count + like_count`
-- 输出包含 Top 活跃发布者、互动量分布
+- 对外输出统一为 `publisher_bar_chart` 的图表结果
 
-**`cross_dimension_matrix`**：
+**`cross_dimension_matrix`**（重定向）：
 - 支持 3 种维度组合：`publisher`、`location`、`topic`
 - `get_dim_value(post, dim)` 内部函数统一提取维度值
-- 输出频次矩阵和百分比矩阵
+- 内部仍构建频次矩阵和百分比矩阵，对外返回 `interaction_heatmap`
 
 **`correlation_analysis`**：
 - 构建数值化特征矩阵：`sentiment_polarity`、`engagement`、`content_length`、`is_media`
@@ -337,7 +339,7 @@ flowchart LR
 | # | 工具名称 | 类型 | 说明 | 关键参数 |
 |:---|:---|:---|:---|:---|
 | 1 | `keyword_wordcloud` | Chart | 关键词频次分布（条形图） | `top_n` |
-| 2 | `entity_cooccurrence_network` | Chart+Data | 实体共现热力图 | `top_n` |
-| 3 | `text_cluster_analysis` | Chart+Data | 文本相似聚类分布 | `threshold`, `min_cluster_size` |
-| 4 | `sentiment_lexicon_comparison` | Chart+Data | 词典情感分布 | — |
-| 5 | `temporal_keyword_heatmap` | Chart+Data | 关键词时间热力图 | `top_n`, `granularity` |
+| 2 | `entity_cooccurrence_network` | Chart | 实体共现热力图 | `top_n` |
+| 3 | `text_cluster_analysis` | Chart | 文本相似聚类分布 | `threshold`, `min_cluster_size` |
+| 4 | `sentiment_lexicon_comparison` | Chart | 词典情感分布 | — |
+| 5 | `temporal_keyword_heatmap` | Chart | 关键词时间热力图 | `top_n`, `granularity` |

@@ -81,8 +81,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "parameters": {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "sentiment_time_series": {
         "name": "sentiment_time_series",
@@ -93,8 +93,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
             "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "hour"}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "sentiment_anomaly_detection": {
         "name": "sentiment_anomaly_detection",
@@ -197,8 +197,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "parameters": {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "topic_time_evolution": {
         "name": "topic_time_evolution",
@@ -210,8 +210,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "granularity": {"type": "string", "description": "时间粒度: hour/day", "required": False, "default": "day"},
             "top_n": {"type": "int", "description": "显示的热门主题数量", "required": False, "default": 5}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "topic_cooccurrence_analysis": {
         "name": "topic_cooccurrence_analysis",
@@ -222,8 +222,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
             "min_support": {"type": "int", "description": "最小支持度阈值", "required": False, "default": 2}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "topic_ranking_chart": {
         "name": "topic_ranking_chart",
@@ -317,8 +317,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "parameters": {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "geographic_hotspot_detection": {
         "name": "geographic_hotspot_detection",
@@ -329,8 +329,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
             "threshold_percentile": {"type": "float", "description": "热点阈值百分位数", "required": False, "default": 90}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "geographic_sentiment_analysis": {
         "name": "geographic_sentiment_analysis",
@@ -341,8 +341,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True},
             "min_posts": {"type": "int", "description": "最小博文数阈值", "required": False, "default": 5}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "geographic_heatmap": {
         "name": "geographic_heatmap",
@@ -420,8 +420,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
         "parameters": {
             "blog_data": {"type": "list", "description": "增强后的博文数据列表", "required": True}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "cross_dimension_matrix": {
         "name": "cross_dimension_matrix",
@@ -433,8 +433,8 @@ TOOL_REGISTRY: Dict[str, Dict[str, Any]] = {
             "dim1": {"type": "string", "description": "第一个维度: publisher/location/topic", "required": False, "default": "publisher"},
             "dim2": {"type": "string", "description": "第二个维度: sentiment_polarity/topic/publisher", "required": False, "default": "sentiment_polarity"}
         },
-        "output_type": "data",
-        "generates_chart": False
+        "output_type": "chart",
+        "generates_chart": True
     },
     "influence_analysis": {
         "name": "influence_analysis",

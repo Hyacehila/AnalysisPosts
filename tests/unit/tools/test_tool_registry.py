@@ -26,7 +26,8 @@ def test_get_tool_by_name_returns_tool():
 
 def test_execute_tool_returns_result(sample_enhanced_data):
     result = execute_tool("sentiment_distribution_stats", sample_enhanced_data)
-    assert "data" in result
+    assert "charts" in result
+    assert "data" not in result
     assert result["tool_name"] == "sentiment_distribution_stats"
 
 
@@ -41,3 +42,24 @@ def test_chart_and_data_tools_split():
     assert chart_tools
     assert data_tools
     assert chart_tools.isdisjoint(data_tools)
+
+
+def test_redirected_stats_are_registered_as_chart_tools():
+    redirected = [
+        "sentiment_distribution_stats",
+        "sentiment_time_series",
+        "topic_frequency_stats",
+        "topic_time_evolution",
+        "topic_cooccurrence_analysis",
+        "geographic_distribution_stats",
+        "geographic_hotspot_detection",
+        "geographic_sentiment_analysis",
+        "publisher_distribution_stats",
+        "cross_dimension_matrix",
+    ]
+
+    for tool_name in redirected:
+        info = get_tool_by_name(tool_name)
+        assert info is not None
+        assert info["output_type"] == "chart"
+        assert info["generates_chart"] is True

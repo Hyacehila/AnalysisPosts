@@ -160,13 +160,13 @@ def _normalize_tool_result(tool_name: str, result: Any, tool_index: Dict[str, Di
     if isinstance(result, dict) and "error" in result:
         return {"error": result["error"]}
     charts: List[Dict[str, Any]] = []
-    data_payload = result
+    data_payload: Any = None
     summary = f"MCP工具 {tool_name} 执行完成"
 
     if isinstance(result, dict):
         charts = result.get("charts") or []
         summary = result.get("summary", summary)
-        data_payload = result if "data" not in result else result.get("data")
+        data_payload = result.get("data")
         single_path = result.get("chart_path") or result.get("image_path") or result.get("file_path")
         if not charts and single_path:
             charts = [{
@@ -200,6 +200,8 @@ def _normalize_tool_result(tool_name: str, result: Any, tool_index: Dict[str, Di
                 "source_tool": ch.get("source_tool") or tool_name,
             })
         charts = normalized_charts
+    else:
+        data_payload = result
 
     category = _normalize_tool_category(tool_name, tool_index) or _get_tool_category(tool_name)
 

@@ -357,7 +357,8 @@ def test_resolve_glm_api_key_yaml_over_env(monkeypatch):
     assert os.environ.get("GLM_API_KEY") == "yaml-key"
 
 
-def test_config_to_shared_contains_required_keys():
+def test_config_to_shared_contains_required_keys(monkeypatch):
+    monkeypatch.setattr("config.os.path.exists", lambda _path: False)
     config = AppConfig()
     shared = config_to_shared(config)
 

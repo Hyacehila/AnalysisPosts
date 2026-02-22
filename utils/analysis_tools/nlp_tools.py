@@ -39,10 +39,8 @@ def keyword_wordcloud(
         counter.update([k for k in keywords if k])
 
     top_items = counter.most_common(top_n)
-    data = {"keywords": top_items}
-
     if not top_items:
-        return {"data": data, "charts": []}
+        return {"charts": [], "summary": "没有可用关键词"}
 
     labels = [k for k, _ in top_items]
     values = [v for _, v in top_items]
@@ -59,7 +57,6 @@ def keyword_wordcloud(
     plt.close(fig)
 
     return {
-        "data": data,
         "charts": [{
             "id": "keyword_wordcloud",
             "title": "关键词频次分布",
@@ -93,7 +90,7 @@ def entity_cooccurrence_network(
 
     top_entities = [e for e, _ in entity_counts.most_common(top_n)]
     if not top_entities:
-        return {"data": {"nodes": [], "edges": []}, "charts": []}
+        return {"charts": [], "summary": "没有可用实体共现数据"}
 
     idx_map = {e: i for i, e in enumerate(top_entities)}
     matrix = np.zeros((len(top_entities), len(top_entities)), dtype=int)
@@ -123,13 +120,7 @@ def entity_cooccurrence_network(
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
-    edge_list = [
-        {"source": a, "target": b, "weight": w}
-        for (a, b), w in edges.items()
-    ]
-
     return {
-        "data": {"nodes": top_entities, "edges": edge_list},
         "charts": [{
             "id": "entity_cooccurrence_network",
             "title": "实体共现热力图",
@@ -157,10 +148,8 @@ def text_cluster_analysis(
         groups = cluster_similar_texts(texts, threshold=threshold, min_cluster_size=min_cluster_size)
 
     counts = Counter([g for g in groups if g is not None and g >= 0])
-    data = {"clusters": counts}
-
     if not counts:
-        return {"data": data, "charts": []}
+        return {"charts": [], "summary": "没有可用的聚类数据"}
 
     labels = [str(k) for k in counts.keys()]
     values = list(counts.values())
@@ -177,7 +166,6 @@ def text_cluster_analysis(
     plt.close(fig)
 
     return {
-        "data": data,
         "charts": [{
             "id": "text_cluster_analysis",
             "title": "文本相似聚类分布",
@@ -205,10 +193,8 @@ def sentiment_lexicon_comparison(
         labels.append(lex.get("label", "neutral"))
 
     counts = Counter(labels)
-    data = {"distribution": dict(counts)}
-
     if not counts:
-        return {"data": data, "charts": []}
+        return {"charts": [], "summary": "没有可用词典情感数据"}
 
     fig, ax = plt.subplots(figsize=(5, 4))
     ax.bar(list(counts.keys()), list(counts.values()))
@@ -222,7 +208,6 @@ def sentiment_lexicon_comparison(
     plt.close(fig)
 
     return {
-        "data": data,
         "charts": [{
             "id": "sentiment_lexicon_comparison",
             "title": "词典情感分布",
@@ -263,7 +248,7 @@ def temporal_keyword_heatmap(
             rows.append({"time_key": key, "keyword": kw})
 
     if not rows:
-        return {"data": {"matrix": []}, "charts": []}
+        return {"charts": [], "summary": "没有可用关键词时间数据"}
 
     df = pd.DataFrame(rows)
     top_keywords = df["keyword"].value_counts().head(top_n).index.tolist()
@@ -289,11 +274,6 @@ def temporal_keyword_heatmap(
     plt.close(fig)
 
     return {
-        "data": {
-            "matrix": pivot.to_dict(),
-            "time_keys": list(pivot.index),
-            "keywords": list(pivot.columns),
-        },
         "charts": [{
             "id": "temporal_keyword_heatmap",
             "title": "关键词时间热力图",

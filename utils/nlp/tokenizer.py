@@ -3,8 +3,9 @@ Tokenizer wrapper (jieba) with light normalization.
 """
 from __future__ import annotations
 
-from typing import List
+import logging
 import re
+from typing import List
 
 try:
     import jieba  # type: ignore
@@ -12,6 +13,14 @@ except Exception:  # pragma: no cover - fallback if jieba missing
     jieba = None
 
 from utils.nlp.text_cleaner import clean_text
+
+
+if jieba is not None:
+    logging.getLogger("jieba").setLevel(logging.ERROR)
+    try:
+        jieba.initialize()
+    except Exception:
+        jieba = None
 
 
 def tokenize(text: str) -> List[str]:
@@ -25,7 +34,7 @@ def tokenize(text: str) -> List[str]:
         tokens = [t.strip() for t in jieba.lcut(cleaned, HMM=False)]
     else:
         # Fallback: keep CJK chars and word tokens
-        tokens = re.findall(r"[A-Za-z0-9_]+|[\u4e00-\u9fff]", cleaned)
+        tokens = re.findall(r"[A-Za-z0-9_]+|[\u4e00-\u9fff]+", cleaned)
     return [t for t in tokens if t]
 
 

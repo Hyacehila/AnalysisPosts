@@ -103,6 +103,7 @@ powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1 -BaseTe
 | Stage3 配置兼容（移除 `min_score` + 兼容旧键） | `tests/unit/core/test_config.py`, `dashboard/tests/test_pipeline_api.py` |
 | 仓库配置安全（禁止真实 key 入仓） | `tests/unit/core/test_no_real_secrets.py`, `tests/unit/core/test_e2e_config_runtime_keys.py` |
 | A3 搜索封装（Tavily） | `tests/unit/core/test_web_search.py` |
+| MCP 客户端解析 + 子进程解释器一致性 | `tests/unit/core/test_mcp_client_parsing.py` |
 | 线性主链入口与阶段状态（StageD） | `tests/unit/core/test_flow_entrypoint.py`, `tests/unit/core/test_pipeline_state.py` |
 | 状态事件链路（enter/exit + 并行分支） | `tests/unit/core/test_status_events.py`, `tests/unit/core/test_node_status_events.py`, `tests/unit/stage2/test_stage2_parallel_flow.py` |
 | E2E 运行时配置构造与产物契约断言 | `tests/unit/core/test_e2e_runtime_profile.py`, `tests/unit/core/test_e2e_config_runtime_keys.py` |
@@ -113,6 +114,8 @@ powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1 -BaseTe
 | Stage 2 洞察语义兼容（analysis_content/analysis） | `tests/unit/stage2/test_stage2_insight.py` |
 | Stage 3 统一报告链路（Outline/Chapters/Review/IRRenderer/Trace/Methodology/Render） | `tests/unit/stage3/test_stage3_outline.py`, `tests/unit/stage3/test_stage3_chapters.py`, `tests/unit/stage3/test_stage3_review.py`, `tests/unit/stage3/test_stage3_ir_renderer.py`, `tests/unit/stage3/test_stage3_trace_inject.py`, `tests/unit/stage3/test_stage3_methodology.py`, `tests/unit/stage3/test_stage3_render_html.py`, `tests/unit/stage3/test_stage3_report.py`, `tests/unit/stage3/test_report_cleanup.py`, `tests/unit/stage3/test_report_image_fallback.py` |
 | 工具注册与 MCP 暴露一致性 | `tests/unit/tools/test_tool_registry.py`, `tests/unit/tools/test_mcp_tool_exposure.py` |
+| 图表输出契约（无大 `data` 返回）与 Top5 截断 | `tests/unit/tools/test_tool_output_contracts.py` |
+| tokenizer fallback 中文连续词回退 | `tests/unit/tools/test_nlp_tools.py` |
 | I/O 契约与数据格式 | `tests/integration/io/test_data_loader_integration.py`, `tests/integration/io/test_data_format_contract.py`, `tests/integration/io/test_json_reference_contract.py` |
 | 跨阶段串联集成 | `tests/integration/pipeline/test_flow_pipeline_integration.py`, `tests/integration/pipeline/test_stage2_forum_pipeline_integration.py`, `tests/integration/pipeline/test_stage3_unified_pipeline_integration.py` |
 | Pipeline 失败路径（key 缺失 / Stage3 前置缺失 / 非法入口） | `tests/integration/pipeline/test_pipeline_failure_modes_integration.py` |

@@ -49,6 +49,14 @@ def _collect_time_points(blog_data: Iterable[dict]) -> List[Tuple[datetime, str]
     return points
 
 
+def _clean_legacy_reports(report_dir: str = "report") -> None:
+    if not report_dir:
+        return
+    legacy_json = os.path.join(report_dir, "chart_analyses.json")
+    if os.path.exists(legacy_json):
+        os.remove(legacy_json)
+
+
 class LoadEnhancedDataNode(MonitoredNode):
     """
     加载增强数据节点
@@ -56,6 +64,8 @@ class LoadEnhancedDataNode(MonitoredNode):
 
     def prep(self, shared):
         config = shared.get("config", {})
+        report_dir = config.get("report", {}).get("output_dir", "report")
+        _clean_legacy_reports(report_dir)
         enhanced_data_path = config.get("data_source", {}).get(
             "enhanced_data_path", "data/enhanced_blogs.json"
         )

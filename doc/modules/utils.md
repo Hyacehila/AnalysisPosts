@@ -1,6 +1,6 @@
 # 工具函数文档
 
-> **文档状态**: 2026-02-20 更新  
+> **文档状态**: 2026-02-22 更新  
 > **关联源码**: `utils/call_llm.py`, `utils/llm_retry.py`, `utils/data_loader.py`, `utils/console_safe.py`, `utils/path_manager.py`, `utils/status_events.py`, `utils/status_store.py`, `utils/trace_manager.py`, `utils/web_search.py`, `utils/data_sources/*`, `utils/nlp/*`  
 > **上级文档**: [系统设计总览](design.md)
 
@@ -244,7 +244,7 @@ os.replace(temp_file.name, output_path)  # 原子替换
 提供轻量文本处理能力（不依赖外部模型）：
 
 - `text_cleaner`：清洗 URL/HTML/Emoji
-- `tokenizer`：分词（jieba + fallback）
+- `tokenizer`：分词（优先 `jieba`，模块加载时显式 `jieba.initialize()`；失败时自动降级到正则 fallback，且中文连续词按 `[\u4e00-\u9fff]+` 提取）
 - `keyword_extractor`：关键词抽取
 - `ner`：规则实体抽取（#话题#, @用户）
 - `sentiment_lexicon`：词典情感

@@ -44,39 +44,41 @@ def publisher_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
     Returns:
         包含data、summary的标准字典结构
     """
+    return publisher_bar_chart(blog_data)
+
+
+def _build_publisher_distribution_data(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     total = len(blog_data)
     if total == 0:
         return {
             "data": {},
-            "summary": "没有可分析的博文数据"
+            "summary": "没有可分析的博文数据",
         }
-    
-    publisher_stats = defaultdict(lambda: {
-        "count": 0,
-        "total_reposts": 0,
-        "total_comments": 0,
-        "total_likes": 0,
-        "sentiment_sum": 0,
-        "sentiment_count": 0
-    })
-    
+
+    publisher_stats = defaultdict(
+        lambda: {
+            "count": 0,
+            "total_reposts": 0,
+            "total_comments": 0,
+            "total_likes": 0,
+            "sentiment_sum": 0,
+            "sentiment_count": 0,
+        }
+    )
+
     for post in blog_data:
-        publisher = post.get("publisher", "未知")
-        if not publisher:
-            publisher = "未知"
-        
+        publisher = post.get("publisher", "未知") or "未知"
         stats = publisher_stats[publisher]
         stats["count"] += 1
         stats["total_reposts"] += post.get("repost_count", 0)
         stats["total_comments"] += post.get("comment_count", 0)
         stats["total_likes"] += post.get("like_count", 0)
-        
+
         polarity = post.get("sentiment_polarity")
         if polarity is not None:
             stats["sentiment_sum"] += polarity
             stats["sentiment_count"] += 1
-    
-    # 构建分布数据
+
     distribution = {}
     for publisher, stats in publisher_stats.items():
         count = stats["count"]
@@ -86,11 +88,12 @@ def publisher_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
             "avg_reposts": round(stats["total_reposts"] / count, 2) if count > 0 else 0,
             "avg_comments": round(stats["total_comments"] / count, 2) if count > 0 else 0,
             "avg_likes": round(stats["total_likes"] / count, 2) if count > 0 else 0,
-            "avg_sentiment": round(stats["sentiment_sum"] / stats["sentiment_count"], 2) if stats["sentiment_count"] > 0 else None,
-            "total_engagement": stats["total_reposts"] + stats["total_comments"] + stats["total_likes"]
+            "avg_sentiment": round(stats["sentiment_sum"] / stats["sentiment_count"], 2)
+            if stats["sentiment_count"] > 0
+            else None,
+            "total_engagement": stats["total_reposts"] + stats["total_comments"] + stats["total_likes"],
         }
 
-    # 高互动账号与代表性帖子（融合新工具能力，保持旧接口向后兼容）
     def _engagement(post):
         return post.get("repost_count", 0) + post.get("comment_count", 0) + post.get("like_count", 0)
 
@@ -102,12 +105,14 @@ def publisher_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
         if name in seen:
             continue
         seen.add(name)
-        top_accounts.append({
-            "username": name,
-            "publisher": post.get("publisher", "未知"),
-            "engagement": _engagement(post),
-            "followers_count": post.get("followers_count")
-        })
+        top_accounts.append(
+            {
+                "username": name,
+                "publisher": post.get("publisher", "未知"),
+                "engagement": _engagement(post),
+                "followers_count": post.get("followers_count"),
+            }
+        )
         if len(top_accounts) >= 20:
             break
 
@@ -117,29 +122,24 @@ def publisher_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, A
             "publisher": p.get("publisher", "未知"),
             "publish_time": p.get("publish_time"),
             "engagement": _engagement(p),
-            "content": p.get("content")
+            "content": p.get("content"),
         }
         for p in sorted_posts[:50]
     ]
-    
-    # 排序
+
     sorted_publishers = sorted(distribution.items(), key=lambda x: x[1]["count"], reverse=True)
     top_publisher = sorted_publishers[0][0] if sorted_publishers else "无"
-    
     summary = f"共{len(distribution)}种发布者类型，「{top_publisher}」占比最高"
-    
     return {
         "data": {
             "distribution": dict(sorted_publishers),
             "total_posts": total,
             "publisher_types": len(distribution),
-            "top_publishers": [
-                {"publisher": p, **stats} for p, stats in sorted_publishers[:5]
-            ],
+            "top_publishers": [{"publisher": p, **stats} for p, stats in sorted_publishers[:5]],
             "top_accounts": top_accounts,
-            "representative_posts": representative_posts
+            "representative_posts": representative_posts,
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -159,46 +159,45 @@ def cross_dimension_matrix(blog_data: List[Dict[str, Any]],
     Returns:
         包含data、summary的标准字典结构
     """
+    return interaction_heatmap(blog_data, dim1=dim1, dim2=dim2)
+
+
+def _build_cross_dimension_data(
+    blog_data: List[Dict[str, Any]],
+    dim1: str = "publisher",
+    dim2: str = "sentiment_polarity",
+) -> Dict[str, Any]:
     if not blog_data:
-        return {
-            "data": {},
-            "summary": "没有可分析的博文数据"
-        }
-    
-    # 提取维度值
+        return {"data": {}, "summary": "没有可分析的博文数据"}
+
     def get_dim_value(post, dim):
         if dim == "publisher":
             return post.get("publisher") or "未知"
-        elif dim == "location":
+        if dim == "location":
             return post.get("location") or "未知"
-        elif dim == "sentiment_polarity":
+        if dim == "sentiment_polarity":
             polarity = post.get("sentiment_polarity")
             return POLARITY_LABELS.get(polarity, "未知") if polarity else "未知"
-        elif dim == "topic":
+        if dim == "topic":
             topics = post.get("topics", [])
             if topics:
                 return topics[0].get("parent_topic", "未知")
             return "未知"
         return "未知"
-    
-    # 统计交叉计数
+
     cross_counts = defaultdict(lambda: defaultdict(int))
     dim1_counts = Counter()
     dim2_counts = Counter()
-    
+
     for post in blog_data:
         val1 = get_dim_value(post, dim1)
         val2 = get_dim_value(post, dim2)
-        
         cross_counts[val1][val2] += 1
         dim1_counts[val1] += 1
         dim2_counts[val2] += 1
-    
-    # 取Top值（避免矩阵过大）
+
     top_dim1 = [v[0] for v in dim1_counts.most_common(10)]
     top_dim2 = [v[0] for v in dim2_counts.most_common(10)]
-    
-    # 构建矩阵
     matrix = {}
     for v1 in top_dim1:
         matrix[v1] = {}
@@ -207,11 +206,10 @@ def cross_dimension_matrix(blog_data: List[Dict[str, Any]],
             matrix[v1][v2] = {
                 "count": count,
                 "row_percentage": round(count / dim1_counts[v1] * 100, 2) if dim1_counts[v1] > 0 else 0,
-                "col_percentage": round(count / dim2_counts[v2] * 100, 2) if dim2_counts[v2] > 0 else 0
+                "col_percentage": round(count / dim2_counts[v2] * 100, 2) if dim2_counts[v2] > 0 else 0,
             }
-    
+
     summary = f"{dim1} × {dim2} 交叉分析矩阵，{len(top_dim1)}行×{len(top_dim2)}列"
-    
     return {
         "data": {
             "matrix": matrix,
@@ -219,9 +217,9 @@ def cross_dimension_matrix(blog_data: List[Dict[str, Any]],
             "dim1_values": top_dim1,
             "dim2_values": top_dim2,
             "dim1_totals": {v: dim1_counts[v] for v in top_dim1},
-            "dim2_totals": {v: dim2_counts[v] for v in top_dim2}
+            "dim2_totals": {v: dim2_counts[v] for v in top_dim2},
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -268,9 +266,10 @@ def influence_analysis(blog_data: List[Dict[str, Any]],
             "publisher": post.get("publisher", "未知")
         })
     
-    # 排序获取Top N
+    # 排序获取Top N，并对外严格限制最多返回5条，避免大体量结果导致MCP拥塞。
+    capped_top_n = min(max(top_n, 0), 5)
     sorted_posts = sorted(posts_with_score, key=lambda x: x["influence_score"], reverse=True)
-    top_posts = sorted_posts[:top_n]
+    top_posts = sorted_posts[:capped_top_n]
     
     # 统计指标
     total_engagement = sum(p["influence_score"] for p in posts_with_score)
@@ -284,7 +283,7 @@ def influence_analysis(blog_data: List[Dict[str, Any]],
     
     sorted_publisher_influence = sorted(publisher_influence.items(), key=lambda x: x[1], reverse=True)
     
-    summary = f"Top{top_n}博文贡献了{concentration}%的总影响力"
+    summary = f"Top{capped_top_n}博文贡献了{concentration}%的总影响力"
     
     return {
         "data": {
@@ -420,7 +419,7 @@ def interaction_heatmap(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取交叉矩阵数据
-    matrix_result = cross_dimension_matrix(blog_data, dim1, dim2)
+    matrix_result = _build_cross_dimension_data(blog_data, dim1, dim2)
     matrix = matrix_result["data"].get("matrix", {})
     dim1_values = matrix_result["data"].get("dim1_values", [])
     dim2_values = matrix_result["data"].get("dim2_values", [])
@@ -514,7 +513,7 @@ def publisher_bar_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取发布者分布数据
-    pub_result = publisher_distribution_stats(blog_data)
+    pub_result = _build_publisher_distribution_data(blog_data)
     distribution = pub_result["data"].get("distribution", {})
     
     if not distribution:
@@ -727,11 +726,6 @@ def publisher_focus_distribution_chart(blog_data: List[Dict[str, Any]],
             "source_tool": "publisher_focus_distribution_chart",
             "description": f"焦点窗口内 Top{top_n} 发布者类型的日发布量趋势"
         }],
-        "data": {
-            "focus_window": {"start": str(start.date()), "end": str(end.date())},
-            "series": pivot.reset_index().to_dict(orient="records"),
-            "top_publishers": top_publishers
-        },
         "summary": f"焦点窗口（{start.date()}~{end.date()}）内发布者类型发布趋势。"
     }
 

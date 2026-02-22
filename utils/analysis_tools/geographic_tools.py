@@ -38,35 +38,33 @@ def geographic_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, 
     Returns:
         包含data、summary的标准字典结构
     """
+    return geographic_bar_chart(blog_data)
+
+
+def _build_geographic_distribution_data(blog_data: List[Dict[str, Any]]) -> Dict[str, Any]:
     total = len(blog_data)
     if total == 0:
         return {
             "data": {},
-            "summary": "没有可分析的博文数据"
+            "summary": "没有可分析的博文数据",
         }
-    
+
     location_counts = Counter()
     posts_with_location = 0
-    
     for post in blog_data:
         location = post.get("location", "").strip()
         if location:
             posts_with_location += 1
             location_counts[location] += 1
-    
-    # 构建分布数据
-    distribution = {}
-    for location, count in location_counts.most_common():
-        distribution[location] = {
-            "count": count,
-            "percentage": round(count / total * 100, 2)
-        }
-    
+
+    distribution = {
+        location: {"count": count, "percentage": round(count / total * 100, 2)}
+        for location, count in location_counts.most_common()
+    }
+
     coverage = round(posts_with_location / total * 100, 2) if total > 0 else 0
     top_location = location_counts.most_common(1)[0][0] if location_counts else "无"
-    
     summary = f"地理信息覆盖率{coverage}%，最热门地区「{top_location}」共{location_counts.get(top_location, 0)}条"
-    
     return {
         "data": {
             "distribution": distribution,
@@ -75,11 +73,11 @@ def geographic_distribution_stats(blog_data: List[Dict[str, Any]]) -> Dict[str, 
             "coverage_percentage": coverage,
             "unique_locations": len(location_counts),
             "top_locations": [
-                {"location": loc, "count": cnt, "percentage": round(cnt/total*100, 2)}
+                {"location": loc, "count": cnt, "percentage": round(cnt / total * 100, 2)}
                 for loc, cnt in location_counts.most_common(10)
-            ]
+            ],
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -97,56 +95,7 @@ def geographic_hotspot_detection(blog_data: List[Dict[str, Any]],
     Returns:
         包含data、summary的标准字典结构
     """
-    # 首先获取地理分布
-    dist_result = geographic_distribution_stats(blog_data)
-    distribution = dist_result["data"].get("distribution", {})
-    
-    if not distribution:
-        return {
-            "data": {"hotspots": []},
-            "summary": "没有地理位置数据"
-        }
-    
-    # 计算阈值
-    counts = [v["count"] for v in distribution.values()]
-    if not counts:
-        return {
-            "data": {"hotspots": []},
-            "summary": "没有地理位置数据"
-        }
-    
-    threshold = np.percentile(counts, threshold_percentile)
-    
-    # 识别热点
-    hotspots = []
-    for location, stats in distribution.items():
-        if stats["count"] >= threshold:
-            hotspots.append({
-                "location": location,
-                "count": stats["count"],
-                "percentage": stats["percentage"],
-                "is_hotspot": True
-            })
-    
-    # 按数量排序
-    hotspots.sort(key=lambda x: x["count"], reverse=True)
-    
-    # 计算热点区域占总量的比例
-    hotspot_count = sum(h["count"] for h in hotspots)
-    total = sum(counts)
-    concentration = round(hotspot_count / total * 100, 2) if total > 0 else 0
-    
-    summary = f"识别出{len(hotspots)}个热点区域，占总量的{concentration}%"
-    
-    return {
-        "data": {
-            "hotspots": hotspots,
-            "threshold": round(threshold, 2),
-            "threshold_percentile": threshold_percentile,
-            "hotspot_concentration": concentration
-        },
-        "summary": summary
-    }
+    return geographic_heatmap(blog_data)
 
 
 def geographic_sentiment_analysis(blog_data: List[Dict[str, Any]],
@@ -163,51 +112,85 @@ def geographic_sentiment_analysis(blog_data: List[Dict[str, Any]],
     Returns:
         包含data、summary的标准字典结构
     """
+    return geographic_sentiment_bar_chart(blog_data, top_n=12)
+
+
+def _build_geographic_hotspot_data(
+    blog_data: List[Dict[str, Any]],
+    threshold_percentile: float = 90,
+) -> Dict[str, Any]:
+    dist_result = _build_geographic_distribution_data(blog_data)
+    distribution = dist_result["data"].get("distribution", {})
+    if not distribution:
+        return {"data": {"hotspots": []}, "summary": "没有地理位置数据"}
+
+    counts = [v["count"] for v in distribution.values()]
+    if not counts:
+        return {"data": {"hotspots": []}, "summary": "没有地理位置数据"}
+
+    threshold = np.percentile(counts, threshold_percentile)
+    hotspots = []
+    for location, stats in distribution.items():
+        if stats["count"] >= threshold:
+            hotspots.append(
+                {
+                    "location": location,
+                    "count": stats["count"],
+                    "percentage": stats["percentage"],
+                    "is_hotspot": True,
+                }
+            )
+    hotspots.sort(key=lambda x: x["count"], reverse=True)
+
+    hotspot_count = sum(h["count"] for h in hotspots)
+    total = sum(counts)
+    concentration = round(hotspot_count / total * 100, 2) if total > 0 else 0
+    summary = f"识别出{len(hotspots)}个热点区域，占总量的{concentration}%"
+    return {
+        "data": {
+            "hotspots": hotspots,
+            "threshold": round(threshold, 2),
+            "threshold_percentile": threshold_percentile,
+            "hotspot_concentration": concentration,
+        },
+        "summary": summary,
+    }
+
+
+def _build_geographic_sentiment_data(
+    blog_data: List[Dict[str, Any]],
+    min_posts: int = 5,
+) -> Dict[str, Any]:
     if not blog_data:
-        return {
-            "data": {},
-            "summary": "没有可分析的博文数据"
-        }
-    
-    # 按地区分组统计情感
+        return {"data": {}, "summary": "没有可分析的博文数据"}
+
     location_sentiments = defaultdict(list)
-    
     for post in blog_data:
         location = post.get("location", "").strip()
         polarity = post.get("sentiment_polarity")
-        
         if location and polarity is not None:
             location_sentiments[location].append(polarity)
-    
-    # 计算每个地区的情感统计
+
     regional_analysis = {}
     for location, polarities in location_sentiments.items():
         if len(polarities) >= min_posts:
             avg_polarity = sum(polarities) / len(polarities)
             positive_count = len([p for p in polarities if p >= 4])
             negative_count = len([p for p in polarities if p <= 2])
-            
             regional_analysis[location] = {
                 "post_count": len(polarities),
                 "avg_polarity": round(avg_polarity, 2),
                 "positive_ratio": round(positive_count / len(polarities) * 100, 2),
                 "negative_ratio": round(negative_count / len(polarities) * 100, 2),
                 "sentiment_label": (
-                    "正面主导" if avg_polarity >= 3.5 else 
-                    ("负面主导" if avg_polarity <= 2.5 else "中性")
-                )
+                    "正面主导" if avg_polarity >= 3.5 else ("负面主导" if avg_polarity <= 2.5 else "中性")
+                ),
             }
-    
-    # 找出情感最正面和最负面的地区
+
     if regional_analysis:
-        sorted_by_polarity = sorted(
-            regional_analysis.items(), 
-            key=lambda x: x[1]["avg_polarity"],
-            reverse=True
-        )
+        sorted_by_polarity = sorted(regional_analysis.items(), key=lambda x: x[1]["avg_polarity"], reverse=True)
         most_positive = sorted_by_polarity[0] if sorted_by_polarity else None
         most_negative = sorted_by_polarity[-1] if sorted_by_polarity else None
-        
         summary_parts = []
         if most_positive:
             summary_parts.append(f"最正面地区「{most_positive[0]}」({most_positive[1]['avg_polarity']})")
@@ -216,14 +199,14 @@ def geographic_sentiment_analysis(blog_data: List[Dict[str, Any]],
         summary = "，".join(summary_parts) if summary_parts else "无显著差异"
     else:
         summary = "没有足够数据进行地区情感分析"
-    
+
     return {
         "data": {
             "regional_analysis": regional_analysis,
             "min_posts_threshold": min_posts,
-            "regions_analyzed": len(regional_analysis)
+            "regions_analyzed": len(regional_analysis),
         },
-        "summary": summary
+        "summary": summary,
     }
 
 
@@ -242,7 +225,7 @@ def geographic_heatmap(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取地区情感分析数据
-    sentiment_result = geographic_sentiment_analysis(blog_data)
+    sentiment_result = _build_geographic_sentiment_data(blog_data)
     regional_analysis = sentiment_result["data"].get("regional_analysis", {})
     
     if len(regional_analysis) < 2:
@@ -347,7 +330,7 @@ def geographic_bar_chart(blog_data: List[Dict[str, Any]],
         包含图表路径和描述的字典
     """
     # 获取地理分布统计
-    dist_result = geographic_distribution_stats(blog_data)
+    dist_result = _build_geographic_distribution_data(blog_data)
     distribution = dist_result["data"].get("distribution", {})
     
     if not distribution:
@@ -363,7 +346,7 @@ def geographic_bar_chart(blog_data: List[Dict[str, Any]],
     percentages = [stats["percentage"] for _, stats in sorted_locations]
     
     # 获取情感数据
-    sentiment_result = geographic_sentiment_analysis(blog_data)
+    sentiment_result = _build_geographic_sentiment_data(blog_data)
     regional_analysis = sentiment_result["data"].get("regional_analysis", {})
     
     # 创建双轴图表
@@ -444,7 +427,7 @@ def geographic_sentiment_bar_chart(blog_data: List[Dict[str, Any]],
     """
     正负面占比的地区对比条形图，突出地区情绪差异。
     """
-    sentiment_result = geographic_sentiment_analysis(blog_data)
+    sentiment_result = _build_geographic_sentiment_data(blog_data)
     regional = sentiment_result.get("data", {}).get("regional_analysis", {})
     if not regional:
         return {"charts": [], "summary": "没有可用的地区情绪数据"}

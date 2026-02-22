@@ -6,6 +6,7 @@
 import asyncio
 import ast
 import os
+import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from mcp import ClientSession, StdioServerParameters
@@ -115,7 +116,7 @@ async def mcp_get_tools(server_script_path: str = "utils.mcp_server") -> List[Di
                 server_script_path += '.py'
 
         server_params = StdioServerParameters(
-            command="python",
+            command=sys.executable,
             args=[server_script_path],
             env=_build_mcp_env()
         )
@@ -197,7 +198,7 @@ async def mcp_call_tool(server_script_path: str, tool_name: str, arguments: Dict
                 server_script_path += '.py'
 
         server_params = StdioServerParameters(
-            command="python",
+            command=sys.executable,
             args=[server_script_path],
             env=_build_mcp_env()
         )
