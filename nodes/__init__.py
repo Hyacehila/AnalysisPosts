@@ -79,6 +79,7 @@ from nodes.stage3 import (
     PlanOutlineNode,
     GenerateChaptersBatchNode,
     ReviewChaptersNode,
+    IRRendererNode,
     InjectTraceNode,
     MethodologyAppendixNode,
     FormatReportNode,
@@ -137,7 +138,7 @@ __all__ = [
     "VisualAnalysisNode", "MergeResultsNode",
     # stage3
     "LoadAnalysisResultsNode", "PlanOutlineNode", "GenerateChaptersBatchNode",
-    "ReviewChaptersNode", "InjectTraceNode", "MethodologyAppendixNode",
+    "ReviewChaptersNode", "IRRendererNode", "InjectTraceNode", "MethodologyAppendixNode",
     "FormatReportNode", "RenderHTMLNode", "SaveReportNode",
     "ClearStage3OutputsNode",
 ]

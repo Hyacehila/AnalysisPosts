@@ -81,6 +81,8 @@ class LLMInsightNode(MonitoredNode):
 3. **地域分布特点**：基于地理数据，总结区域分布模式
 4. **发布者行为特征**：基于发布者类型数据，描述行为模式
 5. **综合数据概览**：整合所有数据的整体特征
+6. **数据与外部事件交叉对比**：若统计数据中出现异常波动（如情感突变、话题骤增），
+   请结合数据时间点分析可能的外部驱动因素，明确标注"数据显示X时段出现Y变化"
 
 ## 输出格式（严格JSON）
 ```json
@@ -89,7 +91,8 @@ class LLMInsightNode(MonitoredNode):
     "topic_distribution": "基于数据描述的主题分布特征",
     "geographic_distribution": "基于数据的地理分布特点",
     "publisher_behavior": "基于数据的发布者行为模式",
-    "overall_summary": "所有数据的整合性总结"
+    "overall_summary": "所有数据的整合性总结",
+    "cross_reference_insight": "数据异常与可能的外部事件关联分析"
 }}
 ```
 
@@ -130,11 +133,12 @@ class LLMInsightNode(MonitoredNode):
             insights = json.loads(json_str)
         except json.JSONDecodeError:
             insights = {
-                "sentiment_insight": "基于图表分析，情感趋势显示整体态势相对稳定，需要关注异常波动点。",
-                "topic_insight": "主题演化分析表明核心话题持续活跃，新兴话题呈现增长趋势。",
-                "geographic_insight": "地理分布分析显示热点区域集中，区域差异特征明显。",
-                "cross_dimension_insight": "发布者类型分析显示不同群体影响力差异显著，交互模式多样。",
-                "summary_insight": response[:800] if response else "综合分析已完成，建议关注图表中的关键发现。",
+                "sentiment_summary": "基于图表分析，情感趋势显示整体态势相对稳定，需要关注异常波动点。",
+                "topic_distribution": "主题演化分析表明核心话题持续活跃，新兴话题呈现增长趋势。",
+                "geographic_distribution": "地理分布分析显示热点区域集中，区域差异特征明显。",
+                "publisher_behavior": "发布者类型分析显示不同群体影响力差异显著，交互模式多样。",
+                "overall_summary": response[:800] if response else "综合分析已完成，建议关注图表中的关键发现。",
+                "cross_reference_insight": "数据显示关键时段存在波动，但当前输入缺少明确外部事件证据。",
             }
 
         return insights

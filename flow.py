@@ -43,6 +43,7 @@ from nodes import (
     PlanOutlineNode,
     GenerateChaptersBatchNode,
     ReviewChaptersNode,
+    IRRendererNode,
     InjectTraceNode,
     MethodologyAppendixNode,
     FormatReportNode,
@@ -156,6 +157,7 @@ def _create_unified_report_flow() -> AsyncFlow:
     outline_node = PlanOutlineNode()
     generate_chapters_node = GenerateChaptersBatchNode(max_concurrent=3)
     review_chapters_node = ReviewChaptersNode()
+    ir_renderer_node = IRRendererNode()
     inject_trace_node = InjectTraceNode()
     methodology_node = MethodologyAppendixNode()
     format_node = FormatReportNode()
@@ -169,8 +171,9 @@ def _create_unified_report_flow() -> AsyncFlow:
     generate_chapters_node >> review_chapters_node
 
     review_chapters_node - "needs_revision" >> generate_chapters_node
-    review_chapters_node - "satisfied" >> inject_trace_node
+    review_chapters_node - "satisfied" >> ir_renderer_node
 
+    ir_renderer_node >> inject_trace_node
     inject_trace_node >> methodology_node
     methodology_node >> format_node
     format_node >> render_html_node

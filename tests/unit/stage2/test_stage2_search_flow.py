@@ -5,7 +5,7 @@ import asyncio
 
 from nodes.stage2.search import create_query_search_flow
 import nodes.stage2.search as search_module
-from nodes.stage2.search import SearchReflectionNode
+from nodes.stage2.search import SearchReflectionNode, SearchSummaryNode
 
 
 def _build_shared():
@@ -222,3 +222,38 @@ def test_search_reflection_prompt_includes_document_snippets(monkeypatch):
     node.exec(prep_res)
 
     assert "启动应急响应并公布救援进展" in captured["prompt"]
+
+
+def test_search_summary_prompt_contains_density_requirements(monkeypatch):
+    captured = {}
+
+    def fake_llm(prompt, *args, **kwargs):
+        captured["prompt"] = prompt
+        return (
+            '{"event_timeline":["2026-02-18: 官方通报发布"],'
+            '"key_actors":["北京市应急管理局"],'
+            '"official_responses":["北京市应急管理局：已启动应急响应"],'
+            '"public_reactions_summary":"公众关注排水与交通恢复。",'
+            '"related_events":["2023年同期暴雨事件"]}'
+        )
+
+    monkeypatch.setattr(search_module, "call_glm46", fake_llm)
+
+    node = SearchSummaryNode()
+    prep_res = {
+        "documents": [
+            {
+                "title": "官方通报",
+                "snippet": "启动应急响应",
+                "url": "https://example.com/notice",
+            }
+        ],
+        "data_summary": "北京暴雨事件舆情快速升温",
+        "request_timeout_seconds": 120,
+    }
+    result = node.exec(prep_res)
+
+    assert result["key_actors"] == ["北京市应急管理局"]
+    assert "事件时间线" in captured["prompt"]
+    assert "信息密度要求" in captured["prompt"]
+    assert "官方回应汇总" in captured["prompt"]

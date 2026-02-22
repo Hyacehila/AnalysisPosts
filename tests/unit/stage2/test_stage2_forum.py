@@ -59,6 +59,7 @@ def test_forum_host_routes_to_supplement_data(monkeypatch):
                 "gaps": ["缺少细分人群分布"],
                 "decision": "supplement_data",
                 "directive": {"tools": ["publisher_type_distribution"]},
+                "host_narrative": "主持人认为当前人群结构证据不足，应补充发布者类型分析。",
                 "synthesized_conclusions": [],
             },
             ensure_ascii=False,
@@ -73,7 +74,9 @@ def test_forum_host_routes_to_supplement_data(monkeypatch):
     assert action == "supplement_data"
     assert shared["forum"]["current_round"] == 1
     assert shared["forum"]["current_directive"]["tools"] == ["publisher_type_distribution"]
+    assert shared["forum"]["debate_logs"] == ["主持人认为当前人群结构证据不足，应补充发布者类型分析。"]
     assert len(shared["trace"]["forum_rounds"]) == 1
+    assert shared["trace"]["forum_rounds"][0]["host_narrative"] == "主持人认为当前人群结构证据不足，应补充发布者类型分析。"
     assert shared["trace"]["loop_status"]["forum"]["current"] == 1
     assert shared["trace"]["loop_status"]["forum"]["max"] == 3
 
@@ -96,6 +99,7 @@ def test_forum_host_enforces_min_round_before_sufficient(monkeypatch):
                 "gaps": [],
                 "decision": "sufficient",
                 "directive": {},
+                "host_narrative": "主持人认为第一轮结论尚需验证。",
                 "synthesized_conclusions": ["首轮即可收敛"],
             },
             ensure_ascii=False,
@@ -130,6 +134,7 @@ def test_forum_host_force_sufficient_when_max_round_reached(monkeypatch):
                 "gaps": ["继续补充"],
                 "decision": "supplement_search",
                 "directive": {"queries": ["事件 官方回应"]},
+                "host_narrative": "主持人建议继续追踪官方回应。",
                 "synthesized_conclusions": [],
             },
             ensure_ascii=False,
@@ -165,6 +170,7 @@ def test_forum_host_routes_to_supplement_visual(monkeypatch):
                     "question": "请解释该图的峰值变化。",
                     "reason": "补齐视觉证据。",
                 },
+                "host_narrative": "主持人建议补齐图表视觉解释。",
                 "synthesized_conclusions": [],
             },
             ensure_ascii=False,
@@ -194,6 +200,7 @@ def test_forum_host_respects_stage2_reasoning_switch(monkeypatch):
                 "gaps": [],
                 "decision": "sufficient",
                 "directive": {},
+                "host_narrative": "主持人确认当前证据可收敛。",
                 "synthesized_conclusions": [],
             },
             ensure_ascii=False,
@@ -223,6 +230,7 @@ def test_forum_prompt_contains_explicit_event_keyword_context(monkeypatch):
                 "gaps": [],
                 "decision": "sufficient",
                 "directive": {},
+                "host_narrative": "主持人综合观点并准备收敛。",
                 "synthesized_conclusions": [],
             },
             ensure_ascii=False,
@@ -239,3 +247,41 @@ def test_forum_prompt_contains_explicit_event_keyword_context(monkeypatch):
     assert "2024-08-16 10:00:00 至 2024-08-31 22:00:00" in captured["prompt"]
     assert "用户分析指令" in captured["prompt"]
     assert "重点分析官方部门回应是否充分" in captured["prompt"]
+    assert "host_narrative" in captured["prompt"]
+
+
+def test_forum_exec_supports_structured_host_narrative(monkeypatch):
+    shared = _build_shared()
+
+    monkeypatch.setattr(
+        forum_module,
+        "call_glm46",
+        lambda *args, **kwargs: json.dumps(
+            {
+                "cross_analysis": {"agreement": ["主叙事一致"], "conflicts": ["时效认知存在差异"]},
+                "gaps": ["官方回应细节不足"],
+                "decision": "supplement_search",
+                "directive": {"queries": ["北京暴雨 官方发布会"], "reason": "补齐用户关注的官方回应细节"},
+                "host_narrative": {
+                    "timeline_analysis": "8月16日至8月31日期间讨论持续升温。",
+                    "viewpoint_synthesis": "INSIGHT与MEDIA对情绪走向达成一致。",
+                    "deep_analysis": "争议焦点集中于信息发布时效。",
+                    "guided_questions": ["回应是否覆盖核心质疑？", "后续政策是否跟进？"],
+                },
+                "synthesized_conclusions": ["需补充官方发布会原文"],
+            },
+            ensure_ascii=False,
+        ),
+    )
+
+    node = ForumHostNode()
+    prep_res = node.prep(shared)
+    exec_res = node.exec(prep_res)
+    action = node.post(shared, prep_res, exec_res)
+
+    assert action == "supplement_search"
+    narrative = exec_res["host_narrative"]
+    assert "【事件脉络】" in narrative
+    assert "【观点综合】" in narrative
+    assert "【深层分析】" in narrative
+    assert "【引导问题】" in narrative

@@ -1,6 +1,6 @@
 # 阶段 3：报告生成子系统
 
-> **文档状态**: 2026-02-21 更新  
+> **文档状态**: 2026-02-22 更新  
 > **关联源码**: `nodes/stage3/*`, `flow.py`, `config.py`  
 > **上级文档**: [系统设计总览](../architecture.md)
 
@@ -35,7 +35,8 @@ flowchart LR
     PO --> GC[GenerateChaptersBatch]
     GC --> RC[ReviewChapters]
     RC -- needs_revision --> GC
-    RC -- satisfied --> IT[InjectTrace]
+    RC -- satisfied --> IR[IRRenderer]
+    IR --> IT[InjectTrace]
     IT --> MA[MethodologyAppendix]
     MA --> FR[FormatReport]
     FR --> RH[RenderHTML]
@@ -49,12 +50,13 @@ flowchart LR
 |:---|:---|
 | `ClearStage3OutputsNode` | 清理 `report.md/report.html`，保留 Stage2 产物、`images/` 与 `status.json` |
 | `LoadAnalysisResultsNode` | 内存优先读取 Stage2 结果，文件回退加载 JSON 与 trace |
-| `PlanOutlineNode` | LLM 规划报告大纲（失败时回退默认大纲）；提示词注入洞察摘要、事件关键词、分析时间范围、用户指令并禁止占位符 |
-| `GenerateChaptersBatchNode` | 并行逐章生成内容（支持反馈驱动重生成）；提示词注入图表分析正文、洞察摘要、搜索背景、证据卡索引，并要求“段落后证据说明” |
-| `ReviewChaptersNode` | 章节级评审循环，输出 `needs_revision/satisfied` 路由；占位符命中或段落证据说明缺失为硬失败并强制修订 |
-| `InjectTraceNode` | 追加“参考资料与证据索引”精简附录（正文证据说明为主，附录用于审计） |
+| `PlanOutlineNode` | LLM 规划报告布局（标题/副标题/hero/tocPlan/字数预算）；章节级 `allowSwot`/`allowPest` 组件权限锁在节点内做独占校验 |
+| `GenerateChaptersBatchNode` | 并行逐章生成 **JSON IR blocks**（支持反馈驱动重生成）；提示词注入图表分析正文、洞察摘要、搜索背景、论坛辩论纪要、证据卡索引、组件权限；输出模式 `generation_mode=unified_json` |
+| `ReviewChaptersNode` | 章节级评审循环，输出 `needs_revision/satisfied` 路由；对 `blocks` 先扁平化为文本再评审；占位符命中、段落缺少 `[E#]`、非法引用标记、重复标题、未授权 SWOT/PEST 块均硬失败并强制修订 |
+| `IRRendererNode` | 将章节 JSON IR blocks 渲染为 Markdown（含 `paragraph/list/table/swotTable/pestTable/engineQuote/image`）并组装 `reviewed_report_text` |
+| `InjectTraceNode` | 追加“参考资料与证据索引”精简附录（正文角标引用为主，附录用于审计） |
 | `MethodologyAppendixNode` | 追加方法论附录（工具调用、循环状态、局限性） |
-| `FormatReportNode` | 执行摘要注入、目录生成、图片路径归一化、图表附录兜底 |
+| `FormatReportNode` | 执行摘要注入、重复标题去重、目录生成、图片路径归一化、图表附录兜底 |
 | `RenderHTMLNode` | Markdown 渲染为交互 HTML（图片放大预览 + `<details>` 保留 + 标题锚点/Markdown 链接可点击） |
 | `SaveReportNode` | 保存 MD/HTML/trace 三类产物 |
 
@@ -100,6 +102,7 @@ stage3:
 统一流程写入：
 
 - `outline`
+- `hero`
 - `chapters`
 - `review_round`
 - `chapter_review_history`
@@ -110,7 +113,7 @@ stage3:
 - `final_report_html`
 - `output_files`（`report_md/report_html/trace_file`）
 - `report_file`
-- `generation_mode="unified"`
+- `generation_mode`（章节阶段为 `unified_json`，最终格式化后为统一输出模式）
 
 ### 4.3 `shared["trace"]["loop_status"]["stage3_chapter_review"]`
 
@@ -143,13 +146,13 @@ stage3:
 
 正文证据融合规则（本轮）：
 
-- 每个实质性段落后必须有一行 `证据说明：...`
-- `证据说明` 必须包含：
-  - 证据索引（如 `[E1]`）
-  - 来源解释（非裸 source 名）
-  - 置信度（高/中/低）
-  - 置信度理由
-- 若缺失上述要素，`ReviewChaptersNode` 会强制进入修订循环
+- 每个实质性段落必须内嵌证据角标（如 `[E1]`）
+- 多证据并列必须写作 `[E1][E2]`（禁止 `[E1, E2]`）
+- 禁止输出非证据格式的方括号引用（如 `[topic_distribution]`）
+- 禁止在章节正文重复输出同名标题行（避免与汇编标题重复）
+- `swotTable/pestTable` 必须受大纲权限控制：全文最多一个 SWOT 块、最多一个 PEST 块，且不能同章出现
+- `engineQuote` 仅用于引用论坛辩论纪要或搜索背景中的智能体原始观点
+- 若缺失或违规，`ReviewChaptersNode` 会强制进入修订循环
 
 ---
 

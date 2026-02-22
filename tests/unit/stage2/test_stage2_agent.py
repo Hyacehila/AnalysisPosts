@@ -243,6 +243,24 @@ class TestDecisionToolsNode:
         assert "用户分析指令" in prompt
         assert "优先核验官方回应与公众质疑是否一致" in prompt
 
+    @patch("nodes.stage2.agent.call_glm46")
+    def test_decision_prompt_contains_explicit_finish_gate(self, mock_llm, minimal_shared):
+        mock_llm.return_value = json.dumps(
+            {
+                "action": "execute",
+                "tool_name": "sentiment_distribution_stats",
+                "reason": "test",
+            }
+        )
+        shared = self._make_agent_shared(minimal_shared)
+        node = DecisionToolsNode()
+
+        prep_res = node.prep(shared)
+        node.exec(prep_res)
+        prompt = mock_llm.call_args.args[0]
+
+        assert "满足以下条件时必须输出 finish" in prompt
+
     def test_post_execute_action(self, minimal_shared):
         """action=execute → 设置 next_tool"""
         shared = self._make_agent_shared(minimal_shared)
@@ -290,6 +308,7 @@ class TestDecisionToolsNode:
         assert len(shared["trace"]["decisions"]) == 1
         assert shared["trace"]["decisions"][0]["action"] == "finish"
         assert shared["trace"]["decisions"][0]["tool_name"] == ""
+        assert shared["trace"]["loop_status"]["data_agent"]["termination_reason"] == "agent_sufficient"
 
     def test_post_finish_forces_chart_when_missing(self, minimal_shared):
         """action=finish 但图表不足 → 强制 execute"""

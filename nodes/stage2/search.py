@@ -110,6 +110,11 @@ class ExtractQueriesNode(MonitoredNode):
     def exec(self, prep_res):
         prompt = f"""你是舆情检索分析助手。请基于数据概况生成搜索查询词。
 
+**核心搜索策略：想象你是一个真实的普通网民**
+- 杜绝使用"舆情传播"、"情绪倾向"、"公众反应"等书面化、官方化术语。
+- 使用含有情感色彩的网络词汇（如"炸了"、"翻车"、"怎么回事"、"实名反对"等）来还原真实语境。
+- 尝试模拟网友的口吻构建查询词，以获取最真实的民间情感和反响。
+
 ## 数据概况
 {prep_res.get("data_summary", "")}
 
@@ -387,21 +392,33 @@ class SearchSummaryNode(MonitoredNode):
     def exec(self, prep_res):
         docs = prep_res.get("documents", [])
         request_timeout_seconds = int(prep_res.get("request_timeout_seconds", 120))
-        prompt = f"""基于搜索文档生成结构化背景摘要。
+        prompt = f"""你是一位专业的新闻分析师和深度内容创作专家。请基于以下搜索文档，生成信息密集、结构完整的结构化背景摘要。
 
-数据概况:
+## 数据概况
 {prep_res.get("data_summary", "")}
 
-搜索文档（最多10条）:
+## 搜索文档（最多10条）
 {json.dumps(docs[:10], ensure_ascii=False)}
 
-输出 JSON:
+## 写作要求
+1. **事件时间线**：按时间顺序整理搜索结果中的关键事件节点，每个事件必须包含具体时间和事实描述。
+2. **关键主体识别**：提取新闻中出现的具体人名、机构名、平台名等，禁止使用泛称。
+3. **官方回应汇总**：摘录搜索结果中的官方声明原文或核心表态，标注来源。
+4. **公众反应总结**：整合搜索结果中关于公众/舆论态度的描述，使用引号标注直接引用。
+5. **关联事件**：识别搜索结果中提到的关联事件或历史类比。
+
+## 信息密度要求
+- 每个字段至少包含 2-3 个具体信息点（数据、引用、事实）
+- 时间线条目必须包含具体日期或时间描述
+- 所有内容必须可追溯至搜索文档，不得臆造
+
+输出 JSON：
 {{
-  "event_timeline": [...],
-  "key_actors": [...],
-  "official_responses": [...],
-  "public_reactions_summary": "...",
-  "related_events": [...]
+  "event_timeline": ["YYYY-MM-DD: 事件描述", ...],
+  "key_actors": ["具体人名/机构名", ...],
+  "official_responses": ["来源+原文摘录", ...],
+  "public_reactions_summary": "综合性的公众反应描述，至少 100 字",
+  "related_events": ["关联事件描述", ...]
 }}
 """
         try:

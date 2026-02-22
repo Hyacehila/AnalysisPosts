@@ -21,13 +21,59 @@ def _safe_json_loads(text: str) -> Dict[str, Any]:
     return json.loads(payload)
 
 
+def _blocks_to_text(blocks) -> str:
+    """将 JSON IR blocks 列表扁平化为纯文本，供评审逻辑使用。"""
+    if not isinstance(blocks, list):
+        return str(blocks or "")
+    lines = []
+    for block in blocks:
+        if not isinstance(block, dict):
+            lines.append(str(block))
+            continue
+        block_type = block.get("type", "")
+        if block_type == "paragraph":
+            inlines = block.get("inlines", [])
+            text = "".join(str(run.get("text", "")) for run in inlines if isinstance(run, dict))
+            lines.append(text)
+        elif block_type == "heading":
+            lines.append(f"# {block.get('text', '')}")
+        elif block_type == "list":
+            for item in block.get("items", []):
+                lines.append(f"- {item}")
+        elif block_type == "engineQuote":
+            sub_blocks = block.get("blocks", [])
+            lines.append(f"[{block.get('title', 'Agent')}]: {_blocks_to_text(sub_blocks)}")
+        elif block_type == "swotTable":
+            for dim in ("strengths", "weaknesses", "opportunities", "threats"):
+                for entry in block.get(dim, []):
+                    if isinstance(entry, dict):
+                        lines.append(f"SWOT-{dim}: {entry.get('point', '')} {entry.get('detail', '')}")
+        elif block_type == "pestTable":
+            for dim in ("political", "economic", "social", "technological"):
+                for entry in block.get(dim, []):
+                    if isinstance(entry, dict):
+                        lines.append(f"PEST-{dim}: {entry.get('factor', '')} {entry.get('detail', '')}")
+        elif block_type == "image":
+            lines.append(f"![{block.get('alt', '')}]({block.get('src', '')})")
+        elif block_type == "table":
+            for row in block.get("rows", []):
+                lines.append(" | ".join(str(cell) for cell in row))
+        else:
+            lines.append(str(block))
+    return "\n\n".join(lines)
+
+
 def _assemble_chapters(title: str, chapters: List[Dict[str, Any]]) -> str:
     lines = [f"# {title}", ""]
     for chapter in chapters:
         chapter_title = chapter.get("title") or chapter.get("id") or "未命名章节"
         lines.append(f"## {chapter_title}")
         lines.append("")
-        lines.append(str(chapter.get("content", "")).strip())
+        blocks = chapter.get("blocks", [])
+        if isinstance(blocks, list) and blocks:
+            lines.append(_blocks_to_text(blocks))
+        else:
+            lines.append(str(chapter.get("content", "")).strip())
         lines.append("")
     return "\n".join(lines).strip() + "\n"
 
@@ -105,28 +151,63 @@ def _is_narrative_block(block: str) -> bool:
         return False
     if text.startswith("!["):
         return False
-    if text.startswith("证据说明："):
-        return False
     return True
 
 
-def _missing_evidence_notes(chapter_text: str) -> List[str]:
+def _normalize_heading_text(text: str) -> str:
+    normalized = re.sub(r"\s+", "", str(text or "").strip().lower())
+    return re.sub(r"[^\w\u4e00-\u9fff]+", "", normalized)
+
+
+def _contains_duplicate_heading(chapter_text: str, chapter_title: str) -> bool:
+    title_norm = _normalize_heading_text(chapter_title)
+    if not title_norm:
+        return False
+    for line in str(chapter_text or "").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("#"):
+            continue
+        heading = re.sub(r"^#+\s*", "", stripped).strip()
+        if _normalize_heading_text(heading) == title_norm:
+            return True
+    return False
+
+
+def _missing_inline_citations(chapter_text: str) -> List[str]:
     blocks = [chunk.strip() for chunk in re.split(r"\n\s*\n", str(chapter_text or "")) if chunk.strip()]
     issues: List[str] = []
-    for idx, block in enumerate(blocks):
+    for block in blocks:
         if not _is_narrative_block(block):
             continue
-        next_block = blocks[idx + 1] if idx + 1 < len(blocks) else ""
-        if not next_block.startswith("证据说明："):
-            issues.append("段落后缺少“证据说明：”")
-            continue
-        if re.search(r"\[E\d+\]", next_block) is None:
-            issues.append("证据说明缺少证据索引（如 [E1]）")
-        if "置信度：" not in next_block:
-            issues.append("证据说明缺少置信度字段")
-        if "理由：" not in next_block:
-            issues.append("证据说明缺少置信度理由")
+        if re.search(r"\[E\d+\]", block) is None:
+            issues.append("段落缺少证据角标（如 [E1]）")
     return list(dict.fromkeys(issues))
+
+
+def _find_invalid_bracket_citations(chapter_text: str) -> List[str]:
+    """Find bracket tokens that are not valid [E\\d+] evidence citations.
+
+    Exemptions — tokens produced legitimately by _blocks_to_text or sanitize:
+    - [E1], [E12] — valid evidence IDs
+    - [Insight Agent], [Media Agent] etc — engineQuote title labels ending with "Agent"
+    - [SWOT-strengths:], [PEST-political:] — SWOT/PEST dimension prefix labels
+
+    Everything else, including [topic_distribution], [议题A], [争议点], is flagged.
+    """
+    invalid: List[str] = []
+    for match in re.finditer(r"\[([^\]\n]{1,64})\](?!\()", str(chapter_text or "")):
+        token = str(match.group(1) or "").strip()
+        # Valid evidence citation [E1], [E12]
+        if re.fullmatch(r"E\d+", token):
+            continue
+        # engineQuote flattened labels always end with "Agent"
+        if token.endswith("Agent"):
+            continue
+        # SWOT/PEST dimension labels start with "SWOT-" or "PEST-"
+        if re.match(r"(?:SWOT|PEST)-", token):
+            continue
+        invalid.append(token)
+    return list(dict.fromkeys(invalid))
 
 
 class ReviewChaptersNode(MonitoredNode):
@@ -140,6 +221,7 @@ class ReviewChaptersNode(MonitoredNode):
             "review_round": int(stage3_results.get("review_round", 0) or 0),
             "chapter_review_max_rounds": int(review_cfg.get("chapter_review_max_rounds", 2) or 2),
             "outline_title": stage3_results.get("outline", {}).get("title", "舆情分析统一报告"),
+            "outline": stage3_results.get("outline", {}),
             "reference_context": _build_reference_context(shared),
             "reasoning_enabled_stage3": reasoning_enabled_stage3(shared),
             "request_timeout_seconds": llm_request_timeout(shared),
@@ -149,11 +231,17 @@ class ReviewChaptersNode(MonitoredNode):
         use_reasoning = bool(prep_res.get("reasoning_enabled_stage3", False))
         reference_context = str(prep_res.get("reference_context", "") or "")
         reviews: List[Dict[str, Any]] = []
+        outline = prep_res.get("outline", {})
+        outline_chapters = {str(c.get("id", "")): c for c in outline.get("chapters", []) if isinstance(c, dict)}
 
         for chapter in prep_res.get("chapters", []):
             chapter_id = chapter.get("id")
             chapter_title = chapter.get("title")
-            chapter_text = str(chapter.get("content", ""))
+            blocks = chapter.get("blocks", [])
+            if isinstance(blocks, list) and blocks:
+                chapter_text = _blocks_to_text(blocks)
+            else:
+                chapter_text = str(chapter.get("content", ""))
             prompt = (
                 "请评审以下舆情报告章节，返回 JSON。\n"
                 "字段: score(0-100), needs_revision(bool), feedback(str)。\n"
@@ -163,8 +251,10 @@ class ReviewChaptersNode(MonitoredNode):
                 "评审要求:\n"
                 "1. 发现[议题X]/[争议点]/[媒体A]等占位符必须判定 needs_revision=true。\n"
                 "2. 数据、人物、事件名称需与参考数据一致。\n"
-                "3. 每个正文段落后都应有“证据说明：”并包含证据索引、置信度、理由。\n"
-                "4. 反馈需指出具体缺失点（证据、数字、逻辑）。\n"
+                "3. 每个实质性正文段落都应包含证据角标引用（如 [E1]）。\n"
+                "4. 禁止在章节正文中重复输出与章节标题同名的标题行。\n"
+                "5. 不得引入输入未出现的新专有名词（若无法确认，应判定 needs_revision=true）。\n"
+                "6. 反馈需指出具体缺失点（证据、数字、逻辑）。\n"
                 "仅输出 JSON。"
             )
             try:
@@ -191,16 +281,50 @@ class ReviewChaptersNode(MonitoredNode):
                 addition = f"检测到占位符[{placeholder}]，必须替换为真实事件信息。"
                 feedback = f"{feedback} {addition}".strip() if feedback else addition
 
-            evidence_issues = _missing_evidence_notes(chapter_text)
+            evidence_issues = _missing_inline_citations(chapter_text)
             if evidence_issues:
                 needs_revision = True
                 score = min(score, 45)
                 addition = "；".join(evidence_issues)
                 feedback = (
-                    f"{feedback} 段落证据融合不完整：{addition}。".strip()
+                    f"{feedback} 段落证据引用不完整：{addition}。".strip()
                     if feedback
-                    else f"段落证据融合不完整：{addition}。"
+                    else f"段落证据引用不完整：{addition}。"
                 )
+
+            invalid_citations = _find_invalid_bracket_citations(chapter_text)
+            if invalid_citations:
+                needs_revision = True
+                score = min(score, 40)
+                preview = "、".join([f"[{item}]" for item in invalid_citations[:3]])
+                addition = f"检测到非法引用标记{preview}，仅允许 [E数字] 格式。"
+                feedback = f"{feedback} {addition}".strip() if feedback else addition
+
+            if _contains_duplicate_heading(chapter_text, str(chapter_title or "")):
+                needs_revision = True
+                score = min(score, 40)
+                addition = "检测到与章节标题同名的重复标题行。"
+                feedback = f"{feedback} {addition}".strip() if feedback else addition
+
+            ch_outline = outline_chapters.get(str(chapter_id), {})
+            if not ch_outline.get("allowSwot", False):
+                if isinstance(blocks, list) and any(
+                    isinstance(block, dict) and block.get("type") == "swotTable"
+                    for block in blocks
+                ):
+                    needs_revision = True
+                    score = min(score, 30)
+                    addition = "章节未获授权使用 swotTable 组件，请移除。"
+                    feedback = f"{feedback} {addition}".strip() if feedback else addition
+            if not ch_outline.get("allowPest", False):
+                if isinstance(blocks, list) and any(
+                    isinstance(block, dict) and block.get("type") == "pestTable"
+                    for block in blocks
+                ):
+                    needs_revision = True
+                    score = min(score, 30)
+                    addition = "章节未获授权使用 pestTable 组件，请移除。"
+                    feedback = f"{feedback} {addition}".strip() if feedback else addition
 
             reviews.append(
                 {
@@ -239,10 +363,20 @@ class ReviewChaptersNode(MonitoredNode):
             loop_current = stage3_results["review_round"]
         else:
             stage3_results["chapter_feedback"] = {}
-            stage3_results["reviewed_report_text"] = _assemble_chapters(
-                prep_res.get("outline_title", "舆情分析统一报告"),
-                prep_res.get("chapters", []),
+            # NOTE: reviewed_report_text will be written by IRRendererNode
+            # (which produces properly formatted Markdown from JSON blocks).
+            # We only write a fallback here for the pure-Markdown code path
+            # (chapters with no blocks field).
+            chapters = prep_res.get("chapters", [])
+            has_json_blocks = any(
+                isinstance(ch.get("blocks"), list) and ch.get("blocks")
+                for ch in chapters
             )
+            if not has_json_blocks:
+                stage3_results["reviewed_report_text"] = _assemble_chapters(
+                    prep_res.get("outline_title", "舆情分析统一报告"),
+                    chapters,
+                )
             action = "satisfied"
             if needs_revision and current_round >= max_rounds:
                 termination_reason = "max_iterations_reached"

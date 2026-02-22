@@ -15,6 +15,8 @@ def test_clear_report_dir_node_recreates_images(tmp_path, monkeypatch):
     images_dir.mkdir()
     old_file = report_dir / "old.txt"
     old_file.write_text("stale", encoding="utf-8")
+    old_image = images_dir / "stale.png"
+    old_image.write_bytes(b"image")
 
     monkeypatch.setattr(PathManager, "report_dir", lambda self: report_dir)
 
@@ -24,6 +26,7 @@ def test_clear_report_dir_node_recreates_images(tmp_path, monkeypatch):
     assert report_dir.exists()
     assert images_dir.exists()
     assert not old_file.exists()
+    assert not old_image.exists()
 
 
 def test_clear_report_dir_node_preserves_status_and_acceptance(tmp_path, monkeypatch):

@@ -1,7 +1,7 @@
 # Design Doc: AnalysisPosts v1.0 (Phase 1–3)
 
 > Please DON'T remove notes for AI
-> Last Updated: 2026-02-21
+> Last Updated: 2026-02-22
 
 ## Requirements
 
@@ -28,12 +28,14 @@
 
 1. **Stage 1 (Enhancement)**: Load raw posts → enrich with LLM + local NLP → save enhanced data.
 2. **Stage 2 (Analysis)**: Load enhanced data → QuerySearchFlow 外部检索 → DataAgent/SearchAgent 双信源并行 → ForumHost 动态循环（SupplementData / SupplementSearch / VisualAnalysis）→ MergeResults 收敛 → chart gap-fill analysis + insight → save results + trace.
-3. **Stage 3 (Report)**: Load analysis results → PlanOutline → GenerateChaptersBatch → ReviewChapters(loop) → InjectTrace + MethodologyAppendix → Format → RenderHTML → save Markdown/HTML/trace.
+3. **Stage 3 (Report)**: Load analysis results → PlanOutline(layout+hero+budget) → GenerateChaptersBatch(JSON IR blocks) → ReviewChapters(loop, includes component-permission checks) → IRRenderer(JSON IR→Markdown) → InjectTrace + MethodologyAppendix → Format → RenderHTML → save Markdown/HTML/trace.
    - Quality gate: Stage3 prompts must use real insights/chart analyses/search context and explicitly prohibit placeholder text (`[议题A]` etc.).
-   - Review gate: chapter revision is controlled by model review + hard checks (placeholder hit / paragraph evidence note missing => forced revision); no `min_score` threshold.
-   - Evidence policy: each narrative paragraph should end with an LLM-generated `证据说明` line containing evidence index, source explanation, and confidence reasoning.
+   - Review gate: chapter revision is controlled by model review + hard checks (placeholder hit / missing `[E#]` / invalid bracket citation / duplicate heading => forced revision); no `min_score` threshold.
+   - Evidence policy: each narrative paragraph must include inline evidence citations (`[E1]`, `[E2]`), with appendix index used for audit traceability.
+   - Layout policy: SWOT/PEST blocks are outline-authorized components with exclusivity (max one SWOT chapter + max one PEST chapter, never same chapter).
 4. **Pipeline Entry**: `pipeline.start_stage` 仅支持 `1/2/3`，从指定阶段进入后按线性主链顺序执行到结束。
    - E2E 可观测性：循环状态统一写入 `trace.loop_status`，关键字段包括 `forum` 与 `stage3_chapter_review`。
+   - Stage2 Forum 会沉淀 `forum.debate_logs`，并在合并节点写入 `stage2_results.search_context.forum_debate_logs` 供 Stage3 叙事引用。
 5. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。
    - Pipeline Console supports `pipeline.user_analysis_instruction` input and persists it to `config.yaml`.
    - Results Viewer uses source-partitioned tabs (images / tables / forum debate / search summary / evidence chain / JSON files) for full run traceability.
@@ -171,7 +173,7 @@ shared = {
 4. **ForumHostNode (Stage2)**
    - Type: Regular
    - prep: collect dual-source results + forum history
-   - exec: choose one action (`supplement_data/search/visual/sufficient`)
+   - exec: choose one action (`supplement_data/search/visual/sufficient`) + generate structured host narrative (timeline/synthesis/deep-analysis/guided-questions)
    - post: update forum rounds + loop status + route action
 
 5. **MergeResultsNode (Stage2)**

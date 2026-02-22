@@ -7,6 +7,7 @@ from nodes.stage3.format import FormatReportNode
 from nodes.stage3.load_results import LoadAnalysisResultsNode
 from nodes.stage3.methodology import MethodologyAppendixNode
 from nodes.stage3.outline import PlanOutlineNode
+from nodes.stage3.ir_renderer import IRRendererNode
 from nodes.stage3.render_html import RenderHTMLNode
 from nodes.stage3.review import ReviewChaptersNode
 from nodes.stage3.save import SaveReportNode
@@ -17,6 +18,7 @@ __all__ = [
     "PlanOutlineNode",
     "GenerateChaptersBatchNode",
     "ReviewChaptersNode",
+    "IRRendererNode",
     "InjectTraceNode",
     "MethodologyAppendixNode",
     "FormatReportNode",

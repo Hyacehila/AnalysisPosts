@@ -33,7 +33,8 @@ def _shared_for_outline():
 @patch("nodes.stage3.outline.call_glm46")
 def test_outline_parses_llm_json(mock_llm):
     mock_llm.return_value = (
-        '{"title":"测试报告","chapters":[{"id":"ch01","title":"执行摘要","target_words":300}]}'
+        '{"title":"测试报告","subtitle":"副标题","hero":{"summary":"总览","highlights":["h1"],"actions":["a1"]},'
+        '"chapters":[{"id":"ch01","title":"执行摘要","target_words":300}]}'
     )
     shared = _shared_for_outline()
 
@@ -44,7 +45,11 @@ def test_outline_parses_llm_json(mock_llm):
 
     assert action == "default"
     assert shared["stage3_results"]["outline"]["title"] == "测试报告"
+    assert shared["stage3_results"]["outline"]["subtitle"] == "副标题"
+    assert shared["stage3_results"]["hero"]["summary"] == "总览"
     assert shared["stage3_results"]["outline"]["chapters"][0]["id"] == "ch01"
+    assert shared["stage3_results"]["outline"]["chapters"][0]["allowSwot"] is False
+    assert shared["stage3_results"]["outline"]["chapters"][0]["allowPest"] is False
 
 
 @patch("nodes.stage3.outline.call_glm46", return_value="not-json")
@@ -58,8 +63,39 @@ def test_outline_uses_fallback_when_llm_invalid(_mock_llm):
 
     outline = shared["stage3_results"]["outline"]
     assert outline["title"]
+    assert "hero" in outline
     assert len(outline["chapters"]) >= 3
     assert outline["chapters"][0]["id"]
+    assert "allowSwot" in outline["chapters"][0]
+    assert "allowPest" in outline["chapters"][0]
+
+
+@patch("nodes.stage3.outline.call_glm46")
+def test_outline_enforces_swot_pest_exclusive_rules(mock_llm):
+    mock_llm.return_value = (
+        '{"title":"测试报告","hero":{"summary":"","highlights":[],"actions":[]},'
+        '"chapters":['
+        '{"id":"ch01","title":"执行摘要","allowSwot":true,"allowPest":true},'
+        '{"id":"ch02","title":"趋势分析","allowSwot":true,"allowPest":false},'
+        '{"id":"ch03","title":"风险分析","allowSwot":false,"allowPest":true}'
+        "]}"
+    )
+    shared = _shared_for_outline()
+
+    node = PlanOutlineNode()
+    prep_res = node.prep(shared)
+    exec_res = node.exec(prep_res)
+    node.post(shared, prep_res, exec_res)
+
+    chapters = shared["stage3_results"]["outline"]["chapters"]
+    swot_count = sum(1 for chapter in chapters if chapter.get("allowSwot"))
+    pest_count = sum(1 for chapter in chapters if chapter.get("allowPest"))
+    assert swot_count <= 1
+    assert pest_count <= 1
+    assert all(
+        not (chapter.get("allowSwot") and chapter.get("allowPest"))
+        for chapter in chapters
+    )
 
 
 @patch("nodes.stage3.outline.call_glm46")

@@ -12,7 +12,7 @@ def _success_payload() -> str:
     return (
         '{"sentiment_summary":"情感总结","topic_distribution":"主题总结",'
         '"geographic_distribution":"地域总结","publisher_behavior":"发布者总结",'
-        '"overall_summary":"综合总结"}'
+        '"overall_summary":"综合总结","cross_reference_insight":"异常波动与外部事件关联"}'
     )
 
 
@@ -43,6 +43,8 @@ def test_insight_exec_prefers_analysis_content(monkeypatch):
     exec_res = node.exec(prep_res)
 
     assert "来自analysis_content的图表洞察" in captured["prompt"]
+    assert "数据与外部事件交叉对比" in captured["prompt"]
+    assert "cross_reference_insight" in captured["prompt"]
     assert exec_res["overall_summary"] == "综合总结"
 
 
@@ -74,3 +76,4 @@ def test_insight_exec_keeps_backward_compat_with_analysis(monkeypatch):
 
     assert "来自analysis字段的旧版洞察" in captured["prompt"]
     assert exec_res["sentiment_summary"] == "情感总结"
+    assert exec_res["cross_reference_insight"] == "异常波动与外部事件关联"

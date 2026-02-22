@@ -11,7 +11,7 @@ from utils.path_manager import PathManager
 
 
 _PRESERVED_FILES = {"status.json"}
-_PRESERVED_DIRS = {"acceptance", "images"}
+_PRESERVED_DIRS = {"acceptance"}
 
 
 def _should_preserve(path: Path) -> bool:

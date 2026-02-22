@@ -1,6 +1,6 @@
 # 阶段 2：深度分析子系统
 
-> **文档状态**: 2026-02-21 更新  
+> **文档状态**: 2026-02-22 更新  
 > **关联源码**: `nodes/stage2/*`, `flow.py`, `config.py`, `utils/web_search.py`  
 > **上级文档**: [系统设计总览](../architecture.md)
 
@@ -88,12 +88,18 @@ flowchart LR
   - `supplement_search`
   - `supplement_visual`
   - `sufficient`
+- `ForumHostNode` 本轮新增：
+  - 输出 `host_narrative`（支持结构化输入并标准化为【事件脉络】【观点综合】【深层分析】【引导问题】文本）
+  - 累积 `forum.debate_logs`（跨轮讨论脉络）
 - `SupplementDataNode`：按主持人 directive 调用指定 MCP 工具子集
 - `SupplementSearchNode`：追加搜索并刷新 SearchAgent 结论
 - `VisualAnalysisNode`：按需调用 GLM4.5V 解析图表
 - `MergeResultsNode`：合并 Data/Search/Forum 产物，回填兼容 `stage2_results`
 - `ForumHostNode` 提示词显式注入“事件关键词 + 分析时间范围 + 用户分析指令”上下文，避免无焦点补充检索。
 - 当用户诉求尚未覆盖时，主持人优先引导 `supplement_search` 并输出更明确的查询 directive。
+- `MergeResultsNode` 会将 `forum.debate_logs` 注入 `stage2_results.search_context.forum_debate_logs`，供 Stage3 章节生成引用论坛共识/分歧。
+- `SearchSummaryNode` 提示词升级为高信息密度结构化摘要，强制时间线/关键主体/官方回应/公众反应/关联事件五要素。
+- `LLMInsightNode` 洞察提示词新增“数据与外部事件交叉对比”维度，并输出 `cross_reference_insight` 字段。
 
 循环治理：
 
@@ -128,6 +134,15 @@ flowchart LR
 - 清理策略改为“选择性删除”：保留 `report/status.json`、`report/acceptance/`、`report/images/`，仅删除 Stage2 可再生产物。
 - 该策略避免验收日志与运行状态在 Stage2 重跑时被误删。 
 
+### 3.7 Decision Prompt 收敛门槛（性能优化）
+
+文件：`nodes/stage2/agent.py`
+
+- DecisionTools 提示词新增“强约束收敛门槛”：
+  - 五维（情感/主题/地理/交互/NLP）均有有效结果后，且用户指令已被证据覆盖时，允许并鼓励输出 `finish`；
+  - 最近两轮无新增洞察或执行工具数达到阈值时，必须优先考虑收敛；
+- 该策略用于减少“仅因惯性而继续调用工具”的长尾循环，降低 live 运行耗时和 API 成本。
+
 ---
 
 ## 4. Shared 契约（Stage2 新增/稳定字段）
@@ -149,6 +164,7 @@ shared["analysis_context"] = {
 shared["forum"] = {
     "current_round": 0,
     "rounds": [],
+    "debate_logs": [],
     "current_directive": {},
     "visual_analyses": [],
 }
@@ -161,6 +177,7 @@ shared["trace"]["loop_status"] = {
 ```
 
 `stage2_results` 继续向后兼容，核心字段不变，保留 `search_context` 并新增论坛综合上下文（如 `forum_conclusions`）。
+其中 `search_context.forum_debate_logs` 为 Stage3 提供可直接引用的主持人纪要上下文。
 
 ---
 

@@ -59,6 +59,9 @@ def _fallback_result(prep_res: Dict[str, Any]) -> Dict[str, Any]:
                 "queries": [f"{spot} 官方回应" for spot in blind_spots[:2]],
                 "reason": "盲区仍存在，继续补充外部信息。",
             },
+            "host_narrative": "【事件脉络】当前信息不足以构建完整时间线。"
+            "【观点综合】主持人判断盲区仍未闭合。"
+            "【深层分析】需要补充更多外部证据。",
             "synthesized_conclusions": [],
         }
 
@@ -67,6 +70,9 @@ def _fallback_result(prep_res: Dict[str, Any]) -> Dict[str, Any]:
         "gaps": [],
         "decision": "sufficient",
         "directive": {},
+        "host_narrative": "【事件脉络】已获取的信息链基本完整。"
+        "【观点综合】各Agent观点趋于一致。"
+        "【深层分析】当前证据已形成闭环，可进入收敛阶段。",
         "synthesized_conclusions": [],
     }
 
@@ -142,6 +148,7 @@ class ForumHostNode(MonitoredNode):
             "search_agent_results": shared.get("agent_results", {}).get("search_agent", {}),
             "visual_analyses": list(forum.get("visual_analyses", []) or []),
             "previous_rounds": list(forum.get("rounds", []) or []),
+            "debate_logs": list(forum.get("debate_logs", []) or []),
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
             "event_keywords": _extract_event_keywords(shared.get("agent", {}).get("data_summary", "")),
             "analysis_time_range_text": str(analysis_context.get("time_range_text", "")).strip(),
@@ -152,7 +159,7 @@ class ForumHostNode(MonitoredNode):
 
     def exec(self, prep_res):
         round_index = int(prep_res.get("round", 0)) + 1
-        prompt = f"""你是舆情分析论坛主持人（第{round_index}轮）。请对双信源结果做交叉评估并给出下一步动作。
+        prompt = f"""你是舆情分析论坛主持人（第{round_index}轮）。你的核心角色不仅是总结者，更是“对抗式审查者”。请对多信源结果做严苛的交叉盘问，给出结构化辩论纪要和下一步动作。
 
 数据摘要：
 {prep_res.get("data_summary", "")}
@@ -175,18 +182,29 @@ SearchAgent结果：
 视觉分析：
 {json.dumps(prep_res.get("visual_analyses", []), ensure_ascii=False)[:1200]}
 
+历史主持人纪要：
+{json.dumps(prep_res.get("debate_logs", [])[-4:], ensure_ascii=False)}
+
 输出严格JSON：
 {{
-  "cross_analysis": {{"agreement": [], "conflicts": []}},
-  "gaps": [],
+  "cross_analysis": {{"agreement": ["多源一致的发现"], "conflicts": ["多源矛盾的发现"]}},
+  "gaps": ["尚未覆盖的信息盲区"],
   "decision": "supplement_data|supplement_search|supplement_visual|sufficient",
   "directive": {{}},
-  "synthesized_conclusions": []
+  "host_narrative": {{
+    "timeline_analysis": "从各Agent发言中识别的关键事件时间线和因果关系，100-200字",
+    "viewpoint_synthesis": "综合各视角的共识与分歧分析，指出发现的事实错误或逻辑矛盾，100-200字",
+    "deep_analysis": "基于已有信息的深层原因、影响因素和趋势预测，100-200字",
+    "guided_questions": ["值得深入探讨的、存在逻辑挑战的关键问题"]
+  }},
+  "synthesized_conclusions": ["本轮形成的确定性结论"]
 }}
 
 要求：
 1) 若用户分析指令尚未被现有证据充分覆盖，必须优先输出 supplement_search 并在 directive.queries 中给出明确检索指令。
-2) directive.reason 必须解释该动作如何弥补时间线或用户诉求缺口。"""
+2) directive.reason 必须解释该动作如何弥补时间线或用户诉求缺口。
+3) host_narrative 必须客观概述多Agent观点，并主动寻找和指出其结果中的【事实冲突】或【逻辑漏洞】。对于没有实证支撑的空泛结论，必须提出质疑。
+4) cross_analysis.agreement 和 conflicts 必须引用具体的数据事实，禁止泛泛而谈。"""
 
         try:
             resp = call_glm46(
@@ -205,12 +223,32 @@ SearchAgent结果：
         decision = _normalize_decision(parsed.get("decision"))
         gaps = list(parsed.get("gaps", []) or [])
         directive = _normalize_directive(decision, parsed.get("directive", {}), gaps)
+        raw_narrative = parsed.get("host_narrative", "")
+        if isinstance(raw_narrative, dict):
+            narrative_parts = []
+            timeline = str(raw_narrative.get("timeline_analysis", "")).strip()
+            viewpoint = str(raw_narrative.get("viewpoint_synthesis", "")).strip()
+            deep = str(raw_narrative.get("deep_analysis", "")).strip()
+            questions = raw_narrative.get("guided_questions", [])
+            if timeline:
+                narrative_parts.append(f"【事件脉络】{timeline}")
+            if viewpoint:
+                narrative_parts.append(f"【观点综合】{viewpoint}")
+            if deep:
+                narrative_parts.append(f"【深层分析】{deep}")
+            if questions:
+                q_text = "；".join(str(question) for question in questions[:3])
+                narrative_parts.append(f"【引导问题】{q_text}")
+            host_narrative = " ".join(narrative_parts)
+        else:
+            host_narrative = str(raw_narrative).strip()
 
         return {
             "cross_analysis": parsed.get("cross_analysis", {}),
             "gaps": gaps,
             "decision": decision,
             "directive": directive,
+            "host_narrative": host_narrative,
             "synthesized_conclusions": list(parsed.get("synthesized_conclusions", []) or []),
             "confidence_assessments": parsed.get("confidence_assessments", {}),
         }
@@ -221,12 +259,17 @@ SearchAgent结果：
             {
                 "current_round": 0,
                 "rounds": [],
+                "debate_logs": [],
                 "current_directive": {},
                 "visual_analyses": [],
             },
         )
+        forum["debate_logs"] = list(forum.get("debate_logs", []) or [])
         forum["current_round"] = int(forum.get("current_round", 0)) + 1
         forum["rounds"] = list(forum.get("rounds", []) or [])
+        host_narrative = str(exec_res.get("host_narrative", "")).strip()
+        if host_narrative:
+            forum["debate_logs"].append(host_narrative)
         forum["rounds"].append(
             {
                 "round": forum["current_round"],
@@ -280,6 +323,7 @@ SearchAgent结果：
                 "decision": action,
                 "directive": directive,
                 "gaps": list(exec_res.get("gaps", []) or []),
+                "host_narrative": host_narrative,
                 "synthesized_conclusions": list(exec_res.get("synthesized_conclusions", []) or []),
             }
         )

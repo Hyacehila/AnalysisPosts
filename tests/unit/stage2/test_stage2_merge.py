@@ -36,6 +36,7 @@ def test_merge_results_node_builds_stage2_compatible_output():
         },
         "forum": {
             "current_round": 2,
+            "debate_logs": ["主持人：第一轮结论证据不足。", "主持人：第二轮建议收敛。"],
             "rounds": [
                 {"round": 1, "summary": {"decision": "supplement_search"}},
                 {
@@ -61,3 +62,7 @@ def test_merge_results_node_builds_stage2_compatible_output():
     assert shared["stage2_results"]["execution_log"]["tools_executed"] == ["tool_a"]
     assert shared["stage2_results"]["search_context"]["background_context"] == "外部背景"
     assert shared["stage2_results"]["search_context"]["forum_conclusions"] == ["结论1", "结论2"]
+    assert shared["stage2_results"]["search_context"]["forum_debate_logs"] == [
+        "主持人：第一轮结论证据不足。",
+        "主持人：第二轮建议收敛。",
+    ]

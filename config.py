@@ -151,8 +151,28 @@ def load_config(path: str) -> AppConfig:
     )
 
 
-def _derive_data_source_type(pipeline: PipelineConfig) -> str:
-    if pipeline.start_stage == 1:
+def _derive_effective_start_stage(data: DataConfig, pipeline: PipelineConfig) -> int:
+    """
+    Auto-advance start_stage from 1 → 2 when enhanced data already exists.
+
+    When ``resume_if_exists=True`` and the enhanced output file is already
+    present on disk, Stage1 (bulk sentiment / topic / publisher analysis) is
+    entirely redundant.  This function returns 2 so that the caller can skip
+    Stage1 without requiring the user to manually change ``start_stage`` in
+    config.yaml.
+    """
+    if (
+        pipeline.start_stage == 1
+        and data.resume_if_exists
+        and data.output_path
+        and os.path.exists(data.output_path)
+    ):
+        return 2
+    return pipeline.start_stage
+
+
+def _derive_data_source_type(effective_start_stage: int) -> str:
+    if effective_start_stage == 1:
         return "original"
     return "enhanced"
 
@@ -285,7 +305,13 @@ def validate_config(config: AppConfig) -> None:
 
 def config_to_shared(config: AppConfig) -> dict:
     """Convert AppConfig into the shared store structure used by nodes."""
-    data_source_type = _derive_data_source_type(config.pipeline)
+    effective_start_stage = _derive_effective_start_stage(config.data, config.pipeline)
+    if effective_start_stage != config.pipeline.start_stage:
+        print(
+            f"[Config] Enhanced data detected at '{config.data.output_path}', "
+            f"auto-skipping Stage1 → starting from Stage2"
+        )
+    data_source_type = _derive_data_source_type(effective_start_stage)
     llm_controls = _resolve_llm_controls(config.llm)
 
     shared = {
@@ -304,7 +330,7 @@ def config_to_shared(config: AppConfig) -> dict:
             },
         },
         "pipeline_state": {
-            "start_stage": config.pipeline.start_stage,
+            "start_stage": effective_start_stage,
             "current_stage": 0,
             "completed_stages": [],
         },
@@ -315,7 +341,7 @@ def config_to_shared(config: AppConfig) -> dict:
         },
         "config": {
             "pipeline": {
-                "start_stage": config.pipeline.start_stage,
+                "start_stage": effective_start_stage,
                 "user_analysis_instruction": str(config.pipeline.user_analysis_instruction or "").strip(),
             },
             "enhancement_mode": config.stage1.mode,

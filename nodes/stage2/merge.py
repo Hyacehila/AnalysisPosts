@@ -33,6 +33,7 @@ class MergeResultsNode(MonitoredNode):
         forum = prep_res.get("forum", {}) or {}
         rounds = list(forum.get("rounds", []) or [])
         visual_analyses = list(forum.get("visual_analyses", []) or [])
+        debate_logs = [str(item).strip() for item in list(forum.get("debate_logs", []) or []) if str(item).strip()]
 
         execution_log = dict(data_agent.get("execution_log", {}) or {})
         execution_log.setdefault("tools_executed", [])
@@ -42,6 +43,7 @@ class MergeResultsNode(MonitoredNode):
 
         search_context = dict(search_agent)
         search_context["forum_conclusions"] = _extract_forum_conclusions(rounds)
+        search_context["forum_debate_logs"] = debate_logs
         search_context["forum_rounds"] = int(forum.get("current_round", 0))
         search_context["visual_analyses"] = visual_analyses
 

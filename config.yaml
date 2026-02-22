@@ -8,8 +8,8 @@ data:
   belief_system_path: data/believe_system_common.json
   publisher_decision_path: data/publisher_decision.json
 pipeline:
-  start_stage: 1
-  user_analysis_instruction: 重点分析公众的质疑焦点
+  start_stage: 2
+  user_analysis_instruction: 我们希望围绕2024年6月2日至11月30日期间，位于河南郑州的大学生夜骑开封事件，进行详细的探索和舆情分析。侧重于公众感受与政府行为两大核心方向，构建该事件的全景脉络。
 stage1:
   mode: async
   checkpoint:
@@ -25,12 +25,12 @@ stage2:
   mode: agent
   tool_source: mcp
   agent_max_iterations: 30
-  search_reflection_max_rounds: 2
-  forum_max_rounds: 2
-  forum_min_rounds_for_sufficient: 2
+  search_reflection_max_rounds: 10
+  forum_max_rounds: 10
+  forum_min_rounds_for_sufficient: 5
   search_provider: tavily
-  search_max_results: 3
-  search_timeout_seconds: 60
+  search_max_results: 30
+  search_timeout_seconds: 120
   search_api_key: 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
   chart_tool_policy: coverage_first
   chart_missing_policy: warn
@@ -41,16 +41,16 @@ stage2:
     interaction: 1
     nlp: 1
 stage3:
-  max_iterations: 5
-  chapter_review_max_rounds: 2
+  max_iterations: 10
+  chapter_review_max_rounds: 10
 runtime:
   concurrent_num: 60
   max_retries: 3
   wait_time: 8
 llm:
-  acceptance_profile: fast
-  reasoning_enabled_stage2: false
-  reasoning_enabled_stage3: false
-  vision_thinking_enabled: false
-  request_timeout_seconds: 120
+  acceptance_profile: quality
+  reasoning_enabled_stage2: true
+  reasoning_enabled_stage3: true
+  vision_thinking_enabled: true
+  request_timeout_seconds: 150
   glm_api_key: fecda0f3e009473a88c9bcfe711c3248.D35PCYssGvjLqObH

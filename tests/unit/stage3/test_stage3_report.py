@@ -117,6 +117,20 @@ class TestFormatReportNode:
         assert "stage3_chapter_review" in output
         assert "max_iterations_reached" in output
 
+    @patch("nodes.stage3.format._load_analysis_charts", return_value=[])
+    def test_exec_removes_immediate_duplicate_heading_lines(self, _mock_charts, minimal_shared):
+        minimal_shared["stage3_results"] = {
+            "report_text": "# 报告\n\n## 情感分析\n\n### 情感分析\n\n该段结论由趋势图支持[E1]。"
+        }
+        minimal_shared["trace"] = {"loop_status": {}}
+
+        node = FormatReportNode()
+        prep_res = node.prep(minimal_shared)
+        output = node.exec(prep_res)
+
+        assert "## 情感分析" in output
+        assert "### 情感分析" not in output
+
 
 class TestSaveReportNode:
     @patch("nodes.stage3.save.get_report_dir")

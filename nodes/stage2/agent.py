@@ -425,6 +425,13 @@ class DecisionToolsNode(MonitoredNode):
 - **可视化工具后续**：再执行 *_chart 工具生成可视化
 - **综合工具最后**：comprehensive_analysis 作为总结
 
+### 5. 收敛门槛（强约束）
+满足以下条件时必须输出 finish：
+- 情感、主题、地理、多维交互、NLP 五个维度均已有有效结果（统计或图表至少其一）；
+- 用户分析指令已被现有证据直接回应；
+- 且满足任一项：最近2轮未新增关键洞察，或已执行工具数 >= 12。
+若以上条件不满足，必须输出 execute 并选择最能补齐缺口的工具。
+
 ## 决策输出
 请以JSON格式输出你的推理决策：
 ```json
@@ -512,6 +519,13 @@ class DecisionToolsNode(MonitoredNode):
 
             shared["agent"]["is_finished"] = True
             _record_decision("finish", "", exec_res.get("reason", ""))
+            trace = shared.setdefault("trace", {})
+            loop_status = trace.setdefault("loop_status", {})
+            loop_status["data_agent"] = {
+                "current": int(agent.get("current_iteration", 0)),
+                "max": int(agent.get("max_iterations", 10)),
+                "termination_reason": "agent_sufficient",
+            }
             print(f"\n[DecisionTools] GLM4.6智能体决定: 分析已充分，结束循环")
             print(f"  推理理由: {exec_res.get('reason', '无')}")
             return "finish"

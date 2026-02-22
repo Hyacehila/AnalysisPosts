@@ -1,6 +1,7 @@
 """
 Stage 3 report formatting node.
 """
+import re
 from pathlib import Path
 from typing import Any, Dict
 
@@ -22,6 +23,31 @@ def _build_execution_summary(loop_status: Dict[str, Any]) -> str:
             lines.append(f"- {loop_id}: {status}")
     lines.append("")
     return "\n".join(lines)
+
+
+def _normalize_heading(text: str) -> str:
+    normalized = re.sub(r"\s+", "", str(text or "").strip().lower())
+    return re.sub(r"[^\w\u4e00-\u9fff]+", "", normalized)
+
+
+def _dedupe_immediate_headings(markdown_text: str) -> str:
+    lines = str(markdown_text or "").splitlines()
+    output = []
+    previous_heading_norm = ""
+    for line in lines:
+        stripped = line.strip()
+        match = re.match(r"^(#{1,6})\s+(.+)$", stripped)
+        if not match:
+            output.append(line)
+            if stripped:
+                previous_heading_norm = ""
+            continue
+        heading_norm = _normalize_heading(match.group(2))
+        if heading_norm and heading_norm == previous_heading_norm:
+            continue
+        output.append(line)
+        previous_heading_norm = heading_norm
+    return "\n".join(output)
 
 
 class FormatReportNode(MonitoredNode):
@@ -67,6 +93,8 @@ class FormatReportNode(MonitoredNode):
         for old_path, new_path in path_replacements:
             formatted_content = formatted_content.replace(old_path, new_path)
 
+        formatted_content = _dedupe_immediate_headings(formatted_content)
+
         analysis_charts = _load_analysis_charts()
         if analysis_charts:
             formatted_content = _remap_report_images(formatted_content, analysis_charts)
@@ -96,8 +124,6 @@ class FormatReportNode(MonitoredNode):
             formatted_content = formatted_content.rstrip() + "\n\n" + "\n".join(appendix_lines) + "\n"
 
         if "# 目录" not in formatted_content and "## 目录" not in formatted_content:
-            import re
-
             headers = re.findall(r"^(#{1,6})\s+(.+)$", formatted_content, re.MULTILINE)
             if headers:
                 toc_lines = ["## 目录\n"]

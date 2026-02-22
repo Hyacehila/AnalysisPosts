@@ -1,6 +1,6 @@
 # 测试工作流指南
 
-> **Last Updated**: 2026-02-21  
+> **Last Updated**: 2026-02-22  
 > **关联源码**: `tests/` 目录  
 > **上级文档**: [系统设计总览](../architecture.md)
 
@@ -57,7 +57,7 @@ uv run main.py
 验收时需额外检查 `report/`：
 
 - `report.md`、`report.html`、`trace.json`、`status.json` 均已刷新
-- 报告正文为段落级“证据说明”融合（非 `<details>` 堆叠）
+- 报告正文为段落级 `[E#]` 角标引用融合（非“证据说明：...”模板段落）
 - `status.json` 事件流显示进入终端节点并完成输出
 
 ### 2.4 全量验收（脚本）
@@ -111,7 +111,7 @@ powershell -ExecutionPolicy Bypass -File scripts/run_full_acceptance.ps1 -BaseTe
 | Stage 2 QuerySearchFlow + SearchAgent + 并行桥接 | `tests/unit/stage2/test_stage2_search_flow.py`, `tests/unit/stage2/test_stage2_search_agent.py`, `tests/unit/stage2/test_stage2_parallel_flow.py` |
 | Stage 2 Forum 动态循环（B5~B8） | `tests/unit/stage2/test_stage2_forum.py`, `tests/unit/stage2/test_stage2_supplement.py`, `tests/unit/stage2/test_stage2_visual.py`, `tests/unit/stage2/test_stage2_merge.py`, `tests/unit/stage2/test_stage2_chart_analysis_gapfill.py` |
 | Stage 2 洞察语义兼容（analysis_content/analysis） | `tests/unit/stage2/test_stage2_insight.py` |
-| Stage 3 统一报告链路（Outline/Chapters/Review/Trace/Methodology/Render） | `tests/unit/stage3/test_stage3_outline.py`, `tests/unit/stage3/test_stage3_chapters.py`, `tests/unit/stage3/test_stage3_review.py`, `tests/unit/stage3/test_stage3_trace_inject.py`, `tests/unit/stage3/test_stage3_methodology.py`, `tests/unit/stage3/test_stage3_render_html.py`, `tests/unit/stage3/test_stage3_report.py`, `tests/unit/stage3/test_report_cleanup.py`, `tests/unit/stage3/test_report_image_fallback.py` |
+| Stage 3 统一报告链路（Outline/Chapters/Review/IRRenderer/Trace/Methodology/Render） | `tests/unit/stage3/test_stage3_outline.py`, `tests/unit/stage3/test_stage3_chapters.py`, `tests/unit/stage3/test_stage3_review.py`, `tests/unit/stage3/test_stage3_ir_renderer.py`, `tests/unit/stage3/test_stage3_trace_inject.py`, `tests/unit/stage3/test_stage3_methodology.py`, `tests/unit/stage3/test_stage3_render_html.py`, `tests/unit/stage3/test_stage3_report.py`, `tests/unit/stage3/test_report_cleanup.py`, `tests/unit/stage3/test_report_image_fallback.py` |
 | 工具注册与 MCP 暴露一致性 | `tests/unit/tools/test_tool_registry.py`, `tests/unit/tools/test_mcp_tool_exposure.py` |
 | I/O 契约与数据格式 | `tests/integration/io/test_data_loader_integration.py`, `tests/integration/io/test_data_format_contract.py`, `tests/integration/io/test_json_reference_contract.py` |
 | 跨阶段串联集成 | `tests/integration/pipeline/test_flow_pipeline_integration.py`, `tests/integration/pipeline/test_stage2_forum_pipeline_integration.py`, `tests/integration/pipeline/test_stage3_unified_pipeline_integration.py` |
