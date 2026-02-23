@@ -74,17 +74,6 @@ def _default_summary(raw_docs: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def _extract_event_keywords(data_summary: str, *, limit: int = 6) -> List[str]:
-    stopwords = {"分析", "数据", "事件", "舆情", "讨论", "结果", "相关", "官方"}
-    counts: Dict[str, int] = {}
-    for token in re.findall(r"[\u4e00-\u9fff]{2,10}", str(data_summary or "")):
-        if token in stopwords:
-            continue
-        counts[token] = counts.get(token, 0) + 1
-    sorted_tokens = sorted(counts.items(), key=lambda item: (-item[1], -len(item[0]), item[0]))
-    return [token for token, _ in sorted_tokens[:limit]]
-
-
 class ExtractQueriesNode(MonitoredNode):
     """Extract search queries from data summary and previous gaps."""
 
@@ -98,28 +87,34 @@ class ExtractQueriesNode(MonitoredNode):
             last_missing = list(latest.get("missing", []) or [])
             last_hints = list(latest.get("query_hints", []) or [])
 
+        analysis_context = shared.get("analysis_context", {}) or {}
+
         return {
             "data_summary": shared.get("agent", {}).get("data_summary", ""),
             "round": int(search.get("round", 0)) + 1,
             "last_missing": last_missing,
             "last_hints": last_hints,
-            "event_keywords": _extract_event_keywords(shared.get("agent", {}).get("data_summary", "")),
+            "user_analysis_instruction": str(analysis_context.get("user_analysis_instruction", "")).strip(),
             "request_timeout_seconds": llm_request_timeout(shared),
         }
 
     def exec(self, prep_res):
-        prompt = f"""你是舆情检索分析助手。请基于数据概况生成搜索查询词。
+        round_num = prep_res.get("round", 1)
+        prompt = f"""你是舆情检索分析助手。请基于用户分析指令和数据概况生成搜索查询词。
 
-**核心搜索策略：想象你是一个真实的普通网民**
-- 杜绝使用"舆情传播"、"情绪倾向"、"公众反应"等书面化、官方化术语。
-- 使用含有情感色彩的网络词汇（如"炸了"、"翻车"、"怎么回事"、"实名反对"等）来还原真实语境。
-- 尝试模拟网友的口吻构建查询词，以获取最真实的民间情感和反响。
+**核心搜索策略**：
+1. **第一轮检索，必须完全围绕用户的分析方向（用户分析指令）获取外部事实内容**。
+2. 后续轮次的检索，在贴合用户指令核心方向的基础上，综合考虑现有的盲区和历史查询进行检索。确保检索动作紧扣用户指令方向，不可跑偏。
+3. 想象你是一个真实的普通网民，尝试模拟网友的口吻构建查询词，以获取真实的民间情感和反响（可适当使用含情感色彩的网络词汇如"炸了"、"翻车"等）。杜绝使用"舆情传播"、"情绪倾向"等书面化、官方化术语。
+
+## 用户分析指令
+{prep_res.get("user_analysis_instruction", "")}
 
 ## 数据概况
 {prep_res.get("data_summary", "")}
 
-## 事件关键词
-{prep_res.get("event_keywords", [])}
+## 当前轮次
+{round_num}
 
 ## 上一轮缺口
 {prep_res.get("last_missing", [])}
@@ -146,19 +141,11 @@ class ExtractQueriesNode(MonitoredNode):
             queries = []
 
         if not queries:
-            keyword_base = prep_res.get("event_keywords", [])
-            if keyword_base:
-                fallback = [
-                    f"{keyword_base[0]} 官方回应",
-                    f"{keyword_base[0]} 最新进展",
-                    f"{keyword_base[0]} 争议焦点",
-                ]
-            else:
-                fallback = [
-                    "事件 官方回应",
-                    "事件 最新进展",
-                    "事件 舆情评论",
-                ]
+            fallback = [
+                "事件 官方回应",
+                "事件 最新进展",
+                "事件 讨论焦点",
+            ]
             queries = _normalize_queries(fallback, limit=5)
         return {"queries": queries}
 

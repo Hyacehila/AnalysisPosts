@@ -158,7 +158,7 @@ class PlanOutlineNode(MonitoredNode):
             "   - 全文最多只允许一个章节设置 allowPest: true\n"
             "   - SWOT 和 PEST 不应出现在同一章节\n"
             "6. 章节组织必须显式回应用户分析指令。\n"
-            "7. 禁止使用[议题A]/[争议点]/[媒体A]等占位符。\n\n"
+            "7. 禁止使用[主题A]/[讨论焦点]/[来源A]等占位符。\n\n"
             f"图表数量: {len(charts)}\n"
             f"图表ID候选: {chart_ids[:12]}\n"
             f"事件关键词: {prep_res.get('event_keywords', [])}\n"

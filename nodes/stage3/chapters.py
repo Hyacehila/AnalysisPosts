@@ -217,6 +217,10 @@ def _sanitize_blocks(blocks: List[Dict[str, Any]], chapter_title: str) -> List[D
 class GenerateChaptersBatchNode(AsyncParallelBatchNode):
     """Generate chapter drafts in parallel from outline."""
 
+    def __init__(self, **kwargs):
+        kwargs.setdefault("max_concurrent", 3)
+        super().__init__(**kwargs)
+
     async def prep_async(self, shared: Dict[str, Any]) -> List[Dict[str, Any]]:
         stage3_results = shared.setdefault("stage3_results", {})
         outline = stage3_results.get("outline", {})
@@ -319,7 +323,7 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
             f"搜索背景:\n{json.dumps(search_context, ensure_ascii=False)[:900] if search_context else '无'}\n"
             f"分析时间范围:\n{analysis_time_range_text or '未知'}\n"
             f"用户分析指令:\n{user_analysis_instruction or '无'}\n"
-            f"论坛辩论纪要:\n{json.dumps(debate_logs[:4], ensure_ascii=False) if debate_logs else '无'}\n"
+            f"论坛讨论纪要:\n{json.dumps(debate_logs[:4], ensure_ascii=False) if debate_logs else '无'}\n"
             f"证据卡片索引:\n{evidence_catalog}\n"
             f"组件权限: allowSwot={allow_swot}, allowPest={allow_pest}\n\n"
             "输出要求（严格 JSON 数组，每个元素是一个 block）：\n"
@@ -337,7 +341,7 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
             "2. paragraph 结构示例:\n"
             '   {"type": "paragraph", "inlines": [\n'
             '     {"text": "根据数据分析，", "marks": []},\n'
-            '     {"text": "负面情绪占比达 42%", "marks": [{"type": "bold"}]},\n'
+            '     {"text": "特定情绪占比达 42%", "marks": [{"type": "bold"}]},\n'
             '     {"text": "，较上月上升 5 个百分点 [E1]。", "marks": []}\n'
             "   ]}\n\n"
             "3. engineQuote 结构示例:\n"
@@ -346,7 +350,7 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
             '     {"type": "paragraph", "inlines": [{"text": "原话内容...", "marks": []}]}\n'
             "   ]}\n"
             "   - engine 可选值: insight, media, query\n"
-            "   - 仅当论坛辩论纪要或搜索背景中确实有智能体观点值得直接引用时才使用\n"
+            "   - 仅当论坛讨论纪要或搜索背景中确实有智能体观点值得直接引用时才使用\n"
             "   - 严禁臆造内容或将图表数据改写进 engineQuote\n\n"
             "4. SWOT/PEST 限制:\n"
             f"   - allowSwot={allow_swot}：{'允许使用 swotTable 块' if allow_swot else '禁止使用 swotTable 块'}\n"
@@ -357,15 +361,15 @@ class GenerateChaptersBatchNode(AsyncParallelBatchNode):
             "   - 禁止另起「证据说明」段落\n"
             "   - 多个证据写成 [E1][E2]\n\n"
             "6. 其他禁令:\n"
-            "   - 禁止出现 [议题A]/[争议点]/[媒体A] 等占位符\n"
+            "   - 禁止出现 [主题A]/[讨论焦点]/[来源A] 等占位符\n"
             "   - 禁止输出与章节标题同名的 heading\n"
             "   - 不得新增输入中不存在的专有名词\n"
             "   - 引用图表使用 image block: {\"type\": \"image\", \"src\": \"./images/文件名\", \"alt\": \"标题\"}\n\n"
-            "7. 内容要求与信息密度考核（防空话机制）:\n"
+            "7. 内容要求与信息密度考核（实质内容保障）:\n"
             "   - 章节必须优先回答用户指令中的核心问题\n"
             "   - 严禁任何无数据、无引用支撑的空泛过渡句，每段话都必须言之有物\n"
             "   - 保持极高的信息密度：每100字至少包含2-3个具体信息点（如数值、图表引用、代表性用户原话等）\n"
-            "   - 必要时引用论坛辩论纪要中的共识与分歧（以 engineQuote 呈现）\n"
+            "   - 必要时引用论坛讨论纪要中的共识与不同视角（以 engineQuote 呈现）\n"
             "   - 内容必须体现时间范围约束\n\n"
             "只返回 JSON 数组，格式为 [{block}, {block}, ...]。禁止返回 Markdown 或额外说明。"
         )

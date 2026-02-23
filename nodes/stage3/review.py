@@ -120,8 +120,8 @@ def _build_reference_context(shared: Dict[str, Any]) -> str:
 
 
 _PLACEHOLDER_KEYWORDS = (
-    "议题",
-    "争议",
+    "主题",
+    "讨论焦点",
     "媒体",
     "地区",
     "关键事件",
@@ -192,7 +192,7 @@ def _find_invalid_bracket_citations(chapter_text: str) -> List[str]:
     - [Insight Agent], [Media Agent] etc — engineQuote title labels ending with "Agent"
     - [SWOT-strengths:], [PEST-political:] — SWOT/PEST dimension prefix labels
 
-    Everything else, including [topic_distribution], [议题A], [争议点], is flagged.
+    Everything else, including [topic_distribution], [主题A], [讨论焦点], is flagged.
     """
     invalid: List[str] = []
     for match in re.finditer(r"\[([^\]\n]{1,64})\](?!\()", str(chapter_text or "")):
@@ -249,7 +249,7 @@ class ReviewChaptersNode(MonitoredNode):
                 f"参考数据:\n{reference_context[:1800] if reference_context else '无'}\n"
                 f"章节内容:\n{chapter_text[:2500]}\n"
                 "评审要求:\n"
-                "1. 发现[议题X]/[争议点]/[媒体A]等占位符必须判定 needs_revision=true。\n"
+                "1. 发现[主题X]/[讨论焦点]/[来源A]等占位符必须判定 needs_revision=true。\n"
                 "2. 数据、人物、事件名称需与参考数据一致。\n"
                 "3. 每个实质性正文段落都应包含证据角标引用（如 [E1]）。\n"
                 "4. 禁止在章节正文中重复输出与章节标题同名的标题行。\n"

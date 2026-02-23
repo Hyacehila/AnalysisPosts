@@ -9,7 +9,7 @@ from typing import Callable
 
 def _should_retry(exc: Exception) -> bool:
     msg = str(exc).lower()
-    return "429" in msg or "rate" in msg or "concurrency" in msg
+    return "429" in msg or "rate" in msg or "concurrency" in msg or "400" in msg or "bad request" in msg
 
 
 def llm_retry(max_retries: int = 3, retry_delay: float = 5.0, backoff: str = "exponential") -> Callable:

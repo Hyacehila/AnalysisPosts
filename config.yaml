@@ -9,7 +9,7 @@ data:
   publisher_decision_path: data/publisher_decision.json
 pipeline:
   start_stage: 2
-  user_analysis_instruction: 我们希望围绕2024年6月2日至11月30日期间，位于河南郑州的大学生夜骑开封事件，进行详细的探索和舆情分析。侧重于公众感受与政府行为两大核心方向，构建该事件的全景脉络。
+  user_analysis_instruction: 我们希望围绕2024年6月2日至11月30日期间，位于河南郑州的大学生夜骑开封事件，进行详细的探索和事件分析。侧重于公众感受构建该事件的全景脉络。
 stage1:
   mode: async
   checkpoint:
@@ -44,7 +44,7 @@ stage3:
   max_iterations: 10
   chapter_review_max_rounds: 10
 runtime:
-  concurrent_num: 60
+  concurrent_num: 3
   max_retries: 3
   wait_time: 8
 llm:

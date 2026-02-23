@@ -5,7 +5,7 @@ import json
 
 from nodes.base import MonitoredNode
 
-from utils.call_llm import call_glm_45_air, call_glm46
+from utils.call_llm import call_glm46
 from utils.llm_modes import llm_request_timeout, reasoning_enabled_stage2
 from utils.trace_manager import build_lite_confidence, set_insight_provenance
 
@@ -117,8 +117,8 @@ class LLMInsightNode(MonitoredNode):
             )
             if is_recoverable_error:
                 print(f"[LLMInsight] GLM-4.6调用失败: {error_msg}")
-                print(f"[LLMInsight] 回退到GLM-4.5-air模型...")
-                response = call_glm_45_air(prompt, temperature=0.7, timeout=120)
+                print(f"[LLMInsight] 降级: 关闭推理模式重新调用GLM-4.6模型...")
+                response = call_glm46(prompt, temperature=0.7, enable_reasoning=False, timeout=120)
             else:
                 raise
 

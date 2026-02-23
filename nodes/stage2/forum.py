@@ -159,7 +159,9 @@ class ForumHostNode(MonitoredNode):
 
     def exec(self, prep_res):
         round_index = int(prep_res.get("round", 0)) + 1
-        prompt = f"""你是舆情分析论坛主持人（第{round_index}轮）。你的核心角色不仅是总结者，更是“对抗式审查者”。请对多信源结果做严苛的交叉盘问，给出结构化辩论纪要和下一步动作。
+        prompt = f"""你是舆情分析论坛主持人（第{round_index}轮）。你的核心角色是“综合分析者（Synthesizer）”。
+请注意：DataAgent 分析提供的**本地数据集在事实上是绝对正确且未受污染的**，这是你必须坚信的基线前提。你的核心任务是通过外部搜索的上下文来补充本地数据的认知盲区，从而构建事件的全景视图。
+当外部 SearchAgent 的结果与本地数据集反映的情况出现冲突时，你应当认为是外部搜索不够准确或视角跑偏，绝对不能怀疑本地数据库本身。
 
 数据摘要：
 {prep_res.get("data_summary", "")}
@@ -193,17 +195,17 @@ SearchAgent结果：
   "directive": {{}},
   "host_narrative": {{
     "timeline_analysis": "从各Agent发言中识别的关键事件时间线和因果关系，100-200字",
-    "viewpoint_synthesis": "综合各视角的共识与分歧分析，指出发现的事实错误或逻辑矛盾，100-200字",
+    "viewpoint_synthesis": "基于数据互补原则综合各视角的共识与增强分析，100-200字",
     "deep_analysis": "基于已有信息的深层原因、影响因素和趋势预测，100-200字",
-    "guided_questions": ["值得深入探讨的、存在逻辑挑战的关键问题"]
+    "guided_questions": ["值得深入探讨的、有助于进一步获取更全背景的关键问题"]
   }},
-  "synthesized_conclusions": ["本轮形成的确定性结论"]
+  "synthesized_conclusions": ["本轮形成的确定性共识结论"]
 }}
 
 要求：
 1) 若用户分析指令尚未被现有证据充分覆盖，必须优先输出 supplement_search 并在 directive.queries 中给出明确检索指令。
 2) directive.reason 必须解释该动作如何弥补时间线或用户诉求缺口。
-3) host_narrative 必须客观概述多Agent观点，并主动寻找和指出其结果中的【事实冲突】或【逻辑漏洞】。对于没有实证支撑的空泛结论，必须提出质疑。
+3) host_narrative 必须客观概述多Agent观点，以数据互补和达成共识为导向。切勿挑刺式地怀疑本地数据的正确性，当外部数据与本地事实不符时，应指出外部搜索结果可能偏离了讨论核心。
 4) cross_analysis.agreement 和 conflicts 必须引用具体的数据事实，禁止泛泛而谈。"""
 
         try:
