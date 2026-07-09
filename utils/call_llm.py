@@ -237,16 +237,18 @@ def call_glm46(prompt: str, temperature: float = 0.8,
     ]
 
     params = {
-        "model": "glm-4.7",
+        "model": "glm-4.6",
         "messages": messages,
         "temperature": temperature,
         "stream": False,
         "timeout": timeout,
-        "thinking": {"enabled": False}
     }
 
     if max_tokens:
         params["max_tokens"] = max_tokens
+
+    if enable_reasoning:
+        params["thinking"] = {"enabled": True}
 
     response = client.chat.completions.create(**params)
     return response.choices[0].message.content

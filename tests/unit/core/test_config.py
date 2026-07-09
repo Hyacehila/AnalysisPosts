@@ -417,6 +417,24 @@ def test_config_to_shared_contains_required_keys(monkeypatch):
     }
 
 
+def test_config_to_shared_keeps_explicit_start_stage_when_enhanced_data_exists(monkeypatch):
+    monkeypatch.setattr("config.os.path.exists", lambda _path: True)
+    config = AppConfig(
+        data=DataConfig(
+            output_path="data/enhanced_posts.json",
+            resume_if_exists=True,
+        ),
+        pipeline=PipelineConfig(start_stage=1),
+    )
+
+    shared = config_to_shared(config)
+
+    assert shared["pipeline_state"]["start_stage"] == 1
+    assert shared["config"]["pipeline"]["start_stage"] == 1
+    assert shared["config"]["data_source"]["type"] == "original"
+    assert shared["config"]["data_source"]["resume_if_exists"] is True
+
+
 def test_config_to_shared_contains_user_analysis_instruction():
     config = AppConfig(
         pipeline=PipelineConfig(

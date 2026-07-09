@@ -120,6 +120,13 @@ def _build_reference_context(shared: Dict[str, Any]) -> str:
 
 
 _PLACEHOLDER_KEYWORDS = (
+    "\u8bae\u9898",
+    "\u4e3b\u9898",
+    "\u8ba8\u8bba\u7126\u70b9",
+    "\u6765\u6e90",
+    "\u5a92\u4f53",
+    "\u5730\u533a",
+    "\u5173\u952e\u4e8b\u4ef6",
     "主题",
     "讨论焦点",
     "媒体",

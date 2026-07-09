@@ -34,6 +34,8 @@
    - Evidence policy: each narrative paragraph must include inline evidence citations (`[E1]`, `[E2]`), with appendix index used for audit traceability.
    - Layout policy: SWOT/PEST blocks are outline-authorized components with exclusivity (max one SWOT chapter + max one PEST chapter, never same chapter).
 4. **Pipeline Entry**: `pipeline.start_stage` 仅支持 `1/2/3`，从指定阶段进入后按线性主链顺序执行到结束。
+   - `config.yaml` is the local system source of truth; saved local API keys and run paths are treated as workstation configuration.
+   - `pipeline.start_stage` is never auto-rewritten by existing enhanced data. `data.resume_if_exists` only lets Stage1 reuse a matching enhanced dataset after Stage1 has been explicitly selected.
    - E2E 可观测性：循环状态统一写入 `trace.loop_status`，关键字段包括 `forum` 与 `stage3_chapter_review`。
    - Stage2 Forum 会沉淀 `forum.debate_logs`，并在合并节点写入 `stage2_results.search_context.forum_debate_logs` 供 Stage3 叙事引用。
 5. **Dashboard (Streamlit)**: Provide configuration, progress monitor, results viewer, report preview. DataFrame 等全宽展示统一使用 `width="stretch"`（内容宽度用 `width="content"`）。

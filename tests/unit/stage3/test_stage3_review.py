@@ -4,7 +4,7 @@ ReviewChaptersNode unit tests.
 from unittest.mock import patch
 
 from nodes import ReviewChaptersNode
-from nodes.stage3.review import _blocks_to_text
+from nodes.stage3.review import _blocks_to_text, _find_placeholder
 
 
 def _shared_for_review(round_no=0, max_rounds=2):
@@ -80,6 +80,11 @@ def test_blocks_to_text_engine_quote():
     assert "Insight Agent" in result
     assert "观点内容" in result
 
+
+
+def test_find_placeholder_detects_chinese_issue_token():
+    text = "\u6838\u5fc3\u89c2\u70b9\uff1a[\u8bae\u9898A] \u7ee7\u7eed\u53d1\u9175\u3002"
+    assert _find_placeholder(text) == "\u8bae\u9898A"
 
 @patch("nodes.stage3.review.call_glm46")
 def test_review_needs_revision_when_model_flags_revision(mock_llm):

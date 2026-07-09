@@ -287,6 +287,10 @@ post_async(shared, prep_res, exec_res) → 将结果批量写回 shared
 | `"original"` | 加载原始博文 + 5 个参考数据文件 |
 | `"enhanced"` | 直接加载已增强的博文数据 |
 
+#### Pipeline entry and resume boundary
+
+`pipeline.start_stage` in `config.yaml` is the explicit pipeline entry and is not auto-advanced when `data.resume_if_exists` is true or when `data.output_path` already exists. Resume only applies after Stage1 is selected and `DataLoadNode` is running in `original` mode.
+
 #### 断点续传逻辑（`original` 模式）
 
 当 `data.resume_if_exists == True`（默认）且增强数据文件已存在时：
